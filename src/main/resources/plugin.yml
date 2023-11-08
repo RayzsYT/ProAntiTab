@@ -1,0 +1,11 @@
+name: ProAntiTab
+description: A simple strucutured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.
+
+author: Rayzs_YT
+version: 1.2.2
+api-version: 1.13
+main: de.rayzs.pat.plugin.BukkitLoader
+
+commands:
+  proantitab:
+    aliases: [pat]

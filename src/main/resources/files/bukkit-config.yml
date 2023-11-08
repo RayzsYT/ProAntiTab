@@ -1,0 +1,47 @@
+updater:
+  enabled: true
+  period: 18000
+settings:
+  help:
+    - '&7Available commands are: &f/%label%&7...  [&eBUKKIT&7]'
+    - '&f  reload &7to reload the plugin'
+    - '&f  list &7to see all blacklisted commands'
+    - '&f  add/remove (command) &7to manage the blacklist'
+    - '&f  notify &7to get alerted'
+    - '&f  clear &7to clear the blacklist'
+  no-permissions: '&cYou are not allowed to execute this command! Missing permission: &4%permission%'
+  unknown-command: "&cFailed to execute this command! Use '/pat' to see all available commands."
+  reload:
+    loading: '&eReloading all configuration files...'
+    done: '&aSuccessfully reloaded all configuration files!'
+  cancel-blocked-commands:
+    enabled: true
+    message: '&cThe command ''%command%'' is blocked!'
+  notification:
+    enabled: '&aEnabled notifications!'
+    disabled: '&cDisabled notifications!'
+    alert: '&8[&4ALERT&8] &c%player% tried to execute the following blocked command: &4%command%'
+  blacklist:
+    commands:
+      - help
+      - '?'
+      - about
+      - ver
+      - version
+      - icanhasbukkit
+      - pl
+      - plugins
+    add:
+      success: '&aSuccessfully added %command% into blocked-commands list!'
+      fail: '&c%command% is already in the list!'
+      failed: '&c%command% is already in the list!'
+    remove:
+      success: '&aSuccessfully removed %command% from blocked-commands list!'
+      fail: '&c%command% is not listed!'
+      failed: '&c%command% is not listed!'
+    clear:
+      message: '&aList of blacklisted commands has been cleared!'
+    list:
+      message: '&7Blocked commands (&f%size%&7)&8: &f%commands%'
+      splitter: '&7, '
+      command: '&f'
