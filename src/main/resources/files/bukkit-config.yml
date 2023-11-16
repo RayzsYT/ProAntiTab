@@ -5,10 +5,10 @@ settings:
   help:
     - '&7Available commands are: &f/%label%&7...  [&eBUKKIT&7]'
     - '&f  reload &7to reload the plugin'
-    - '&f  list &7to see all blacklisted commands'
-    - '&f  add/remove (command) &7to manage the blacklist'
+    - '&f  list &7to see all listed commands'
+    - '&f  add/remove (command) &7to manage the list'
     - '&f  notify &7to get alerted'
-    - '&f  clear &7to clear the blacklist'
+    - '&f  clear &7to clear the list'
   no-permissions: '&cYou are not allowed to execute this command! Missing permission: &4%permission%'
   unknown-command: "&cFailed to execute this command! Use '/pat' to see all available commands."
   reload:
@@ -22,6 +22,8 @@ settings:
     disabled: '&cDisabled notifications!'
     alert: '&8[&4ALERT&8] &c%player% tried to execute the following blocked command: &4%command%'
   blacklist:
+    turn-blacklist-to-whitelist:
+      enabled: false
     commands:
       - help
       - '?'
