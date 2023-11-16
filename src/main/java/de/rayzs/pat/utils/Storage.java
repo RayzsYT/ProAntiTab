@@ -9,7 +9,7 @@ public class Storage {
     public static ArrayList<String> BLOCKED_COMMANDS_LIST, COMMAND_HELP = new ArrayList<>();
     public static List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
     public static String NOTIFY_ALERT, NOTIFY_ENABLED, NOTIFY_DISABLED, CANCEL_COMMANDS_MESSAGE, COMMAND_UNKNOWN, NO_PERMISSIONS, RELOAD_LOADING, RELOAD_DONE, BLACKLIST_CLEAR_MESSAGE, BLACKLIST_LIST_COMMAND_MESSAGE, BLACKLIST_ADD_MESSAGE, BLACKLIST_ADD_FAIL_MESSAGE, BLACKLIST_REMOVE_MESSAGE, BLACKLIST_REMOVE_FAIL_MESSAGE, BLACKLIST_LIST_MESSAGE, BLACKLIST_LIST_SPLITTER_MESSAGE;
-    public static boolean CANCEL_COMMANDS, UPDATE_ENABLED, OUTDATED_VERSION = false, CONSOLE_NOTIFICATION_ENABLED = true;
+    public static boolean TURN_BLACKLIST_TO_WHITELIST, CANCEL_COMMANDS, UPDATE_ENABLED, OUTDATED_VERSION = false, CONSOLE_NOTIFICATION_ENABLED = true;
     public static int UPDATE_PERIOD;
 
     public static void load() {
@@ -21,10 +21,10 @@ public class Storage {
         defaultBlockedCommandArray.addAll(Arrays.asList("help", "?", "about", "ver", "version", "icanhasbukkit", "pl", "plugins"));
         defaultHelpArray.add("&7Available commands are: &f/%label%&7...");
         defaultHelpArray.add("&f  reload &7to reload the plugin");
-        defaultHelpArray.add("&f  list &7to see all blacklisted commands");
-        defaultHelpArray.add("&f  add/remove (command) &7to manage the blacklist");
+        defaultHelpArray.add("&f  list &7to see all listed commands");
+        defaultHelpArray.add("&f  add/remove (command) &7to manage the list");
         defaultHelpArray.add("&f  notify &7to get alerted");
-        defaultHelpArray.add("&f  clear &7to clear the blacklist");
+        defaultHelpArray.add("&f  clear &7to clear the list");
 
         UPDATE_ENABLED = (boolean) CONFIGURATION.getOrSet("updater.enabled", true);
         UPDATE_PERIOD = (int) CONFIGURATION.getOrSet("updater.period", 18000);
@@ -40,6 +40,7 @@ public class Storage {
         CANCEL_COMMANDS = (boolean) CONFIGURATION.getOrSet("settings.cancel-blocked-commands.enabled", true);
         CANCEL_COMMANDS_MESSAGE = (String) CONFIGURATION.getOrSet("settings.cancel-blocked-commands.message", "&cThe command '%command%' is blocked!");
 
+        TURN_BLACKLIST_TO_WHITELIST = (boolean) CONFIGURATION.getOrSet("settings.blacklist.turn-blacklist-to-whitelist.enabled", false);
         BLACKLIST_CLEAR_MESSAGE = (String) CONFIGURATION.getOrSet("settings.blacklist.clear.message", "&aList of blacklisted commands has been cleared!");
         BLACKLIST_LIST_MESSAGE = (String) CONFIGURATION.getOrSet("settings.blacklist.list.message", "&7Blocked commands (&f%size%&7)&8: &f%commands%");
         BLACKLIST_LIST_SPLITTER_MESSAGE = (String) CONFIGURATION.getOrSet("settings.blacklist.list.splitter", "&7, ");
@@ -65,6 +66,7 @@ public class Storage {
                 .set("settings.help", COMMAND_HELP)
                 .set("settings.cancel-blocked-commands.enabled", CANCEL_COMMANDS)
                 .set("settings.cancel-blocked-commands.message", CANCEL_COMMANDS_MESSAGE)
+                .set("settings.blacklist.turn-blacklist-to-whitelist.enabled", TURN_BLACKLIST_TO_WHITELIST)
                 .set("settings.blacklist.commands", BLOCKED_COMMANDS_LIST)
                 .set("settings.blacklist.clear.message", BLACKLIST_CLEAR_MESSAGE)
                 .set("settings.blacklist.add.success", BLACKLIST_ADD_MESSAGE)
@@ -80,6 +82,14 @@ public class Storage {
     public static boolean isCommandBlocked(String command) {
         if(command.contains(" ")) command = command.split(" ")[0];
         if(command.contains(":")) command = command.split(":")[1];
+        for (String blockedCommand : BLOCKED_COMMANDS_LIST) {
+            if(blockedCommand.equals(command.toLowerCase())) return true;
+        }
+        return false;
+    }
+
+    public static boolean isCommandBlockedPrecise(String command) {
+        if(command.contains(" ")) command = command.split(" ")[0];
         for (String blockedCommand : BLOCKED_COMMANDS_LIST) {
             if(blockedCommand.equals(command.toLowerCase())) return true;
         }
