@@ -20,6 +20,18 @@ public class BungeeBlockCommandListener implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) connection;
         String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", "").toLowerCase();
+
+        if(rawCommand.equals("/")) return;
+
+        if((Storage.TURN_BLACKLIST_TO_WHITELIST)) {
+            if(Storage.isCommandBlockedPrecise(command)) return;
+            if(PermissionUtil.hasBypassPermission(player, command)) return;
+
+            player.sendMessage(Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));
+            event.setCancelled(true);
+            return;
+        }
+
         if(command.contains(":")) command = command.split(":")[1];
 
         if(!Storage.isCommandBlocked(command) || PermissionUtil.hasBypassPermission(player, command)) return;

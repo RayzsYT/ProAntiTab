@@ -52,6 +52,15 @@ public class BungeeAntiTabListener implements Listener {
             String command = dummy.get(i), tempName = command;
 
             if (tempName.startsWith("/")) tempName = tempName.replaceFirst("/", "");
+
+            if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
+                if(Storage.isCommandBlockedPrecise(tempName) && !event.getSuggestions().contains(command))
+                    event.getSuggestions().add(command);
+                else if(!Storage.isCommandBlockedPrecise(tempName) && !PermissionUtil.hasPermissionWithResponse(player, tempName))
+                    event.getSuggestions().remove(command);
+                continue;
+            }
+
             if (tempName.contains(":")) tempName = tempName.split(":")[1];
 
             if (!Storage.isCommandBlocked(tempName)) continue;
