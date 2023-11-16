@@ -6,7 +6,7 @@
 
     <groupId>de.rayzs.pat</groupId>
     <artifactId>ProAntiTab</artifactId>
-    <version>1.2.2</version>
+    <version>1.3.0</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
