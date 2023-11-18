@@ -80,8 +80,16 @@ public class Storage {
     }
 
     public static boolean isCommandBlocked(String command) {
-        if(command.contains(" ")) command = command.split(" ")[0];
-        if(command.contains(":")) command = command.split(":")[1];
+        String[] split;
+        if(command.contains(" ")) {
+            split = command.split(" ");
+            if(split.length > 0) command = split[0];
+            command = command.split(" ")[0];
+        }
+        if(command.contains(":")) {
+            split = command.split(":");
+            if(split.length > 0) command = split[1];
+        }
         for (String blockedCommand : BLOCKED_COMMANDS_LIST) {
             if(blockedCommand.equals(command.toLowerCase())) return true;
         }
@@ -89,7 +97,12 @@ public class Storage {
     }
 
     public static boolean isCommandBlockedPrecise(String command) {
-        if(command.contains(" ")) command = command.split(" ")[0];
+        String[] split;
+        if(command.contains(" ")) {
+            split = command.split(" ");
+            if(split.length > 0) command = split[0];
+            command = command.split(" ")[0];
+        }
         for (String blockedCommand : BLOCKED_COMMANDS_LIST) {
             if(blockedCommand.equals(command.toLowerCase())) return true;
         }
