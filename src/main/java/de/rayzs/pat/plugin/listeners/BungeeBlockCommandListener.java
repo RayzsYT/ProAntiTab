@@ -32,7 +32,10 @@ public class BungeeBlockCommandListener implements Listener {
             return;
         }
 
-        if(command.contains(":")) command = command.split(":")[1];
+        if (command.contains(":")) {
+            String[] commandSplit = command.split(":");
+            if(commandSplit.length > 1) command = commandSplit[1];
+        }
 
         if(!Storage.isCommandBlocked(command) || PermissionUtil.hasBypassPermission(player, command)) return;
         player.sendMessage(Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));

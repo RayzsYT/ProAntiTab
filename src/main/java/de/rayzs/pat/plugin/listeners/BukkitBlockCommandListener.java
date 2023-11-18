@@ -28,7 +28,10 @@ public class BukkitBlockCommandListener implements Listener {
             return;
         }
 
-        if (command.contains(":")) command = command.split(":")[1];
+        if (command.contains(":")) {
+            String[] commandSplit = command.split(":");
+            if(commandSplit.length > 1) command = commandSplit[1];
+        }
 
         if (!Storage.isCommandBlocked(commandLowerCased)) return;
         if (PermissionUtil.hasBypassPermission(player, command)) return;

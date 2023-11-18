@@ -6,6 +6,9 @@ import de.rayzs.pat.utils.*;
 import org.bukkit.event.*;
 import org.bukkit.Bukkit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BukkitAntiTabListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
@@ -13,35 +16,29 @@ public class BukkitAntiTabListener implements Listener {
         Player player = event.getPlayer();
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        for (int i = 0; i < event.getCommands().size(); i++) {
-            String command = (String) event.getCommands().toArray()[i], tempName = command;
+        List<String> dummy = new ArrayList<>(event.getCommands()),
+                commands = new ArrayList<>();
+        for (int i = 0; i < dummy.size(); i++) {
+            String command = dummy.get(i), tempName = command;
 
             if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
-                if(!PermissionUtil.hasBypassPermission(player, tempName)) {
-                    if(Storage.isCommandBlockedPrecise(tempName)) {
-                        event.getCommands().add(command);
-                        if (!event.getCommands().contains(tempName)) event.getCommands().add(tempName);
-                    } else {
-                        event.getCommands().remove(command);
-                        if(event.getCommands().contains(tempName)) event.getCommands().remove(tempName);
-                    }
-                }
-
+                if(!PermissionUtil.hasBypassPermission(player, tempName) && Storage.isCommandBlockedPrecise(tempName))
+                    commands.add(command);
                 continue;
             }
 
             if (tempName.contains(":")) tempName = tempName.split(":")[1];
 
             if (Storage.isCommandBlocked(tempName)) {
-                if(PermissionUtil.hasBypassPermission(player, tempName)) {
-                    event.getCommands().add(command);
-                    if(!event.getCommands().contains(tempName)) event.getCommands().add(tempName);
-                }
-                else {
-                    event.getCommands().remove(command);
-                    if(event.getCommands().contains(tempName)) event.getCommands().remove(tempName);
-                }
+                if(PermissionUtil.hasBypassPermission(player, tempName)) continue;
+                event.getCommands().remove(command);
+                if(event.getCommands().contains(tempName)) event.getCommands().remove(tempName);
             }
+        }
+
+        if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
+            event.getCommands().clear();
+            event.getCommands().addAll(commands);
         }
     }
 
