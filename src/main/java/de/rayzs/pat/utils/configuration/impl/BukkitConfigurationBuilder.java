@@ -5,6 +5,7 @@ import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.ChatColor;
 import java.io.File;
+import java.util.Collection;
 
 public class BukkitConfigurationBuilder implements ConfigurationBuilder {
 
@@ -106,6 +107,11 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
             return ChatColor.translateAlternateColorCodes('&', objString);
         }
         return object;
+    }
+
+    @Override
+    public Collection<String> getKeys(boolean deep) {
+        return this.configuration.getKeys(deep);
     }
 
     @Override

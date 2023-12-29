@@ -1,6 +1,7 @@
 package de.rayzs.pat.utils.configuration;
 
 import java.io.File;
+import java.util.Collection;
 
 public interface ConfigurationBuilder {
     void reload();
@@ -14,6 +15,7 @@ public interface ConfigurationBuilder {
     Object getOrSet(String target, Object object);
     Object get(String target);
     Object get(String path, String target);
+    Collection<String> getKeys(boolean deep);
     File getFile();
     boolean loadDefault();
 }

@@ -5,6 +5,7 @@ import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.config.*;
 import java.io.File;
+import java.util.Collection;
 
 public class BungeeConfigurationBuilder implements ConfigurationBuilder {
 
@@ -114,6 +115,11 @@ public class BungeeConfigurationBuilder implements ConfigurationBuilder {
             return ChatColor.translateAlternateColorCodes('&', objString);
         }
         return object;
+    }
+
+    @Override
+    public Collection<String> getKeys(boolean deep) {
+        return this.configuration.getKeys();
     }
 
     @Override
