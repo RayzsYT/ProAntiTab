@@ -1,5 +1,7 @@
 package de.rayzs.pat.utils;
 
+import de.rayzs.pat.utils.group.GroupManager;
+
 public class PermissionUtil {
 
     public static boolean hasPermission(Object targetObj, String permission) {
@@ -16,7 +18,9 @@ public class PermissionUtil {
     }
 
     public static boolean hasBypassPermission(Object targetObj, String command) {
-        return hasBypassPermission(targetObj) || hasPermission(targetObj, "bypass." + command.toLowerCase());
+        return hasBypassPermission(targetObj)
+                || hasPermission(targetObj, "bypass." + command.toLowerCase())
+                || GroupManager.canAccessCommand(targetObj, command);
     }
 
     public static boolean hasPermissionWithResponse(Object targetObj, String command) {
