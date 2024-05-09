@@ -1,0 +1,13 @@
+commands:
+  - help
+  - '?'
+  - about
+  - ver
+  - version
+  - icanhasbukkit
+  - pl
+  - plugins
+
+examplegroup:
+  - help
+  - '?'

@@ -1,0 +1,3 @@
+- Message when Bungeecord is enabled (use bpat instead...)
+- Customizable updater-notification message
+- Add Velocity Support
