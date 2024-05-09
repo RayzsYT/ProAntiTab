@@ -55,7 +55,7 @@ public class Storage {
             UNKNOWN_COMMAND = (ArrayList<String>) CONFIGURATION.getOrSet("custom-unknown-command.message", defaultUnknownCommandArray);
         }
 
-        TOKEN =  (String) CONFIGURATION.getOrSet(Reflection.isProxyServer() ? "token" : "handle-through-bungeecord.token", Reflection.isProxyServer() ? TOKEN : "insert-token-of-bungeecord-here");
+        TOKEN =  (String) CONFIGURATION.getOrSet(Reflection.isProxyServer() && !Reflection.isVelocityServer() ? "token" : "handle-through-bungeecord.token", Reflection.isProxyServer() ? TOKEN : "insert-token-of-bungeecord-here");
 
         NOTIFY_ENABLED = (String) CONFIGURATION.getOrSet("notification.enabled", "&aEnabled notifications!");
         NOTIFY_DISABLED = (String) CONFIGURATION.getOrSet("notification.disabled", "&cDisabled notifications!");

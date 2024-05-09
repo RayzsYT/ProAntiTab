@@ -73,4 +73,8 @@ public class Configurator {
             throwable.printStackTrace();
         }
     }
+
+    public static void createResourcedFile(String dataFolder, String resourcePath, String exportRessourcePath, boolean replace) {
+        createResourcedFile(new File(dataFolder), resourcePath, exportRessourcePath, replace);
+    }
 }

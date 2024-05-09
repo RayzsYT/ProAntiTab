@@ -1,5 +1,3 @@
-token:
-
 updater:
   enabled: true
   period: 18000

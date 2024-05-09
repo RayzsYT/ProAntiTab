@@ -21,6 +21,7 @@ import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.utils.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
+import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
@@ -50,6 +51,10 @@ public class VelocityLoader {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         Reflection.initialize(server);
+
+        Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\velocity-config.yml", "config.yml", false);
+        Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\velocity-storage.yml", "storage.yml", false);
+
         Storage.load();
         GroupManager.initialize();
 
