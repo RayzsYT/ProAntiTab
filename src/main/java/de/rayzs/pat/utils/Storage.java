@@ -14,7 +14,8 @@ public class Storage {
     public static boolean BUNGEECORD = false, USE_UNKNOWN_COMMAND, TURN_BLACKLIST_TO_WHITELIST, CANCEL_COMMANDS, UPDATE_ENABLED, OUTDATED_VERSION = false, CONSOLE_NOTIFICATION_ENABLED = true;
     public static int UPDATE_PERIOD;
 
-    public static void load() {
+    public static void
+    load() {
         STORAGE.reload();
         CONFIGURATION.reload();
 
