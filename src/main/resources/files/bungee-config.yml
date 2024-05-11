@@ -9,7 +9,7 @@ updater:
 
 turn-blacklist-to-whitelist: false
 no-permissions: '&cYou are not allowed to execute this command! Missing permission: &4proantitab.%permission%'
-command-failed: '&cFailed to execute this command! Use '/bpat' to see all available commands.'
+command-failed: '&cFailed to execute this command! Use "/bpat" to see all available commands.'
 
 notification:
   enabled: '&aEnabled notifications!'
