@@ -34,7 +34,12 @@ public class ExpireCache<T, K> {
 
     public K get(T t) {
         Object result = cache.getIfPresent(t);;
-        return result == null ? null : (K) cache.getIfPresent(t);
+        return result == null ? null : (K) result;
+    }
+
+    public K getOrDefault(T t, K k) {
+        Object result = cache.getIfPresent(t);;
+        return result == null ? k : (K) result;
     }
 
     public int getSize() {
