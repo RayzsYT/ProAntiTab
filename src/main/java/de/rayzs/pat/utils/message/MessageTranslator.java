@@ -39,8 +39,7 @@ public class MessageTranslator {
 
         support =  Reflection.getMinor() == 16 && Reflection.getRelease() == 5
                 || Reflection.getMinor() >= 17
-                || Reflection.isVelocityServer()
-                || Reflection.getVersionName().contains("Paper");
+                || Reflection.isProxyServer();
 
         if(support)
             translator = Reflection.isVelocityServer() ? new VelocityMessageTranslator()

@@ -20,6 +20,7 @@ public class BungeeMessageTranslator implements Translator {
 
     @Override
     public void send(Object target, String text) {
+        System.out.println("Penis");
         Audience audience = target instanceof ProxiedPlayer ? audiences.player((ProxiedPlayer) target) : audiences.sender((CommandSender) target);
         audience.sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
     }

@@ -156,7 +156,7 @@
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-minimessage</artifactId>
             <version>4.15.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
