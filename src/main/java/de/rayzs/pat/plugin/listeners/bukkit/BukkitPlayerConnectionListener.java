@@ -6,6 +6,7 @@ import de.rayzs.pat.plugin.netty.PacketAnalyzer;
 import de.rayzs.pat.utils.PermissionUtil;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.event.player.*;
 import org.bukkit.entity.Player;
@@ -22,7 +23,7 @@ public class BukkitPlayerConnectionListener implements Listener {
         if(!Storage.BUNGEECORD && Storage.OUTDATED_VERSION && (PermissionUtil.hasPermission(player, "update"))) {
             Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
                 if(player.isOnline()) {
-                    Storage.UPDATE_NOTIFICATION.forEach(message -> player.sendMessage(message.replace("&", "§")));
+                    Storage.UPDATE_NOTIFICATION.forEach(message -> MessageTranslator.send(player, message.replace("&", "§")));
                 }
             }, 20);
         }

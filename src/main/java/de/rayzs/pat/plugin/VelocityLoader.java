@@ -1,14 +1,10 @@
 package de.rayzs.pat.plugin;
 
 import com.google.inject.Inject;
-import com.mojang.brigadier.tree.RootCommandNode;
-import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.commands.VelocityCommand;
@@ -18,12 +14,12 @@ import de.rayzs.pat.plugin.listeners.velocity.VelocityConnectionListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import de.rayzs.pat.utils.ConnectionBuilder;
-import de.rayzs.pat.utils.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import de.rayzs.pat.utils.message.translators.VelocityMessageTranslator;
 
 import java.util.concurrent.TimeUnit;
 
@@ -74,7 +70,7 @@ public class VelocityLoader {
         task = server.getScheduler().buildTask(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
-            if (!result.equals("1.5.3")) {
+            if (!result.equals("1.5.4")) {
 
                 if (result.equals("unknown")) {
                     Logger.warning("Failed reaching web host! (firewall enabled? website down?)");
@@ -82,7 +78,7 @@ public class VelocityLoader {
                     Logger.warning("Failed creating web instance! (outdated java version?)");
                 } else {
                     Storage.OUTDATED_VERSION = true;
-                    Storage.UPDATE_NOTIFICATION.forEach(message -> server.getConsoleCommandSource().sendMessage(MiniMessage.miniMessage().deserialize(MessageTranslator.translate(message.replace("&", "§")))));
+                    Storage.UPDATE_NOTIFICATION.forEach(message -> MessageTranslator.send(server.getConsoleCommandSource(), message));
                 }
             }
         }).delay(1, TimeUnit.SECONDS).repeat(Storage.UPDATE_PERIOD, TimeUnit.SECONDS).schedule();

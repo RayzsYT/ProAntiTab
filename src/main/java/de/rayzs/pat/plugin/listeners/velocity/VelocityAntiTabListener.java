@@ -1,6 +1,5 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
-import com.mojang.brigadier.tree.RootCommandNode;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
@@ -9,8 +8,6 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.rayzs.pat.utils.PermissionUtil;
 import de.rayzs.pat.utils.Storage;
-
-import java.util.HashMap;
 
 public class VelocityAntiTabListener {
 
@@ -51,7 +48,7 @@ public class VelocityAntiTabListener {
     }
 
     public static void updateCommands() {
-        /*
+        /* Different solution required
         for (Player player : server.getAllPlayers()) {
             RootCommandNode<?> rootCommandNode = PLAYER_ROOT_NODES.get(player);
             if(rootCommandNode == null) return;

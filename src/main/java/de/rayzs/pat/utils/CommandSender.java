@@ -1,8 +1,7 @@
 package de.rayzs.pat.utils;
 
 import com.velocitypowered.api.command.CommandSource;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.connection.*;
 import org.bukkit.entity.Player;
 
@@ -40,9 +39,9 @@ public class CommandSender {
     }
 
     public void sendMessage(String text) {
-        if(Reflection.isVelocityServer()) ((CommandSource) sender).sendMessage(MiniMessage.miniMessage().deserialize(MessageTranslator.translate(text)));
+        if(Reflection.isVelocityServer()) MessageTranslator.send(sender, text);
         else if(Reflection.isProxyServer()) ((net.md_5.bungee.api.CommandSender) sender).sendMessage(text);
-        else ((org.bukkit.command.CommandSender) sender).sendMessage(text);
+        else MessageTranslator.send(sender, text);
     }
 
     public UUID getUniqueId() {

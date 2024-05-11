@@ -2,6 +2,7 @@
 
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -22,7 +23,7 @@ public class BukkitBlockCommandListener implements Listener {
             String targetCommand = rawCommand.contains(" ") ? rawCommand.split(" ")[0] : rawCommand;
             HelpTopic helpTopic = Bukkit.getHelpMap().getHelpTopic(targetCommand);
             if(helpTopic == null) {
-                for (String line : Storage.UNKNOWN_COMMAND) player.sendMessage(line.replace("&", "§"));
+                for (String line : Storage.UNKNOWN_COMMAND) MessageTranslator.send(player, line.replace("&", "§"));
                 event.setCancelled(true);
                 return;
             }
@@ -33,7 +34,7 @@ public class BukkitBlockCommandListener implements Listener {
         if((Storage.TURN_BLACKLIST_TO_WHITELIST)) {
             if(Storage.isCommandBlockedPrecise(command)) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
-            player.sendMessage(Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));
+            MessageTranslator.send(player, Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));
             event.setCancelled(true);
             return;
         }
@@ -46,13 +47,13 @@ public class BukkitBlockCommandListener implements Listener {
         if (!Storage.isCommandBlocked(commandLowerCased)) return;
         if (PermissionUtil.hasBypassPermission(player, command)) return;
 
-        player.sendMessage(Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));
+        MessageTranslator.send(player, Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));
 
         final World world = player.getWorld();
         final String worldName = world.getName(), alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%world%", worldName);
         Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-            Player notifier = Bukkit.getServer().getPlayer(uuid);
-            notifier.sendMessage(alertMessage);
+            Player target = Bukkit.getServer().getPlayer(uuid);
+            MessageTranslator.send(target, alertMessage);
         });
         if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
         event.setCancelled(true);
