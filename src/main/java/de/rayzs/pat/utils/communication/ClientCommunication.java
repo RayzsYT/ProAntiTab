@@ -44,7 +44,7 @@ public class ClientCommunication {
     }
 
     public static void sendRequest() {
-        sendInformation("request::" + Storage.TOKEN);
+        sendInformation("request::" + Storage.TOKEN_KEY);
     }
 
     public static Client getClient() {
