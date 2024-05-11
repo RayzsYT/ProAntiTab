@@ -62,9 +62,7 @@ public class Storage {
                 TOKEN_KEY = (String) CONFIGURATION.get("token");
                 TOKEN.setAndSave("token", TOKEN_KEY);
             } else TOKEN_KEY = (String) TOKEN.getOrSet("token", TOKEN_KEY);
-        }
-
-        TOKEN_KEY =  (String) CONFIGURATION.getOrSet(Reflection.isProxyServer() && !Reflection.isVelocityServer() ? "token" : "handle-through-bungeecord.token", Reflection.isProxyServer() ? TOKEN : "insert-token-of-bungeecord-here");
+        } else if(!Reflection.isProxyServer()) TOKEN_KEY = (String) CONFIGURATION.getOrSet("handle-through-bungeecord.token", "insert-token-of-bungeecord-here");
 
         NOTIFY_ENABLED = (String) CONFIGURATION.getOrSet("notification.enabled", "&aEnabled notifications!");
         NOTIFY_DISABLED = (String) CONFIGURATION.getOrSet("notification.disabled", "&cDisabled notifications!");
@@ -152,7 +150,7 @@ public class Storage {
             CONFIGURATION.set("custom-unknown-command.enabled", USE_UNKNOWN_COMMAND)
                     .set("custom-unknown-command.message", UNKNOWN_COMMAND)
                     .set("handle-through-bungeecord.enabled", BUNGEECORD)
-                    .set("handle-through-bungeecord.token", TOKEN)
+                    .set("handle-through-bungeecord.token", TOKEN_KEY)
                     .set("handle-through-bungeecord.message", BUNGEECORD_MESSAGE);
         }
 
