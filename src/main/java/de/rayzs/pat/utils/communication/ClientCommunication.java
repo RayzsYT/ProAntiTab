@@ -23,24 +23,24 @@ public class ClientCommunication {
 
         switch (args[0].toLowerCase()) {
             case "request":
-                if(args.length != 2 || !args[1].equals(Storage.TOKEN)) return;
+                if(args.length != 2 || !args[1].equals(Storage.TOKEN_KEY)) return;
                 BungeeLoader.handleIfConnectedToSpigot();
                 synchronizeInformation();
                 break;
             case "receive-commands":
-                if(args.length != 3) return;
-                BukkitLoader.synchronizeCommandData(Boolean.parseBoolean(args[1]), args[2].equals("§") ? new ArrayList<>() : Arrays.asList(args[2].split(";")));
+                if(args.length != 4 || !args[1].equals(Storage.TOKEN_KEY)) return;
+                BukkitLoader.synchronizeCommandData(Boolean.parseBoolean(args[2]), args[3].equals("§") ? new ArrayList<>() : Arrays.asList(args[3].split(";")));
                 break;
             case "receive-groups":
-                if(args.length != 2) return;
-                BukkitLoader.synchronizeGroupData(args[1]);
+                if(args.length != 3 || !args[1].equals(Storage.TOKEN_KEY)) return;
+                BukkitLoader.synchronizeGroupData(args[2]);
                 break;
         }
     }
 
     public static void synchronizeInformation() {
-        sendInformation("receive-commands::" + Storage.TURN_BLACKLIST_TO_WHITELIST + "::" + (DataConverter.convertCommandsToString(Storage.BLOCKED_COMMANDS_LIST)));
-        sendInformation("receive-groups::" + DataConverter.convertGroupsToString());
+        sendInformation("receive-commands::" + Storage.TOKEN_KEY + "::" + Storage.TURN_BLACKLIST_TO_WHITELIST + "::" + (DataConverter.convertCommandsToString(Storage.BLOCKED_COMMANDS_LIST)));
+        sendInformation("receive-groups::" + Storage.TOKEN_KEY + "::" + DataConverter.convertGroupsToString());
     }
 
     public static void sendRequest() {
