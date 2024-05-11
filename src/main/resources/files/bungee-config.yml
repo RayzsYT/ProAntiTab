@@ -4,12 +4,12 @@ updater:
   enabled: true
   period: 18000
   notification:
-    - "&8[&4ProAntiTab&8] &cYou're using an outdated version of this plugin!"
-    - "&8[&4ProAntiTab&8] &cPlease update it on: &ehttps://www.rayzs.de/products/proantitab/page"
+    - '&8[&4ProAntiTab&8] &cYou're using an outdated version of this plugin!'
+    - '&8[&4ProAntiTab&8] &cPlease update it on: &ehttps://www.rayzs.de/products/proantitab/page'
 
 turn-blacklist-to-whitelist: false
 no-permissions: '&cYou are not allowed to execute this command! Missing permission: &4proantitab.%permission%'
-command-failed: "&cFailed to execute this command! Use '/bpat' to see all available commands."
+command-failed: '&cFailed to execute this command! Use '/bpat' to see all available commands.'
 
 notification:
   enabled: '&aEnabled notifications!'
@@ -18,7 +18,7 @@ notification:
 
 cancel-blocked-commands:
   enabled: true
-  message: "&cThe command '%command%' is blocked!"
+  message: '&cThe command "%command%" is blocked!'
 
 reload:
   loading: '&eReloading all configuration files...'
