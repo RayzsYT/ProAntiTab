@@ -3,6 +3,7 @@ package de.rayzs.pat.plugin.listeners.bungee;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.PermissionUtil;
 import de.rayzs.pat.utils.Storage;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.*;
@@ -28,7 +29,7 @@ public class BungeeBlockCommandListener implements Listener {
             if(Storage.isCommandBlockedPrecise(command)) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
 
-            player.sendMessage(Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));
+            MessageTranslator.send(player, Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));
             event.setCancelled(true);
             return;
         }
@@ -39,14 +40,14 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if(!Storage.isCommandBlocked(command) || PermissionUtil.hasBypassPermission(player, command)) return;
-        player.sendMessage(Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));
+        MessageTranslator.send(player, Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", rawCommand.replaceFirst("/", "")));
 
         final ServerInfo serverInfo = player.getServer().getInfo();
         final String serverName = serverInfo != null ? serverInfo.getName() : "unknown",
                 alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%server%", serverName);
         Storage.NOTIFY_PLAYERS.stream().filter(uuid -> ProxyServer.getInstance().getPlayer(uuid) != null).forEach(uuid -> {
-            ProxiedPlayer notifier = ProxyServer.getInstance().getPlayer(uuid);
-            notifier.sendMessage(alertMessage);
+            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uuid);
+            MessageTranslator.send(target, alertMessage);
         });
         if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
         event.setCancelled(true);

@@ -94,7 +94,7 @@ public class BungeeLoader extends Plugin {
                     Logger.warning("Failed creating web instance! (outdated java version?)");
                 } else {
                     Storage.OUTDATED_VERSION = true;
-                    Storage.UPDATE_NOTIFICATION.forEach(message -> Logger.warning(message.replace("&", "§")));
+                    Storage.UPDATE_NOTIFICATION.forEach(Logger::warning);
                 }
             }
         }, 20L, Storage.UPDATE_PERIOD, TimeUnit.MILLISECONDS);

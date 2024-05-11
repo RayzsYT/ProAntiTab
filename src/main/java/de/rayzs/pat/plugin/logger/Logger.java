@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.logger;
 
 import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
@@ -24,8 +25,8 @@ public class Logger {
         }
         boolean hasColors = text.contains("§");
         if(hasColors) {
-            if (Reflection.isProxyServer()) ProxyServer.getInstance().getConsole().sendMessage(text);
-            else Bukkit.getServer().getConsoleSender().sendMessage(text);
+            if (Reflection.isProxyServer()) MessageTranslator.send(ProxyServer.getInstance().getConsole(), text);
+            else MessageTranslator.send(Bukkit.getServer().getConsoleSender(), text);
             return;
         }
 
