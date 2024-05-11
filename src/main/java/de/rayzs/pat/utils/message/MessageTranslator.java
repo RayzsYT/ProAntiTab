@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.message;
 import de.rayzs.pat.utils.CommandSender;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.translators.BukkitMessageTranslator;
+import de.rayzs.pat.utils.message.translators.BungeeMessageTranslator;
 import de.rayzs.pat.utils.message.translators.VelocityMessageTranslator;
 
 import java.util.HashMap;
@@ -36,8 +37,15 @@ public class MessageTranslator {
         colors.put('o', "<i>");
         colors.put('l', "<b>");
 
-        support =  Reflection.getMinor() == 16 && Reflection.getRelease() == 5 || Reflection.getMinor() >= 17 || Reflection.isVelocityServer() || Reflection.getVersionName().contains("Paper");
-        if(support) translator = Reflection.isVelocityServer() ? new VelocityMessageTranslator() : new BukkitMessageTranslator();
+        support =  Reflection.getMinor() == 16 && Reflection.getRelease() == 5
+                || Reflection.getMinor() >= 17
+                || Reflection.isVelocityServer()
+                || Reflection.getVersionName().contains("Paper");
+
+        if(support)
+            translator = Reflection.isVelocityServer() ? new VelocityMessageTranslator()
+                    : Reflection.isProxyServer() ? new BungeeMessageTranslator()
+                    : new BukkitMessageTranslator();
     }
 
     public static String translateLegacy(String text) {
