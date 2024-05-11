@@ -12,6 +12,7 @@ import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.communication.ClientCommunication;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import de.rayzs.pat.utils.Storage;
@@ -64,6 +65,11 @@ public class BungeeLoader extends Plugin {
         ProxyServer.getInstance().getScheduler().schedule(this, () -> ClientCommunication.sendInformation("instance::"), 2, TimeUnit.SECONDS);
     }
 
+    @Override
+    public void onDisable() {
+        MessageTranslator.closeAudiences();
+    }
+
     private static void registerCommand(String... commands) {
         for (String commandName : commands) {
             BungeeCommand command = new BungeeCommand(commandName);
@@ -94,7 +100,7 @@ public class BungeeLoader extends Plugin {
                     Logger.warning("Failed creating web instance! (outdated java version?)");
                 } else {
                     Storage.OUTDATED_VERSION = true;
-                    Storage.UPDATE_NOTIFICATION.forEach(Logger::warning);
+                    Storage.UPDATE_NOTIFICATION.forEach(logger::warning);
                 }
             }
         }, 20L, Storage.UPDATE_PERIOD, TimeUnit.MILLISECONDS);

@@ -77,6 +77,11 @@ public class MessageTranslator {
         translator.send(target, text);
     }
 
+    public static void closeAudiences() {
+        if(translator == null) return;
+        translator.close();
+    }
+
     public static boolean isSupported() {
         return support;
     }

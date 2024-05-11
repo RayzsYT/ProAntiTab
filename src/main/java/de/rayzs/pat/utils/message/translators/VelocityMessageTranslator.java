@@ -20,4 +20,7 @@ public class VelocityMessageTranslator implements Translator {
         else if(target instanceof ConsoleCommandSource)
             ((ConsoleCommandSource) target).sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
     }
+
+    @Override
+    public void close() { }
 }

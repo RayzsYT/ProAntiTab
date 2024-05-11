@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class BukkitMessageTranslator implements Translator {
 
-    private final BukkitAudiences audiences;
+    private BukkitAudiences audiences;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     public BukkitMessageTranslator() {
@@ -22,5 +22,11 @@ public class BukkitMessageTranslator implements Translator {
     public void send(Object target, String text) {
         Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
         audience.sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+    }
+
+    @Override
+    public void close() {
+        audiences.close();
+        audiences = null;
     }
 }

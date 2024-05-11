@@ -10,6 +10,7 @@ import de.rayzs.pat.plugin.netty.PacketAnalyzer;
 import de.rayzs.pat.utils.communication.ClientCommunication;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.*;
@@ -60,8 +61,8 @@ public class BukkitLoader extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if(!Storage.BUNGEECORD)
-            PacketAnalyzer.uninjectAll();
+        if(!Storage.BUNGEECORD) PacketAnalyzer.uninjectAll();
+        MessageTranslator.closeAudiences();
     }
 
     public void registerCommand(String... commands) {
