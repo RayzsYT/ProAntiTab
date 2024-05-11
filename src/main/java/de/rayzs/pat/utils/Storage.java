@@ -5,10 +5,10 @@ import java.util.*;
 
 public class Storage {
 
-    public static ConfigurationBuilder CONFIGURATION = Configurator.get("config"), STORAGE = Configurator.get("storage");;
+    public static ConfigurationBuilder CONFIGURATION = Configurator.get("config"), STORAGE = Configurator.get("storage"), TOKEN = Configurator.get("token");
     public static List<String> UNKNOWN_COMMAND, BLOCKED_COMMANDS_LIST, COMMAND_HELP = new ArrayList<>(), UPDATE_NOTIFICATION = new ArrayList<>();
     public static List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
-    public static String TOKEN = UUID.randomUUID().toString(), BUNGEECORD_MESSAGE, NOTIFY_ALERT, NOTIFY_ENABLED, NOTIFY_DISABLED, CANCEL_COMMANDS_MESSAGE, COMMAND_UNKNOWN, NO_PERMISSIONS, RELOAD_LOADING, RELOAD_DONE,
+    public static String TOKEN_KEY = UUID.randomUUID().toString(), BUNGEECORD_MESSAGE, NOTIFY_ALERT, NOTIFY_ENABLED, NOTIFY_DISABLED, CANCEL_COMMANDS_MESSAGE, COMMAND_UNKNOWN, NO_PERMISSIONS, RELOAD_LOADING, RELOAD_DONE,
             BLACKLIST_CLEAR_CONFIRM_MESSAGE, BLACKLIST_CLEAR_MESSAGE, BLACKLIST_LIST_COMMAND_MESSAGE, BLACKLIST_ADD_MESSAGE, BLACKLIST_ADD_FAIL_MESSAGE, BLACKLIST_REMOVE_MESSAGE, BLACKLIST_REMOVE_FAIL_MESSAGE, BLACKLIST_LIST_MESSAGE, BLACKLIST_LIST_SPLITTER_MESSAGE,
             GROUP_CREATE_MESSAGE, GROUP_DELETE_MESSAGE, GROUP_ALREADY_CREATED_MESSAGE, GROUP_NOT_EXIST_MESSAGE, GROUP_CLEAR_MESSAGE, GROUP_LIST_COMMAND_MESSAGE, GROUP_ADD_MESSAGE, GROUP_ADD_FAIL_MESSAGE, GROUP_REMOVE_MESSAGE, GROUP_REMOVE_FAIL_MESSAGE, GROUP_LIST_MESSAGE, GROUP_LIST_SPLITTER_MESSAGE, GROUPS_LIST_MESSAGE, GROUPS_LIST_SPLITTER_MESSAGE, GROUPS_LIST_GROUPS_MESSAGE,
             GROUP_CLEAR_CONFIRM_MESSAGE;
@@ -57,7 +57,14 @@ public class Storage {
             UNKNOWN_COMMAND = (ArrayList<String>) CONFIGURATION.getOrSet("custom-unknown-command.message", defaultUnknownCommandArray);
         }
 
-        TOKEN =  (String) CONFIGURATION.getOrSet(Reflection.isProxyServer() && !Reflection.isVelocityServer() ? "token" : "handle-through-bungeecord.token", Reflection.isProxyServer() ? TOKEN : "insert-token-of-bungeecord-here");
+        if(Reflection.isProxyServer() && !Reflection.isVelocityServer()) {
+            if(CONFIGURATION.get("token") != null) {
+                TOKEN_KEY = (String) CONFIGURATION.get("token");
+                TOKEN.setAndSave("token", TOKEN_KEY);
+            } else TOKEN_KEY = (String) TOKEN.getOrSet("token", TOKEN_KEY);
+        }
+
+        TOKEN_KEY =  (String) CONFIGURATION.getOrSet(Reflection.isProxyServer() && !Reflection.isVelocityServer() ? "token" : "handle-through-bungeecord.token", Reflection.isProxyServer() ? TOKEN : "insert-token-of-bungeecord-here");
 
         NOTIFY_ENABLED = (String) CONFIGURATION.getOrSet("notification.enabled", "&aEnabled notifications!");
         NOTIFY_DISABLED = (String) CONFIGURATION.getOrSet("notification.disabled", "&cDisabled notifications!");
@@ -68,7 +75,7 @@ public class Storage {
 
         TURN_BLACKLIST_TO_WHITELIST = (boolean) CONFIGURATION.getOrSet("turn-blacklist-to-whitelist", false);
         BLACKLIST_CLEAR_MESSAGE = (String) CONFIGURATION.getOrSet("blacklist.clear", "&aList has been cleared!");
-        BLACKLIST_CLEAR_CONFIRM_MESSAGE = (String) CONFIGURATION.getOrSet("blacklist.clear-confirmation", "&4&lWarning! &7This command will &cclear the entire list&7! &eRepeat the &nsame command &eto confirm this action.");
+        BLACKLIST_CLEAR_CONFIRM_MESSAGE = (String) CONFIGURATION.getOrSet("blacklist.clear-confirmation", "&4Warning! &7This command will &cclear the entire list&7! &7Repeat the &esame command &7to confirm this action.");
         BLACKLIST_LIST_MESSAGE = (String) CONFIGURATION.getOrSet("blacklist.list.message", "&7Listed commands (&f%size%&7)&8: &f%commands%");
         BLACKLIST_LIST_SPLITTER_MESSAGE = (String) CONFIGURATION.getOrSet("blacklist.list.splitter", "&7, ");
         BLACKLIST_LIST_COMMAND_MESSAGE = (String) CONFIGURATION.getOrSet("blacklist.list.command", "&f");
@@ -87,7 +94,7 @@ public class Storage {
         GROUP_NOT_EXIST_MESSAGE = (String) CONFIGURATION.getOrSet("group.does-not-exist", "&cGroup %group% does not exist!");
         GROUP_DELETE_MESSAGE = (String) CONFIGURATION.getOrSet("group.delete", "&cGroup %group% has been deleted!");
         GROUP_CLEAR_MESSAGE = (String) CONFIGURATION.getOrSet("group.clear", "&aList of group %group% has been cleared!");
-        GROUP_CLEAR_CONFIRM_MESSAGE = (String) CONFIGURATION.getOrSet("group.clear-confirmation", "&4&lWarning! &7This command will &cclear the entire list&7 of this group! &eRepeat the &nsame command &eto confirm this action.");
+        GROUP_CLEAR_CONFIRM_MESSAGE = (String) CONFIGURATION.getOrSet("group.clear-confirmation", "&4Warning! &7This command will &cclear the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.");
         GROUP_LIST_MESSAGE = (String) CONFIGURATION.getOrSet("group.list.message", "&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%");
         GROUP_LIST_SPLITTER_MESSAGE = (String) CONFIGURATION.getOrSet("group.list.splitter", "&7, ");
         GROUP_LIST_COMMAND_MESSAGE = (String) CONFIGURATION.getOrSet("group.list.command", "&f");
