@@ -232,14 +232,14 @@ public class CommandProcess {
                 if (PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(Arrays.asList("deletegroup", "dg"));
                 if (PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(Arrays.asList("listgroups", "lg"));
                 if (PermissionUtil.hasPermission(sender, "list")) suggestions.addAll(Arrays.asList("list", "ls"));
-                if (PermissionUtil.hasPermission(sender, "clear")) suggestions.addAll(Arrays.asList("clear", "cls"));
+                if (PermissionUtil.hasPermission(sender, "clear")) suggestions.add("clear");
                 if (PermissionUtil.hasPermission(sender, "reload")) suggestions.addAll(Arrays.asList("reload", "rl"));
                 if (PermissionUtil.hasPermission(sender, "add")) suggestions.add("add");
                 if (PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(Arrays.asList("remove", "rem", "rm"));
                 break;
             case 2:
                 if(Arrays.asList("deletegroup", "dg").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(GroupManager.getGroupNames());
-                if(Arrays.asList("clear", "cls").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "clear")) suggestions.addAll(GroupManager.getGroupNames());
+                if(args[0].equals("clear") && PermissionUtil.hasPermission(sender, "clear")) suggestions.addAll(GroupManager.getGroupNames());
                 if(Arrays.asList("ls", "list").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "list")) suggestions.addAll(GroupManager.getGroupNames());
                 if(args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer()) suggestions.addAll(BukkitLoader.getNotBlockedCommands());
                 if(Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(Storage.BLOCKED_COMMANDS_LIST);
