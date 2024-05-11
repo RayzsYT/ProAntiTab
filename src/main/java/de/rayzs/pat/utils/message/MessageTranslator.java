@@ -69,4 +69,8 @@ public class MessageTranslator {
 
         translator.send(target, text);
     }
+
+    public static boolean isSupported() {
+        return support;
+    }
 }
