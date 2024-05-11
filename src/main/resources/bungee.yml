@@ -2,5 +2,5 @@ name: ProAntiTab
 description: A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.
 
 author: Rayzs_YT
-version: 1.5.3
+version: 1.5.4
 main: de.rayzs.pat.plugin.BungeeLoader
