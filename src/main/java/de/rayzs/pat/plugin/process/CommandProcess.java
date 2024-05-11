@@ -41,7 +41,7 @@ public class CommandProcess {
                             else if(!Reflection.isProxyServer() && Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
                             sender.sendMessage(Storage.RELOAD_DONE);
                             return;
-                        case "clear": case "cls":
+                        case "clear":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
                             Storage.BLOCKED_COMMANDS_LIST.clear();
                             Storage.save();
