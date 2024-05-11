@@ -12,10 +12,10 @@ import java.util.Map;
 public class MessageTranslator {
 
     private static final HashMap<Character, String> colors = new HashMap<>();
-    private static final boolean support;
+    private static boolean support;
     private static Translator translator = null;
 
-    static {
+    public static void initialize() {
         colors.put('1', "<dark_blue>");
         colors.put('2', "<dark_green>");
         colors.put('3', "<dark_aqua>");

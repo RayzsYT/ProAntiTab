@@ -52,7 +52,9 @@ public class VelocityLoader {
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\velocity-storage.yml", "storage.yml", false);
 
         Storage.load();
+        MessageTranslator.initialize();
         GroupManager.initialize();
+
 
         metricsFactory.make(this, 21638);
 

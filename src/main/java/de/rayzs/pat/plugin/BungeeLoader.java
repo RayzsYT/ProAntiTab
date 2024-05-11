@@ -40,6 +40,7 @@ public class BungeeLoader extends Plugin {
 
         Reflection.initialize(getProxy());
         Storage.load();
+        MessageTranslator.initialize();
         GroupManager.initialize();
         bStats.initialize(this);
         PluginManager manager = ProxyServer.getInstance().getPluginManager();
@@ -61,7 +62,6 @@ public class BungeeLoader extends Plugin {
         }
 
         startUpdaterTask();
-
         ProxyServer.getInstance().getScheduler().schedule(this, () -> ClientCommunication.sendInformation("instance::"), 2, TimeUnit.SECONDS);
     }
 
