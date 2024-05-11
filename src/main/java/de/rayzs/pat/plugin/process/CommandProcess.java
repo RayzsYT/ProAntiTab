@@ -135,7 +135,7 @@ public class CommandProcess {
                                 sender.sendMessage((bool ? Storage.GROUP_DELETE_MESSAGE : Storage.GROUP_NOT_EXIST_MESSAGE).replace("%group%", sub.toLowerCase()));
                                 return;
 
-                            case "clear": case "cls":
+                            case "clear":
                                 if(!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
                                 group = GroupManager.getGroupByName(sub);
 
