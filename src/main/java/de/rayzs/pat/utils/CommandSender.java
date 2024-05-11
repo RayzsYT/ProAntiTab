@@ -10,6 +10,7 @@ import java.util.UUID;
 public class CommandSender {
 
     private final Object sender;
+    private static final UUID CONSOLE_UUID = UUID.randomUUID();
 
     public CommandSender(Object sender) {
         this.sender = sender;
@@ -51,6 +52,7 @@ public class CommandSender {
     public UUID getUniqueId() {
         if(Reflection.isVelocityServer()) return ((com.velocitypowered.api.proxy.Player) sender).getUniqueId();
         else if(Reflection.isProxyServer()) return ((ProxiedPlayer) sender).getUniqueId();
-        else return ((Player) sender).getUniqueId();
+        else if(sender instanceof Player) ((Player) sender).getUniqueId();
+        return CONSOLE_UUID;
     }
 }

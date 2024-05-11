@@ -7,13 +7,17 @@ import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.communication.ClientCommunication;
 import de.rayzs.pat.utils.group.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class CommandProcess {
 
+    private static final ExpireCache<UUID, String> CONFIRMATION = new ExpireCache<>(4, TimeUnit.SECONDS);
+
     public static void handleCommand(Object senderObj, String[] args, String label) {
         CommandSender sender = new CommandSender(senderObj);
+        UUID uuid = sender.getUniqueId();
         int length = args.length;
-        String task, sub, extra;
+        String task, sub, extra, confirmationString;
         Group group;
         boolean bool;
         if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
@@ -43,13 +47,20 @@ public class CommandProcess {
                             return;
                         case "clear":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
-                            Storage.BLOCKED_COMMANDS_LIST.clear();
-                            Storage.save();
-                            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
-                            else if(!Reflection.isProxyServer()) {
-                                if(Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
-                            } else ClientCommunication.synchronizeInformation();
-                            sender.sendMessage(Storage.BLACKLIST_CLEAR_MESSAGE);
+                            confirmationString = "clear";
+
+                            if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                                Storage.BLOCKED_COMMANDS_LIST.clear();
+                                Storage.save();
+                                if (Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+                                else if (!Reflection.isProxyServer()) {
+                                    if (Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
+                                } else ClientCommunication.synchronizeInformation();
+                                sender.sendMessage(Storage.BLACKLIST_CLEAR_MESSAGE);
+                            } else {
+                                CONFIRMATION.put(uuid, confirmationString);
+                                sender.sendMessage(Storage.BLACKLIST_CLEAR_CONFIRM_MESSAGE);
+                            }
                             return;
                         case "notify":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "notify")) return;
@@ -143,13 +154,19 @@ public class CommandProcess {
                                     sender.sendMessage(Storage.GROUP_NOT_EXIST_MESSAGE.replace("%group%", sub));
                                     return;
                                 }
+                                confirmationString = "clear " + group.getGroupName();
 
-                                group.clear();
-                                if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
-                                else if(!Reflection.isProxyServer()) {
-                                    if(Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
-                                } else ClientCommunication.synchronizeInformation();
-                                sender.sendMessage(Storage.GROUP_CLEAR_MESSAGE.replace("%group%", group.getGroupName()));
+                                if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                                    group.clear();
+                                    if (Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+                                    else if (!Reflection.isProxyServer()) {
+                                        if (Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
+                                    } else ClientCommunication.synchronizeInformation();
+                                    sender.sendMessage(Storage.GROUP_CLEAR_MESSAGE.replace("%group%", group.getGroupName()));
+                                } else {
+                                    CONFIRMATION.put(uuid, confirmationString);
+                                    sender.sendMessage(Storage.GROUP_CLEAR_CONFIRM_MESSAGE);
+                                }
                                 return;
 
                             case "add":

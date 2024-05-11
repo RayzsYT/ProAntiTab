@@ -34,7 +34,7 @@ reload:
 
 blacklist:
   clear: '&aList has been cleared!'
-  clear-confirmation: '&4&lWarning! &7This command will &cclear the entire list&7! &eRepeat the &nsame command &eto confirm this action.'
+  clear-confirmation: '&4Warning! &7This command will &cclear the entire list&7! &7Repeat the &esame command &7to confirm this action.'
 
   list:
     message: '&7Listed commands (&f%size%&7)&8: &f%commands%'
@@ -54,7 +54,7 @@ group:
   already-exist: '&cGroup %group% already exist!'
   does-not-exist: '&cGroup %group% does not exist!'
   clear: '&aList of group %group% has been cleared!'
-  clear-confirmation: '&4&lWarning! &7This command will &cclear the entire list&7 of this group! &eRepeat the &nsame command &eto confirm this action.'
+  clear-confirmation: '&4Warning! &7This command will &cclear the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
 
   list-groups:
     message: '&7All groups (&f%size%&7)&8: &f%groups%'
