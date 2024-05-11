@@ -23,6 +23,8 @@ public class Logger {
             System.out.println(text);
             return;
         }
+
+        text = text.replace("&", "§");
         boolean hasColors = text.contains("§");
         if(hasColors) {
             if (Reflection.isProxyServer()) MessageTranslator.send(ProxyServer.getInstance().getConsole(), text);
