@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import org.bukkit.event.*;
 import org.bukkit.Bukkit;
-
 import java.util.*;
 
 public class BukkitAntiTabListener implements Listener {

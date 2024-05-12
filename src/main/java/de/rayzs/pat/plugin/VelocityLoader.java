@@ -19,7 +19,6 @@ import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.message.translators.VelocityMessageTranslator;
 
 import java.util.concurrent.TimeUnit;
 

@@ -1,13 +1,8 @@
 package de.rayzs.pat.utils.message;
 
-import de.rayzs.pat.utils.CommandSender;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.message.translators.BukkitMessageTranslator;
-import de.rayzs.pat.utils.message.translators.BungeeMessageTranslator;
-import de.rayzs.pat.utils.message.translators.VelocityMessageTranslator;
-
-import java.util.HashMap;
-import java.util.Map;
+import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.message.translators.*;
+import java.util.*;
 
 public class MessageTranslator {
 
