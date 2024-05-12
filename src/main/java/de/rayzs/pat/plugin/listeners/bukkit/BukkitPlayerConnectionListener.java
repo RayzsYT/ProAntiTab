@@ -1,10 +1,8 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.netty.PacketAnalyzer;
 import de.rayzs.pat.utils.PermissionUtil;
-import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
@@ -18,7 +16,7 @@ public class BukkitPlayerConnectionListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        if(!PacketAnalyzer.inject(player) && Reflection.getMinor() <= 17) player.kickPlayer("Failed to inject player!");
+        if(!PacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
 
         if(!Storage.BUNGEECORD && Storage.OUTDATED_VERSION && (PermissionUtil.hasPermission(player, "update"))) {
             Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
