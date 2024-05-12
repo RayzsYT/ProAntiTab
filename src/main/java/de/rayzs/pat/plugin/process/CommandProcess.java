@@ -41,8 +41,7 @@ public class CommandProcess {
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "reload")) return;
                             sender.sendMessage(Storage.RELOAD_LOADING);
                             Storage.load();
-                            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
-                            else if(!Reflection.isProxyServer() && Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
+                            handleChange();
                             sender.sendMessage(Storage.RELOAD_DONE);
                             return;
                         case "clear":
@@ -52,10 +51,7 @@ public class CommandProcess {
                             if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
                                 Storage.BLOCKED_COMMANDS_LIST.clear();
                                 Storage.save();
-                                if (Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
-                                else if (!Reflection.isProxyServer()) {
-                                    if (Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
-                                } else ClientCommunication.synchronizeInformation();
+                                handleChange();
                                 sender.sendMessage(Storage.BLACKLIST_CLEAR_MESSAGE);
                             } else {
                                 CONFIRMATION.put(uuid, confirmationString);
@@ -164,10 +160,8 @@ public class CommandProcess {
 
                                 if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
                                     group.clear();
-                                    if (Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
-                                    else if (!Reflection.isProxyServer()) {
-                                        if (Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
-                                    } else ClientCommunication.synchronizeInformation();
+                                    handleChange();
+
                                     sender.sendMessage(Storage.GROUP_CLEAR_MESSAGE.replace("%group%", group.getGroupName()));
                                 } else {
                                     CONFIRMATION.put(uuid, confirmationString);
@@ -180,10 +174,7 @@ public class CommandProcess {
                                 if (!bool) {
                                     Storage.BLOCKED_COMMANDS_LIST.add(sub);
                                     Storage.save();
-                                    if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
-                                    else if(!Reflection.isProxyServer()) {
-                                        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
-                                    } else ClientCommunication.synchronizeInformation();
+                                    handleChange();
                                 }
 
                                 sender.sendMessage((bool ? Storage.BLACKLIST_ADD_FAIL_MESSAGE : Storage.BLACKLIST_ADD_MESSAGE).replace("%command%", sub));
@@ -195,10 +186,7 @@ public class CommandProcess {
                                 if (bool) {
                                     Storage.BLOCKED_COMMANDS_LIST.remove(sub);
                                     Storage.save();
-                                    if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
-                                    else if(!Reflection.isProxyServer()) {
-                                        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
-                                    } else ClientCommunication.synchronizeInformation();
+                                    handleChange();
                                 }
                                 sender.sendMessage((!bool ? Storage.BLACKLIST_REMOVE_FAIL_MESSAGE : Storage.BLACKLIST_REMOVE_MESSAGE).replace("%command%", sub));
                                 return;
@@ -221,7 +209,10 @@ public class CommandProcess {
 
                         case "add":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
-                            if (!bool) group.add(sub);
+                            if (!bool) {
+                                group.add(sub);
+                                handleChange();
+                            }
 
                             sender.sendMessage((bool ? Storage.GROUP_ADD_FAIL_MESSAGE : Storage.GROUP_ADD_MESSAGE).replace("%command%", sub).replace("%group%", extra));
                             return;
@@ -229,7 +220,10 @@ public class CommandProcess {
                         case "rem":
                         case "rm":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
-                            if (bool) group.remove(sub);
+                            if (bool) {
+                                group.remove(sub);
+                                handleChange();
+                            }
                             sender.sendMessage((!bool ? Storage.GROUP_REMOVE_FAIL_MESSAGE : Storage.GROUP_REMOVE_MESSAGE).replace("%command%", sub).replace("%group%", extra));
                             return;
                     }
@@ -275,5 +269,14 @@ public class CommandProcess {
 
         suggestions.stream().filter(suggestion -> suggestion.startsWith(args[args.length-1].toLowerCase())).forEach(result::add);
         return result;
+    }
+
+    private static void handleChange() {
+        if(Reflection.isProxyServer()) {
+            ClientCommunication.synchronizeInformation();
+            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+        } else {
+            if (Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
+        }
     }
 }
