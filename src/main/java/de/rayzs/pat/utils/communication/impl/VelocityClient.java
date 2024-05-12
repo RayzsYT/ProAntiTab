@@ -20,7 +20,7 @@ public class VelocityClient implements Client {
 
     public VelocityClient() {
         SERVER.getChannelRegistrar().register(IDENTIFIER);
-        SERVER.getEventManager().register(VelocityLoader.getPlugin(), this);
+        SERVER.getEventManager().register(VelocityLoader.getInstance(), this);
     }
 
     @Override
