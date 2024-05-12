@@ -14,6 +14,7 @@ import de.rayzs.pat.plugin.listeners.velocity.VelocityConnectionListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import de.rayzs.pat.utils.ConnectionBuilder;
+import de.rayzs.pat.utils.communication.ClientCommunication;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
@@ -29,16 +30,16 @@ authors = "Rayzs_YT",
 description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.")
 public class VelocityLoader {
 
-    private final VelocityLoader plugin;
-    private final ProxyServer server;
+    private static VelocityLoader plugin;
+    private static ProxyServer server;
     private final EventManager manager;
     private final VelocityMetrics.Factory metricsFactory;
     private ScheduledTask task;
 
     @Inject
     public VelocityLoader(ProxyServer server, VelocityMetrics.Factory metricsFactory) {
-        this.plugin = this;
-        this.server = server;
+        VelocityLoader.plugin = this;
+        VelocityLoader.server = server;
         this.manager = server.getEventManager();
         this.metricsFactory = metricsFactory;
     }
@@ -63,6 +64,7 @@ public class VelocityLoader {
         server.getEventManager().register(this, new VelocityConnectionListener(server, this));
 
         startUpdaterTask();
+        server.getScheduler().buildTask(this, () -> ClientCommunication.sendInformation("instance::")).delay(2, TimeUnit.SECONDS).schedule();
     }
 
     public void startUpdaterTask() {
@@ -83,5 +85,13 @@ public class VelocityLoader {
                 }
             }
         }).delay(1, TimeUnit.SECONDS).repeat(Storage.UPDATE_PERIOD, TimeUnit.SECONDS).schedule();
+    }
+
+    public static ProxyServer getServer() {
+        return server;
+    }
+
+    public static VelocityLoader getPlugin() {
+        return plugin;
     }
 }

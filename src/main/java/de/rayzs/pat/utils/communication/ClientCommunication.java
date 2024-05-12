@@ -1,19 +1,15 @@
 package de.rayzs.pat.utils.communication;
 
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.plugin.BungeeLoader;
-import de.rayzs.pat.utils.DataConverter;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.Storage;
+import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.communication.impl.*;
 import java.util.*;
 
 public class ClientCommunication {
 
-    private static final Client CLIENT = Reflection.isVelocityServer() ? null : Reflection.isProxyServer() ? new BungeeClient() : new BukkitClient();
+    private static final Client CLIENT = Reflection.isVelocityServer() ? new VelocityClient() : Reflection.isProxyServer() ? new BungeeClient() : new BukkitClient();
 
     public static void sendInformation(String information) {
-        if(CLIENT == null) return;
         CLIENT.sendInformation(information);
     }
 
@@ -24,7 +20,6 @@ public class ClientCommunication {
         switch (args[0].toLowerCase()) {
             case "request":
                 if(args.length != 2 || !args[1].equals(Storage.TOKEN_KEY)) return;
-                BungeeLoader.handleIfConnectedToSpigot();
                 synchronizeInformation();
                 break;
             case "receive-commands":

@@ -56,7 +56,6 @@ public class BukkitLoader extends JavaPlugin {
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
 
         registerCommand("proantitab", "pat");
-
         startUpdaterTask();
     }
 
