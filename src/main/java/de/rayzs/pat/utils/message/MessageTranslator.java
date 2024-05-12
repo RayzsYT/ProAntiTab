@@ -16,7 +16,7 @@ public class MessageTranslator {
     private static Translator translator = null;
 
     public static void initialize() {
-        final String reset = "<r>";
+        final String reset = "<reset>";
         colors.put('1', reset + "<dark_blue>");
         colors.put('2', reset + "<dark_green>");
         colors.put('3', reset + "<dark_aqua>");
