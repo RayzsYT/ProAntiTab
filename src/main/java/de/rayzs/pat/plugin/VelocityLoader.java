@@ -72,7 +72,7 @@ public class VelocityLoader {
         task = server.getScheduler().buildTask(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
-            if (!result.equals("1.5.4")) {
+            if (!result.equals("1.5.5")) {
 
                 if (result.equals("unknown")) {
                     Logger.warning("Failed reaching web host! (firewall enabled? website down?)");
