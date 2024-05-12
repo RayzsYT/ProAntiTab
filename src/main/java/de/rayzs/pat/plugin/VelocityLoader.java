@@ -5,6 +5,7 @@ import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.commands.VelocityCommand;
@@ -25,20 +26,21 @@ import java.util.concurrent.TimeUnit;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "1.5.3",
+version = "1.5.6",
 authors = "Rayzs_YT",
 description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.")
 public class VelocityLoader {
 
-    private static VelocityLoader plugin;
+    private static VelocityLoader instance;
     private static ProxyServer server;
     private final EventManager manager;
     private final VelocityMetrics.Factory metricsFactory;
+    private PluginContainer pluginContainer;
     private ScheduledTask task;
 
     @Inject
     public VelocityLoader(ProxyServer server, VelocityMetrics.Factory metricsFactory) {
-        VelocityLoader.plugin = this;
+        VelocityLoader.instance = this;
         VelocityLoader.server = server;
         this.manager = server.getEventManager();
         this.metricsFactory = metricsFactory;
@@ -48,6 +50,7 @@ public class VelocityLoader {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         Reflection.initialize(server);
 
+        pluginContainer = server.getPluginManager().getPlugin("proantitab").get();
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\velocity-config.yml", "config.yml", false);
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\velocity-storage.yml", "storage.yml", false);
 
@@ -73,7 +76,7 @@ public class VelocityLoader {
         task = server.getScheduler().buildTask(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
-            if (!result.equals("1.5.5")) {
+            if (pluginContainer != null && !result.equals(pluginContainer.getDescription().getVersion().get())) {
 
                 if (result.equals("unknown")) {
                     Logger.warning("Failed reaching web host! (firewall enabled? website down?)");
@@ -91,7 +94,7 @@ public class VelocityLoader {
         return server;
     }
 
-    public static VelocityLoader getPlugin() {
-        return plugin;
+    public static VelocityLoader getInstance() {
+        return instance;
     }
 }
