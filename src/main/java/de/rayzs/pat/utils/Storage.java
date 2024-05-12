@@ -10,7 +10,7 @@ public class Storage {
     public static List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
     public static String TOKEN_KEY = UUID.randomUUID().toString(), BUNGEECORD_MESSAGE, NOTIFY_ALERT, NOTIFY_ENABLED, NOTIFY_DISABLED, CANCEL_COMMANDS_MESSAGE, COMMAND_UNKNOWN, NO_PERMISSIONS, RELOAD_LOADING, RELOAD_DONE,
             BLACKLIST_CLEAR_CONFIRM_MESSAGE, BLACKLIST_CLEAR_MESSAGE, BLACKLIST_LIST_COMMAND_MESSAGE, BLACKLIST_ADD_MESSAGE, BLACKLIST_ADD_FAIL_MESSAGE, BLACKLIST_REMOVE_MESSAGE, BLACKLIST_REMOVE_FAIL_MESSAGE, BLACKLIST_LIST_MESSAGE, BLACKLIST_LIST_SPLITTER_MESSAGE,
-            GROUP_CREATE_MESSAGE, GROUP_DELETE_MESSAGE, GROUP_ALREADY_CREATED_MESSAGE, GROUP_NOT_EXIST_MESSAGE, GROUP_CLEAR_MESSAGE, GROUP_LIST_COMMAND_MESSAGE, GROUP_ADD_MESSAGE, GROUP_ADD_FAIL_MESSAGE, GROUP_REMOVE_MESSAGE, GROUP_REMOVE_FAIL_MESSAGE, GROUP_LIST_MESSAGE, GROUP_LIST_SPLITTER_MESSAGE, GROUPS_LIST_MESSAGE, GROUPS_LIST_SPLITTER_MESSAGE, GROUPS_LIST_GROUPS_MESSAGE,
+            GROUP_DELETE_CONFIRM_MESSAGE, GROUP_CREATE_MESSAGE, GROUP_DELETE_MESSAGE, GROUP_ALREADY_CREATED_MESSAGE, GROUP_NOT_EXIST_MESSAGE, GROUP_CLEAR_MESSAGE, GROUP_LIST_COMMAND_MESSAGE, GROUP_ADD_MESSAGE, GROUP_ADD_FAIL_MESSAGE, GROUP_REMOVE_MESSAGE, GROUP_REMOVE_FAIL_MESSAGE, GROUP_LIST_MESSAGE, GROUP_LIST_SPLITTER_MESSAGE, GROUPS_LIST_MESSAGE, GROUPS_LIST_SPLITTER_MESSAGE, GROUPS_LIST_GROUPS_MESSAGE,
             GROUP_CLEAR_CONFIRM_MESSAGE;
     public static boolean BUNGEECORD = false, USE_UNKNOWN_COMMAND, TURN_BLACKLIST_TO_WHITELIST, CANCEL_COMMANDS, UPDATE_ENABLED, OUTDATED_VERSION = false, CONSOLE_NOTIFICATION_ENABLED = true;
     public static int UPDATE_PERIOD;
@@ -91,6 +91,7 @@ public class Storage {
         GROUP_ALREADY_CREATED_MESSAGE = (String) CONFIGURATION.getOrSet("group.already-exist", "&cGroup %group% already exist!");
         GROUP_NOT_EXIST_MESSAGE = (String) CONFIGURATION.getOrSet("group.does-not-exist", "&cGroup %group% does not exist!");
         GROUP_DELETE_MESSAGE = (String) CONFIGURATION.getOrSet("group.delete", "&cGroup %group% has been deleted!");
+        GROUP_DELETE_CONFIRM_MESSAGE = (String) CONFIGURATION.getOrSet("group.delete-confirmation", "&4Warning! &7This command will &cdelete the group with the whole list&7 of this group! &7Repeat the &esame command &7to confirm this action.");
         GROUP_CLEAR_MESSAGE = (String) CONFIGURATION.getOrSet("group.clear", "&aList of group %group% has been cleared!");
         GROUP_CLEAR_CONFIRM_MESSAGE = (String) CONFIGURATION.getOrSet("group.clear-confirmation", "&4Warning! &7This command will &cclear the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.");
         GROUP_LIST_MESSAGE = (String) CONFIGURATION.getOrSet("group.list.message", "&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%");
@@ -131,6 +132,7 @@ public class Storage {
 
                 .set("group.create", GROUP_CREATE_MESSAGE)
                 .set("group.delete", GROUP_DELETE_MESSAGE)
+                .set("group.delete-confirmation", GROUP_DELETE_CONFIRM_MESSAGE)
                 .set("group.already-exist", GROUP_ALREADY_CREATED_MESSAGE)
                 .set("group.does-not-exist", GROUP_NOT_EXIST_MESSAGE)
                 .set("group.clear", GROUP_CLEAR_MESSAGE)

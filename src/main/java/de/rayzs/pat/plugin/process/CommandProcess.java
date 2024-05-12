@@ -141,9 +141,15 @@ public class CommandProcess {
                             case "dg":
                                 if(!PermissionUtil.hasPermissionWithResponse(sender, "deletegroup")) return;
                                 bool = GroupManager.isGroupRegistered(sub.toLowerCase());
+                                confirmationString = "deletegroup " + sub.toLowerCase();
 
-                                if(bool) GroupManager.unregisterGroup(sub.toLowerCase());
-                                sender.sendMessage((bool ? Storage.GROUP_DELETE_MESSAGE : Storage.GROUP_NOT_EXIST_MESSAGE).replace("%group%", sub.toLowerCase()));
+                                if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                                    if (bool) GroupManager.unregisterGroup(sub.toLowerCase());
+                                    sender.sendMessage((bool ? Storage.GROUP_DELETE_MESSAGE : Storage.GROUP_NOT_EXIST_MESSAGE).replace("%group%", sub.toLowerCase()));
+                                } else {
+                                    CONFIRMATION.put(uuid, confirmationString);
+                                    sender.sendMessage(Storage.GROUP_DELETE_CONFIRM_MESSAGE);
+                                }
                                 return;
 
                             case "clear":

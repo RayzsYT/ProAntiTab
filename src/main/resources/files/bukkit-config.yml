@@ -51,6 +51,7 @@ blacklist:
 group:
   create: '&aGroup %group% has been created!'
   delete: '&cGroup %group% has been deleted!'
+  delete-confirmation: '&4Warning! &7This command will &cdelete the group with the whole list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
   already-exist: '&cGroup %group% already exist!'
   does-not-exist: '&cGroup %group% does not exist!'
   clear: '&aList of group %group% has been cleared!'
