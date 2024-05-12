@@ -53,7 +53,7 @@ public class BukkitLoader extends JavaPlugin {
         }
 
         if(Reflection.getMinor() >= 18) manager.registerEvents(new BukkitAntiTabListener(), this);
-        else manager.registerEvents(new BukkitPlayerConnectionListener(), this);
+        manager.registerEvents(new BukkitPlayerConnectionListener(), this);
 
         registerCommand("proantitab", "pat");
 
