@@ -25,7 +25,6 @@ public class BungeeLoader extends Plugin {
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
     private ScheduledTask updaterTask;
-    private static boolean isConnectedToSpigot = false;
 
     @Override
     public void onLoad() {
@@ -76,16 +75,6 @@ public class BungeeLoader extends Plugin {
             BungeeCommand command = new BungeeCommand(commandName);
             ProxyServer.getInstance().getPluginManager().registerCommand(plugin, command);
         }
-    }
-
-    public static boolean isConnectedToSpigot() {
-        return isConnectedToSpigot;
-    }
-
-    public static void handleIfConnectedToSpigot() {
-        if(isConnectedToSpigot) return;
-        logger.info("Found compatible Spigot server!");
-        isConnectedToSpigot = true;
     }
 
     public void startUpdaterTask() {
