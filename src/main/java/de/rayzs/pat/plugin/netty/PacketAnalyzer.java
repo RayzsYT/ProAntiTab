@@ -2,13 +2,11 @@ package de.rayzs.pat.plugin.netty;
 
 import de.rayzs.pat.plugin.netty.handlers.LegacyPacketHandler;
 import de.rayzs.pat.plugin.netty.handlers.ModernPacketHandler;
-import de.rayzs.pat.utils.PermissionUtil;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.Storage;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import java.lang.reflect.Field;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
