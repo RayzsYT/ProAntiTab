@@ -16,25 +16,24 @@ public class MessageTranslator {
     private static Translator translator = null;
 
     public static void initialize() {
-        final String reset = "<reset>";
-        colors.put('1', reset + "<dark_blue>");
-        colors.put('2', reset + "<dark_green>");
-        colors.put('3', reset + "<dark_aqua>");
-        colors.put('4', reset + "<dark_red>");
-        colors.put('5', reset + "<dark_purple>");
-        colors.put('6', reset + "<orange>");
-        colors.put('7', reset + "<gray>");
-        colors.put('8', reset + "<dark_gray>");
-        colors.put('9', reset + "<blue>");
-        colors.put('a', reset + "<green>");
-        colors.put('b', reset + "<aqua>");
-        colors.put('c', reset + "<red>");
-        colors.put('d', reset + "<light_purple>");
-        colors.put('e', reset + "<yellow>");
-        colors.put('f', reset + "<white>");
+        colors.put('1', "<dark_blue>");
+        colors.put('2', "<dark_green>");
+        colors.put('3', "<dark_aqua>");
+        colors.put('4', "<dark_red>");
+        colors.put('5', "<dark_purple>");
+        colors.put('6', "<orange>");
+        colors.put('7', "<gray>");
+        colors.put('8', "<dark_gray>");
+        colors.put('9', "<blue>");
+        colors.put('a', "<green>");
+        colors.put('b', "<aqua>");
+        colors.put('c', "<red>");
+        colors.put('d', "<light_purple>");
+        colors.put('e', "<yellow>");
+        colors.put('f', "<white>");
         colors.put('m', "<st>");
         colors.put('k', "<obf>");
-        colors.put('n', reset);
+        colors.put('n', "<reset>");
         colors.put('o', "<i>");
         colors.put('l', "<b>");
 
