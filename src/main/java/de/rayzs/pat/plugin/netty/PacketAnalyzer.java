@@ -13,8 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PacketAnalyzer {
 
     public static final ConcurrentHashMap<UUID, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
-    public static final String PIPELINE_NAME = "pat-packethandler", HANDLER_NAME = "packet_handler";
+
+    private static final String PIPELINE_NAME = "pat-packethandler", HANDLER_NAME = "packet_handler";
     private static final PacketHandler PACKET_HANDLER = Reflection.getMinor() >= 18 ? new ModernPacketHandler() : new LegacyPacketHandler();
+    private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
     public static void injectAll() {
         Bukkit.getOnlinePlayers().forEach(PacketAnalyzer::inject);
@@ -52,6 +54,16 @@ public class PacketAnalyzer {
                 });
             }
         }
+    }
+
+    public static String getPlayerInput(Player player) {
+        String input = PLAYER_INPUT_CACHE.get(player);
+        PLAYER_INPUT_CACHE.remove(player);
+        return input;
+    }
+
+    public static void insertPlayerInput(Player player, String text) {
+        PLAYER_INPUT_CACHE.put(player, text);
     }
 
     private static class PacketDecoder extends ChannelDuplexHandler {

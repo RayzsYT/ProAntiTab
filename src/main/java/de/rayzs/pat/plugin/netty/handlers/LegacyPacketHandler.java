@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin.netty.handlers;
 
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.netty.PacketAnalyzer;
 import de.rayzs.pat.plugin.netty.PacketHandler;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
@@ -18,20 +19,19 @@ public class LegacyPacketHandler implements PacketHandler {
         }
 
         String text = (String) stringField.get(packetObj);
-        playerInputCache.put(player, text);
+        PacketAnalyzer.insertPlayerInput(player, text);
         return true;
     }
 
     @Override
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
-        String input = playerInputCache.get(player);
+        String input = PacketAnalyzer.getPlayerInput(player);
 
         if(input == null) {
             Logger.warning("Failed PacketAnalyze process! (#2)");
             return false;
         }
 
-        playerInputCache.remove(player);
         boolean cancelsBeforeHand = false;
 
         if(input.startsWith("/")) {
