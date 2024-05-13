@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.netty.handlers;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.netty.PacketHandler;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
@@ -9,7 +10,38 @@ import java.util.*;
 public class LegacyPacketHandler implements PacketHandler {
 
     @Override
-    public void handlePacket(Player player, Object packetObj) throws Exception {
+    public boolean handleIncomingPacket(Player player, Object packetObj) throws Exception {
+        Field stringField = Reflection.getFirstFieldByType(packetObj.getClass(), "String", Reflection.SearchOption.ENDS);
+        if(stringField == null) {
+            Logger.warning("Failed PacketAnalyze process! (#1)");
+            return false;
+        }
+
+        String text = (String) stringField.get(packetObj);
+        playerInputCache.put(player, text);
+        return true;
+    }
+
+    @Override
+    public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
+        String input = playerInputCache.get(player);
+
+        if(input == null) {
+            Logger.warning("Failed PacketAnalyze process! (#2)");
+            return false;
+        }
+
+        playerInputCache.remove(player);
+        boolean cancelsBeforeHand = false;
+
+        if(input.startsWith("/")) {
+            input = input.replace("/", "");
+            if(input.contains(" ")) input = input.split(" ")[0];
+
+            cancelsBeforeHand = Storage.isCommandBlockedPrecise(input) && !PermissionUtil.hasBypassPermission(player, input)
+                    || Storage.isCommandBlocked(input) && !PermissionUtil.hasBypassPermission(player, input);
+        }
+
         for (Field field : Reflection.getFields(packetObj)) {
             field.setAccessible(true);
             Object result = field.get(packetObj);
@@ -20,25 +52,28 @@ public class LegacyPacketHandler implements PacketHandler {
 
             String tempName;
 
-            for (String s : tR) {
-                tempName = s.replaceFirst("/", "");
+            if(!cancelsBeforeHand)
+                for (String s : tR) {
+                    tempName = s.replaceFirst("/", "");
 
-                if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
-                    if(!Storage.isCommandBlockedPrecise(tempName)) continue;
-                    if(PermissionUtil.hasBypassPermission(player, tempName)) continue;
-                    newResultList.add(s);
-                    continue;
+                    if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
+                        if(!Storage.isCommandBlockedPrecise(tempName)) continue;
+                        if(PermissionUtil.hasBypassPermission(player, tempName)) continue;
+                        newResultList.add(s);
+                        continue;
+                    }
+
+                    if (tempName.contains(":")) tempName = tempName.split(":")[1];
+
+                    if (!Storage.isCommandBlocked(tempName)
+                            || Storage.isCommandBlocked(tempName)
+                            && PermissionUtil.hasBypassPermission(player, tempName))
+                        newResultList.add(s);
                 }
-
-                if (tempName.contains(":")) tempName = tempName.split(":")[1];
-
-                if (!Storage.isCommandBlocked(tempName)
-                        || Storage.isCommandBlocked(tempName)
-                        && PermissionUtil.hasBypassPermission(player, tempName))
-                    newResultList.add(s);
-            }
 
             field.set(packetObj, newResultList.toArray(new String[0]));
         }
+
+        return true;
     }
 }

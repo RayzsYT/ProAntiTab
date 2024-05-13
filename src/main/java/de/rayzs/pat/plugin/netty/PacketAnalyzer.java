@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PacketAnalyzer {
 
     public static final ConcurrentHashMap<UUID, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
-    public static final String CHANNEL_NAME = "pat-packethandler", HANDLER_NAME = "packet_handler";
+    public static final String PIPELINE_NAME = "pat-packethandler", HANDLER_NAME = "packet_handler";
     private static final PacketHandler PACKET_HANDLER = Reflection.getMinor() >= 18 ? new ModernPacketHandler() : new LegacyPacketHandler();
 
     public static void injectAll() {
@@ -33,7 +33,7 @@ public class PacketAnalyzer {
                 return false;
             }
 
-            channel.pipeline().addAfter(PacketAnalyzer.HANDLER_NAME, PacketAnalyzer.CHANNEL_NAME, new PacketDecoder(player));
+            channel.pipeline().addBefore(PacketAnalyzer.HANDLER_NAME, PacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
             PacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -48,7 +48,7 @@ public class PacketAnalyzer {
                 PacketAnalyzer.INJECTED_PLAYERS.remove(uuid);
                 channel.eventLoop().submit(() -> {
                     ChannelPipeline pipeline = channel.pipeline();
-                    if (pipeline.names().contains(PacketAnalyzer.CHANNEL_NAME)) pipeline.remove(PacketAnalyzer.CHANNEL_NAME);
+                    if (pipeline.names().contains(PacketAnalyzer.PIPELINE_NAME)) pipeline.remove(PacketAnalyzer.PIPELINE_NAME);
                 });
             }
         }
@@ -62,16 +62,31 @@ public class PacketAnalyzer {
         }
 
         @Override
-        public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) throws Exception {
+        public void channelRead(ChannelHandlerContext channel, Object packetObj) {
             try {
                 if (!player.hasPermission("proantitab.bypass") && packetObj.getClass() != null) {
                     String packetName = packetObj.getClass().getSimpleName();
-                    if (packetName.equals("PacketPlayOutTabComplete"))
-                        PACKET_HANDLER.handlePacket(player, packetObj);
-
+                    if (packetName.equals("PacketPlayInTabComplete")) {
+                        if(!PACKET_HANDLER.handleIncomingPacket(player, packetObj)) return;
+                    }
                 }
+
+                super.channelRead(channel, packetObj);
             } catch (Throwable exception) { exception.printStackTrace(); }
-            super.write(channel, packetObj, promise);
+        }
+
+        @Override
+        public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
+            try {
+                if (!player.hasPermission("proantitab.bypass") && packetObj.getClass() != null) {
+                    String packetName = packetObj.getClass().getSimpleName();
+                    if (packetName.equals("PacketPlayOutTabComplete")) {
+                        if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;
+                    }
+                }
+
+                super.write(channel, packetObj, promise);
+            } catch (Throwable exception) { exception.printStackTrace(); }
         }
     }
 }
