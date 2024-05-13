@@ -2,7 +2,7 @@ updater:
   enabled: true
   period: 18000
   notification:
-    - '&8[&4ProAntiTab&8] &cYou are using an outdated version of this plugin!'
+    - '&8[&4ProAntiTab&8] &cYou are using an outdated version of this plugin! (%current_version% -> %newest-version%)'
     - '&8[&4ProAntiTab&8] &cPlease update it on: &ehttps://www.rayzs.de/products/proantitab/page'
 
 handle-through-bungeecord:
