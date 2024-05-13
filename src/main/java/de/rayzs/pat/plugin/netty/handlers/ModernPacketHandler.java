@@ -35,7 +35,6 @@ public class ModernPacketHandler implements PacketHandler {
         }
 
         playerInputCache.remove(player);
-        System.out.println("Input: " + input);
 
         Suggestions suggestions = (Suggestions) suggestionsField.get(packetObj);
         suggestions.getList().removeIf(suggestion -> {
