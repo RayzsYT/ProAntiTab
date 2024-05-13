@@ -39,7 +39,7 @@ public class Storage {
 
         defaultUnknownCommandArray.add("&cThis command does not exist!");
 
-        defaultNotificationArray.add("&8[&4ProAntiTab&8] &cYou're using an outdated version of this plugin!");
+        defaultNotificationArray.add("&8[&4ProAntiTab&8] &cYou're using an outdated version of this plugin! (%current_version% -> %newest_version%)");
         defaultNotificationArray.add("&8[&4ProAntiTab&8] &cPlease update it on: &ehttps://www.rayzs.de/products/proantitab/page");
 
         UPDATE_ENABLED = (boolean) CONFIGURATION.getOrSet("updater.enabled", true);
