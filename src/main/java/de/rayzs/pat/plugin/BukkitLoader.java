@@ -36,7 +36,9 @@ public class BukkitLoader extends JavaPlugin {
         plugin = this;
         logger = getLogger();
 
+        Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
         Reflection.initialize(getServer());
+
         Storage.load();
         MessageTranslator.initialize();
         bStats.initialize(this);

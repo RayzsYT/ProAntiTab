@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.logger;
 
 import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import java.util.logging.Level;
@@ -19,6 +20,8 @@ public class Logger {
     public static void warning(String text) { send(Priority.WARNING, text); }
 
     protected static void send(Priority priority, String text) {
+        text = text.replace("%current_version%", Storage.CURRENT_VERSION_NAME).replace("%newest_version%", Storage.NEWEST_VERSION_NAME);
+
         if(LOGGER == null) {
             System.out.println(text);
             return;

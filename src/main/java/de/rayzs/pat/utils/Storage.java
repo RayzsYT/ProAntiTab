@@ -5,6 +5,7 @@ import java.util.*;
 
 public class Storage {
 
+    public static String CURRENT_VERSION_NAME = "", NEWEST_VERSION_NAME = "";
     public static ConfigurationBuilder CONFIGURATION = Configurator.get("config"), STORAGE = Configurator.get("storage"), TOKEN = Configurator.get("token");
     public static List<String> UNKNOWN_COMMAND, BLOCKED_COMMANDS_LIST, COMMAND_HELP = new ArrayList<>(), UPDATE_NOTIFICATION = new ArrayList<>();
     public static List<UUID> NOTIFY_PLAYERS = new ArrayList<>();

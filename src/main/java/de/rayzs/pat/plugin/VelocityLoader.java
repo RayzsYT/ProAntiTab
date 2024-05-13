@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "1.5.6",
+version = "1.5.7",
 authors = "Rayzs_YT",
 description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.")
 public class VelocityLoader {
@@ -35,7 +35,6 @@ public class VelocityLoader {
     private static ProxyServer server;
     private final EventManager manager;
     private final VelocityMetrics.Factory metricsFactory;
-    private PluginContainer pluginContainer;
     private ScheduledTask task;
 
     @Inject
@@ -48,9 +47,11 @@ public class VelocityLoader {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        PluginContainer pluginContainer = server.getPluginManager().getPlugin("proantitab").get();
+
+        Storage.CURRENT_VERSION_NAME = pluginContainer.getDescription().getVersion().get();
         Reflection.initialize(server);
 
-        pluginContainer = server.getPluginManager().getPlugin("proantitab").get();
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\velocity-config.yml", "config.yml", false);
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\velocity-storage.yml", "storage.yml", false);
 
@@ -76,9 +77,11 @@ public class VelocityLoader {
         task = server.getScheduler().buildTask(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
-            if (pluginContainer != null && !result.equals(pluginContainer.getDescription().getVersion().get())) {
 
-                if (result.equals("unknown")) {
+            Storage.NEWEST_VERSION_NAME = result;
+            if (!Storage.NEWEST_VERSION_NAME.equals(Storage.CURRENT_VERSION_NAME)) {
+
+                if (Storage.NEWEST_VERSION_NAME.equals("unknown")) {
                     Logger.warning("Failed reaching web host! (firewall enabled? website down?)");
                 } else if (result.equals("exception")) {
                     Logger.warning("Failed creating web instance! (outdated java version?)");
