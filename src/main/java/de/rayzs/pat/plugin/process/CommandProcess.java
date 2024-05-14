@@ -270,7 +270,7 @@ public class CommandProcess {
 
         switch (args.length) {
             case 1:
-                if (PermissionUtil.hasPermission(sender, "stats")) suggestions.add("stats");
+                if (PermissionUtil.hasPermission(sender, "stats") && Reflection.isProxyServer()) suggestions.add("stats");
                 if (PermissionUtil.hasPermission(sender, "notify")) suggestions.add("notify");
                 if (PermissionUtil.hasPermission(sender, "creategroup")) suggestions.addAll(Arrays.asList("creategroup", "cg"));
                 if (PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(Arrays.asList("deletegroup", "dg"));
