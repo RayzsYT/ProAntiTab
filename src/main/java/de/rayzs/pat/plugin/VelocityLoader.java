@@ -49,11 +49,11 @@ public class VelocityLoader {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         PluginContainer pluginContainer = server.getPluginManager().getPlugin("proantitab").get();
 
-        Storage.CURRENT_VERSION_NAME = pluginContainer.getDescription().getVersion().get();
-        Reflection.initialize(server);
-
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\velocity-config.yml", "config.yml", false);
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\velocity-storage.yml", "storage.yml", false);
+
+        Reflection.initialize(server);
+        Storage.CURRENT_VERSION_NAME = pluginContainer.getDescription().getVersion().get();
 
         Storage.load();
         MessageTranslator.initialize();
