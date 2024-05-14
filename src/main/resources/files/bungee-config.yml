@@ -18,6 +18,16 @@ cancel-blocked-commands:
   enabled: true
   message: '&cThe command "%command%" is blocked!'
 
+stats:
+  fail: '&cThis command works on Bungeecord/Velocity servers only!'
+  no-server: '&cNone!'
+  message:
+    statistic:
+      - '&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)'
+      - '&7Sent to servers: &f%servers%'
+    splitter: '&7, '
+    server: '&f%servername% &8(%updated%)'
+
 reload:
   loading: '&eReloading all configuration files...'
   done: '&aSuccessfully reloaded all configuration files!'
