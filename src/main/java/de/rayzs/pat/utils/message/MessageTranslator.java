@@ -62,7 +62,7 @@ public class MessageTranslator {
     }
 
     public static void send(Object target, String text) {
-        text = text.replace("%current_version%", Storage.CURRENT_VERSION_NAME).replace("%newest_version%", Storage.NEWEST_VERSION_NAME);
+        text = text.replace("%current_version%", Storage.CURRENT_VERSION_NAME).replace("%newest_version%", Storage.NEWEST_VERSION_NAME).replace("\\n", "\n");
         if(translator == null) {
             CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
             sender.sendMessage(text);

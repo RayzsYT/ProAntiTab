@@ -20,7 +20,7 @@ public class Logger {
     public static void warning(String text) { send(Priority.WARNING, text); }
 
     protected static void send(Priority priority, String text) {
-        text = text.replace("%current_version%", Storage.CURRENT_VERSION_NAME).replace("%newest_version%", Storage.NEWEST_VERSION_NAME);
+        text = text.replace("%current_version%", Storage.CURRENT_VERSION_NAME).replace("%newest_version%", Storage.NEWEST_VERSION_NAME).replace("\\n", "\n");
 
         if(LOGGER == null) {
             System.out.println(text);
