@@ -5,6 +5,7 @@ import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.communication.ClientCommunication;
+import de.rayzs.pat.utils.communication.ClientInfo;
 import de.rayzs.pat.utils.group.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +37,31 @@ public class CommandProcess {
                     task = args[0].toLowerCase();
 
                     switch (task) {
+
+                        case "stats":
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "stats")) return;
+                            if(!Reflection.isProxyServer()) {
+                                sender.sendMessage(Storage.STATS_FAIL_MESSAGE);
+                                return;
+                            }
+
+                            int found = 0;
+                            StringBuilder statsBuilder = new StringBuilder();
+                            for (int i = 0; i < ClientCommunication.CLIENTS.size(); i++) {
+                                bool = (i >= ClientCommunication.CLIENTS.size() - 1);
+                                ClientInfo client = ClientCommunication.CLIENTS.get(i);
+                                if(!client.hasSentFeedback()) continue;
+                                found++;
+
+                                statsBuilder.append(Storage.STATS_SERVERS_MESSAGE.replace("%updated%", client.getSyncTime()).replace("%servername%", client.getName()));
+                                if (!bool)
+                                    statsBuilder.append(Storage.STATS_SERVERS_SPLITTER_MESSAGE);
+                            }
+
+                            int finalFound = found;
+                            Storage.STATS.forEach(message -> sender.sendMessage(message.replace("%server_count%", String.valueOf(Storage.SERVER_DATA_SYNC_COUNT)).replace("%last_sync_time%", TimeConverter.calcAndGetTime(Storage.LAST_DATA_UPDATE)).replace("%servers%", finalFound > 0 ? statsBuilder : Storage.STATS_SERVERS_NO_SERVER_MESSAGE)));
+                            return;
+
                         case "reload":
                         case "rl":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "reload")) return;
