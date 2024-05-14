@@ -4,11 +4,11 @@ import java.io.*;
 import net.md_5.bungee.api.ProxyServer;
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.communication.*;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.PluginMessageEvent;
-import org.bukkit.Server;
 
 public class BungeeClient implements Client, Listener {
 
@@ -38,7 +38,7 @@ public class BungeeClient implements Client, Listener {
             DataInputStream input = new DataInputStream(new ByteArrayInputStream(event.getData()));
             String information = input.readUTF();
             Server server = (Server) event.getSender();
-            ClientCommunication.receiveInformation(server.getName(), information);
+            ClientCommunication.receiveInformation(server.getInfo().getName(), information);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
 }
