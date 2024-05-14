@@ -76,7 +76,7 @@ public class CommandProcess {
 
                             if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
                                 Storage.BLOCKED_COMMANDS_LIST.clear();
-                                Storage.save();
+                                Storage.saveStorage();
                                 handleChange();
                                 sender.sendMessage(Storage.BLACKLIST_CLEAR_MESSAGE);
                             } else {
@@ -199,7 +199,7 @@ public class CommandProcess {
                                 if(!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
                                 if (!bool) {
                                     Storage.BLOCKED_COMMANDS_LIST.add(sub);
-                                    Storage.save();
+                                    Storage.saveStorage();
                                     handleChange();
                                 }
 
@@ -211,7 +211,7 @@ public class CommandProcess {
                                 if(!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
                                 if (bool) {
                                     Storage.BLOCKED_COMMANDS_LIST.remove(sub);
-                                    Storage.save();
+                                    Storage.saveStorage();
                                     handleChange();
                                 }
                                 sender.sendMessage((!bool ? Storage.BLACKLIST_REMOVE_FAIL_MESSAGE : Storage.BLACKLIST_REMOVE_MESSAGE).replace("%command%", sub));
