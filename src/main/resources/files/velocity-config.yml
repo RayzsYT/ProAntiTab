@@ -4,7 +4,7 @@ updater:
   notification:
     - '&8[&4ProAntiTab&8] &cThere is a new version available! (%newest_version%)'
     - '&8[&4ProAntiTab&8] &cYou are still using the %current_version%.'
-    - '&8[&4ProAntiTab&8] &cGet the newest version here:!'
+    - '&8[&4ProAntiTab&8] &cGet the newest version here:'
     - '&8[&4ProAntiTab&8] &ehttps://www.rayzs.de/products/proantitab/page'
 
 turn-blacklist-to-whitelist: false

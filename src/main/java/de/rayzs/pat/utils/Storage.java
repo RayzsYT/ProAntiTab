@@ -42,8 +42,10 @@ public class Storage {
 
         defaultUnknownCommandArray.add("&cThis command does not exist!");
 
-        defaultNotificationArray.add("&8[&4ProAntiTab&8] &cYou're using an outdated version of this plugin! (%current_version% -> %newest_version%)");
-        defaultNotificationArray.add("&8[&4ProAntiTab&8] &cPlease update it on: &ehttps://www.rayzs.de/products/proantitab/page");
+        defaultNotificationArray.add("&8[&4ProAntiTab&8] &cThere is a new version available! (%newest_version%)");
+        defaultNotificationArray.add("&8[&4ProAntiTab&8] &cYou are still using the %current_version%.");
+        defaultNotificationArray.add("&8[&4ProAntiTab&8] &cGet the newest version here:");
+        defaultNotificationArray.add("&8[&4ProAntiTab&8] &ehttps://www.rayzs.de/products/proantitab/page");
 
         statsMessageArray.add("&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)");
         statsMessageArray.add("&7Sent to servers: &f%servers%");
