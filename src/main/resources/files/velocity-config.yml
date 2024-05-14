@@ -76,6 +76,7 @@ group:
 help:
   - '&7Available commands are: &f/%label%&7...'
   - '&f  reload &7to reload the plugin'
+  - '&f  stats &7view when data has been synced'
   - '&f  notify &7to get alerted'
   - '&f  listgroups &7List all groups'
   - '&f  creategroup (group) &7Create a group'

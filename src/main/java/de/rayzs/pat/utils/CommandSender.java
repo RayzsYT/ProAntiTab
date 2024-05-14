@@ -40,13 +40,9 @@ public class CommandSender {
     }
 
     public void sendMessage(String text) {
-        if(Reflection.isVelocityServer()) MessageTranslator.send(sender, text);
-        else if(Reflection.isProxyServer()) ((net.md_5.bungee.api.CommandSender) sender).sendMessage(text);
-        else {
-            if(MessageTranslator.isSupported()) MessageTranslator.send(sender, text);
-            else if(sender instanceof Player) ((Player) sender).sendMessage(text);
-            else if(sender instanceof org.bukkit.command.CommandSender) ((org.bukkit.command.CommandSender) sender).sendMessage(text);
-        }
+        if(MessageTranslator.isSupported()) MessageTranslator.send(sender, text);
+        else if(sender instanceof Player) ((Player) sender).sendMessage(text);
+        else if(sender instanceof org.bukkit.command.CommandSender) ((org.bukkit.command.CommandSender) sender).sendMessage(text);
     }
 
     public UUID getUniqueId() {
