@@ -8,6 +8,7 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.PluginMessageEvent;
+import org.bukkit.Server;
 
 public class BungeeClient implements Client, Listener {
 
@@ -36,7 +37,8 @@ public class BungeeClient implements Client, Listener {
         try {
             DataInputStream input = new DataInputStream(new ByteArrayInputStream(event.getData()));
             String information = input.readUTF();
-            ClientCommunication.receiveInformation(information);
+            Server server = (Server) event.getSender();
+            ClientCommunication.receiveInformation(server.getName(), information);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
 }

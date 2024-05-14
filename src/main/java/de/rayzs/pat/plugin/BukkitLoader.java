@@ -36,8 +36,8 @@ public class BukkitLoader extends JavaPlugin {
         plugin = this;
         logger = getLogger();
 
-        Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
         Reflection.initialize(getServer());
+        Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
 
         Storage.load();
         MessageTranslator.initialize();
@@ -77,6 +77,7 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public static void synchronizeCommandData(boolean turn, List<String> commands) {
+        ClientCommunication.sendFeedback();
         if (!Storage.BLOCKED_COMMANDS_LIST.containsAll(commands) || !commands.containsAll(Storage.BLOCKED_COMMANDS_LIST))
             Storage.BLOCKED_COMMANDS_LIST = commands;
 

@@ -37,8 +37,8 @@ public class BungeeLoader extends Plugin {
         plugin = this;
         logger = getLogger();
 
-        Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
         Reflection.initialize(getProxy());
+        Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
 
         Storage.load();
         MessageTranslator.initialize();
