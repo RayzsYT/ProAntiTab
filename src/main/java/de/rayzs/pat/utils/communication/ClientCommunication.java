@@ -36,7 +36,6 @@ public class ClientCommunication {
                 else if(!client.getName().equals(serverName)) client.setName(serverName);
 
                 if(!client.hasSentFeedback()) {
-                    System.out.println("Feedback from server: " + client.getName());
                     client.setFeedback(true);
                     client.syncTime();
                     Storage.SERVER_DATA_SYNC_COUNT++;
