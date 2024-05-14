@@ -120,7 +120,11 @@ public class Storage {
         RELOAD_DONE = (String) CONFIGURATION.getOrSet("reload.done", "&aSuccessfully reloaded all configuration files!");
     }
 
-    public static void save() {
+    public static void saveStorage() {
+        STORAGE.setAndSave("commands", BLOCKED_COMMANDS_LIST);
+    }
+
+    public static void saveConfiguration() {
         CONFIGURATION
                 .set("updater.enabled", UPDATE_ENABLED)
                 .set("updater.period", UPDATE_PERIOD)
@@ -174,7 +178,6 @@ public class Storage {
                     .set("handle-through-bungeecord.message", BUNGEECORD_MESSAGE);
         }
 
-        STORAGE.setAndSave("commands", BLOCKED_COMMANDS_LIST);
         CONFIGURATION.save();
     }
 
