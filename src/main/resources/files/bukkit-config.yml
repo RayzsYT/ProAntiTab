@@ -1,3 +1,13 @@
+#      ____             ___          __  _ ______      __
+#     / __ \_________  /   |  ____  / /_(_)_  __/___ _/ /_
+#    / /_/ / ___/ __ \/ /| | / __ \/ __/ / / / / __ `/ __ \
+#   / ____/ /  / /_/ / ___ |/ / / / /_/ / / / / /_/ / /_/ /
+#  /_/   /_/   \____/_/  |_/_/ /_/\__/_/ /_/  \__,_/_.___/
+#  config.yml (Spigot version)
+
+# This section doesn't really need to be changed
+# but few people seems not to like my design for a custom update-notification message...
+# Well... that's basically the whole reason for this one here. xd
 updater:
   enabled: true
   period: 18000
@@ -7,12 +17,86 @@ updater:
     - '&8[&4ProAntiTab&8] &cGet the newest version here:'
     - '&8[&4ProAntiTab&8] &ehttps://www.rayzs.de/products/proantitab/page'
 
+# This part is VERY important if you are using a Bungeecord/Velocity server!
+# Enabling this allows the Bungeecord/Velocity server to communicate with the Spigot server and exchange information.
+# This is very important to block tab-completions and unwanted suggestions.
+# Please follow the instructions on the documentation page to understand how to set it up.
+# https://www.spigotmc.org/resources/113172/field?field=documentation
+# Go to the section "How to setup" (It's the first section actually)
+# and open the spoiler that matches to your server scenario.
 handle-through-bungeecord:
   enabled: false
   token: insert-token-of-bungeecord-here
   message: '&cPlease use &4/bpat &cinstead!'
 
+# This is a very necessary feature if you have way to many commands to block and instead decides
+# to whitelist specific commands.
+# Enabling this will disable ALL commands except for those that are in the (group-)list
 turn-blacklist-to-whitelist: false
+
+# This feature allows you to customize your server-brand you see when you press F3
+# Normally there stands something like 'Purpur', or 'Spigot'.
+# With this feature you are able to change and even animate it! ^^
+custom-server-brand:
+  # Replace 'false' with 'true' to enable this feature.
+  enabled: false
+
+  # Determines the speed in that the animation goes
+  repeat-delay: 3
+
+  # This here is the list of the animation
+  brands:
+    - '&f&lP&froAntiTab |'
+    - '&fP&lr&foAntiTab /'
+    - '&fPr&lo&fAntiTab -'
+    - '&fPro&lA&fntiTab |'
+    - '&fProA&ln&ftiTab \'
+    - '&fProAn&lt&fiTab |'
+    - '&fProAnt&li&fTab /'
+    - '&fProAnti&lT&fab -'
+    - '&fProAnti&lT&fab \'
+    - '&fProAntiT&la&fb |'
+    - '&fProAntiTa&lb&f /'
+    - '&fProAntiTab -'
+    - '&fProAntiTab \'
+
+# Should the listed command be blocked?
+# Yea... I just comment on it because I wanted to xd
+cancel-blocked-commands:
+  enabled: true
+  message: '&cThe command "%command%" is blocked!'
+
+# Now there we come to the good stuff! ^^
+# If ProAntiTab is loaded on a Spigot server, you will see this option right here.
+# With that you can also customize your own "Unknown Command"-message.
+custom-unknown-command:
+  # Just replace 'false' with 'true' if you want to enable this feature! ^^
+  enabled: false
+  message:
+    - '&cThis command does not exist!'
+
+# This one here allows you to see on what servers ProAntiTab has been synced on and when.
+# But it's for Bungeecord/Velocity servers only!
+stats:
+  fail: '&cThis command works on Bungeecord/Velocity servers only!'
+  no-server: '&cNone!'
+  message:
+    splitter: '&7, '
+    server: '&f%servername% &8(%updated%)'
+    statistic:
+      - '&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)'
+      - '&7Sent to servers: &f%servers%'
+
+# ------------------------------------------------------------------------------
+#       __  ___
+#      /  |/  /__  ______________ _____ ____  _____
+#     / /|_/ / _ \/ ___/ ___/ __ `/ __ `/ _ \/ ___/
+#    / /  / /  __(__  |__  ) /_/ / /_/ /  __(__  )
+#   /_/  /_/\___/____/____/\__,_/\__, /\___/____/
+#                               /____/
+# Here are all the remaining messages for the InGame commands.
+# Have fun editing it to your liking! ^^
+
 no-permissions: '&cYou are not allowed to execute this command! Missing permission: &4proantitab.%permission%'
 command-failed: '&cFailed to execute this command! Use "/pat" to see all available commands.'
 
@@ -21,24 +105,16 @@ notification:
   disabled: '&cDisabled notifications!'
   alert: '&8[&4ALERT&8] &c%player% &8(&7world: &e%world%&8) &ctried to execute the following blocked command: &4%command%'
 
-cancel-blocked-commands:
-  enabled: true
-  message: '&cThe command "%command%" is blocked!'
-
-custom-unknown-command:
-  enabled: false
-  message:
-    - '&cThis command does not exist!'
-
-stats:
-  fail: '&cThis command works on Bungeecord/Velocity servers only!'
-  no-server: '&cNone!'
-  message:
-    statistic:
-      - '&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)'
-      - '&7Sent to servers: &f%servers%'
-    splitter: '&7, '
-    server: '&f%servername% &8(%updated%)'
+help:
+  - '&7Available commands are: &f/%label%&7...'
+  - '&f  reload &7to reload the plugin'
+  - '&f  notify &7to get alerted'
+  - '&f  listgroups &7List all groups'
+  - '&f  creategroup (group) &7Create a group'
+  - '&f  deletegroup (group) &7Delete a group'
+  - '&f  list &8(optional: group) &7to see all listed commands'
+  - '&f  clear &8(optional: group) &7to clear the list'
+  - '&f  add/remove (command) &8(optional: group) &7to manage the list'
 
 reload:
   loading: '&eReloading all configuration files...'
@@ -84,14 +160,3 @@ group:
   remove:
     success: '&aSuccessfully removed %command% from the list of group %group%!'
     failed: '&c%command% is not listed in the group %group%!'
-
-help:
-  - '&7Available commands are: &f/%label%&7...'
-  - '&f  reload &7to reload the plugin'
-  - '&f  notify &7to get alerted'
-  - '&f  listgroups &7List all groups'
-  - '&f  creategroup (group) &7Create a group'
-  - '&f  deletegroup (group) &7Delete a group'
-  - '&f  list &8(optional: group) &7to see all listed commands'
-  - '&f  clear &8(optional: group) &7to clear the list'
-  - '&f  add/remove (command) &8(optional: group) &7to manage the list'
