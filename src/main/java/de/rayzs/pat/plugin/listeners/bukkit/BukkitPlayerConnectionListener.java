@@ -4,6 +4,7 @@ import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.netty.PacketAnalyzer;
 import de.rayzs.pat.utils.PermissionUtil;
 import de.rayzs.pat.utils.Storage;
+import de.rayzs.pat.utils.brand.CustomServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.event.player.*;
@@ -15,6 +16,9 @@ public class BukkitPlayerConnectionListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+
+        CustomServerBrand.preparePlayer(player);
+        CustomServerBrand.sendBrandToPlayer(player);
 
         if(!PacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
 

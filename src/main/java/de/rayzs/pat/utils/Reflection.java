@@ -49,9 +49,18 @@ public class Reflection {
         return velocity;
     }
 
-    public static Class<?> getClass(String path, String name) throws ClassNotFoundException {
-        String classPath = path + "." + name;
-        return Class.forName(classPath);
+    public static Class<?> getClass(String clazzPath) {
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(clazzPath);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        return clazz;
+    }
+
+    public static Class<?> getClass(String path, String name) {
+        return getClass(path + "." + name);
     }
 
     public static Class<?> getPacketClass() throws ClassNotFoundException {
@@ -115,6 +124,41 @@ public class Reflection {
         return result;
     }
 
+    public static List<Method> getMethodsByName(Object obj, String name) {
+        return getMethodsByName(obj.getClass(), name);
+    }
+
+    public static List<Method> getMethodsByName(Class<?> clazz, String name) {
+        List<Method> result = new ArrayList<>();
+        getMethods(clazz).stream().filter(method -> method.getName().equals(name)).forEach(result::add);
+        return result;
+    }
+
+    public static List<Method> getMethodsByParameterAndName(Object obj, String name, Class<?>... parameterTypes) {
+        return getMethodsByParameterAndName(obj.getClass(), name, parameterTypes);
+    }
+
+    public static List<Method> getMethodsByParameterAndName(Class<?> clazz, String name, Class<?>... parameterTypes) {
+        List<Method> result = new ArrayList<>();
+        getMethodsByName(clazz, name).stream().filter(method -> Arrays.equals(method.getParameterTypes(), parameterTypes)).forEach(result::add);
+        return result;
+    }
+
+    public static Object invokeMethode(Method method, Object obj, Object... parameters) throws Exception {
+        method.setAccessible(true);
+        return method.invoke(obj, parameters);
+    }
+
+    public static List<Method> getMethodsByParameter(Object obj, Class<?>... parameterTypes) {
+        return getMethodsByParameter(obj.getClass(), parameterTypes);
+    }
+
+    public static List<Method> getMethodsByParameter(Class<?> clazz, Class<?>... parameterTypes) {
+        List<Method> result = new ArrayList<>();
+        getMethods(clazz).stream().filter(method -> Arrays.equals(method.getParameterTypes(), parameterTypes)).forEach(result::add);
+        return result;
+    }
+
     public static List<Field> getFieldsByType(Class<?> clazz, String target, SearchOption type) {
         List<Field> result = new ArrayList<>(), fieldLists = getFields(clazz);
 
@@ -154,6 +198,18 @@ public class Reflection {
         return getMethodsByReturnType(clazz, target, type).get(0);
     }
 
+    public static List<Method> getMethodsByReturnTypeAndParameter(Class<?> clazz, String returnType, SearchOption type, Class<?>... parameters) {
+        List<Method> result = new ArrayList<>();
+        getMethodsByReturnType(clazz, returnType, type).stream().filter(method -> Arrays.equals(method.getParameterTypes(), parameters)).forEach(result::add);
+        return result;
+    }
+
+    public static List<Method> getMethodsByReturnTypeAndName(Class<?> clazz, String returnType, SearchOption type, String methodName) {
+        List<Method> result = new ArrayList<>();
+        getMethodsByReturnType(clazz, returnType, type).stream().filter(method -> method.getName().equals(methodName)).forEach(result::add);
+        return result;
+    }
+
     public static Object getPlayerConnection(Player player) throws Exception {
         Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
         return getFieldsByType(entityPlayer.getClass(), "PlayerConnection", SearchOption.ENDS).get(0).get(entityPlayer);
@@ -177,6 +233,22 @@ public class Reflection {
     public static void setFieldValue(Field field, Object clazzObj, Object value, boolean closeAccessibility) throws IllegalAccessException {
         field.set(clazzObj, value);
         if(closeAccessibility) field.setAccessible(false);
+    }
+
+    public static Constructor<?> getConstructor(Object obj) throws NoSuchMethodException {
+        return getConstructor(obj.getClass());
+    }
+
+    public static Constructor<?> getConstructor(Class<?> clazz) throws NoSuchMethodException {
+        return clazz.getDeclaredConstructor(new Class[] { null });
+    }
+
+    public static Constructor<?> getConstructor(Object obj, Class<?>... parameters) throws NoSuchMethodException {
+        return getConstructor(obj.getClass(), parameters);
+    }
+
+    public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameters) throws NoSuchMethodException {
+        return clazz.getDeclaredConstructor(parameters);
     }
 
     public static void getAndSetField(String fieldName, Class<?> clazz, Object clazzObj, Object value, boolean closeAccessibility) throws Exception {

@@ -7,15 +7,15 @@ public class Storage {
 
     public static String CURRENT_VERSION_NAME = "", NEWEST_VERSION_NAME = "";
     public static ConfigurationBuilder CONFIGURATION = Configurator.get("config"), STORAGE = Configurator.get("storage"), TOKEN = Configurator.get("token");
-    public static List<String> UNKNOWN_COMMAND, STATS, BLOCKED_COMMANDS_LIST, COMMAND_HELP = new ArrayList<>(), UPDATE_NOTIFICATION = new ArrayList<>();
+    public static List<String> UNKNOWN_COMMAND, STATS, BLOCKED_COMMANDS_LIST, COMMAND_HELP = new ArrayList<>(), CUSTOM_SERVER_BRANDS = new ArrayList<>(), UPDATE_NOTIFICATION = new ArrayList<>();
     public static List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
     public static String TOKEN_KEY = UUID.randomUUID().toString(), BUNGEECORD_MESSAGE, NOTIFY_ALERT, NOTIFY_ENABLED, NOTIFY_DISABLED, CANCEL_COMMANDS_MESSAGE, COMMAND_UNKNOWN, NO_PERMISSIONS, RELOAD_LOADING, RELOAD_DONE,
             BLACKLIST_CLEAR_CONFIRM_MESSAGE, BLACKLIST_CLEAR_MESSAGE, BLACKLIST_LIST_COMMAND_MESSAGE, BLACKLIST_ADD_MESSAGE, BLACKLIST_ADD_FAIL_MESSAGE, BLACKLIST_REMOVE_MESSAGE, BLACKLIST_REMOVE_FAIL_MESSAGE, BLACKLIST_LIST_MESSAGE, BLACKLIST_LIST_SPLITTER_MESSAGE,
             GROUP_DELETE_CONFIRM_MESSAGE, GROUP_CREATE_MESSAGE, GROUP_DELETE_MESSAGE, GROUP_ALREADY_CREATED_MESSAGE, GROUP_NOT_EXIST_MESSAGE, GROUP_CLEAR_MESSAGE, GROUP_LIST_COMMAND_MESSAGE, GROUP_ADD_MESSAGE, GROUP_ADD_FAIL_MESSAGE, GROUP_REMOVE_MESSAGE, GROUP_REMOVE_FAIL_MESSAGE, GROUP_LIST_MESSAGE, GROUP_LIST_SPLITTER_MESSAGE, GROUPS_LIST_MESSAGE, GROUPS_LIST_SPLITTER_MESSAGE, GROUPS_LIST_GROUPS_MESSAGE,
             GROUP_CLEAR_CONFIRM_MESSAGE,
             STATS_FAIL_MESSAGE, STATS_SERVERS_SPLITTER_MESSAGE, STATS_SERVERS_MESSAGE, STATS_SERVERS_NO_SERVER_MESSAGE;
-    public static boolean BUNGEECORD = false, USE_UNKNOWN_COMMAND, TURN_BLACKLIST_TO_WHITELIST, CANCEL_COMMANDS, UPDATE_ENABLED, OUTDATED_VERSION = false, CONSOLE_NOTIFICATION_ENABLED = true;
-    public static int UPDATE_PERIOD, SERVER_DATA_SYNC_COUNT = 0;
+    public static boolean BUNGEECORD = false, USE_CUSTOM_BRAND, USE_UNKNOWN_COMMAND, TURN_BLACKLIST_TO_WHITELIST, CANCEL_COMMANDS, UPDATE_ENABLED, OUTDATED_VERSION = false, CONSOLE_NOTIFICATION_ENABLED = true;
+    public static int UPDATE_PERIOD, SERVER_DATA_SYNC_COUNT = 0, CUSTOM_SERVER_BRAND_REPEAT_DELAY;
     public static long LAST_DATA_UPDATE = System.currentTimeMillis();
 
     public static void
@@ -27,7 +27,8 @@ public class Storage {
                 defaultHelpArray = new ArrayList<>(),
                 defaultUnknownCommandArray = new ArrayList<>(),
                 defaultNotificationArray = new ArrayList<>(),
-                statsMessageArray = new ArrayList<>();
+                statsMessageArray = new ArrayList<>(),
+                customServerBrandsArray = new ArrayList<>();
 
         defaultBlockedCommandArray.addAll(Arrays.asList("help", "?", "about", "ver", "version", "icanhasbukkit", "pl", "plugins"));
         defaultHelpArray.add("&7Available commands are: &f/%label%&7...");
@@ -50,11 +51,27 @@ public class Storage {
         statsMessageArray.add("&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)");
         statsMessageArray.add("&7Sent to servers: &f%servers%");
 
+        customServerBrandsArray.add("&f&lP&froAntiTab |");
+        customServerBrandsArray.add("&fP&lr&foAntiTab /");
+        customServerBrandsArray.add("&fPr&lo&fAntiTab -");
+        customServerBrandsArray.add("&fPro&lA&fntiTab |");
+        customServerBrandsArray.add("&fProA&ln&ftiTab \\");
+        customServerBrandsArray.add("&fProAn&lt&fiTab |");
+        customServerBrandsArray.add("&fProAnt&li&fTab /");
+        customServerBrandsArray.add("&fProAnti&lT&fab -");
+        customServerBrandsArray.add("&fProAnti&lT&fab \\");
+        customServerBrandsArray.add("&fProAntiT&la&fb |");
+        customServerBrandsArray.add("&fProAntiTa&lb&f /");
+        customServerBrandsArray.add("&fProAntiTab -");
+        customServerBrandsArray.add("&fProAntiTab \\");
+
         UPDATE_ENABLED = (boolean) CONFIGURATION.getOrSet("updater.enabled", true);
         UPDATE_PERIOD = (int) CONFIGURATION.getOrSet("updater.period", 18000);
 
         UPDATE_NOTIFICATION = (ArrayList<String>) CONFIGURATION.getOrSet("updater.notification", defaultNotificationArray);
         STATS =  (ArrayList<String>) CONFIGURATION.getOrSet("stats.message.statistic", statsMessageArray);
+
+        CUSTOM_SERVER_BRANDS = (ArrayList<String>) CONFIGURATION.getOrSet("custom-server-brand.brands", customServerBrandsArray);
 
         COMMAND_HELP = (ArrayList<String>) CONFIGURATION.getOrSet("help", defaultHelpArray);
         BLOCKED_COMMANDS_LIST = (ArrayList<String>) STORAGE.getOrSet("commands", defaultBlockedCommandArray);
@@ -82,6 +99,9 @@ public class Storage {
         STATS_SERVERS_NO_SERVER_MESSAGE = (String) CONFIGURATION.getOrSet("stats.no-server", "&cNone!");
         STATS_SERVERS_SPLITTER_MESSAGE = (String) CONFIGURATION.getOrSet("stats.message.splitter", "&7, ");
         STATS_SERVERS_MESSAGE = (String) CONFIGURATION.getOrSet("stats.message.server", "&f%servername% &8(%updated%)");
+
+        USE_CUSTOM_BRAND = (boolean) CONFIGURATION.getOrSet("custom-server-brand.enabled", false);
+        CUSTOM_SERVER_BRAND_REPEAT_DELAY = (int) CONFIGURATION.getOrSet("custom-server-brand.repeat-delay", Reflection.isProxyServer() ? 150 : 3);
 
         CANCEL_COMMANDS = (boolean) CONFIGURATION.getOrSet("cancel-blocked-commands.enabled", true);
         CANCEL_COMMANDS_MESSAGE = (String) CONFIGURATION.getOrSet("cancel-blocked-commands.message", "&cThe command '%command%' is blocked!");

@@ -6,7 +6,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.communication.Client;
 import de.rayzs.pat.utils.communication.ClientCommunication;
@@ -40,11 +39,14 @@ public class VelocityClient implements Client {
     @Subscribe
     public void onQueryReceive(PluginMessageEvent event) {
         if (event.getIdentifier() != IDENTIFIER) return;
+
         try {
             DataInputStream input = new DataInputStream(new ByteArrayInputStream(event.getData()));
             String information = input.readUTF();
             ServerConnection server = (ServerConnection) event.getSource();
             ClientCommunication.receiveInformation(server.getServerInfo().getName(), information);
-        } catch (Throwable throwable) { throwable.printStackTrace(); }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 }

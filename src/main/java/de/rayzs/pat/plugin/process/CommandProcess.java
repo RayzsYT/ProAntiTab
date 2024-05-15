@@ -4,6 +4,7 @@ import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.brand.CustomServerBrand;
 import de.rayzs.pat.utils.communication.ClientCommunication;
 import de.rayzs.pat.utils.communication.ClientInfo;
 import de.rayzs.pat.utils.group.*;
@@ -67,6 +68,7 @@ public class CommandProcess {
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "reload")) return;
                             sender.sendMessage(Storage.RELOAD_LOADING);
                             Storage.load();
+                            CustomServerBrand.initialize();
                             handleChange();
                             sender.sendMessage(Storage.RELOAD_DONE);
                             return;

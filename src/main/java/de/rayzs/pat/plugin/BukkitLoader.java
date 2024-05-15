@@ -7,6 +7,7 @@ import de.rayzs.pat.plugin.listeners.bukkit.BukkitPlayerConnectionListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.netty.PacketAnalyzer;
+import de.rayzs.pat.utils.brand.CustomServerBrand;
 import de.rayzs.pat.utils.communication.ClientCommunication;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -41,6 +42,7 @@ public class BukkitLoader extends JavaPlugin {
 
         Storage.load();
         MessageTranslator.initialize();
+        CustomServerBrand.initialize();
         bStats.initialize(this);
 
         PluginManager manager = getServer().getPluginManager();

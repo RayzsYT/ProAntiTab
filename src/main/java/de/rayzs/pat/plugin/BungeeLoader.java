@@ -9,6 +9,7 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.brand.CustomServerBrand;
 import de.rayzs.pat.utils.communication.ClientCommunication;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -42,6 +43,7 @@ public class BungeeLoader extends Plugin {
 
         Storage.load();
         MessageTranslator.initialize();
+        CustomServerBrand.initialize();
         GroupManager.initialize();
         bStats.initialize(this);
         PluginManager manager = ProxyServer.getInstance().getPluginManager();

@@ -15,6 +15,7 @@ import de.rayzs.pat.plugin.listeners.velocity.VelocityConnectionListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import de.rayzs.pat.utils.ConnectionBuilder;
+import de.rayzs.pat.utils.brand.CustomServerBrand;
 import de.rayzs.pat.utils.communication.ClientCommunication;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
@@ -57,6 +58,7 @@ public class VelocityLoader {
 
         Storage.load();
         MessageTranslator.initialize();
+        CustomServerBrand.initialize();
         GroupManager.initialize();
 
 
