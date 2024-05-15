@@ -6,9 +6,15 @@ import de.rayzs.pat.plugin.netty.PacketAnalyzer;
 import de.rayzs.pat.plugin.netty.PacketHandler;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import de.rayzs.pat.utils.*;
 
 public class ModernPacketHandler implements PacketHandler {
+
+    /*
+    https://haste.rayzs.de/fapunebeva.md
+     */
 
     @Override
     public boolean handleIncomingPacket(Player player, Object packetObj) throws Exception {
@@ -25,8 +31,8 @@ public class ModernPacketHandler implements PacketHandler {
 
     @Override
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
-        Field suggestionsField = Reflection.getFirstFieldByType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS);
-        if(suggestionsField == null) return false;
+        Method suggestionsMethod = Reflection.getMethodsByReturnType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
+        if(suggestionsMethod == null) return false;
 
         String input = PacketAnalyzer.getPlayerInput(player);
 
@@ -45,7 +51,7 @@ public class ModernPacketHandler implements PacketHandler {
                     || Storage.isCommandBlocked(input) && !PermissionUtil.hasBypassPermission(player, input);
         }
 
-        Suggestions suggestions = (Suggestions) suggestionsField.get(packetObj);
+        Suggestions suggestions = (Suggestions) suggestionsMethod.invoke(packetObj);
 
         if(!cancelsBeforeHand)
             suggestions.getList().removeIf(suggestion -> {
