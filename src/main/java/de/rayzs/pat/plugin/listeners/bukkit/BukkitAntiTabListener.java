@@ -24,7 +24,7 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     public static void updateCommands() {
-        if(Reflection.getMinor() >= 18) Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+        if(Reflection.getMinor() >= 16) Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
     }
 
     public static void handleTabCompletion(List<String> commands) {

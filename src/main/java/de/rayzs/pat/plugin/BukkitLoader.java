@@ -56,7 +56,7 @@ public class BukkitLoader extends JavaPlugin {
             manager.registerEvents(new BukkitBlockCommandListener(), this);
         }
 
-        if(Reflection.getMinor() >= 18) manager.registerEvents(new BukkitAntiTabListener(), this);
+        if(Reflection.getMinor() >= 16) manager.registerEvents(new BukkitAntiTabListener(), this);
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
 
         registerCommand("proantitab", "pat");
