@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "1.5.7",
+version = "1.6.0",
 authors = "Rayzs_YT",
 description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.")
 public class VelocityLoader {
