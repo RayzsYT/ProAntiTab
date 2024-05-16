@@ -1,24 +1,13 @@
 package de.rayzs.pat.plugin.netty.handlers;
 
-import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.netty.PacketAnalyzer;
-import de.rayzs.pat.plugin.netty.PacketHandler;
+import de.rayzs.pat.plugin.netty.*;
 import org.bukkit.entity.Player;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
+import java.lang.reflect.*;
 import de.rayzs.pat.utils.*;
 
 public class ModernPacketHandler implements PacketHandler {
-
-    /*
-    https://haste.rayzs.de/fapunebeva.md
-     */
 
     @Override
     public boolean handleIncomingPacket(Player player, Object packetObj) throws Exception {
