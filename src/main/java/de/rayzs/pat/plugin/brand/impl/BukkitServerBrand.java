@@ -1,11 +1,13 @@
 package de.rayzs.pat.plugin.brand.impl;
 
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.plugin.netty.PacketAnalyzer;
 import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.plugin.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.brand.ServerBrand;
+import io.netty.channel.Channel;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -21,10 +23,21 @@ public class BukkitServerBrand implements ServerBrand {
     private static final Server SERVER = Bukkit.getServer();
     private static String BRAND = "";
     private static int TASK = -1;
-    private static boolean INITIALIZED = false;
+    private static boolean INITIALIZED = false, WEIRD = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() >= 20;;
+    private static Class<?> brandPayloadClass, clientBoundCustomPacketPayloadPacketClass, customPacketPayloadPacketClass;
 
     @Override
     public void initializeTask() {
+
+        if(brandPayloadClass == null)
+            brandPayloadClass = Reflection.getClass("net.minecraft.network.protocol.common.custom.BrandPayload");
+
+        if(clientBoundCustomPacketPayloadPacketClass == null)
+            clientBoundCustomPacketPayloadPacketClass = Reflection.getClass("net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket");
+
+        if(customPacketPayloadPacketClass == null)
+            customPacketPayloadPacketClass = Reflection.getClass("net.minecraft.network.protocol.common.custom.CustomPacketPayload");
+
         Bukkit.getOnlinePlayers().forEach(this::preparePlayer);
         if(!INITIALIZED)
             try {
@@ -48,7 +61,6 @@ public class BukkitServerBrand implements ServerBrand {
             BRAND = Storage.CUSTOM_SERVER_BRANDS.get(animationState.get());
             Bukkit.getOnlinePlayers().forEach(this::send);
         }, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY);
-
     }
 
     @Override
@@ -72,8 +84,22 @@ public class BukkitServerBrand implements ServerBrand {
         if(!(playerObj instanceof Player) || !Storage.USE_CUSTOM_BRAND) return;
         Player player = (Player) playerObj;
 
-        PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(BRAND.replace("&", "§") + "§r");
-        player.sendPluginMessage(BukkitLoader.getPlugin(), CustomServerBrand.CHANNEL_NAME, serverBrand.getBytes());
+        if(!WEIRD) {
+            PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(BRAND.replace("&", "§") + "§r");
+            player.sendPluginMessage(BukkitLoader.getPlugin(), CustomServerBrand.CHANNEL_NAME, serverBrand.getBytes());
+            return;
+        }
 
+        try {
+            Channel channel = PacketAnalyzer.INJECTED_PLAYERS.get(player.getUniqueId());
+            if(channel == null) return;
+
+            Object brandPayloadObj = brandPayloadClass.getDeclaredConstructor(String.class).newInstance(BRAND.replace("&", "§") + "§r"),
+                    customPacketPayloadPacket = clientBoundCustomPacketPayloadPacketClass.getDeclaredConstructor(customPacketPayloadPacketClass).newInstance(brandPayloadObj);
+            channel.pipeline().writeAndFlush(customPacketPayloadPacket);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 }
