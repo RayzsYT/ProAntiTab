@@ -36,6 +36,7 @@ public class BungeeBlockCommandListener implements Listener {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uuid);
                 MessageTranslator.send(target, alertMessage);
             });
+            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
             return;
         }
 
