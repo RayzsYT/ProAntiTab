@@ -19,8 +19,6 @@ public class VelocityAntiTabListener {
 
     @Subscribe
     public void onTabComplete(TabCompleteEvent event) {
-        if(!Storage.CANCEL_COMMANDS) return;
-
         Player player = event.getPlayer();
 
         if(PermissionUtil.hasBypassPermission(player)) return;
@@ -34,7 +32,6 @@ public class VelocityAntiTabListener {
 
     @Subscribe (order = PostOrder.FIRST)
     public void onPlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
-        if(!Storage.CANCEL_COMMANDS) return;
         Player player = event.getPlayer();
 
         if(PermissionUtil.hasBypassPermission(player)) return;
