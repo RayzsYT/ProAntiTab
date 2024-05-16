@@ -32,7 +32,7 @@ public class VelocityBlockCommandListener {
             if(Storage.isCommandBlockedPrecise(command)) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
 
-            MessageTranslator.send(player, Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", command.replaceFirst("/", "")));
+            for (String line : Storage.COMMAND_HELP) MessageTranslator.send(player, line.replace("%command%", command.replaceFirst("/", "")));
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
@@ -43,7 +43,7 @@ public class VelocityBlockCommandListener {
         }
 
         if(!Storage.isCommandBlocked(command) || PermissionUtil.hasBypassPermission(player, command)) return;
-        MessageTranslator.send(player, Storage.CANCEL_COMMANDS_MESSAGE.replace("%command%", command.replaceFirst("/", "")));
+        for (String line : Storage.COMMAND_HELP) MessageTranslator.send(player, line.replace("%command%", command.replaceFirst("/", "")));
 
         final String serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown",
                 alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getUsername()).replace("%command%", command).replace("%server%", serverName);
