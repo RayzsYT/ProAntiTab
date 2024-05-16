@@ -10,7 +10,7 @@ public class MessageTranslator {
     private static final HashMap<Character, String> colors = new HashMap<>();
     private static boolean support;
     private static Translator translator = null;
-    private static boolean placeholderapi = false;
+    private static boolean placeholderSupport = false;
 
     public static void initialize() {
         colors.put('1', "<dark_blue>");
@@ -43,8 +43,8 @@ public class MessageTranslator {
                     : new BukkitMessageTranslator();
     }
 
-    public static void enablePlaceholderUsage() {
-        placeholderapi = true;
+    public static void enablePlaceholderSupport() {
+        placeholderSupport = true;
     }
 
     public static String replaceMessage(String text) {
@@ -53,7 +53,7 @@ public class MessageTranslator {
 
     public static String replaceMessage(Object playerObj, String text) {
         text = text.replace("&", "§").replace("%newest_version%", Storage.NEWEST_VERSION_NAME).replace("\\n", "\n");
-        return placeholderapi || playerObj == null ? PlaceholderReplacer.replace(playerObj, text) : text;
+        return placeholderSupport || playerObj == null ? PlaceholderReplacer.replace(playerObj, text) : text;
     }
 
     public static String translateLegacy(String text) {
