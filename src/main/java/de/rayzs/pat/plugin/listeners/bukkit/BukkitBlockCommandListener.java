@@ -31,16 +31,17 @@ public class BukkitBlockCommandListener implements Listener {
 
         if(rawCommand.equals("/")) return;
 
+        World world = player.getWorld();
+        String worldName = world.getName(), alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%world%", worldName);
+
         if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
             for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
 
-            final World world = player.getWorld();
-            final String worldName = world.getName(), alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%world%", worldName);
+            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
                 Player target = Bukkit.getServer().getPlayer(uuid);
                 MessageTranslator.send(target, alertMessage);
             });
-            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
             event.setCancelled(true);
             return;
         }
@@ -63,13 +64,11 @@ public class BukkitBlockCommandListener implements Listener {
 
         for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
 
-        final World world = player.getWorld();
-        final String worldName = world.getName(), alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%world%", worldName);
+        if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
         Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
             Player target = Bukkit.getServer().getPlayer(uuid);
             MessageTranslator.send(target, alertMessage);
         });
-        if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
         event.setCancelled(true);
     }
 }

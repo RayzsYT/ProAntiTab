@@ -24,19 +24,20 @@ public class BungeeBlockCommandListener implements Listener {
         String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", "").toLowerCase();
 
         if(rawCommand.equals("/")) return;
+        ServerInfo serverInfo = player.getServer().getInfo();
+        String serverName = serverInfo != null ? serverInfo.getName() : "unknown",
+                alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%server%", serverName);
+
 
         if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
             for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
             event.setCancelled(true);
 
-            final ServerInfo serverInfo = player.getServer().getInfo();
-            final String serverName = serverInfo != null ? serverInfo.getName() : "unknown",
-                    alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%server%", serverName);
+            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> ProxyServer.getInstance().getPlayer(uuid) != null).forEach(uuid -> {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uuid);
                 MessageTranslator.send(target, alertMessage);
             });
-            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
             return;
         }
 
@@ -57,14 +58,11 @@ public class BungeeBlockCommandListener implements Listener {
         if(!Storage.isCommandBlocked(command) || PermissionUtil.hasBypassPermission(player, command)) return;
         for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
 
-        final ServerInfo serverInfo = player.getServer().getInfo();
-        final String serverName = serverInfo != null ? serverInfo.getName() : "unknown",
-                alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%server%", serverName);
+        if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
         Storage.NOTIFY_PLAYERS.stream().filter(uuid -> ProxyServer.getInstance().getPlayer(uuid) != null).forEach(uuid -> {
             ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uuid);
             MessageTranslator.send(target, alertMessage);
         });
-        if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
         event.setCancelled(true);
     }
 }

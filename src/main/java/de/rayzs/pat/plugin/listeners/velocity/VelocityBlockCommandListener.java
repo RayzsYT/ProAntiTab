@@ -27,17 +27,18 @@ public class VelocityBlockCommandListener {
         if(!(commandSource instanceof Player)) return;
 
         Player player = (Player) commandSource;
-        String command = event.getCommand();
+        String command = event.getCommand(),
+                serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown",
+                alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getUsername()).replace("%command%", command).replace("%server%", serverName);
 
         if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
             for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", command.replaceFirst("/", "")));
             event.setResult(CommandExecuteEvent.CommandResult.denied());
-            final String serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown",
-                    alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getUsername()).replace("%command%", command).replace("%server%", serverName);
+
+            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent() && server.getPlayer(uuid).get().isActive()).forEach(uuid -> {
                 MessageTranslator.send(server.getPlayer(uuid).get(), alertMessage);
             });
-            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
             return;
         }
 
@@ -58,13 +59,11 @@ public class VelocityBlockCommandListener {
         if(!Storage.isCommandBlocked(command) || PermissionUtil.hasBypassPermission(player, command)) return;
         for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", command.replaceFirst("/", "")));
 
-        final String serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown",
-                alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getUsername()).replace("%command%", command).replace("%server%", serverName);
+        if(Storage.CONSOLE_NOTIFICATION_ENABLED) MessageTranslator.send(server.getConsoleCommandSource(), alertMessage);
         Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent() && server.getPlayer(uuid).get().isActive()).forEach(uuid -> {
             MessageTranslator.send(server.getPlayer(uuid).get(), alertMessage);
         });
 
-        if(Storage.CONSOLE_NOTIFICATION_ENABLED) MessageTranslator.send(server.getConsoleCommandSource(), alertMessage);
         event.setResult(CommandExecuteEvent.CommandResult.denied());
     }
 }
