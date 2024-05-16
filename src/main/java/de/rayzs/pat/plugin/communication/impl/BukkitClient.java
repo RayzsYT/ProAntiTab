@@ -31,7 +31,6 @@ public class BukkitClient implements Client, PluginMessageListener {
         try {
             ByteArrayDataInput input = ByteStreams.newDataInput(bytes);
             String information = input.readUTF();
-            System.out.println("IN: " + information);
             Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> ClientCommunication.receiveInformation("proxy", information));
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
