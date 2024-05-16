@@ -7,9 +7,9 @@ public class Storage {
 
     public static String CURRENT_VERSION_NAME = "", NEWEST_VERSION_NAME = "";
     public static ConfigurationBuilder CONFIGURATION = Configurator.get("config"), STORAGE = Configurator.get("storage"), TOKEN = Configurator.get("token");
-    public static List<String> UNKNOWN_COMMAND, STATS, BLOCKED_COMMANDS_LIST, COMMAND_HELP = new ArrayList<>(), CUSTOM_SERVER_BRANDS = new ArrayList<>(), UPDATE_NOTIFICATION = new ArrayList<>();
+    public static List<String> UNKNOWN_COMMAND, CANCEL_COMMANDS_MESSAGE, STATS, BLOCKED_COMMANDS_LIST, COMMAND_HELP = new ArrayList<>(), CUSTOM_SERVER_BRANDS = new ArrayList<>(), UPDATE_NOTIFICATION = new ArrayList<>();
     public static List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
-    public static String TOKEN_KEY = UUID.randomUUID().toString(), BUNGEECORD_MESSAGE, NOTIFY_ALERT, NOTIFY_ENABLED, NOTIFY_DISABLED, CANCEL_COMMANDS_MESSAGE, COMMAND_UNKNOWN, NO_PERMISSIONS, RELOAD_LOADING, RELOAD_DONE,
+    public static String TOKEN_KEY = UUID.randomUUID().toString(), BUNGEECORD_MESSAGE, NOTIFY_ALERT, NOTIFY_ENABLED, NOTIFY_DISABLED, COMMAND_UNKNOWN, NO_PERMISSIONS, RELOAD_LOADING, RELOAD_DONE,
             BLACKLIST_CLEAR_CONFIRM_MESSAGE, BLACKLIST_CLEAR_MESSAGE, BLACKLIST_LIST_COMMAND_MESSAGE, BLACKLIST_ADD_MESSAGE, BLACKLIST_ADD_FAIL_MESSAGE, BLACKLIST_REMOVE_MESSAGE, BLACKLIST_REMOVE_FAIL_MESSAGE, BLACKLIST_LIST_MESSAGE, BLACKLIST_LIST_SPLITTER_MESSAGE,
             GROUP_DELETE_CONFIRM_MESSAGE, GROUP_CREATE_MESSAGE, GROUP_DELETE_MESSAGE, GROUP_ALREADY_CREATED_MESSAGE, GROUP_NOT_EXIST_MESSAGE, GROUP_CLEAR_MESSAGE, GROUP_LIST_COMMAND_MESSAGE, GROUP_ADD_MESSAGE, GROUP_ADD_FAIL_MESSAGE, GROUP_REMOVE_MESSAGE, GROUP_REMOVE_FAIL_MESSAGE, GROUP_LIST_MESSAGE, GROUP_LIST_SPLITTER_MESSAGE, GROUPS_LIST_MESSAGE, GROUPS_LIST_SPLITTER_MESSAGE, GROUPS_LIST_GROUPS_MESSAGE,
             GROUP_CLEAR_CONFIRM_MESSAGE,
@@ -28,7 +28,8 @@ public class Storage {
                 defaultUnknownCommandArray = new ArrayList<>(),
                 defaultNotificationArray = new ArrayList<>(),
                 statsMessageArray = new ArrayList<>(),
-                customServerBrandsArray = new ArrayList<>();
+                customServerBrandsArray = new ArrayList<>(),
+                commandBlockedArray = new ArrayList<>();
 
         defaultBlockedCommandArray.addAll(Arrays.asList("help", "?", "about", "ver", "version", "icanhasbukkit", "pl", "plugins"));
         defaultHelpArray.add("&7Available commands are: &f/%label%&7...");
@@ -65,6 +66,8 @@ public class Storage {
         customServerBrandsArray.add("&fProAntiTab -");
         customServerBrandsArray.add("&fProAntiTab \\");
 
+        commandBlockedArray.add("The command %command% is blocked!");
+
         UPDATE_ENABLED = (boolean) CONFIGURATION.getOrSet("updater.enabled", true);
         UPDATE_PERIOD = (int) CONFIGURATION.getOrSet("updater.period", 18000);
 
@@ -75,6 +78,9 @@ public class Storage {
 
         COMMAND_HELP = (ArrayList<String>) CONFIGURATION.getOrSet("help", defaultHelpArray);
         BLOCKED_COMMANDS_LIST = (ArrayList<String>) STORAGE.getOrSet("commands", defaultBlockedCommandArray);
+
+        CANCEL_COMMANDS_MESSAGE = (ArrayList) CONFIGURATION.getOrSet("cancel-blocked-commands.message", commandBlockedArray);
+
         NO_PERMISSIONS = (String) CONFIGURATION.getOrSet("no-permissions", "&cYou are not allowed to execute this command! Missing permission: &4proantitab.%permission%");
 
         if(!Reflection.isProxyServer()) {
@@ -104,7 +110,6 @@ public class Storage {
         CUSTOM_SERVER_BRAND_REPEAT_DELAY = (int) CONFIGURATION.getOrSet("custom-server-brand.repeat-delay", Reflection.isProxyServer() ? 150 : 3);
 
         CANCEL_COMMANDS = (boolean) CONFIGURATION.getOrSet("cancel-blocked-commands.enabled", true);
-        CANCEL_COMMANDS_MESSAGE = (String) CONFIGURATION.getOrSet("cancel-blocked-commands.message", "&cThe command '%command%' is blocked!");
 
         TURN_BLACKLIST_TO_WHITELIST = (boolean) CONFIGURATION.getOrSet("turn-blacklist-to-whitelist", false);
         BLACKLIST_CLEAR_MESSAGE = (String) CONFIGURATION.getOrSet("blacklist.clear", "&aList has been cleared!");

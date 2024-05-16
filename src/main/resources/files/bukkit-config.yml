@@ -69,7 +69,8 @@ custom-server-brand:
 # Yea... I just comment on it because I wanted to xd
 cancel-blocked-commands:
   enabled: true
-  message: '&cThe command "%command%" is blocked!'
+  message:
+    - '&cThe command "%command%" is blocked!'
 
 # Now there we come to the good stuff! ^^
 # If ProAntiTab is loaded on a Spigot server, you will see this option right here.
