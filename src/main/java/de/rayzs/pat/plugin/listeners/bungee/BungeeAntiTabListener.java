@@ -20,7 +20,7 @@ public class BungeeAntiTabListener implements Listener {
         event.getSuggestions().removeIf(command -> {
             if(Storage.TURN_BLACKLIST_TO_WHITELIST)
                 return !Storage.isCommandBlockedPrecise(command) && !PermissionUtil.hasBypassPermission(player, command);
-            else return Storage.isCommandBlockedPrecise(command) && !PermissionUtil.hasBypassPermission(player, command);
+            else return Storage.isCommandBlocked(command) && !PermissionUtil.hasBypassPermission(player, command);
         });
     }
 
