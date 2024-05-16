@@ -1,11 +1,11 @@
-package de.rayzs.pat.utils.brand.impl;
+package de.rayzs.pat.plugin.brand.impl;
 
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
-import de.rayzs.pat.utils.brand.CustomServerBrand;
-import de.rayzs.pat.utils.brand.ServerBrand;
+import de.rayzs.pat.plugin.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.brand.ServerBrand;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;

@@ -4,7 +4,7 @@ import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.netty.PacketAnalyzer;
 import de.rayzs.pat.utils.PermissionUtil;
 import de.rayzs.pat.utils.Storage;
-import de.rayzs.pat.utils.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.brand.CustomServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.event.player.*;

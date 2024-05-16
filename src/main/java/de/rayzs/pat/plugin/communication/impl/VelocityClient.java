@@ -1,4 +1,4 @@
-package de.rayzs.pat.utils.communication.impl;
+package de.rayzs.pat.plugin.communication.impl;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
@@ -7,8 +7,8 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.rayzs.pat.plugin.VelocityLoader;
-import de.rayzs.pat.utils.communication.Client;
-import de.rayzs.pat.utils.communication.ClientCommunication;
+import de.rayzs.pat.plugin.communication.Client;
+import de.rayzs.pat.plugin.communication.ClientCommunication;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;

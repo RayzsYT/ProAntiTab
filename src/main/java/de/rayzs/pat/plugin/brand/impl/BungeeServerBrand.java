@@ -1,9 +1,9 @@
-package de.rayzs.pat.utils.brand.impl;
+package de.rayzs.pat.plugin.brand.impl;
 
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Storage;
-import de.rayzs.pat.utils.brand.ServerBrand;
+import de.rayzs.pat.plugin.brand.ServerBrand;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;

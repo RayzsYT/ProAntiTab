@@ -1,4 +1,4 @@
-package de.rayzs.pat.utils.communication;
+package de.rayzs.pat.plugin.communication;
 
 import de.rayzs.pat.utils.TimeConverter;
 

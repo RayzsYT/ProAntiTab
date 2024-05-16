@@ -1,4 +1,4 @@
-package de.rayzs.pat.utils.brand;
+package de.rayzs.pat.plugin.brand;
 
 public interface ServerBrand {
     void preparePlayer(Object playerObj);

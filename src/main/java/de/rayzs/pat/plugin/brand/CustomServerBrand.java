@@ -1,9 +1,9 @@
-package de.rayzs.pat.utils.brand;
+package de.rayzs.pat.plugin.brand;
 
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.brand.impl.BukkitServerBrand;
-import de.rayzs.pat.utils.brand.impl.BungeeServerBrand;
-import de.rayzs.pat.utils.brand.impl.VelocityServerBrand;
+import de.rayzs.pat.plugin.brand.impl.BukkitServerBrand;
+import de.rayzs.pat.plugin.brand.impl.BungeeServerBrand;
+import de.rayzs.pat.plugin.brand.impl.VelocityServerBrand;
 
 public class CustomServerBrand {
 
