@@ -117,20 +117,22 @@ blacklist:
     message: '&7Listed commands (&f%size%&7)&8: &f%commands%'
     splitter: '&7, '
     command: '&f'
+
   add:
     success: '&aSuccessfully added %command% into list!'
     fail: '&c%command% is already in the list!'
     failed: '&c%command% is already in the list!'
+
   remove:
     success: '&aSuccessfully removed %command% from the list!'
     failed: '&c%command% is not listed!'
 
 group:
   create: '&aGroup %group% has been created!'
-  delete: '&cGroup %group% has been deleted!'
-  delete-confirmation: '&4Warning! &7This command will &cdelete the group with the whole list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
   already-exist: '&cGroup %group% already exist!'
   does-not-exist: '&cGroup %group% does not exist!'
+  delete: '&cGroup %group% has been deleted!'
+  delete-confirmation: '&4Warning! &7This command will &cdelete the group with the whole list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
   clear: '&aList of group %group% has been cleared!'
   clear-confirmation: '&4Warning! &7This command will &cclear the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
 
@@ -143,9 +145,11 @@ group:
     message: '&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%'
     splitter: '&7, '
     command: '&f'
+
   add:
     success: '&aSuccessfully added %command% into the list of group %group%!'
     failed: '&c%command% is already in the list of group %group%!'
+
   remove:
     success: '&aSuccessfully removed %command% from the list of group %group%!'
     failed: '&c%command% is not listed in the group %group%!'
