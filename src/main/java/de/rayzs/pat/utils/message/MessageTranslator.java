@@ -52,7 +52,7 @@ public class MessageTranslator {
     }
 
     public static String replaceMessage(Object playerObj, String text) {
-        text = text.replace("&", "§").replace("%newest_version%", Storage.NEWEST_VERSION_NAME).replace("\\n", "\n");
+        text = text.replace("&", "§").replace("%current_version%", Storage.CURRENT_VERSION_NAME).replace("%newest_version%", Storage.NEWEST_VERSION_NAME).replace("\\n", "\n");
         return placeholderSupport || playerObj == null ? PlaceholderReplacer.replace(playerObj, text) : text;
     }
 

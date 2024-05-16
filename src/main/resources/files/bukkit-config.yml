@@ -48,6 +48,7 @@ custom-server-brand:
   # Possible placeholders:
   # %player% - name of the player
   # %displayname% - displayname of the player
+  # ... and other available placeholders from PlaceholderAPI
   brands:
     - '&f&lP&froAntiTab |'
     - '&fP&lr&foAntiTab /'
