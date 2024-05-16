@@ -40,7 +40,7 @@ public class BukkitBlockCommandListener implements Listener {
         if((Storage.TURN_BLACKLIST_TO_WHITELIST)) {
             if(Storage.isCommandBlockedPrecise(command)) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
-            for (String line : Storage.COMMAND_HELP) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
+            for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
             event.setCancelled(true);
             return;
         }
@@ -53,7 +53,7 @@ public class BukkitBlockCommandListener implements Listener {
         if (!Storage.isCommandBlocked(commandLowerCased)) return;
         if (PermissionUtil.hasBypassPermission(player, command)) return;
 
-        for (String line : Storage.COMMAND_HELP) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
+        for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
 
         final World world = player.getWorld();
         final String worldName = world.getName(), alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%world%", worldName);

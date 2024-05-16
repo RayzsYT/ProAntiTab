@@ -35,7 +35,7 @@ public class BungeeBlockCommandListener implements Listener {
             if(Storage.isCommandBlockedPrecise(command)) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
 
-            for (String line : Storage.COMMAND_HELP) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
+            for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
             event.setCancelled(true);
             return;
         }
@@ -46,7 +46,7 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if(!Storage.isCommandBlocked(command) || PermissionUtil.hasBypassPermission(player, command)) return;
-        for (String line : Storage.COMMAND_HELP) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
+        for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
 
         final ServerInfo serverInfo = player.getServer().getInfo();
         final String serverName = serverInfo != null ? serverInfo.getName() : "unknown",
