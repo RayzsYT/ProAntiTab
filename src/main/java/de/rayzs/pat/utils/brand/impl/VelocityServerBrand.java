@@ -2,7 +2,6 @@ package de.rayzs.pat.utils.brand.impl;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.PacketUtils;
@@ -10,7 +9,6 @@ import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.brand.ServerBrand;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
 import java.util.concurrent.TimeUnit;
