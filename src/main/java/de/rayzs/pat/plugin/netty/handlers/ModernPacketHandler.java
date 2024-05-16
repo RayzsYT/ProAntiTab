@@ -48,7 +48,6 @@ public class ModernPacketHandler implements PacketHandler {
         boolean cancelsBeforeHand = false,
                 // 1.20.6 support coming soon bcs it's to annoying to work with on packet-base rn
                 weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() >= 20;
-        int spaces = 0;
 
         if(input.startsWith("/")) {
             input = input.replace("/", "");
