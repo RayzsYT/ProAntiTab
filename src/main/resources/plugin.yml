@@ -6,6 +6,9 @@ version: 1.6.0
 api-version: 1.13
 main: de.rayzs.pat.plugin.BukkitLoader
 
+softdepend:
+  - PlaceholderAPI
+
 commands:
   proantitab:
     aliases: [pat]
