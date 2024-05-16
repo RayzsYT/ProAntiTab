@@ -40,6 +40,7 @@ public class BukkitBlockCommandListener implements Listener {
                 Player target = Bukkit.getServer().getPlayer(uuid);
                 MessageTranslator.send(target, alertMessage);
             });
+            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
             event.setCancelled(true);
             return;
         }

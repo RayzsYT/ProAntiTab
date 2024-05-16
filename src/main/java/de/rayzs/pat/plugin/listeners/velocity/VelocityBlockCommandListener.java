@@ -5,6 +5,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.PermissionUtil;
 import de.rayzs.pat.utils.Storage;
@@ -36,6 +37,7 @@ public class VelocityBlockCommandListener {
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent() && server.getPlayer(uuid).get().isActive()).forEach(uuid -> {
                 MessageTranslator.send(server.getPlayer(uuid).get(), alertMessage);
             });
+            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
             return;
         }
 
