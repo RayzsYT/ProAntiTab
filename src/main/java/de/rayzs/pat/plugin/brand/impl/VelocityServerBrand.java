@@ -43,7 +43,7 @@ public class VelocityServerBrand implements ServerBrand {
             if(animationState.getAndIncrement() >= Storage.CUSTOM_SERVER_BRANDS.size() - 1) animationState.set(0);
             BRAND = MessageTranslator.replaceMessage(Storage.CUSTOM_SERVER_BRANDS.get(animationState.get())) + "§r";
             SERVER.getAllPlayers().forEach(this::send);
-        }).repeat(Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY, TimeUnit.MILLISECONDS).schedule();
+        }).repeat(1, TimeUnit.MILLISECONDS).schedule();
     }
 
 

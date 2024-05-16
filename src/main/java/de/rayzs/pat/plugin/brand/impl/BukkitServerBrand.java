@@ -61,7 +61,7 @@ public class BukkitServerBrand implements ServerBrand {
             if(animationState.getAndIncrement() >= Storage.CUSTOM_SERVER_BRANDS.size() - 1) animationState.set(0);
             BRAND = Storage.CUSTOM_SERVER_BRANDS.get(animationState.get()) + "§r";
             Bukkit.getOnlinePlayers().forEach(this::send);
-        }, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY);
+        }, 1, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY);
     }
 
     @Override
