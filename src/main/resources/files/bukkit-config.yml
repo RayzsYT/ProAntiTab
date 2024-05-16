@@ -24,7 +24,7 @@ updater:
 # https://www.spigotmc.org/resources/113172/field?field=documentation
 # Go to the section "How to setup" (It's the first section actually)
 # and open the spoiler that matches to your server scenario.
-handle-through-bungeecord:
+handle-through-proxy:
   enabled: false
   token: insert-token-of-bungeecord-here
   message: '&cPlease use &4/bpat &cinstead!'

@@ -89,7 +89,7 @@ public class Storage {
                 TOKEN_KEY = (String) CONFIGURATION.get("token");
                 TOKEN.setAndSave("token", TOKEN_KEY);
             } else TOKEN_KEY = (String) TOKEN.getOrSet("token", TOKEN_KEY);
-        } else TOKEN_KEY = (String) CONFIGURATION.getOrSet("handle-through-bungeecord.token", "insert-token-of-bungeecord-here");
+        } else TOKEN_KEY = (String) CONFIGURATION.getOrSet("handle-through-proxy.token", "insert-token-of-proxy-here");
 
         NOTIFY_ENABLED = (String) CONFIGURATION.getOrSet("notification.enabled", "&aEnabled notifications!");
         NOTIFY_DISABLED = (String) CONFIGURATION.getOrSet("notification.disabled", "&cDisabled notifications!");
