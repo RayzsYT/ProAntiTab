@@ -33,6 +33,7 @@ public class BukkitBlockCommandListener implements Listener {
 
         if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
             for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
+            event.setCancelled(true);
             return;
         }
 

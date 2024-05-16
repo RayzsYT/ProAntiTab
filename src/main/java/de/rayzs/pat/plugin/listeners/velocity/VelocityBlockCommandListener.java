@@ -30,6 +30,7 @@ public class VelocityBlockCommandListener {
 
         if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
             for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", command.replaceFirst("/", "")));
+            event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
 
