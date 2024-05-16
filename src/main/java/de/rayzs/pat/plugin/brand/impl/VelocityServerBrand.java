@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.brand.impl;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.PacketUtils;
@@ -12,6 +13,7 @@ import de.rayzs.pat.utils.message.MessageTranslator;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,7 +59,11 @@ public class VelocityServerBrand implements ServerBrand {
             Object connectedPlayerObj = connectedPlayerConnectionClass.cast(player),
                     minecraftConnectionObj = Reflection.getMethodsByName(connectedPlayerObj, "getConnection").get(0).invoke(connectedPlayerObj);
 
-            PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(BRAND.replace("&", "§") + "§r", false);
+            String serverName = "", playerName = player.getUsername();
+            Optional<ServerConnection> serverConnection = player.getCurrentServer();
+            if(serverConnection.isPresent()) serverName = serverConnection.get().getServerInfo().getName();
+
+            PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(BRAND.replace("%player%", playerName).replace("%server%", serverName), false);
             String brand = player.getProtocolVersion().getProtocol() >= ProtocolConstants.MINECRAFT_1_13 ? "minecraft:brand" : "MC|Brand";
             Object pluginMessagePacket = pluginMessagePacketClass.getConstructor(String.class, ByteBuf.class).newInstance(brand, serverBrand.getByteBuf());
             Reflection.getMethodsByParameterAndName(minecraftConnectionObj, "write", Object.class).get(0).invoke(minecraftConnectionObj, pluginMessagePacket);

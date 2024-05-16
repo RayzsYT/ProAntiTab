@@ -30,6 +30,9 @@ custom-server-brand:
   enabled: false
 
   # Determines the speed in that the animation goes
+  # Possible placeholders:
+  # %server% - server-name where the player is
+  # %player% - name of the player
   repeat-delay: 150
   brands:
     - '&f&lP&froAntiTab |'

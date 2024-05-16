@@ -45,6 +45,9 @@ custom-server-brand:
   repeat-delay: 3
 
   # This here is the list of the animation
+  # Possible placeholders:
+  # %player% - name of the player
+  # %displayname% - displayname of the player
   brands:
     - '&f&lP&froAntiTab |'
     - '&fP&lr&foAntiTab /'
