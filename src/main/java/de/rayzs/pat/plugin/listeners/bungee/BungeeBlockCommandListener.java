@@ -25,6 +25,11 @@ public class BungeeBlockCommandListener implements Listener {
 
         if(rawCommand.equals("/")) return;
 
+        if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
+            for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
+            return;
+        }
+
         if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
             if(Storage.isCommandBlockedPrecise(command)) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;

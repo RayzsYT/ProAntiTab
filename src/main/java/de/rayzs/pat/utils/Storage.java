@@ -187,4 +187,17 @@ public class Storage {
         }
         return false;
     }
+
+    public static boolean isPluginsCommand(String command) {
+        String[] split;
+        if(command.contains(" ")) {
+            split = command.split(" ");
+            if(split.length > 0) command = split[0];
+            command = command.split(" ")[0];
+        }
+        for (String blockedCommand : Arrays.asList("pl", "plugins", "bukkit:pl", "bukkit:plugins")) {
+            if(blockedCommand.equals(command.toLowerCase())) return true;
+        }
+        return false;
+    }
 }
