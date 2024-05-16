@@ -53,7 +53,7 @@ public class MessageTranslator {
 
     public static String replaceMessage(Object playerObj, String text) {
         text = text.replace("&", "§").replace("%current_version%", Storage.CURRENT_VERSION_NAME).replace("%newest_version%", Storage.NEWEST_VERSION_NAME).replace("\\n", "\n");
-        return placeholderSupport || playerObj == null ? PlaceholderReplacer.replace(playerObj, text) : text;
+        return !placeholderSupport || playerObj == null || Reflection.isProxyServer() ? text : PlaceholderReplacer.replace(playerObj, text);
     }
 
     public static String translateLegacy(String text) {
@@ -77,7 +77,7 @@ public class MessageTranslator {
     }
 
     public static void send(Object target, String text) {
-        text = replaceMessage(text);
+        text = replaceMessage(target, text);
         if(translator == null) {
             CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
             sender.sendMessage(text);
