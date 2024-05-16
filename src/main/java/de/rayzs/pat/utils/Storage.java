@@ -159,6 +159,7 @@ public class Storage {
     }
 
     public static boolean isCommandBlocked(String command) {
+        System.out.println("Raw: " + command);
         String[] split;
         if(command.contains(" ")) {
             split = command.split(" ");
@@ -167,10 +168,12 @@ public class Storage {
         }
         if(command.contains(":")) {
             split = command.split(":");
-            if(split.length > 0) command = split[1];
+            if(split.length > 0) command = command.replaceFirst(split[0] + ":", "");
         }
         for (String blockedCommand : BLOCKED_COMMANDS_LIST) {
-            if(blockedCommand.equals(command.toLowerCase())) return true;
+
+            if (blockedCommand.equals(command.toLowerCase())) return true;
+
         }
         return false;
     }
@@ -195,9 +198,9 @@ public class Storage {
             if(split.length > 0) command = split[0];
             command = command.split(" ")[0];
         }
-        for (String blockedCommand : Arrays.asList("pl", "plugins", "bukkit:pl", "bukkit:plugins")) {
+        for (String blockedCommand : Arrays.asList("pl", "plugins", "bukkit:pl", "bukkit:plugins"))
             if(blockedCommand.equals(command.toLowerCase())) return true;
-        }
+
         return false;
     }
 }
