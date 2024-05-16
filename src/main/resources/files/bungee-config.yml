@@ -30,7 +30,7 @@ custom-server-brand:
   enabled: false
 
   # Determines the speed in that the animation goes
-  repeat-delay: 3
+  repeat-delay: 150
   brands:
     - '&f&lP&froAntiTab |'
     - '&fP&lr&foAntiTab /'
