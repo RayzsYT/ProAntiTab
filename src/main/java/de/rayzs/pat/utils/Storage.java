@@ -159,7 +159,6 @@ public class Storage {
     }
 
     public static boolean isCommandBlocked(String command) {
-        System.out.println("Raw: " + command);
         String[] split;
         if(command.contains(" ")) {
             split = command.split(" ");
