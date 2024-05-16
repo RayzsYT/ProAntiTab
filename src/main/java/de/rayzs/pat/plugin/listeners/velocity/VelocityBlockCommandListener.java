@@ -31,6 +31,11 @@ public class VelocityBlockCommandListener {
         if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
             for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", command.replaceFirst("/", "")));
             event.setResult(CommandExecuteEvent.CommandResult.denied());
+            final String serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown",
+                    alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getUsername()).replace("%command%", command).replace("%server%", serverName);
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent() && server.getPlayer(uuid).get().isActive()).forEach(uuid -> {
+                MessageTranslator.send(server.getPlayer(uuid).get(), alertMessage);
+            });
             return;
         }
 

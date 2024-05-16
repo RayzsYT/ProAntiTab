@@ -33,6 +33,13 @@ public class BukkitBlockCommandListener implements Listener {
 
         if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
             for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
+
+            final World world = player.getWorld();
+            final String worldName = world.getName(), alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%world%", worldName);
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
+                Player target = Bukkit.getServer().getPlayer(uuid);
+                MessageTranslator.send(target, alertMessage);
+            });
             event.setCancelled(true);
             return;
         }

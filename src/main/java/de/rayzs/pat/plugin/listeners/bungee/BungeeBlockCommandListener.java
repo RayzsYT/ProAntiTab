@@ -28,6 +28,14 @@ public class BungeeBlockCommandListener implements Listener {
         if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
             for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
             event.setCancelled(true);
+
+            final ServerInfo serverInfo = player.getServer().getInfo();
+            final String serverName = serverInfo != null ? serverInfo.getName() : "unknown",
+                    alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%server%", serverName);
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> ProxyServer.getInstance().getPlayer(uuid) != null).forEach(uuid -> {
+                ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uuid);
+                MessageTranslator.send(target, alertMessage);
+            });
             return;
         }
 
