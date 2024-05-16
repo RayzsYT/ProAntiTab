@@ -49,7 +49,7 @@ custom-server-brand:
   # %player%        - name of the player
   # %displayname%   - displayname of the player
   # %world%         - name of world where the player is
-  # ... and other available placeholders from PlaceholderAPI
+  # and the other placeholders from PlaceholderAPI
   brands:
     - '&f&lP&froAntiTab |'
     - '&fP&lr&foAntiTab /'
