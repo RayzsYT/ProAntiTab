@@ -4,6 +4,7 @@ import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.utils.message.*;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,6 +16,11 @@ public class BukkitMessageTranslator implements Translator {
 
     public BukkitMessageTranslator() {
         audiences = BukkitAudiences.create(BukkitLoader.getPlugin());
+    }
+
+    @Override
+    public String translate(String text) {
+        return miniMessage.serialize(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
     }
 
     @Override

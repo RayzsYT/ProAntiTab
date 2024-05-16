@@ -4,6 +4,7 @@ import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.plugin.brand.ServerBrand;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
@@ -30,7 +31,7 @@ public class BungeeServerBrand implements ServerBrand {
         AtomicInteger animationState = new AtomicInteger(0);
         TASK = SERVER.getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
             if(animationState.getAndIncrement() >= Storage.CUSTOM_SERVER_BRANDS.size() - 1) animationState.set(0);
-            BRAND = Storage.CUSTOM_SERVER_BRANDS.get(animationState.get());
+            BRAND = MessageTranslator.replaceMessage(Storage.CUSTOM_SERVER_BRANDS.get(animationState.get())) + "§r";
             SERVER.getPlayers().forEach(this::send);
         }, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY, TimeUnit.MILLISECONDS);
     }

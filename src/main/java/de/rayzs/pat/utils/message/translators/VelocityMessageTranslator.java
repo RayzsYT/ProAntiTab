@@ -10,6 +10,11 @@ public class VelocityMessageTranslator implements Translator {
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
     @Override
+    public String translate(String text) {
+        return miniMessage.serialize(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+    }
+
+    @Override
     public void send(Object target, String text) {
         if(target instanceof Player)
             ((Player) target).sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));

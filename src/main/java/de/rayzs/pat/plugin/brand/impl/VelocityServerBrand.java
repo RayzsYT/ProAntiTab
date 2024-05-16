@@ -8,6 +8,7 @@ import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.plugin.brand.ServerBrand;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
@@ -38,7 +39,7 @@ public class VelocityServerBrand implements ServerBrand {
         AtomicInteger animationState = new AtomicInteger(0);
         TASK = SERVER.getScheduler().buildTask(VelocityLoader.getInstance(), () -> {
             if(animationState.getAndIncrement() >= Storage.CUSTOM_SERVER_BRANDS.size() - 1) animationState.set(0);
-            BRAND = Storage.CUSTOM_SERVER_BRANDS.get(animationState.get());
+            BRAND = MessageTranslator.replaceMessage(Storage.CUSTOM_SERVER_BRANDS.get(animationState.get())) + "§r";
             SERVER.getAllPlayers().forEach(this::send);
         }).repeat(Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY, TimeUnit.MILLISECONDS).schedule();
     }

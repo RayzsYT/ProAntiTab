@@ -7,6 +7,7 @@ import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.plugin.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.brand.ServerBrand;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import io.netty.channel.Channel;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -58,7 +59,7 @@ public class BukkitServerBrand implements ServerBrand {
         AtomicInteger animationState = new AtomicInteger(0);
         TASK = Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
             if(animationState.getAndIncrement() >= Storage.CUSTOM_SERVER_BRANDS.size() - 1) animationState.set(0);
-            BRAND = Storage.CUSTOM_SERVER_BRANDS.get(animationState.get());
+            BRAND = MessageTranslator.replaceMessage(Storage.CUSTOM_SERVER_BRANDS.get(animationState.get())) + "§r";
             Bukkit.getOnlinePlayers().forEach(this::send);
         }, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY);
     }
@@ -85,7 +86,7 @@ public class BukkitServerBrand implements ServerBrand {
         Player player = (Player) playerObj;
 
         if(!WEIRD) {
-            PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(BRAND.replace("&", "§") + "§r");
+            PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(BRAND);
             player.sendPluginMessage(BukkitLoader.getPlugin(), CustomServerBrand.CHANNEL_NAME, serverBrand.getBytes());
             return;
         }
@@ -94,7 +95,7 @@ public class BukkitServerBrand implements ServerBrand {
             Channel channel = PacketAnalyzer.INJECTED_PLAYERS.get(player.getUniqueId());
             if(channel == null) return;
 
-            Object brandPayloadObj = brandPayloadClass.getDeclaredConstructor(String.class).newInstance(BRAND.replace("&", "§") + "§r"),
+            Object brandPayloadObj = brandPayloadClass.getDeclaredConstructor(String.class).newInstance(BRAND),
                     customPacketPayloadPacket = clientBoundCustomPacketPayloadPacketClass.getDeclaredConstructor(customPacketPayloadPacketClass).newInstance(brandPayloadObj);
             channel.pipeline().writeAndFlush(customPacketPayloadPacket);
 
