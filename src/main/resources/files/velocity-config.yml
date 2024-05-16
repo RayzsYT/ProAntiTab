@@ -26,7 +26,6 @@ turn-blacklist-to-whitelist: false
 # Normally there stands something like 'Purpur', or 'Spigot'.
 # With this feature you are able to change and even animate it! ^^
 custom-server-brand:
-  # Just replace 'false' with 'true' if you want to enable this feature! ^^
   enabled: false
 
   # Determines the speed in that the animation goes
@@ -51,20 +50,24 @@ custom-server-brand:
     - '&fProAntiTab -'
     - '&fProAntiTab \'
 
-# Should the listed command be blocked?
-# Yes: true
-# No: false
-# Yea... I just comment on it because I wanted to xd
+# This setting decided if a listed command should be cancelled from execution or not.
+# As you can see it's enabled by default, which is also why every command that is listed
+# is being blocked entirely.
 cancel-blocked-commands:
   enabled: true
   message:
     - '&cThe command "%command%" is blocked!'
 
+# Here you can customize your own fake '/plugins' command ^^
+custom-plugins:
+  enabled: true
+  message:
+    - '&fPlugins (0):'
+
 # Now there we come to the good stuff! ^^
 # If ProAntiTab is loaded on a Spigot server, you will see this option right here.
 # With that you can also customize your own "Unknown Command"-message.
 custom-unknown-command:
-  # Just replace 'false' with 'true' if you want to enable this feature! ^^
   enabled: false
   message:
     - '&cThis command does not exist!'
