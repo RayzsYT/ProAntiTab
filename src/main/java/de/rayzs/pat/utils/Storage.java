@@ -78,8 +78,8 @@ public class Storage {
         NO_PERMISSIONS = (String) CONFIGURATION.getOrSet("no-permissions", "&cYou are not allowed to execute this command! Missing permission: &4proantitab.%permission%");
 
         if(!Reflection.isProxyServer()) {
-            BUNGEECORD = (boolean) CONFIGURATION.getOrSet("handle-through-bungeecord.enabled", BUNGEECORD);
-            BUNGEECORD_MESSAGE = (String) CONFIGURATION.getOrSet("handle-through-bungeecord.message", BUNGEECORD_MESSAGE);
+            BUNGEECORD = (boolean) CONFIGURATION.getOrSet("handle-through-proxy.enabled", BUNGEECORD);
+            BUNGEECORD_MESSAGE = (String) CONFIGURATION.getOrSet("handle-through-proxy.message", BUNGEECORD_MESSAGE);
             USE_UNKNOWN_COMMAND = (boolean) CONFIGURATION.getOrSet("custom-unknown-command.enabled", USE_UNKNOWN_COMMAND);
             UNKNOWN_COMMAND = (ArrayList<String>) CONFIGURATION.getOrSet("custom-unknown-command.message", defaultUnknownCommandArray);
         }
@@ -144,63 +144,6 @@ public class Storage {
 
     public static void saveStorage() {
         STORAGE.setAndSave("commands", BLOCKED_COMMANDS_LIST);
-    }
-
-    public static void saveConfiguration() {
-        CONFIGURATION
-                .set("updater.enabled", UPDATE_ENABLED)
-                .set("updater.period", UPDATE_PERIOD)
-                .set("updater.notification", UPDATE_NOTIFICATION)
-                .set("no-permissions", NO_PERMISSIONS)
-                .set("command-failed", COMMAND_UNKNOWN)
-                .set("reload.loading", RELOAD_LOADING)
-                .set("reload.done", RELOAD_DONE)
-                .set("help", COMMAND_HELP)
-                .set("stats.message.statistic", STATS)
-                .set("stats.message.splitter", STATS_SERVERS_SPLITTER_MESSAGE)
-                .set("stats.message.server", STATS_SERVERS_MESSAGE)
-                .set("stats.fail", STATS_FAIL_MESSAGE)
-                .set("stats.no-server", STATS_SERVERS_NO_SERVER_MESSAGE)
-                .set("cancel-blocked-commands.enabled", CANCEL_COMMANDS)
-                .set("cancel-blocked-commands.message", CANCEL_COMMANDS_MESSAGE)
-                .set("turn-blacklist-to-whitelist", TURN_BLACKLIST_TO_WHITELIST)
-
-                .set("blacklist.clear", BLACKLIST_CLEAR_MESSAGE)
-                .set("blacklist.add.success", BLACKLIST_ADD_MESSAGE)
-                .set("blacklist.remove.success", BLACKLIST_REMOVE_MESSAGE)
-                .set("blacklist.add.failed", BLACKLIST_ADD_FAIL_MESSAGE)
-                .set("blacklist.remove.failed", BLACKLIST_REMOVE_FAIL_MESSAGE)
-                .set("blacklist.list.message", BLACKLIST_LIST_MESSAGE)
-                .set("blacklist.list.command", BLACKLIST_LIST_COMMAND_MESSAGE)
-                .set("blacklist.list.splitter", BLACKLIST_LIST_SPLITTER_MESSAGE)
-
-                .set("group.create", GROUP_CREATE_MESSAGE)
-                .set("group.delete", GROUP_DELETE_MESSAGE)
-                .set("group.delete-confirmation", GROUP_DELETE_CONFIRM_MESSAGE)
-                .set("group.already-exist", GROUP_ALREADY_CREATED_MESSAGE)
-                .set("group.does-not-exist", GROUP_NOT_EXIST_MESSAGE)
-                .set("group.clear", GROUP_CLEAR_MESSAGE)
-                .set("group.add.success", GROUP_ADD_MESSAGE)
-                .set("group.remove.success", GROUP_REMOVE_MESSAGE)
-                .set("group.add.failed", GROUP_ADD_FAIL_MESSAGE)
-                .set("group.remove.failed", GROUP_REMOVE_FAIL_MESSAGE)
-                .set("group.list.message", GROUP_LIST_MESSAGE)
-                .set("group.list.command", GROUP_LIST_COMMAND_MESSAGE)
-                .set("group.list.splitter", GROUP_LIST_SPLITTER_MESSAGE)
-
-                .set("group.list-groups.message", GROUPS_LIST_MESSAGE)
-                .set("group.list-groups.group", GROUPS_LIST_GROUPS_MESSAGE)
-                .set("group.list-groups.splitter", GROUPS_LIST_SPLITTER_MESSAGE);
-
-        if(!Reflection.isProxyServer()) {
-            CONFIGURATION.set("custom-unknown-command.enabled", USE_UNKNOWN_COMMAND)
-                    .set("custom-unknown-command.message", UNKNOWN_COMMAND)
-                    .set("handle-through-bungeecord.enabled", BUNGEECORD)
-                    .set("handle-through-bungeecord.token", TOKEN_KEY)
-                    .set("handle-through-bungeecord.message", BUNGEECORD_MESSAGE);
-        }
-
-        CONFIGURATION.save();
     }
 
     public static boolean isCommandBlocked(String command) {
