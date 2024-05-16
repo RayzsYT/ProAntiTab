@@ -8,6 +8,7 @@ import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
@@ -46,8 +47,8 @@ public class BungeeServerBrand implements ServerBrand {
         ProxiedPlayer player = (ProxiedPlayer) playerObj;
 
         String serverName = "", playerName = player.getName(), customBrand = BRAND.replace("%player%", playerName).replace("%server%", serverName);
-        ServerInfo serverInfo = player.getServer().getInfo();
-        if(serverInfo != null) serverName = serverInfo.getName();
+        Server server = player.getServer();
+        if(server != null) serverName = server.getInfo().getName();
 
         PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(customBrand);
         String brand = player.getPendingConnection().getVersion() >= ProtocolConstants.MINECRAFT_1_13 ? "minecraft:brand" : "MC|Brand";
