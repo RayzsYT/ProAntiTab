@@ -100,7 +100,7 @@ command-failed: '&cFailed to execute this command! Use "/bpat" to see all availa
 notification:
   enabled: '&aEnabled notifications!'
   disabled: '&cDisabled notifications!'
-  alert: '&8[&4ALERT&8] &c%player% &8(&7world: &e%world%&8) &ctried to execute the following blocked command: &4%command%'
+  alert: '&8[&4ALERT&8] &c%player% &8(&7server: &e%server%&8) &ctried to execute the following blocked command: &4%command%'
 
 help:
   - '&7Available commands are: &f/%label%&7...'
