@@ -65,7 +65,10 @@ public class BungeeLoader extends Plugin {
         }
 
         startUpdaterTask();
-        ProxyServer.getInstance().getScheduler().schedule(this, () -> ClientCommunication.sendInformation("instance::"), 2, TimeUnit.SECONDS);
+        ProxyServer.getInstance().getScheduler().schedule(this, () -> {
+            ClientCommunication.sendInformation("instance::");
+            ClientCommunication.synchronizeInformation();
+        }, 2, TimeUnit.SECONDS);
     }
 
     @Override

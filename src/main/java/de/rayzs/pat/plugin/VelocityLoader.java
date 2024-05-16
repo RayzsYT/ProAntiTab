@@ -70,7 +70,10 @@ public class VelocityLoader {
         server.getEventManager().register(this, new VelocityConnectionListener(server, this));
 
         startUpdaterTask();
-        server.getScheduler().buildTask(this, () -> ClientCommunication.sendInformation("instance::")).delay(2, TimeUnit.SECONDS).schedule();
+        server.getScheduler().buildTask(this, () -> {
+            ClientCommunication.sendInformation("instance::");
+            ClientCommunication.synchronizeInformation();
+        }).delay(2, TimeUnit.SECONDS).schedule();
     }
 
     public void startUpdaterTask() {
