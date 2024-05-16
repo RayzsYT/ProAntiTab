@@ -46,8 +46,9 @@ custom-server-brand:
 
   # This here is the list of the animation
   # Possible placeholders:
-  # %player% - name of the player
-  # %displayname% - displayname of the player
+  # %player%        - name of the player
+  # %displayname%   - displayname of the player
+  # %world%         - name of world where the player is
   # ... and other available placeholders from PlaceholderAPI
   brands:
     - '&f&lP&froAntiTab |'

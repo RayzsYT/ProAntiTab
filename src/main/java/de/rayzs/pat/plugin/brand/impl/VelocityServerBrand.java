@@ -59,11 +59,12 @@ public class VelocityServerBrand implements ServerBrand {
             Object connectedPlayerObj = connectedPlayerConnectionClass.cast(player),
                     minecraftConnectionObj = Reflection.getMethodsByName(connectedPlayerObj, "getConnection").get(0).invoke(connectedPlayerObj);
 
-            String serverName = "", playerName = player.getUsername();
+            String serverName = "", playerName = player.getUsername(), customBrand;
             Optional<ServerConnection> serverConnection = player.getCurrentServer();
             if(serverConnection.isPresent()) serverName = serverConnection.get().getServerInfo().getName();
+            customBrand = BRAND.replace("%player%", playerName).replace("%server%", serverName).replace("%ping%", String.valueOf(player.getPing()));
 
-            PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(BRAND.replace("%player%", playerName).replace("%server%", serverName), false);
+            PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(customBrand, false);
             String brand = player.getProtocolVersion().getProtocol() >= ProtocolConstants.MINECRAFT_1_13 ? "minecraft:brand" : "MC|Brand";
             Object pluginMessagePacket = pluginMessagePacketClass.getConstructor(String.class, ByteBuf.class).newInstance(brand, serverBrand.getByteBuf());
             Reflection.getMethodsByParameterAndName(minecraftConnectionObj, "write", Object.class).get(0).invoke(minecraftConnectionObj, pluginMessagePacket);

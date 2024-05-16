@@ -84,10 +84,11 @@ public class BukkitServerBrand implements ServerBrand {
     public void send(Object playerObj) {
         if(!(playerObj instanceof Player) || !Storage.USE_CUSTOM_BRAND) return;
         Player player = (Player) playerObj;
-        String playerName = player.getName(), displayName = player.getDisplayName();
+        String playerName = player.getName(), displayName = player.getDisplayName(), worldName = player.getWorld().getName(),
+                customBrand = BRAND.replace("%player%", playerName).replace("%displayname%", displayName).replace("%world%", worldName);
 
         if(!WEIRD) {
-            PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(MessageTranslator.replaceMessage(player, BRAND.replace("%player%", playerName).replace("%displayname%", displayName)));
+            PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(MessageTranslator.replaceMessage(player, customBrand));
             player.sendPluginMessage(BukkitLoader.getPlugin(), CustomServerBrand.CHANNEL_NAME, serverBrand.getBytes());
             return;
         }
@@ -96,7 +97,7 @@ public class BukkitServerBrand implements ServerBrand {
             Channel channel = PacketAnalyzer.INJECTED_PLAYERS.get(player.getUniqueId());
             if(channel == null) return;
 
-            Object brandPayloadObj = brandPayloadClass.getDeclaredConstructor(String.class).newInstance(MessageTranslator.replaceMessage(player, BRAND.replace("%player%", playerName).replace("%displayname%", displayName))),
+            Object brandPayloadObj = brandPayloadClass.getDeclaredConstructor(String.class).newInstance(MessageTranslator.replaceMessage(player, customBrand)),
                     customPacketPayloadPacket = clientBoundCustomPacketPayloadPacketClass.getDeclaredConstructor(customPacketPayloadPacketClass).newInstance(brandPayloadObj);
             channel.pipeline().writeAndFlush(customPacketPayloadPacket);
 
