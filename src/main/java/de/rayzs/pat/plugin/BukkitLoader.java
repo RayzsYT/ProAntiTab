@@ -57,12 +57,11 @@ public class BukkitLoader extends JavaPlugin {
             loaded = true;
             GroupManager.initialize();
             PacketAnalyzer.injectAll();
-
-            manager.registerEvents(new BukkitBlockCommandListener(), this);
         }
 
         if(Reflection.getMinor() >= 16) manager.registerEvents(new BukkitAntiTabListener(), this);
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
+        manager.registerEvents(new BukkitBlockCommandListener(), this);
 
         registerCommand("proantitab", "pat");
         startUpdaterTask();

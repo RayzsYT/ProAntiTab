@@ -14,8 +14,6 @@ public class BukkitBlockCommandListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
-        if(!Storage.CANCEL_COMMANDS) return;
-
         Player player = event.getPlayer();
         String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", ""), commandLowerCased = command.toLowerCase();
 
@@ -29,7 +27,7 @@ public class BukkitBlockCommandListener implements Listener {
             }
         }
 
-        if(rawCommand.equals("/")) return;
+        if(!Storage.CANCEL_COMMANDS || Storage.BUNGEECORD || rawCommand.equals("/")) return;
 
         World world = player.getWorld();
         String worldName = world.getName(), alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%world%", worldName);
