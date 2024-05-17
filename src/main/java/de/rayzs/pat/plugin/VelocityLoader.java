@@ -6,7 +6,6 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.commands.VelocityCommand;
@@ -24,14 +23,11 @@ import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "1.6.0",
+version = "1.6.1",
 authors = "Rayzs_YT",
 description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.")
 public class VelocityLoader {
