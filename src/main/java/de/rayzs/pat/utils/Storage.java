@@ -5,8 +5,11 @@ import java.util.*;
 
 public class Storage {
 
+    public static ConfigurationBuilder CONFIGURATION = Configurator.get("config"), STORAGE = Configurator.get("storage"),
+            COMMANDS = Configurator.get("commands"),
+            TOKEN = Configurator.get("token");
+
     public static String CURRENT_VERSION_NAME = "", NEWEST_VERSION_NAME = "";
-    public static ConfigurationBuilder CONFIGURATION = Configurator.get("config"), STORAGE = Configurator.get("storage"), TOKEN = Configurator.get("token");
     public static List<String> UNKNOWN_COMMAND, CANCEL_COMMANDS_MESSAGE, STATS, BLOCKED_COMMANDS_LIST, COMMAND_HELP, CUSTOM_SERVER_BRANDS, UPDATE_NOTIFICATION, CUSTOM_PLUGINS;
     public static List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
     public static String TOKEN_KEY = UUID.randomUUID().toString(), BUNGEECORD_MESSAGE, NOTIFY_ALERT, NOTIFY_ENABLED, NOTIFY_DISABLED, COMMAND_UNKNOWN, NO_PERMISSIONS, RELOAD_LOADING, RELOAD_DONE,
@@ -92,7 +95,7 @@ public class Storage {
             BUNGEECORD_MESSAGE = (String) CONFIGURATION.getOrSet("handle-through-proxy.message", BUNGEECORD_MESSAGE);
             USE_UNKNOWN_COMMAND = (boolean) CONFIGURATION.getOrSet("custom-unknown-command.enabled", USE_UNKNOWN_COMMAND);
             UNKNOWN_COMMAND = (ArrayList<String>) CONFIGURATION.getOrSet("custom-unknown-command.message", defaultUnknownCommandArray);
-
+        } else {
             USE_CUSTOM_PROTOCOL_PING = (boolean) CONFIGURATION.getOrSet("custom-protocol-ping.enabled", false);
             USE_ALWAYS_SHOW_CUSTOM_PROTOCOL_PING = (boolean) CONFIGURATION.getOrSet("custom-protocol-ping.show-always", true);
             CUSTOM_PROTOCOL_PING = (String) CONFIGURATION.getOrSet("custom-protocol-ping.protocol", "&f&lProAntiTab &7(&a%online%&7/&c%max%&7)");
