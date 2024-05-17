@@ -9,7 +9,7 @@ public class Storage {
             COMMANDS = Configurator.get("commands"),
             TOKEN = Configurator.get("token");
 
-    public static String CURRENT_VERSION_NAME = "", NEWEST_VERSION_NAME = "";
+    public static String CURRENT_VERSION_NAME = "", NEWEST_VERSION_NAME = "", SERVER_NAME = null;
     public static List<String> UNKNOWN_COMMAND, CANCEL_COMMANDS_MESSAGE, STATS, BLOCKED_COMMANDS_LIST, COMMAND_HELP, CUSTOM_SERVER_BRANDS, UPDATE_NOTIFICATION, CUSTOM_PLUGINS;
     public static List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
     public static String TOKEN_KEY = UUID.randomUUID().toString(), BUNGEECORD_MESSAGE, NOTIFY_ALERT, NOTIFY_ENABLED, NOTIFY_DISABLED, COMMAND_UNKNOWN, NO_PERMISSIONS, RELOAD_LOADING, RELOAD_DONE,
@@ -164,36 +164,33 @@ public class Storage {
         STORAGE.setAndSave("commands", BLOCKED_COMMANDS_LIST);
     }
 
-    public static boolean isCommandBlocked(String command) {
+    public static boolean isBlocked(String command, boolean intensive) {
+        command = command.toLowerCase();
+        if(command.startsWith("/")) command = command.replaceFirst("/", "");
+
         String[] split;
         if(command.contains(" ")) {
             split = command.split(" ");
             if(split.length > 0) command = split[0];
             command = command.split(" ")[0];
         }
-        if(command.contains(":")) {
+
+        if(intensive && command.contains(":")) {
             split = command.split(":");
-            if(split.length > 0) command = command.replaceFirst(split[0] + ":", "");
+            if(split.length > 0)
+                command = command.replaceFirst(split[0] + ":", "");
         }
-        for (String blockedCommand : BLOCKED_COMMANDS_LIST) {
 
-            if (blockedCommand.equals(command.toLowerCase())) return true;
+        for (String blockedCommand : BLOCKED_COMMANDS_LIST)
+            if(blockedCommand.equals(command)) return true;
 
-        }
         return false;
     }
 
-    public static boolean isCommandBlockedPrecise(String command) {
-        String[] split;
-        if(command.contains(" ")) {
-            split = command.split(" ");
-            if(split.length > 0) command = split[0];
-            command = command.split(" ")[0];
-        }
-        for (String blockedCommand : BLOCKED_COMMANDS_LIST) {
-            if(blockedCommand.equals(command.toLowerCase())) return true;
-        }
-        return false;
+    public static boolean hasNoAccess(Object target, String command) {
+        if(Storage.TURN_BLACKLIST_TO_WHITELIST)
+            return !Storage.isBlocked(command, false) && !PermissionUtil.hasBypassPermission(target, command);
+        else return Storage.isBlocked(command, false) && !PermissionUtil.hasBypassPermission(target, command);
     }
 
     public static boolean isPluginsCommand(String command) {

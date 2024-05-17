@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
+import de.rayzs.pat.plugin.BukkitLoader;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
@@ -16,11 +17,8 @@ public class BukkitAntiTabListener implements Listener {
         Player player = event.getPlayer();
         if (PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getCommands().removeIf(command -> {
-           if(Storage.TURN_BLACKLIST_TO_WHITELIST)
-               return !Storage.isCommandBlockedPrecise(command) && !PermissionUtil.hasBypassPermission(player, command);
-           else return Storage.isCommandBlocked(command) && !PermissionUtil.hasBypassPermission(player, command);
-        });
+        if(!BukkitLoader.isLoaded()) event.getCommands().clear();
+        else event.getCommands().removeIf(command -> Storage.hasNoAccess(player, command));
     }
 
     public static void updateCommands() {

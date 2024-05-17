@@ -42,7 +42,7 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
-            if(Storage.isCommandBlockedPrecise(command)) return;
+            if(Storage.isBlocked(command, true)) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
 
             for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
@@ -50,12 +50,7 @@ public class BungeeBlockCommandListener implements Listener {
             return;
         }
 
-        if (command.contains(":")) {
-            String[] commandSplit = command.split(":");
-            if(commandSplit.length > 1) command = commandSplit[1];
-        }
-
-        if(!Storage.isCommandBlocked(command) || PermissionUtil.hasBypassPermission(player, command)) return;
+        if(!Storage.isBlocked(command, false) || PermissionUtil.hasBypassPermission(player, command)) return;
         for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
 
         if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);

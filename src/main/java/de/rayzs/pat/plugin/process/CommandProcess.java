@@ -22,6 +22,7 @@ public class CommandProcess {
         String task, sub, extra, confirmationString;
         Group group;
         boolean bool;
+
         if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
 
         if(Storage.BUNGEECORD) {

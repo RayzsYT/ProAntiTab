@@ -24,6 +24,7 @@ public class BukkitLoader extends JavaPlugin {
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
+    private static boolean loaded = false;
     private int updaterTaskId;
 
     @Override
@@ -52,6 +53,7 @@ public class BukkitLoader extends JavaPlugin {
         if(Storage.BUNGEECORD)
             Bukkit.getScheduler().scheduleSyncRepeatingTask(this, ClientCommunication::sendRequest, 40, 20*10);
         else {
+            loaded = true;
             GroupManager.initialize();
             PacketAnalyzer.injectAll();
 
@@ -89,6 +91,10 @@ public class BukkitLoader extends JavaPlugin {
             Storage.TURN_BLACKLIST_TO_WHITELIST = turn;
 
         if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(commands);
+        if(!loaded) {
+            loaded = true;
+            Logger.info("First data has arrived successfully!");
+        }
     }
 
     public void startUpdaterTask() {
@@ -135,7 +141,7 @@ public class BukkitLoader extends JavaPlugin {
     public static List<String> getNotBlockedCommands() {
         List<String> commands = new ArrayList<>();
         Bukkit.getHelpMap().getHelpTopics().stream()
-                .filter(topic -> !topic.getName().contains(":") && topic.getName().startsWith("/") && !Storage.isCommandBlocked(topic.getName().replaceFirst("/", "")))
+                .filter(topic -> !topic.getName().contains(":") && topic.getName().startsWith("/") && !Storage.isBlocked(topic.getName().replaceFirst("/", ""), false))
                 .forEach(topic -> commands.add(topic.getName().replaceFirst("/", "")));
         return commands;
     }
@@ -146,5 +152,9 @@ public class BukkitLoader extends JavaPlugin {
 
     public static java.util.logging.Logger getPluginLogger() {
         return logger;
+    }
+
+    public static boolean isLoaded() {
+        return loaded;
     }
 }

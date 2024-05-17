@@ -23,11 +23,7 @@ public class VelocityAntiTabListener {
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getSuggestions().removeIf(command -> {
-            if(Storage.TURN_BLACKLIST_TO_WHITELIST)
-                return !Storage.isCommandBlockedPrecise(command) && !PermissionUtil.hasBypassPermission(player, command);
-            else return Storage.isCommandBlocked(command) && !PermissionUtil.hasBypassPermission(player, command);
-        });
+        event.getSuggestions().removeIf(command -> Storage.hasNoAccess(player, command));
     }
 
     @Subscribe (order = PostOrder.FIRST)
@@ -36,12 +32,7 @@ public class VelocityAntiTabListener {
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getRootNode().getChildren().removeIf(command -> {
-            String commandName = command.getName();
-            if(Storage.TURN_BLACKLIST_TO_WHITELIST)
-                return !Storage.isCommandBlockedPrecise(commandName) && !PermissionUtil.hasBypassPermission(player, commandName);
-            else return Storage.isCommandBlocked(commandName) && !PermissionUtil.hasBypassPermission(player, commandName);
-        });
+        event.getRootNode().getChildren().removeIf(command -> Storage.hasNoAccess(player, command.getName()));
     }
 
     public static void updateCommands() {

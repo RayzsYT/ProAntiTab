@@ -38,8 +38,8 @@ public class LegacyPacketHandler implements PacketHandler {
             input = input.replace("/", "");
             if(input.contains(" ")) input = input.split(" ")[0];
 
-            cancelsBeforeHand = Storage.isCommandBlockedPrecise(input) && !PermissionUtil.hasBypassPermission(player, input)
-                    || Storage.isCommandBlocked(input) && !PermissionUtil.hasBypassPermission(player, input);
+            cancelsBeforeHand = Storage.isBlocked(input, true) && !PermissionUtil.hasBypassPermission(player, input)
+                    || Storage.isBlocked(input, false) && !PermissionUtil.hasBypassPermission(player, input);
         }
 
         for (Field field : Reflection.getFields(packetObj)) {
@@ -57,7 +57,7 @@ public class LegacyPacketHandler implements PacketHandler {
                     tempName = s.replaceFirst("/", "");
 
                     if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
-                        if(!Storage.isCommandBlockedPrecise(tempName)) continue;
+                        if(!Storage.isBlocked(tempName, true)) continue;
                         if(PermissionUtil.hasBypassPermission(player, tempName)) continue;
                         newResultList.add(s);
                         continue;
@@ -65,8 +65,8 @@ public class LegacyPacketHandler implements PacketHandler {
 
                     if (tempName.contains(":")) tempName = tempName.split(":")[1];
 
-                    if (!Storage.isCommandBlocked(tempName)
-                            || Storage.isCommandBlocked(tempName)
+                    if (!Storage.isBlocked(tempName, false)
+                            || Storage.isBlocked(tempName, false)
                             && PermissionUtil.hasBypassPermission(player, tempName))
                         newResultList.add(s);
                 }

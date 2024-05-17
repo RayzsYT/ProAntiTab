@@ -45,6 +45,12 @@ public class CommandSender {
         else if(sender instanceof org.bukkit.command.CommandSender) ((org.bukkit.command.CommandSender) sender).sendMessage(text);
     }
 
+    public String getServerName() {
+        if(Reflection.isVelocityServer()) return sender instanceof com.velocitypowered.api.proxy.Player ? ((com.velocitypowered.api.proxy.Player) sender).getCurrentServer().get().getServer().getServerInfo().getName() : Storage.SERVER_NAME;
+        else if(Reflection.isProxyServer()) return  sender instanceof ProxiedPlayer ? ((ProxiedPlayer) sender).getServer().getInfo().getName() : Storage.SERVER_NAME;
+        return Storage.SERVER_NAME;
+    }
+
     public UUID getUniqueId() {
         if(Reflection.isVelocityServer()) return sender instanceof com.velocitypowered.api.proxy.Player ? ((com.velocitypowered.api.proxy.Player) sender).getUniqueId() : CONSOLE_UUID;
         else if(Reflection.isProxyServer()) return  sender instanceof ProxiedPlayer ? ((ProxiedPlayer) sender).getUniqueId() : CONSOLE_UUID;

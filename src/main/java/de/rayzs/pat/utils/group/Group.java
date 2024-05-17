@@ -45,7 +45,7 @@ public class Group {
     }
 
     public boolean hasPermission(Object targetObj) {
-        return PermissionUtil.hasPermission(targetObj, "group." + groupName);
+        return PermissionUtil.hasPermission(targetObj, "group." + groupName) || PermissionUtil.hasServerPermission(targetObj, "group." + groupName, Storage.SERVER_NAME);
     }
 
     public void save() {

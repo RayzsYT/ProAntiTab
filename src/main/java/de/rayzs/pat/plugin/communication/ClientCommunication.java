@@ -39,7 +39,12 @@ public class ClientCommunication {
                     client.setFeedback(true);
                     client.syncTime();
                     Storage.SERVER_DATA_SYNC_COUNT++;
+                    sendInformation("receive-info::" + Storage.TOKEN_KEY + "::" + client.getId() + "::" + client.getName());
                 }
+                break;
+            case "receive-info":
+                if(!args[2].equals(ClientCommunication.SERVER_ID.toString()) || Storage.SERVER_NAME != null || args.length != 4 || !args[1].equals(Storage.TOKEN_KEY)) return;
+                Storage.SERVER_NAME = args[3];
                 break;
             case "receive-commands":
                 if(args.length != 4 || !args[1].equals(Storage.TOKEN_KEY)) return;

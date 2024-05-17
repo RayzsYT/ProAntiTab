@@ -43,8 +43,8 @@ public class ModernPacketHandler implements PacketHandler {
             String[] split = input.split(" ");
             if(input.contains(" ")) input = split[0];
 
-            cancelsBeforeHand = !Storage.TURN_BLACKLIST_TO_WHITELIST && Storage.isCommandBlockedPrecise(input) && !PermissionUtil.hasBypassPermission(player, input)
-                    || Storage.TURN_BLACKLIST_TO_WHITELIST && !Storage.isCommandBlocked(input) && !PermissionUtil.hasBypassPermission(player, input);
+            cancelsBeforeHand = !Storage.TURN_BLACKLIST_TO_WHITELIST && Storage.isBlocked(input, true) && !PermissionUtil.hasBypassPermission(player, input)
+                    || Storage.TURN_BLACKLIST_TO_WHITELIST && !Storage.isBlocked(input, false) && !PermissionUtil.hasBypassPermission(player, input);
         }
 
         Suggestions suggestions = (Suggestions) suggestionsMethod.invoke(packetObj);
@@ -58,8 +58,8 @@ public class ModernPacketHandler implements PacketHandler {
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
                 if (Storage.TURN_BLACKLIST_TO_WHITELIST)
-                    return !Storage.isCommandBlockedPrecise(command) && !PermissionUtil.hasBypassPermission(player, command);
-                else return Storage.isCommandBlocked(command) && !PermissionUtil.hasBypassPermission(player, command);
+                    return !Storage.isBlocked(command, true) && !PermissionUtil.hasBypassPermission(player, command);
+                else return Storage.isBlocked(command, false) && !PermissionUtil.hasBypassPermission(player, command);
             });
         }
 
