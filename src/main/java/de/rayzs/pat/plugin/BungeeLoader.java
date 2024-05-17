@@ -49,7 +49,7 @@ public class BungeeLoader extends Plugin {
         bStats.initialize(this);
         PluginManager manager = ProxyServer.getInstance().getPluginManager();
 
-        registerCommand("bungeeproantitab", "bpat", "pat", "proantitab");
+        registerCommand("bungeeproantitab", "bpat");
 
         manager.registerListener(this, new BungeePlayerConnectionListener());
         manager.registerListener(this, new BungeeAntiTabListener());

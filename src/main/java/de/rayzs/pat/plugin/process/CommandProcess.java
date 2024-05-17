@@ -25,14 +25,6 @@ public class CommandProcess {
 
         if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
 
-        if(Storage.BUNGEECORD) {
-
-            if(!Reflection.isProxyServer())
-                sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
-
-            return;
-        }
-
         try {
             switch (length) {
                 case 1:
@@ -75,6 +67,12 @@ public class CommandProcess {
                             return;
                         case "clear":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
+
+                            if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                                sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
+                                return;
+                            }
+
                             confirmationString = "clear";
 
                             if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
@@ -88,7 +86,14 @@ public class CommandProcess {
                             }
                             return;
                         case "notify":
+
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "notify")) return;
+
+                            if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                                sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
+                                return;
+                            }
+
                             if(sender.isConsole()) {
                                 bool = Storage.CONSOLE_NOTIFICATION_ENABLED;
                                 Storage.CONSOLE_NOTIFICATION_ENABLED = !Storage.CONSOLE_NOTIFICATION_ENABLED;
@@ -102,7 +107,14 @@ public class CommandProcess {
                             return;
                         case "ls":
                         case "list":
+
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
+
+                            if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                                sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
+                                return;
+                            }
+
                             StringBuilder blacklistedCommandBuilder = new StringBuilder();
                             for (int i = 0; i < Storage.BLOCKED_COMMANDS_LIST.size(); i++) {
                                 bool = (i >= Storage.BLOCKED_COMMANDS_LIST.size() - 1);
@@ -115,7 +127,14 @@ public class CommandProcess {
 
                         case "listgroups":
                         case "lg":
+
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "listgroups")) return;
+
+                            if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                                sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
+                                return;
+                            }
+
                             StringBuilder groupsBuilder = new StringBuilder();
                             for (int i = 0; i < GroupManager.getGroupNames().size(); i++) {
                                 bool = (i >= GroupManager.getGroupNames().size() - 1);
@@ -127,6 +146,12 @@ public class CommandProcess {
                             return;
                     }
                 case 2:
+
+                    if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                        sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
+                        return;
+                    }
+
                     task = args[0].toLowerCase();
                     sub = args[1];
                     bool = Storage.BLOCKED_COMMANDS_LIST.contains(sub);
@@ -222,6 +247,12 @@ public class CommandProcess {
                         }
 
                 case 3:
+
+                    if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                        sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
+                        return;
+                    }
+
                     task = args[0].toLowerCase();
                     sub = args[1].toLowerCase();
                     extra = args[2].toLowerCase();
