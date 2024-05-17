@@ -17,7 +17,7 @@ public class VelocityAntiTabListener {
         VelocityAntiTabListener.server = server;
     }
 
-    @Subscribe
+    @Subscribe (order = PostOrder.LAST)
     public void onTabComplete(TabCompleteEvent event) {
         Player player = event.getPlayer();
 
@@ -26,7 +26,7 @@ public class VelocityAntiTabListener {
         event.getSuggestions().removeIf(command -> Storage.hasNoAccess(player, command));
     }
 
-    @Subscribe (order = PostOrder.FIRST)
+    @Subscribe (order = PostOrder.LAST)
     public void onPlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
         Player player = event.getPlayer();
 

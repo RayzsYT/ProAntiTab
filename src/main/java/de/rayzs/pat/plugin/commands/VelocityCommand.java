@@ -8,7 +8,7 @@ public class VelocityCommand implements SimpleCommand {
 
     @Override
     public void execute(Invocation invocation) {
-        CommandProcess.handleCommand(invocation.source(), invocation.arguments(), "vpat");
+        CommandProcess.handleCommand(invocation.source(), invocation.arguments(), "bpat");
     }
 
     @Override

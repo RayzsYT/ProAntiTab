@@ -68,7 +68,7 @@ public class VelocityLoader {
 
         metricsFactory.make(this, 21638);
 
-        server.getCommandManager().register("pat", new VelocityCommand(), "bpat", "bungeeproantitab", "proantitab");
+        server.getCommandManager().register("bpat", new VelocityCommand(), "bungeeproantitab");
         server.getEventManager().register(this, new VelocityBlockCommandListener(server));
         server.getEventManager().register(this, new VelocityAntiTabListener(server));
         server.getEventManager().register(this, new VelocityConnectionListener(server, this));
