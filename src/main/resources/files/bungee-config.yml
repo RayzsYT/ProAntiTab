@@ -79,14 +79,6 @@ custom-plugins:
   message:
     - '&fPlugins (0):'
 
-# Now there we come to the good stuff! ^^
-# If ProAntiTab is loaded on a Spigot server, you will see this option right here.
-# With that you can also customize your own "Unknown Command"-message.
-custom-unknown-command:
-  enabled: false
-  message:
-    - '&cThis command does not exist!'
-
 # This one here allows you to see on what servers ProAntiTab has been synced on and when.
 # But it's for Bungeecord/Velocity servers only!
 stats:
