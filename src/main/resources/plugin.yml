@@ -8,6 +8,7 @@ main: de.rayzs.pat.plugin.BukkitLoader
 
 softdepend:
   - PlaceholderAPI
+  - LuckPerms
 
 commands:
   proantitab:

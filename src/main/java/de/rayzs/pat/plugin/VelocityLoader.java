@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -29,7 +30,10 @@ import java.util.concurrent.TimeUnit;
 id = "proantitab",
 version = "1.6.1",
 authors = "Rayzs_YT",
-description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.")
+description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.",
+dependencies = {
+        @Dependency(id = "luckperms", optional = true)
+})
 public class VelocityLoader {
 
     private static VelocityLoader instance;

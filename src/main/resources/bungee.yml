@@ -4,3 +4,6 @@ description: A simple structured AntiTab plugin to prevent specific commands fro
 author: Rayzs_YT
 version: 1.6.1
 main: de.rayzs.pat.plugin.BungeeLoader
+
+softDepends:
+  - LuckPerms
