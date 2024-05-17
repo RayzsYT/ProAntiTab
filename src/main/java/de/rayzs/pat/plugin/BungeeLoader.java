@@ -38,7 +38,7 @@ public class BungeeLoader extends Plugin {
         Reflection.initialize(getProxy());
         Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
 
-        Storage.load();
+        Storage.load(true);
         MessageTranslator.initialize();
         CustomServerBrand.initialize();
         GroupManager.initialize();

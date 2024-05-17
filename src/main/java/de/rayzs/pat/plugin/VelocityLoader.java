@@ -60,7 +60,7 @@ public class VelocityLoader {
         Reflection.initialize(server);
         Storage.CURRENT_VERSION_NAME = pluginContainer.getDescription().getVersion().get();
 
-        Storage.load();
+        Storage.load(true);
         MessageTranslator.initialize();
         CustomServerBrand.initialize();
         GroupManager.initialize();

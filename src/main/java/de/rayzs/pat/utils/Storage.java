@@ -21,8 +21,8 @@ public class Storage {
     public static int UPDATE_PERIOD, SERVER_DATA_SYNC_COUNT = 0, CUSTOM_SERVER_BRAND_REPEAT_DELAY;
     public static long LAST_DATA_UPDATE = System.currentTimeMillis();
 
-    public static void load() {
-        STORAGE.reload();
+    public static void load(boolean withStorage) {
+        if(withStorage) STORAGE.reload();
         CONFIGURATION.reload();
 
         ArrayList<String> defaultBlockedCommandArray = new ArrayList<>(),
@@ -82,7 +82,7 @@ public class Storage {
         CUSTOM_SERVER_BRANDS = (ArrayList<String>) CONFIGURATION.getOrSet("custom-server-brand.brands", customServerBrandsArray);
 
         COMMAND_HELP = (ArrayList<String>) CONFIGURATION.getOrSet("help", defaultHelpArray);
-        BLOCKED_COMMANDS_LIST = (ArrayList<String>) STORAGE.getOrSet("commands", defaultBlockedCommandArray);
+        if(withStorage) BLOCKED_COMMANDS_LIST = (ArrayList<String>) STORAGE.getOrSet("commands", defaultBlockedCommandArray);
 
         CUSTOM_PLUGINS = (ArrayList<String>) CONFIGURATION.getOrSet("custom-plugins.message", "&fPlugins (0):");
 

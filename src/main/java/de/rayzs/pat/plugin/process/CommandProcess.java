@@ -21,7 +21,7 @@ public class CommandProcess {
         int length = args.length;
         String task, sub, extra, confirmationString;
         Group group;
-        boolean bool;
+        boolean bool, backend = Storage.BUNGEECORD && !Reflection.isProxyServer();
 
         if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
 
@@ -60,9 +60,10 @@ public class CommandProcess {
                         case "rl":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "reload")) return;
                             sender.sendMessage(Storage.RELOAD_LOADING);
-                            Storage.load();
+                            Storage.load(!backend);
                             CustomServerBrand.initialize();
-                            handleChange();
+
+                            if(!backend) handleChange();
                             sender.sendMessage(Storage.RELOAD_DONE);
                             return;
                         case "clear":
@@ -89,7 +90,7 @@ public class CommandProcess {
 
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "notify")) return;
 
-                            if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                            if(backend) {
                                 sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
                                 return;
                             }
@@ -110,7 +111,7 @@ public class CommandProcess {
 
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
 
-                            if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                            if(backend) {
                                 sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
                                 return;
                             }
@@ -130,7 +131,7 @@ public class CommandProcess {
 
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "listgroups")) return;
 
-                            if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                            if(backend) {
                                 sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
                                 return;
                             }
@@ -147,7 +148,7 @@ public class CommandProcess {
                     }
                 case 2:
 
-                    if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                    if(backend) {
                         sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
                         return;
                     }
@@ -248,7 +249,7 @@ public class CommandProcess {
 
                 case 3:
 
-                    if(Storage.BUNGEECORD && !Reflection.isProxyServer()) {
+                    if(backend) {
                         sender.sendMessage(Storage.BUNGEECORD_MESSAGE);
                         return;
                     }
@@ -301,30 +302,31 @@ public class CommandProcess {
     public static List<String> handleTabComplete(Object senderObj, String[] args) {
         CommandSender sender = new CommandSender(senderObj);
         final List<String> suggestions = new ArrayList<>(), result = new ArrayList<>();
+        final boolean backend = Storage.BUNGEECORD && !Reflection.isProxyServer();
 
         switch (args.length) {
             case 1:
-                if (PermissionUtil.hasPermission(sender, "stats") && Reflection.isProxyServer()) suggestions.add("stats");
-                if (PermissionUtil.hasPermission(sender, "notify")) suggestions.add("notify");
-                if (PermissionUtil.hasPermission(sender, "creategroup")) suggestions.addAll(Arrays.asList("creategroup", "cg"));
-                if (PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(Arrays.asList("deletegroup", "dg"));
-                if (PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(Arrays.asList("listgroups", "lg"));
-                if (PermissionUtil.hasPermission(sender, "list")) suggestions.addAll(Arrays.asList("list", "ls"));
-                if (PermissionUtil.hasPermission(sender, "clear")) suggestions.add("clear");
+                if (!backend && PermissionUtil.hasPermission(sender, "stats") && Reflection.isProxyServer()) suggestions.add("stats");
+                if (!backend && PermissionUtil.hasPermission(sender, "notify")) suggestions.add("notify");
+                if (!backend && PermissionUtil.hasPermission(sender, "creategroup")) suggestions.addAll(Arrays.asList("creategroup", "cg"));
+                if (!backend && PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(Arrays.asList("deletegroup", "dg"));
+                if (!backend && PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(Arrays.asList("listgroups", "lg"));
+                if (!backend && PermissionUtil.hasPermission(sender, "list")) suggestions.addAll(Arrays.asList("list", "ls"));
+                if (!backend && PermissionUtil.hasPermission(sender, "clear")) suggestions.add("clear");
                 if (PermissionUtil.hasPermission(sender, "reload")) suggestions.addAll(Arrays.asList("reload", "rl"));
-                if (PermissionUtil.hasPermission(sender, "add")) suggestions.add("add");
-                if (PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(Arrays.asList("remove", "rem", "rm"));
+                if (!backend && PermissionUtil.hasPermission(sender, "add")) suggestions.add("add");
+                if (!backend && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(Arrays.asList("remove", "rem", "rm"));
                 break;
             case 2:
-                if(Arrays.asList("deletegroup", "dg").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(GroupManager.getGroupNames());
-                if(args[0].equals("clear") && PermissionUtil.hasPermission(sender, "clear")) suggestions.addAll(GroupManager.getGroupNames());
-                if(Arrays.asList("ls", "list").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "list")) suggestions.addAll(GroupManager.getGroupNames());
-                if(args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer()) suggestions.addAll(BukkitLoader.getNotBlockedCommands());
-                if(Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(Storage.BLOCKED_COMMANDS_LIST);
+                if(!backend && Arrays.asList("deletegroup", "dg").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(GroupManager.getGroupNames());
+                if(!backend && args[0].equals("clear") && PermissionUtil.hasPermission(sender, "clear")) suggestions.addAll(GroupManager.getGroupNames());
+                if(!backend && Arrays.asList("ls", "list").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "list")) suggestions.addAll(GroupManager.getGroupNames());
+                if(!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer()) suggestions.addAll(BukkitLoader.getNotBlockedCommands());
+                if(!backend && Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(Storage.BLOCKED_COMMANDS_LIST);
                 break;
             case 3:
-                if(args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer()) suggestions.addAll(GroupManager.getGroupByNameNotIncludingCommand(args[1]));
-                if(Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(GroupManager.getGroupByNameOnlyIncludingCommand(args[1]));
+                if(!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer()) suggestions.addAll(GroupManager.getGroupByNameNotIncludingCommand(args[1]));
+                if(!backend && Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(GroupManager.getGroupByNameOnlyIncludingCommand(args[1]));
                 break;
         }
 

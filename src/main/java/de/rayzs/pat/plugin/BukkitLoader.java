@@ -42,7 +42,7 @@ public class BukkitLoader extends JavaPlugin {
         Reflection.initialize(getServer());
         Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
 
-        Storage.load();
+        Storage.load(true);
 
         if(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) MessageTranslator.enablePlaceholderSupport();
         MessageTranslator.initialize();
