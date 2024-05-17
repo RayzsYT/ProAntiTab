@@ -14,6 +14,7 @@ import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.utils.*;

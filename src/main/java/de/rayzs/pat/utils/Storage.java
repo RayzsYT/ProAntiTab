@@ -6,7 +6,7 @@ import java.util.*;
 public class Storage {
 
     public static ConfigurationBuilder CONFIGURATION = Configurator.get("config"), STORAGE = Configurator.get("storage"),
-            COMMANDS = Configurator.get("commands"),
+            //COMMANDS = Configurator.get("commands"),
             TOKEN = Configurator.get("token");
 
     public static String CURRENT_VERSION_NAME = "", NEWEST_VERSION_NAME = "", SERVER_NAME = null;

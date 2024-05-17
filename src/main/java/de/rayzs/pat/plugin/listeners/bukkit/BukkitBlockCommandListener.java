@@ -46,7 +46,7 @@ public class BukkitBlockCommandListener implements Listener {
             return;
         }
 
-        if((Storage.TURN_BLACKLIST_TO_WHITELIST)) {
+        if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
             if(Storage.isBlocked(command, true)) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
             for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
