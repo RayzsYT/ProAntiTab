@@ -28,10 +28,12 @@ custom-protocol-ping:
 
   # Normally it would only display when someone pings the server with the wrong version.
   # Enabling this will always display the protocol and replace it with the normal player-count.
+  show-always: true
+
+  # The displayed protocol message
   # Available placeholders:
   # %online%    - current online players count
   # %max%       - max players count
-  show-always: true
   protocol: '&f&lProAntiTab &7(&a%online%&7/&c%max%&7)'
 
 # This feature allows you to customize your server-brand you see when you press F3.

@@ -16,9 +16,10 @@ public class BungeePingListener implements Listener {
 
         ProxyServer proxyServer = BungeeLoader.getPlugin().getProxy();
         int online = proxyServer.getOnlineCount(), max = proxyServer.getConfigurationAdapter().getListeners().iterator().next().getMaxPlayers();
-        ServerPing oldServerPing = event.getResponse(), newServerPing = new ServerPing();
-        newServerPing.setVersion(new ServerPing.Protocol(Storage.CUSTOM_PROTOCOL_PING.replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max)), !Storage.USE_ALWAYS_SHOW_CUSTOM_PROTOCOL_PING ? oldServerPing.getVersion().getProtocol() : -1));
+        ServerPing serverPing = event.getResponse();
+        ServerPing.Protocol newProtocol = new ServerPing.Protocol(Storage.CUSTOM_PROTOCOL_PING.replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max)), !Storage.USE_ALWAYS_SHOW_CUSTOM_PROTOCOL_PING ? serverPing.getVersion().getProtocol() : 0);
+        serverPing.setVersion(newProtocol);
 
-        event.setResponse(newServerPing);
+        event.setResponse(serverPing);
     }
 }
