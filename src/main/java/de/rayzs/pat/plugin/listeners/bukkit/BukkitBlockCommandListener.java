@@ -15,7 +15,10 @@ public class BukkitBlockCommandListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
-        String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", ""), commandLowerCased = command.toLowerCase();
+        World world = player.getWorld();
+        String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", ""), commandLowerCased = command.toLowerCase(),
+                worldName = world.getName(), alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%world%", worldName);
+
 
         if(Storage.USE_UNKNOWN_COMMAND) {
             String targetCommand = rawCommand.contains(" ") ? rawCommand.split(" ")[0] : rawCommand;
@@ -26,11 +29,6 @@ public class BukkitBlockCommandListener implements Listener {
                 return;
             }
         }
-
-        if(!Storage.CANCEL_COMMANDS || Storage.BUNGEECORD || rawCommand.equals("/")) return;
-
-        World world = player.getWorld();
-        String worldName = world.getName(), alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%world%", worldName);
 
         if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
             for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
@@ -43,6 +41,8 @@ public class BukkitBlockCommandListener implements Listener {
             event.setCancelled(true);
             return;
         }
+
+        if(!Storage.CANCEL_COMMANDS || Storage.BUNGEECORD || rawCommand.equals("/")) return;
 
         if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
             if(Storage.isBlocked(command, true)) return;
