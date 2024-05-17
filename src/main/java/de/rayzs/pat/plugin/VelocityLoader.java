@@ -12,6 +12,7 @@ import de.rayzs.pat.plugin.commands.VelocityCommand;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityBlockCommandListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityConnectionListener;
+import de.rayzs.pat.plugin.listeners.velocity.VelocityPingListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import de.rayzs.pat.utils.ConnectionBuilder;
@@ -68,6 +69,7 @@ public class VelocityLoader {
         server.getEventManager().register(this, new VelocityBlockCommandListener(server));
         server.getEventManager().register(this, new VelocityAntiTabListener(server));
         server.getEventManager().register(this, new VelocityConnectionListener(server, this));
+        server.getEventManager().register(this, new VelocityPingListener(server));
 
         startUpdaterTask();
         server.getScheduler().buildTask(this, () -> {

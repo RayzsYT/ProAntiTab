@@ -1,10 +1,7 @@
 package de.rayzs.pat.plugin;
 
 import de.rayzs.pat.plugin.commands.BungeeCommand;
-import de.rayzs.pat.plugin.listeners.bungee.BungeeAntiTabListener;
-import de.rayzs.pat.plugin.listeners.bungee.BungeeBlockCommandListener;
-import de.rayzs.pat.plugin.listeners.bungee.BungeePlayerConnectionListener;
-import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
+import de.rayzs.pat.plugin.listeners.bungee.*;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.utils.ConnectionBuilder;
@@ -53,6 +50,7 @@ public class BungeeLoader extends Plugin {
         manager.registerListener(this, new BungeePlayerConnectionListener());
         manager.registerListener(this, new BungeeAntiTabListener());
         manager.registerListener(this, new BungeeBlockCommandListener());
+        manager.registerListener(this, new BungeePingListener());
 
         try {
             Class.forName("io.github.waterfallmc.waterfall.QueryResult");
