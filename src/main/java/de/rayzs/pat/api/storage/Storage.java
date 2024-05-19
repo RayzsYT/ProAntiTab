@@ -27,7 +27,6 @@ public class Storage {
     public static void loadConfig() {
         ConfigSections.Messages.initialize();
         ConfigSections.Settings.initialize();
-        Collections.reverse(ConfigSections.SECTIONS);
         ConfigSections.SECTIONS.forEach(ConfigStorage::load);
     }
 
