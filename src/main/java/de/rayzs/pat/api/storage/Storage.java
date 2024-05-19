@@ -12,7 +12,8 @@ import java.util.*;
 public class Storage {
 
     public static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
-    public static String TOKEN, SERVER_NAME;
+    public static String TOKEN, SERVER_NAME, CURRENT_VERSION, NEWER_VERSION;
+    public static boolean OUTDATED = false;
 
     public static void loadAll(boolean loadBlacklist) {
         loadConfig();

@@ -9,6 +9,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.commands.VelocityCommand;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityBlockCommandListener;
@@ -21,7 +22,6 @@ import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
 import java.util.concurrent.TimeUnit;
@@ -58,9 +58,9 @@ public class VelocityLoader {
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-storage.yml", "storage.yml", false);
 
         Reflection.initialize(server);
-        Storage.CURRENT_VERSION_NAME = pluginContainer.getDescription().getVersion().get();
+        Storage.CURRENT_VERSION = pluginContainer.getDescription().getVersion().get();
 
-        Storage.load(true);
+        Storage.loadAll(true);
         MessageTranslator.initialize();
         CustomServerBrand.initialize();
         GroupManager.initialize();
@@ -76,31 +76,31 @@ public class VelocityLoader {
 
         startUpdaterTask();
         server.getScheduler().buildTask(this, () -> {
-            ClientCommunication.sendInformation("instance::");
-            ClientCommunication.synchronizeInformation();
+            ClientCommunication.syncData();
+            ClientCommunication.syncData();
         }).delay(2, TimeUnit.SECONDS).schedule();
     }
 
     public void startUpdaterTask() {
-        if (!Storage.UPDATE_ENABLED) return;
+        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
 
         task = server.getScheduler().buildTask(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
 
-            Storage.NEWEST_VERSION_NAME = result;
-            if (!Storage.NEWEST_VERSION_NAME.equals(Storage.CURRENT_VERSION_NAME)) {
+            Storage.NEWER_VERSION = result;
+            if (!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
 
-                if (Storage.NEWEST_VERSION_NAME.equals("unknown")) {
+                if (Storage.NEWER_VERSION.equals("unknown")) {
                     Logger.warning("Failed reaching web host! (firewall enabled? website down?)");
                 } else if (result.equals("exception")) {
                     Logger.warning("Failed creating web instance! (outdated java version?)");
                 } else {
-                    Storage.OUTDATED_VERSION = true;
-                    Storage.UPDATE_NOTIFICATION.forEach(message -> MessageTranslator.send(server.getConsoleCommandSource(), message));
+                    Storage.OUTDATED = true;
+                    MessageTranslator.send(server.getConsoleCommandSource(), Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
                 }
             }
-        }).delay(1, TimeUnit.SECONDS).repeat(Storage.UPDATE_PERIOD, TimeUnit.SECONDS).schedule();
+        }).delay(1, TimeUnit.SECONDS).repeat(Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.SECONDS).schedule();
     }
 
     public static ProxyServer getServer() {

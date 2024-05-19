@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.message;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.message.translators.*;
@@ -52,7 +53,7 @@ public class MessageTranslator {
     }
 
     public static String replaceMessage(Object playerObj, String text) {
-        text = text.replace("&", "§").replace("%current_version%", Storage.CURRENT_VERSION_NAME).replace("%newest_version%", Storage.NEWEST_VERSION_NAME).replace("\\n", "\n");
+        text = text.replace("&", "§").replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
         return !placeholderSupport || playerObj == null || Reflection.isProxyServer() ? text : PlaceholderReplacer.replace(playerObj, text);
     }
 
@@ -74,6 +75,10 @@ public class MessageTranslator {
             text = text.replace("§" + entry.getKey(), "");
 
         return text;
+    }
+
+    public static void send(Object target, List<String> texts) {
+        texts.forEach(text -> send(target, text));
     }
 
     public static void send(Object target, String text) {

@@ -11,7 +11,7 @@ public class UpdateSection extends ConfigStorage {
 
     public boolean ENABLED;
     public int PERIOD;
-    public MultipleMessagesHelper NOTIFICATION, UPDATED;
+    public MultipleMessagesHelper OUTDATED, UPDATED;
 
     public UpdateSection() {
         super("updater");
@@ -23,7 +23,7 @@ public class UpdateSection extends ConfigStorage {
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
         PERIOD = new ConfigSectionHelper<Integer>(this, "period", 10000).getOrSet();
         UPDATED = new MultipleMessagesHelper(this, "updated", Collections.singletonList("&aYou are using the newest version! ^^"));
-        NOTIFICATION = new MultipleMessagesHelper(this, "outdated", Arrays.asList(
+        OUTDATED = new MultipleMessagesHelper(this, "outdated", Arrays.asList(
                 "&8[&4ProAntiTab&8] &cThere is a new version available! (%newest_version%)",
                 "&8[&4ProAntiTab&8] &cYou are still using the %current_version%.",
                 "&8[&4ProAntiTab&8] &cGet the newest version here:",

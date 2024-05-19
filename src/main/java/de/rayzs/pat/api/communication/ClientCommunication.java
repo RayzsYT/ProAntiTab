@@ -80,6 +80,8 @@ public class ClientCommunication {
             DataConverter.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
             DataConverter.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
 
+            GroupManager.getcom
+
             BukkitLoader.synchronizeCommandData(commandsPacket);
             BukkitLoader.synchronizeGroupData(groupsPacket);
         }

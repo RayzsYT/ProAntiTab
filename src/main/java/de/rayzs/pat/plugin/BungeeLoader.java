@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.commands.BungeeCommand;
 import de.rayzs.pat.plugin.listeners.bungee.*;
 import de.rayzs.pat.plugin.logger.Logger;
@@ -13,7 +14,6 @@ import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
-import de.rayzs.pat.utils.Storage;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import java.util.concurrent.TimeUnit;
@@ -36,10 +36,8 @@ public class BungeeLoader extends Plugin {
         logger = getLogger();
 
         Reflection.initialize(getProxy());
-        Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
-
-        de.rayzs.pat.api.storage.Storage.loadAll(true);
-        Storage.load(true);
+        Storage.CURRENT_VERSION = getDescription().getVersion();
+        Storage.loadAll(true);
 
         MessageTranslator.initialize();
         CustomServerBrand.initialize();
@@ -66,8 +64,8 @@ public class BungeeLoader extends Plugin {
 
         startUpdaterTask();
         ProxyServer.getInstance().getScheduler().schedule(this, () -> {
-            ClientCommunication.sendInformation("instance::");
-            ClientCommunication.synchronizeInformation();
+            ClientCommunication.syncData();
+            ClientCommunication.syncData();
         }, 2, TimeUnit.SECONDS);
     }
 
@@ -84,24 +82,24 @@ public class BungeeLoader extends Plugin {
     }
 
     public void startUpdaterTask() {
-        if (!Storage.UPDATE_ENABLED) return;
+        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
         updaterTask = getProxy().getScheduler().schedule(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
-            Storage.NEWEST_VERSION_NAME = result;
+            Storage.NEWER_VERSION = result;
 
-            if (!Storage.NEWEST_VERSION_NAME.equals(Storage.CURRENT_VERSION_NAME)) {
+            if (!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
                 getProxy().getScheduler().cancel(updaterTask);
                 if (result.equals("unknown")) {
                     Logger.warning("Failed reaching web host! (firewall enabled? website down?)");
                 } else if (result.equals("exception")) {
                     Logger.warning("Failed creating web instance! (outdated java version?)");
                 } else {
-                    Storage.OUTDATED_VERSION = true;
-                    Storage.UPDATE_NOTIFICATION.forEach(Logger::warning);
+                    Storage.OUTDATED = true;
+                    Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
                 }
             }
-        }, 20L, Storage.UPDATE_PERIOD, TimeUnit.MILLISECONDS);
+        }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);
     }
 
     public static Plugin getPlugin() {

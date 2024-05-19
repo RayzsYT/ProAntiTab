@@ -1,9 +1,9 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.netty.PacketAnalyzer;
 import de.rayzs.pat.utils.PermissionUtil;
-import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
@@ -22,10 +22,10 @@ public class BukkitPlayerConnectionListener implements Listener {
 
         if(!PacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
 
-        if(!Storage.BUNGEECORD && Storage.OUTDATED_VERSION && (PermissionUtil.hasPermission(player, "update"))) {
+        if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
             Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
                 if(player.isOnline()) {
-                    Storage.UPDATE_NOTIFICATION.forEach(message -> MessageTranslator.send(player, message.replace("&", "§")));
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
                 }
             }, 20);
         }
