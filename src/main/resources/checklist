@@ -1,0 +1,11 @@
+- Fix 1.8.8 Support
+- New and better storage.yml overlay
+- Remove /pat for proxy
+-
+
+Missing:
+- Check if player is on server
+- Sync new data
+- Create command to add to servers (Proxy only)
+
+https://haste.rayzs.de/royayuluge.yaml

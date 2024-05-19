@@ -4,7 +4,6 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerPing;
-import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.Storage;
 
 public class VelocityPingListener {

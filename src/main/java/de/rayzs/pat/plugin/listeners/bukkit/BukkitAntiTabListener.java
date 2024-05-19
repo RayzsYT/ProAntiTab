@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import org.bukkit.event.*;
 import org.bukkit.Bukkit;
-import org.bukkit.event.server.TabCompleteEvent;
 
 import java.util.*;
 

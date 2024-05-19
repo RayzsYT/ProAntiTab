@@ -2,7 +2,6 @@ package de.rayzs.pat.plugin.logger;
 
 import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import java.util.logging.Level;

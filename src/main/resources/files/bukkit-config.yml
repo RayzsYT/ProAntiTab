@@ -40,7 +40,10 @@ turn-blacklist-to-whitelist: false
 custom-server-brand:
   enabled: false
 
-  # Determines the speed in that the animation goes
+  # Determines the speed in that the animation goes.
+  # Set this to -1 to disable the animation.
+  #  Disabling the animation, will only display
+  #  the first brand of this list.
   repeat-delay: 3
 
   # This here is the list of the animation
@@ -86,18 +89,6 @@ custom-unknown-command:
   message:
     - '&cThis command does not exist!'
 
-# This one here allows you to see on what servers ProAntiTab has been synced on and when.
-# But it's for Bungeecord/Velocity servers only!
-stats:
-  fail: '&cThis command works on Bungeecord/Velocity servers only!'
-  no-server: '&cNone!'
-  message:
-    splitter: '&7, '
-    server: '&f%servername% &8(%updated%)'
-    statistic:
-      - '&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)'
-      - '&7Sent to servers: &f%servers%'
-
 # ------------------------------------------------------------------------------
 #       __  ___
 #      /  |/  /__  ______________ _____ ____  _____
@@ -115,6 +106,18 @@ notification:
   enabled: '&aEnabled notifications!'
   disabled: '&cDisabled notifications!'
   alert: '&8[&4ALERT&8] &c%player% &8(&7world: &e%world%&8) &ctried to execute the following blocked command: &4%command%'
+
+# This one here allows you to see on what servers ProAntiTab has been synced on and when.
+# But it's for Bungeecord/Velocity servers only!
+stats:
+  fail: '&cThis command works on Bungeecord/Velocity servers only!'
+  no-server: '&cNone!'
+  message:
+    splitter: '&7, '
+    server: '&f%servername% &8(%updated%)'
+    statistic:
+      - '&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)'
+      - '&7Sent to servers: &f%servers%'
 
 help:
   - '&7Available commands are: &f/%label%&7...'

@@ -6,15 +6,14 @@ import de.rayzs.pat.plugin.listeners.bukkit.BukkitBlockCommandListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitPlayerConnectionListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.bStats;
-import de.rayzs.pat.plugin.netty.PacketAnalyzer;
-import de.rayzs.pat.plugin.brand.CustomServerBrand;
-import de.rayzs.pat.plugin.communication.ClientCommunication;
+import de.rayzs.pat.api.netty.PacketAnalyzer;
+import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.utils.*;
@@ -43,6 +42,7 @@ public class BukkitLoader extends JavaPlugin {
         Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
 
         Storage.load(true);
+        de.rayzs.pat.api.storage.Storage.ConfigSections.loadAll();
 
         if(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) MessageTranslator.enablePlaceholderSupport();
         MessageTranslator.initialize();

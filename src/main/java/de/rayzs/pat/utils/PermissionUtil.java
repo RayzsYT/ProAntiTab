@@ -1,11 +1,6 @@
 package de.rayzs.pat.utils;
 
-import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.plugin.BungeeLoader;
-import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.group.GroupManager;
-
-import java.util.List;
 
 public class PermissionUtil {
 
