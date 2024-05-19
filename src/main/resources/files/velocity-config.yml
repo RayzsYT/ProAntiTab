@@ -137,8 +137,7 @@ blacklist:
     command: '&f'
 
   add:
-    success: '&aSuccessfully added %command% into list!'
-    fail: '&c%command% is already in the list!'
+    success: '&aSuccessfully added %command% into the list!'
     failed: '&c%command% is already in the list!'
 
   remove:
