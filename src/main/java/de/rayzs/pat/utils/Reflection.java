@@ -17,8 +17,12 @@ public class Reflection {
     public static void initialize(Object serverObj) {
         try {
             Class.forName("org.bukkit.Server");
+            loadVersionName(serverObj);
+            loadAges();
+            loadVersionEnum();
+            legacy = minor <= 16;
             proxy = false;
-        } catch (ClassNotFoundException ignored) { proxy = true; }
+        } catch (Throwable ignored) { proxy = true; }
 
         if(proxy) {
             try {
@@ -27,12 +31,9 @@ public class Reflection {
             } catch (ClassNotFoundException ignored) { velocity = false; }
         }
 
-        if (!proxy) {
-            loadVersionName(serverObj);
-            loadAges();
-            loadVersionEnum();
-            legacy = minor <= 16;
-        } else version = Version.UNKNOWN;
+        if (proxy) version = Version.UNKNOWN;
+
+        System.out.println("Detected version: " + (!proxy ? "Bukkit" : velocity ? "Velocity" : "Bungeecord"));
     }
 
     public static int[] getAges() { return new int[]{major, minor, release}; }
@@ -212,6 +213,7 @@ public class Reflection {
 
     public static Object getPlayerConnection(Player player) throws Exception {
         Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+        getMethods(entityPlayer).forEach(method -> System.out.println(method.getName() + " | " + method.getReturnType().getTypeName()));
         return getFieldsByType(entityPlayer.getClass(), "PlayerConnection", SearchOption.ENDS).get(0).get(entityPlayer);
     }
 
@@ -274,16 +276,12 @@ public class Reflection {
         }
     }
 
-    private static void loadVersionName(Object serverObject) {
-        try {
-            versionName = proxy ? ProxyServer.getInstance().getName() : Bukkit.getName();
-            rawVersionName = (String) serverObject.getClass().getMethod("getBukkitVersion").invoke(serverObject);
-            rawVersionName = rawVersionName.split("-")[0].replace(".", "_");
-            versionPackageName = serverObject.getClass().getPackage().getName();
-            versionPackageName = versionPackageName.substring(versionPackageName.lastIndexOf('.') + 1);
-        }catch (Exception exception) {
-            exception.printStackTrace();
-        }
+    private static void loadVersionName(Object serverObject) throws Exception {
+        versionName = proxy ? ProxyServer.getInstance().getName() : Bukkit.getName();
+        rawVersionName = (String) serverObject.getClass().getMethod("getBukkitVersion").invoke(serverObject);
+        rawVersionName = rawVersionName.split("-")[0].replace(".", "_");
+        versionPackageName = serverObject.getClass().getPackage().getName();
+        versionPackageName = versionPackageName.substring(versionPackageName.lastIndexOf('.') + 1);
     }
 
     private static void loadVersionEnum() {
