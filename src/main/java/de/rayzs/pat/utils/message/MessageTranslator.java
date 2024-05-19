@@ -18,7 +18,7 @@ public class MessageTranslator {
         colors.put('3', "<dark_aqua>");
         colors.put('4', "<dark_red>");
         colors.put('5', "<dark_purple>");
-        colors.put('6', "<orange>");
+        colors.put('6', "<gold>");
         colors.put('7', "<gray>");
         colors.put('8', "<dark_gray>");
         colors.put('9', "<blue>");
