@@ -1,28 +1,33 @@
 package de.rayzs.pat.api.storage;
 
-import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.templates.ConfigStorage;
 import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
-import de.rayzs.pat.api.storage.templates.ConfigStorage;
-import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
-import de.rayzs.pat.utils.configuration.Configurator;
-
-import java.util.ArrayList;
-import java.util.List;
+import de.rayzs.pat.utils.configuration.*;
+import de.rayzs.pat.utils.Reflection;
+import java.util.*;
 
 public class Storage {
 
     public static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
     public static String TOKEN, SERVER_NAME;
 
-    public static void loadToken() {
+    public static void loadAll(boolean loadBlacklist) {
+        loadConfig();
+        loadToken();
+        if(loadBlacklist) BLACKLIST.load();
+    }
 
+    public static void loadToken() {
+        TOKEN = Reflection.isProxyServer() ? (String) Files.TOKEN.getOrSet("token", "insert-token-of-proxy-here") : ConfigSections.Settings.HANDLE_THROUGH_PROXY.TOKEN;
     }
 
     public static void loadConfig() {
         ConfigSections.Messages.initialize();
         ConfigSections.Settings.initialize();
+        Collections.reverse(ConfigSections.SECTIONS);
         ConfigSections.SECTIONS.forEach(ConfigStorage::load);
     }
 
