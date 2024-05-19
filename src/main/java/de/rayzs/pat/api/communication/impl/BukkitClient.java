@@ -1,5 +1,6 @@
 package de.rayzs.pat.api.communication.impl;
 
+import de.rayzs.pat.utils.DataConverter;
 import org.bukkit.*;
 import com.google.common.io.*;
 import org.bukkit.entity.Player;
@@ -17,11 +18,8 @@ public class BukkitClient implements Client, PluginMessageListener {
     }
 
     @Override
-    public void sendInformation(String information) {
-        try {
-            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-            out.writeUTF(information);
-            SERVER.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, out.toByteArray());
+    public void send(Object packet) {
+        try { SERVER.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, DataConverter.convertToBytes(packet));
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
 
@@ -29,9 +27,10 @@ public class BukkitClient implements Client, PluginMessageListener {
     public void onPluginMessageReceived(String channel, Player player, byte[] bytes) {
         if(!channel.equals(CHANNEL_NAME)) return;
         try {
-            ByteArrayDataInput input = ByteStreams.newDataInput(bytes);
-            String information = input.readUTF();
-            Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> ClientCommunication.receiveInformation("proxy", information));
+            Object packetObj = DataConverter.buildFromBytes(bytes);
+            if(!DataConverter.isPacket(packetObj)) return;
+
+            Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> ClientCommunication.receiveInformation("proxy", packetObj, null));
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
 }

@@ -1,30 +1,44 @@
 package de.rayzs.pat.api.communication;
 
+import de.rayzs.pat.api.communication.impl.VelocityClient;
+import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.TimeConverter;
 
 public class ClientInfo {
 
-    private final String id;
-    private String name;
+    private String id, name;
 
     private boolean sentFeedback = false;
     private long syncTime = System.currentTimeMillis();
 
-    public ClientInfo(String id, String name) {
+    private final Object serverObj;
+
+    public ClientInfo(Object serverObj, String serverId) {
+        this.serverObj = serverObj;
+        this.id = serverId;
+    }
+
+    public ClientInfo(Object serverObj, String serverId, String name) {
+        this.serverObj = serverObj;
+        this.id = serverId;
         this.name = name;
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setId(String serverId) {
+        this.id = serverId;
+    }
+
+    public void sendBytes(byte[] bytes) {
+        if(Reflection.isVelocityServer()) ((com.velocitypowered.api.proxy.server.RegisteredServer) serverObj).sendPluginMessage(VelocityClient.getIdentifier(), bytes);
+        else if(Reflection.isProxyServer()) ((net.md_5.bungee.api.config.ServerInfo) serverObj).sendData(Client.CHANNEL_NAME, bytes);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean compareId(String id) {

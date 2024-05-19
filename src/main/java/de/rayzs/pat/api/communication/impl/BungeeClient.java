@@ -1,6 +1,8 @@
 package de.rayzs.pat.api.communication.impl;
 
 import java.io.*;
+
+import de.rayzs.pat.utils.DataConverter;
 import net.md_5.bungee.api.ProxyServer;
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.api.communication.*;
@@ -20,13 +22,9 @@ public class BungeeClient implements Client, Listener {
     }
 
     @Override
-    public void sendInformation(String information) {
+    public void send(Object packet) {
         for(ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
-            try {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                DataOutputStream out = new DataOutputStream(stream);
-                out.writeUTF(information);
-                serverInfo.sendData(CHANNEL_NAME, stream.toByteArray());
+            try { serverInfo.sendData(CHANNEL_NAME, DataConverter.convertToBytes(packet));
             } catch (Throwable throwable) { throwable.printStackTrace(); }
         }
     }
@@ -35,10 +33,11 @@ public class BungeeClient implements Client, Listener {
     public void onQueryReceive(PluginMessageEvent event) {
         if (!event.getTag().equalsIgnoreCase(CHANNEL_NAME)) return;
         try {
-            DataInputStream input = new DataInputStream(new ByteArrayInputStream(event.getData()));
-            String information = input.readUTF();
+            Object packetObj = DataConverter.buildFromBytes(event.getData());
+            if(!DataConverter.isPacket(packetObj)) return;
+
             Server server = (Server) event.getSender();
-            ClientCommunication.receiveInformation(server.getInfo().getName(), information);
+            ClientCommunication.receiveInformation(server.getInfo().getName(), packetObj, server);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
 }

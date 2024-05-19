@@ -9,10 +9,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.api.communication.Client;
 import de.rayzs.pat.api.communication.ClientCommunication;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import de.rayzs.pat.utils.DataConverter;
 
 public class VelocityClient implements Client {
 
@@ -25,13 +22,9 @@ public class VelocityClient implements Client {
     }
 
     @Override
-    public void sendInformation(String information) {
+    public void send(Object packet) {
         for (RegisteredServer registeredServer : SERVER.getAllServers()) {
-            try {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                DataOutputStream out = new DataOutputStream(stream);
-                out.writeUTF(information);
-                registeredServer.sendPluginMessage(IDENTIFIER, stream.toByteArray());
+            try { registeredServer.sendPluginMessage(IDENTIFIER, DataConverter.convertToBytes(packet));
             } catch (Throwable throwable) { throwable.printStackTrace(); }
         }
     }
@@ -39,14 +32,14 @@ public class VelocityClient implements Client {
     @Subscribe
     public void onQueryReceive(PluginMessageEvent event) {
         if (event.getIdentifier() != IDENTIFIER) return;
+        Object packetObj = DataConverter.buildFromBytes(event.getData());
+        if(!DataConverter.isPacket(packetObj)) return;
 
-        try {
-            DataInputStream input = new DataInputStream(new ByteArrayInputStream(event.getData()));
-            String information = input.readUTF();
-            ServerConnection server = (ServerConnection) event.getSource();
-            ClientCommunication.receiveInformation(server.getServerInfo().getName(), information);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
+        ServerConnection server = (ServerConnection) event.getSource();
+        ClientCommunication.receiveInformation(server.getServerInfo().getName(), packetObj, server);
+    }
+
+    public static MinecraftChannelIdentifier getIdentifier() {
+        return IDENTIFIER;
     }
 }

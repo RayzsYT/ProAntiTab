@@ -41,8 +41,8 @@ public class BukkitLoader extends JavaPlugin {
         Reflection.initialize(getServer());
         Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
 
+        de.rayzs.pat.api.storage.Storage.loadAll(true);
         Storage.load(true);
-        de.rayzs.pat.api.storage.Storage.ConfigSections.loadAll();
 
         if(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) MessageTranslator.enablePlaceholderSupport();
         MessageTranslator.initialize();
@@ -82,21 +82,6 @@ public class BukkitLoader extends JavaPlugin {
         }
     }
 
-    public static void synchronizeCommandData(boolean turn, List<String> commands) {
-        ClientCommunication.sendFeedback();
-        if (!Storage.BLOCKED_COMMANDS_LIST.containsAll(commands) || !commands.containsAll(Storage.BLOCKED_COMMANDS_LIST))
-            Storage.BLOCKED_COMMANDS_LIST = commands;
-
-        if (Storage.TURN_BLACKLIST_TO_WHITELIST != turn)
-            Storage.TURN_BLACKLIST_TO_WHITELIST = turn;
-
-        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(commands);
-        if(!loaded) {
-            loaded = true;
-            Logger.info("First data has arrived successfully!");
-        }
-    }
-
     public void startUpdaterTask() {
         if (!Storage.UPDATE_ENABLED || Storage.BUNGEECORD) return;
         updaterTaskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, () -> {
@@ -118,24 +103,25 @@ public class BukkitLoader extends JavaPlugin {
         }, 20L, 20L * Storage.UPDATE_PERIOD);
     }
 
-    public static void synchronizeGroupData(String information) {
-        GroupManager.clearAllGroups();
+    public static void synchronizeCommandData(DataConverter.CommandsPacket packet) {
+        ClientCommunication.sendFeedback();
 
-        Map<String, List<String>> groups = new HashMap<>();
-        String[] groupPartSplits = information.split("\\\\"),
-                groupInformation;
+        if (!Storage.BLOCKED_COMMANDS_LIST.containsAll(packet.getCommands()) || !packet.getCommands().containsAll(Storage.BLOCKED_COMMANDS_LIST))
+            Storage.BLOCKED_COMMANDS_LIST = packet.getCommands();
 
-        for (String groupPartSplit : groupPartSplits) {
-            groupInformation = groupPartSplit.split(";");
-            String groupName = groupInformation[0];
-            List<String> commands = new ArrayList<>();
-            for(int i = 1; i < groupInformation.length; i++)
-                commands.add(groupInformation[i]);
-            groups.put(groupName, commands);
+        if (Storage.TURN_BLACKLIST_TO_WHITELIST != packet.turnBlacklistToWhitelistEnabled())
+            Storage.TURN_BLACKLIST_TO_WHITELIST = packet.turnBlacklistToWhitelistEnabled();
+
+        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(packet.getCommands());
+        if(!loaded) {
+            loaded = true;
+            Logger.info("First data has arrived successfully!");
         }
+    }
 
-        for (Map.Entry<String, List<String>> entry : groups.entrySet())
-            GroupManager.setGroup(entry.getKey(), entry.getValue());
+    public static void synchronizeGroupData(DataConverter.GroupsPacket packet) {
+        GroupManager.clearAllGroups();
+        packet.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getCommands()));
     }
 
     public static List<String> getNotBlockedCommands() {

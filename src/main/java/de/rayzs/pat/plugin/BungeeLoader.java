@@ -26,8 +26,8 @@ public class BungeeLoader extends Plugin {
 
     @Override
     public void onLoad() {
-        Configurator.createResourcedFile(getDataFolder(), "files\\bungee-config.yml", "config.yml", false);
-        Configurator.createResourcedFile(getDataFolder(), "files\\bungee-storage.yml", "storage.yml", false);
+        Configurator.createResourcedFile(getDataFolder(), "files\\proxy-config.yml", "config.yml", false);
+        Configurator.createResourcedFile(getDataFolder(), "files\\proxy-storage.yml", "storage.yml", false);
     }
 
     @Override
@@ -38,8 +38,9 @@ public class BungeeLoader extends Plugin {
         Reflection.initialize(getProxy());
         Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
 
+        de.rayzs.pat.api.storage.Storage.loadAll(true);
         Storage.load(true);
-        de.rayzs.pat.api.storage.Storage.ConfigSections.loadAll();
+
         MessageTranslator.initialize();
         CustomServerBrand.initialize();
         GroupManager.initialize();

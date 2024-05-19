@@ -1,79 +1,118 @@
 package de.rayzs.pat.api.communication;
 
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.utils.*;
 import de.rayzs.pat.api.communication.impl.*;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.DataConverter;
+import de.rayzs.pat.utils.ExpireCache;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.group.GroupManager;
+
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ClientCommunication {
 
     private static final Client CLIENT = Reflection.isVelocityServer() ? new VelocityClient() : Reflection.isProxyServer() ? new BungeeClient() : new BukkitClient();
     private static final UUID SERVER_ID = UUID.randomUUID();
     public static final List<ClientInfo> CLIENTS = new ArrayList<>();
+    private static final ExpireCache<String, ClientInfo> QUEUE_CLIENTS = new ExpireCache<>(15, TimeUnit.SECONDS);
+    private static long LAST_DATA_UPDATE = System.currentTimeMillis();
+    private static int SERVER_DATA_SYNC_COUNT = 0;
 
-    public static void sendInformation(String information) {
-        CLIENT.sendInformation(information);
+    public static void sendPacket(Object packet) {
+        CLIENT.send(packet);
     }
 
-    public static void receiveInformation(String serverName, String information) {
-        if(!information.contains("::")) return;
-        String[] args = information.split("::");
+    public static void sendPacket(ClientInfo clientInfo, Object packet) {
+        clientInfo.sendBytes(DataConverter.convertToBytes(packet));
+    }
 
-        switch (args[0].toLowerCase()) {
-            case "request":
-                if(args.length != 2 || !args[1].equals(Storage.TOKEN_KEY)) return;
-                synchronizeInformation();
-                break;
-            case "received":
-                if(args.length != 3 || !args[1].equals(Storage.TOKEN_KEY)) return;
-                String id = args[2];
-                ClientInfo client = getClientById(id);
+    public static void receiveInformation(String serverName, Object packet, Object serverObj) {
+        if(packet instanceof DataConverter.RequestPacket) {
+            DataConverter.RequestPacket requestPacket = (DataConverter.RequestPacket) packet;
+            if (!requestPacket.isToken(Storage.TOKEN)) return;
 
-                if(client == null) {
-                    client = new ClientInfo(id, serverName);
-                    CLIENTS.add(client);
-                }
-                else if(!client.getName().equals(serverName)) client.setName(serverName);
+            ClientInfo client = getClientById(requestPacket.getServerId());
+            if (client == null) {
+                client = new ClientInfo(requestPacket.getServerId(), serverName);
+                QUEUE_CLIENTS.put(requestPacket.getServerId(), client);
+            } else if (!client.getName().equals(serverName)) client.setName(serverName);
 
-                if(!client.hasSentFeedback()) {
-                    client.setFeedback(true);
-                    client.syncTime();
-                    Storage.SERVER_DATA_SYNC_COUNT++;
-                    sendInformation("receive-info::" + Storage.TOKEN_KEY + "::" + client.getId() + "::" + client.getName());
-                }
-                break;
-            case "receive-info":
-                if(!args[2].equals(ClientCommunication.SERVER_ID.toString()) || Storage.SERVER_NAME != null || args.length != 4 || !args[1].equals(Storage.TOKEN_KEY)) return;
-                Storage.SERVER_NAME = args[3];
-                break;
-            case "receive-commands":
-                if(args.length != 4 || !args[1].equals(Storage.TOKEN_KEY)) return;
-                BukkitLoader.synchronizeCommandData(Boolean.parseBoolean(args[2]), args[3].equals("§") ? new ArrayList<>() : Arrays.asList(args[3].split(";")));
-                Storage.LAST_DATA_UPDATE = System.currentTimeMillis();
-                break;
-            case "receive-groups":
-                if(args.length != 3 || !args[1].equals(Storage.TOKEN_KEY)) return;
-                BukkitLoader.synchronizeGroupData(args[2]);
-                Storage.LAST_DATA_UPDATE = System.currentTimeMillis();
-                break;
+
+            syncData(requestPacket.getServerId());
+            return;
+        }
+
+        if(packet instanceof DataConverter.BackendDataPacket) {
+            DataConverter.BackendDataPacket backendDataPacket = (DataConverter.BackendDataPacket) packet;
+            if (!backendDataPacket.isToken(Storage.TOKEN)) return;
+            Storage.SERVER_NAME = backendDataPacket.getServerName();
+            return;
+        }
+
+        if(packet instanceof DataConverter.FeedbackPacket) {
+            DataConverter.FeedbackPacket feedbackPacket = (DataConverter.FeedbackPacket) packet;
+            if (!feedbackPacket.isToken(Storage.TOKEN)) return;
+            String serverId = feedbackPacket.getServerId();
+
+            ClientInfo client = getClientById(serverId);
+            if(client == null) {
+                client = getQueueClientById(serverId);
+                if(serverId != null) CLIENTS.add(client);
+                else return;
+            }
+
+            if (client == null || client.hasSentFeedback()) return;
+            client.setFeedback(true);
+            client.syncTime();
+            SERVER_DATA_SYNC_COUNT++;
+
+            DataConverter.BackendDataPacket backendDataPacket = new DataConverter.BackendDataPacket(Storage.TOKEN, serverId, serverName);
+            sendPacket(client, backendDataPacket);
+            return;
+        }
+
+        if(packet instanceof DataConverter.PacketBundle) {
+            DataConverter.BackendDataPacket backendDataPacket = (DataConverter.BackendDataPacket) packet;
+            if(!backendDataPacket.isToken(Storage.TOKEN)) return;
+            DataConverter.PacketBundle packetBundle =  (DataConverter.PacketBundle) packet;
+            DataConverter.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
+            DataConverter.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
+
+            BukkitLoader.synchronizeCommandData(commandsPacket);
+            BukkitLoader.synchronizeGroupData(groupsPacket);
         }
     }
 
-    public static void synchronizeInformation() {
-        Storage.LAST_DATA_UPDATE = System.currentTimeMillis();
-        Storage.SERVER_DATA_SYNC_COUNT = 0;
-        resetAllFeedbacks();
+    public static void syncData() {
+        syncData(null);
+    }
 
-        sendInformation("receive-commands::" + Storage.TOKEN_KEY + "::" + Storage.TURN_BLACKLIST_TO_WHITELIST + "::" + (DataConverter.convertCommandsToString(Storage.BLOCKED_COMMANDS_LIST)));
-        sendInformation("receive-groups::" + Storage.TOKEN_KEY + "::" + DataConverter.convertGroupsToString());
+    public static void syncData(String serverId) {
+        LAST_DATA_UPDATE = System.currentTimeMillis();
+        ClientInfo clientInfo = null;
+        if(serverId == null) {
+            resetAllFeedbacks();
+            SERVER_DATA_SYNC_COUNT = 0;
+        } else {
+            clientInfo = getClientById(serverId);
+            SERVER_DATA_SYNC_COUNT = SERVER_DATA_SYNC_COUNT -1;
+        }
+
+        DataConverter.CommandsPacket commandsPacket = new DataConverter.CommandsPacket();
+        DataConverter.GroupsPacket groupsPacket = new DataConverter.GroupsPacket(GroupManager.getGroups());
+        DataConverter.PacketBundle bundle = new DataConverter.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
+
+        if(clientInfo == null) sendPacket(bundle);
+        else clientInfo.sendBytes(DataConverter.convertToBytes(bundle));
     }
 
     public static void sendRequest() {
-        sendInformation("request::" + Storage.TOKEN_KEY);
+        sendPacket(new DataConverter.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
     }
-
     public static void sendFeedback() {
-        sendInformation("received::" + Storage.TOKEN_KEY + "::" + SERVER_ID);
+        sendPacket(new DataConverter.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString()));
     }
 
     public static Client getClient() {
@@ -82,6 +121,10 @@ public class ClientCommunication {
 
     public static ClientInfo getClientById(String id) {
         return CLIENTS.stream().filter(client -> client.compareId(id)).findFirst().orElse(null);
+    }
+
+    public static ClientInfo getQueueClientById(String id) {
+        return QUEUE_CLIENTS.get(id);
     }
 
     public static void resetAllFeedbacks() {

@@ -1,7 +1,10 @@
 - Fix 1.8.8 Support
 - New and better storage.yml overlay
 - Remove /pat for proxy
--
+- Fix gold (&6) color
+- Fix false version detection
+- Fix Paper 1.20.6 support
+- Fix %server% Placeholder at CustomServerBrand for Bungeecord servers
 
 Missing:
 - Check if player is on server
