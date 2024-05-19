@@ -24,13 +24,13 @@ public class BukkitServerBrand implements ServerBrand {
     private static final Server SERVER = Bukkit.getServer();
     private static String BRAND = "";
     private static int TASK = -1;
-    private static boolean INITIALIZED = false, WEIRD = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() >= 20;;
+    private static boolean INITIALIZED = false;
     private static Class<?> brandPayloadClass, clientBoundCustomPacketPayloadPacketClass, customPacketPayloadPacketClass;
 
     @Override
     public void initializeTask() {
 
-        if(WEIRD) {
+        if(Reflection.isWeird()) {
             if (brandPayloadClass == null)
                 brandPayloadClass = Reflection.getClass("net.minecraft.network.protocol.common.custom.BrandPayload");
 
@@ -90,7 +90,7 @@ public class BukkitServerBrand implements ServerBrand {
         String playerName = player.getName(), displayName = player.getDisplayName(), worldName = player.getWorld().getName(),
                 customBrand = BRAND.replace("%player%", playerName).replace("%displayname%", displayName).replace("%world%", worldName);
 
-        if(!WEIRD) {
+        if(!Reflection.isWeird()) {
             PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(MessageTranslator.replaceMessage(player, customBrand));
             player.sendPluginMessage(BukkitLoader.getPlugin(), CustomServerBrand.CHANNEL_NAME, serverBrand.getBytes());
             return;

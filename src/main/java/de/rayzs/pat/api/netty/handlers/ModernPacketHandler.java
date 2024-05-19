@@ -34,10 +34,7 @@ public class ModernPacketHandler implements PacketHandler {
             return false;
         }
 
-        boolean cancelsBeforeHand = false,
-                // 1.20.6 support coming soon bcs it's to annoying to work with on packet-base rn
-                weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() >= 20;
-
+        boolean cancelsBeforeHand = false;
         if(input.startsWith("/")) {
             input = input.replace("/", "");
             String[] split = input.split(" ");
@@ -48,12 +45,12 @@ public class ModernPacketHandler implements PacketHandler {
         }
 
         Suggestions suggestions = (Suggestions) suggestionsMethod.invoke(packetObj);
-        if(input.length() < 1 && weird || cancelsBeforeHand && weird)
+        if(input.length() < 1 && Reflection.isWeird() || cancelsBeforeHand && Reflection.isWeird())
             return false;
         else if(cancelsBeforeHand)
             suggestions.getList().clear();
         else {
-            if(weird) return true;
+            if(Reflection.isWeird()) return true;
 
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
