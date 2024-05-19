@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Reflection {
 
-    private static boolean legacy, proxy, velocity;
+    private static boolean legacy, proxy, velocity, paper, weird;
     private static String versionName, rawVersionName, versionPackageName;
     private static Version version;
     private static int major, minor, release;
@@ -21,8 +21,14 @@ public class Reflection {
             loadAges();
             loadVersionEnum();
             legacy = minor <= 16;
+            weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() >= 20;
             proxy = false;
         } catch (Throwable ignored) { proxy = true; }
+
+        try {
+            Class.forName("com.destroystokyo.paper.Metrics");
+            paper = true;
+        } catch (Throwable throwable) { paper = false; }
 
         if(proxy) {
             try {
@@ -32,8 +38,6 @@ public class Reflection {
         }
 
         if (proxy) version = Version.UNKNOWN;
-
-        System.out.println("Detected version: " + (!proxy ? "Bukkit" : velocity ? "Velocity" : "Bungeecord"));
     }
 
     public static int[] getAges() { return new int[]{major, minor, release}; }
@@ -42,6 +46,7 @@ public class Reflection {
     public static Version getVersion() { return version; }
     public static boolean isModern() { return !legacy; }
     public static boolean isLegacy() { return legacy; }
+    public static boolean isWeird() { return weird; }
 
     public static boolean isProxyServer() {
         return proxy;
@@ -213,16 +218,23 @@ public class Reflection {
 
     public static Object getPlayerConnection(Player player) throws Exception {
         Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-        getMethods(entityPlayer).forEach(method -> System.out.println(method.getName() + " | " + method.getReturnType().getTypeName()));
         return getFieldsByType(entityPlayer.getClass(), "PlayerConnection", SearchOption.ENDS).get(0).get(entityPlayer);
     }
 
     public static Channel getPlayerChannel(Player player) throws Exception {
-        Object playerConnection = getPlayerConnection(player),
-                networkManager = getPlayerNetworkManager(playerConnection);
-        Optional<Field> optional = getFieldsByType(networkManager.getClass(), "Channel", SearchOption.ENDS).stream().findFirst();
-        if(!optional.isPresent()) return null;
-        Object channelObject = optional.get().get(networkManager);
+        Object channelObject;
+        if(paper && Reflection.isWeird()) {
+            Object serverPlayerObj = getMethodsByReturnTypeAndName(player.getClass(), "ServerPlayer", SearchOption.ENDS, "getHandle").get(0).invoke(player),
+                    serverGamePacketListenerImplObj = getFieldByName(serverPlayerObj.getClass(), "connection").get(serverPlayerObj),
+                    connectionObj = getFieldByName(serverGamePacketListenerImplObj.getClass().getSuperclass(), "connection").get(serverGamePacketListenerImplObj);
+            channelObject = getFieldsByType(connectionObj.getClass(), "Channel", SearchOption.ENDS).get(0).get(connectionObj);
+        } else {
+            Object playerConnection = getPlayerConnection(player),
+                    networkManager = getPlayerNetworkManager(playerConnection);
+            Optional<Field> optional = getFieldsByType(networkManager.getClass(), "Channel", SearchOption.ENDS).stream().findFirst();
+            if (!optional.isPresent()) return null;
+            channelObject = optional.get().get(networkManager);
+        }
         return (Channel) channelObject;
     }
 
