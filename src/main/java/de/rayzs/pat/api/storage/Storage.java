@@ -28,10 +28,10 @@ public class Storage {
         public static List<ConfigStorage> LIST = new ArrayList<>();
 
         public static class Messages {
-
             public static OnlyForProxySection NO_PROXY = new OnlyForProxySection();
             public static StatsSection STATS_SECTION = new StatsSection();
 
+            public static void initialize() {}
         }
 
         public static class Settings {
@@ -40,9 +40,14 @@ public class Storage {
             public static CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
             public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
             public static UpdateSection UPDATE = new UpdateSection();
+
+            public static void initialize() {}
         }
 
         public static void loadAll() {
+            Messages.initialize();
+            Settings.initialize();
+
             LIST.forEach(ConfigStorage::load);
         }
     }

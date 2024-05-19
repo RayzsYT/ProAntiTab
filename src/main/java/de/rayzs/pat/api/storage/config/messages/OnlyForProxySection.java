@@ -14,6 +14,6 @@ public class OnlyForProxySection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
-        MESSAGE = new ConfigSectionHelper<String>(this, "", "&cThis command works on Bungeecord/Velocity servers only!").getOrSet();
+        MESSAGE = new ConfigSectionHelper<String>(this, null, "&cThis command works on Bungeecord/Velocity servers only!").getOrSet();
     }
 }
