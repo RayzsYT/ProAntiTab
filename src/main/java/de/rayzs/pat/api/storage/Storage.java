@@ -33,6 +33,7 @@ public class Storage {
             public static GroupSection GROUP = new GroupSection();
             public static HelpSection HELP = new HelpSection();
             public static NoPermissionSection NO_PERMISSION = new NoPermissionSection();
+            public static NotificationSection NOTIFICATION = new NotificationSection();
             public static OnlyForProxySection NO_PROXY = new OnlyForProxySection();
             public static ReloadSection RELOAD = new ReloadSection();
             public static StatsSection STATS_SECTION = new StatsSection();
