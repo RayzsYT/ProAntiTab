@@ -39,6 +39,7 @@ public class BungeeLoader extends Plugin {
         Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
 
         Storage.load(true);
+        de.rayzs.pat.api.storage.Storage.ConfigSections.loadAll();
         MessageTranslator.initialize();
         CustomServerBrand.initialize();
         GroupManager.initialize();

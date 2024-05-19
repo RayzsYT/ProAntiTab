@@ -7,7 +7,7 @@ public class ConfigStorage extends StorageTemplate {
 
     public ConfigStorage(String navigatePath) {
         super(Storage.Files.CONFIGURATION, navigatePath);
-        Storage.ConfigSections.LIST.add(this);
+        Storage.ConfigSections.SECTIONS.add(this);
     }
 
     @Override
