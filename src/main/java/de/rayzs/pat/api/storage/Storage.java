@@ -14,12 +14,25 @@ import java.util.List;
 public class Storage {
 
     public static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
+    public static String TOKEN, SERVER_NAME;
+
+    public static void loadToken() {
+
+    }
+
+    public static void loadConfig() {
+        ConfigSections.Messages.initialize();
+        ConfigSections.Settings.initialize();
+        ConfigSections.SECTIONS.forEach(ConfigStorage::load);
+    }
 
     public static class Files {
         public static final ConfigurationBuilder
                 CONFIGURATION = Configurator.get("settings"),
                 STORAGE = Configurator.get("blacklist"),
                 TOKEN = Configurator.get("token");
+
+        public static void initialize() {}
     }
 
     public static class ConfigSections {
@@ -47,17 +60,11 @@ public class Storage {
             public static CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
             public static CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
             public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
+            public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
             public static TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
             public static UpdateSection UPDATE = new UpdateSection();
 
             public static void initialize() {}
-        }
-
-        public static void loadAll() {
-            Messages.initialize();
-            Settings.initialize();
-
-            SECTIONS.forEach(ConfigStorage::load);
         }
     }
 }
