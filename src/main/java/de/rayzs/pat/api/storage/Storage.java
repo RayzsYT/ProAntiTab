@@ -15,7 +15,7 @@ public class Storage {
     public static final List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
 
     public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
-    public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = false;
+    public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
 
     public static void loadAll(boolean loadBlacklist) {
         loadConfig();
