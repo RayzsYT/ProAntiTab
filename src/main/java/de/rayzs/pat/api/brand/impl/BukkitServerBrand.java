@@ -1,10 +1,10 @@
 package de.rayzs.pat.api.brand.impl;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.netty.PacketAnalyzer;
 import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.brand.ServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BukkitServerBrand implements ServerBrand {
 
     private static final Server SERVER = Bukkit.getServer();
-    private static String BRAND = "";
+    private static String BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0);
     private static int TASK = -1;
     private static boolean INITIALIZED = false;
     private static Class<?> brandPayloadClass, clientBoundCustomPacketPayloadPacketClass, customPacketPayloadPacketClass;
@@ -57,19 +57,19 @@ public class BukkitServerBrand implements ServerBrand {
             TASK = -1;
         }
 
-        if(!Storage.USE_CUSTOM_BRAND || Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY == -1) return;
+        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) return;
 
         AtomicInteger animationState = new AtomicInteger(0);
         TASK = Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
-            if(animationState.getAndIncrement() >= Storage.CUSTOM_SERVER_BRANDS.size() - 1) animationState.set(0);
-            BRAND = Storage.CUSTOM_SERVER_BRANDS.get(animationState.get()) + "§r";
+            if(animationState.getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1) animationState.set(0);
+            BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get()) + "§r";
             Bukkit.getOnlinePlayers().forEach(this::send);
-        }, 1, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY);
+        }, 1, Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY);
     }
 
     @Override
     public void preparePlayer(Object playerObj) {
-        if(!(playerObj instanceof Player) || !Storage.USE_CUSTOM_BRAND) return;
+        if(!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
         Player player = (Player) playerObj;
 
         try {
@@ -85,7 +85,7 @@ public class BukkitServerBrand implements ServerBrand {
 
     @Override
     public void send(Object playerObj) {
-        if(!(playerObj instanceof Player) || !Storage.USE_CUSTOM_BRAND) return;
+        if(!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
         Player player = (Player) playerObj;
         String playerName = player.getName(), displayName = player.getDisplayName(), worldName = player.getWorld().getName(),
                 customBrand = BRAND.replace("%player%", playerName).replace("%displayname%", displayName).replace("%world%", worldName);

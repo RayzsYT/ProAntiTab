@@ -41,14 +41,14 @@ public class BlacklistStorage extends StorageTemplate {
     }
 
     public boolean isBlocked(Object targetObj, String command) {
-        if(/*Storage.TURN_BLACKLIST_TO_WHITELIST*/ false)
-            return !isListed(command, false) && !PermissionUtil.hasBypassPermission(targetObj, command);
-        else
-            return isListed(command, false) && !PermissionUtil.hasBypassPermission(targetObj, command);
+        return isBlocked(targetObj, command, false);
     }
 
     public boolean isBlocked(Object targetObj, String command, boolean intensive) {
-        return isListed(command, intensive) && !PermissionUtil.hasBypassPermission(targetObj, command);
+        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+            return !isListed(command, intensive) && !PermissionUtil.hasBypassPermission(targetObj, command);
+        else
+            return isListed(command, intensive) && !PermissionUtil.hasBypassPermission(targetObj, command);
     }
 
     public void setList(List<String> commands) {

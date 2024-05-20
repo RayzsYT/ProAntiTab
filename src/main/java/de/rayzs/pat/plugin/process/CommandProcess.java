@@ -326,8 +326,8 @@ public class CommandProcess {
                 if(!backend && Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(Storage.BLOCKED_COMMANDS_LIST);
                 break;
             case 3:
-                if(!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer()) suggestions.addAll(GroupManager.getGroupByNameNotIncludingCommand(args[1]));
-                if(!backend && Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(GroupManager.getGroupByNameOnlyIncludingCommand(args[1]));
+                if(!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer()) suggestions.addAll(GroupManager.getGroupsByNameNotIncludingCommand(args[1]));
+                if(!backend && Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(GroupManager.getGroupsByNameOnlyIncludingCommand(args[1]));
                 break;
         }
 

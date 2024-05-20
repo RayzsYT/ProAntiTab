@@ -1,8 +1,8 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.PermissionUtil;
-import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -18,10 +18,10 @@ public class BungeePlayerConnectionListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPostLogin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        if(Storage.OUTDATED_VERSION && (PermissionUtil.hasPermission(player, "update"))) {
+        if(Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
                 if (player.isConnected()) {
-                    Storage.UPDATE_NOTIFICATION.forEach(message -> MessageTranslator.send(player, message));
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED);
                 }
             }, 1, TimeUnit.SECONDS);
         }

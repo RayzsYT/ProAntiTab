@@ -1,21 +1,23 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.PermissionUtil;
-import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.*;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.*;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import java.util.List;
 
 public class BungeeBlockCommandListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onChat(ChatEvent event) {
-        if(!Storage.CANCEL_COMMANDS) return;
+        if(event.isCancelled()) return;
 
         Connection connection = event.getSender();
         if(!(connection instanceof ProxiedPlayer) || !event.getMessage().startsWith("/")) return;
@@ -25,39 +27,43 @@ public class BungeeBlockCommandListener implements Listener {
 
         if(rawCommand.equals("/")) return;
         ServerInfo serverInfo = player.getServer().getInfo();
-        String serverName = serverInfo != null ? serverInfo.getName() : "unknown",
-                alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getName()).replace("%command%", command).replace("%server%", serverName);
+        String serverName = serverInfo != null ? serverInfo.getName() : "unknown";
+        List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%server%", serverName);
 
 
-        if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
-            for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
-            event.setCancelled(true);
+        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
 
-            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> ProxyServer.getInstance().getPlayer(uuid) != null).forEach(uuid -> {
-                ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uuid);
-                MessageTranslator.send(target, alertMessage);
+            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
+                Player target = Bukkit.getServer().getPlayer(uuid);
+                MessageTranslator.send(target, notificationMessage);
             });
-            return;
-        }
-
-        if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
-            if(Storage.isBlocked(command, true)) return;
-            if(PermissionUtil.hasBypassPermission(player, command)) return;
-
-            for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
             event.setCancelled(true);
             return;
         }
 
-        if(!Storage.isBlocked(command, false) || PermissionUtil.hasBypassPermission(player, command)) return;
-        for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", rawCommand.replaceFirst("/", "")));
+        if(!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return;
 
-        if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
-        Storage.NOTIFY_PLAYERS.stream().filter(uuid -> ProxyServer.getInstance().getPlayer(uuid) != null).forEach(uuid -> {
-            ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uuid);
-            MessageTranslator.send(target, alertMessage);
+        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
+        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+            if(Storage.BLACKLIST.isListed(command, true)) return;
+            if(PermissionUtil.hasBypassPermission(player, command)) return;
+            MessageTranslator.send(player, cancelCommandMessage);
+            event.setCancelled(true);
+            return;
+        }
+
+        if (!Storage.BLACKLIST.isBlocked(player, command)) return;
+        if (PermissionUtil.hasBypassPermission(player, command)) return;
+        MessageTranslator.send(player, cancelCommandMessage);
+
+        if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+        Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
+            Player target = Bukkit.getServer().getPlayer(uuid);
+            MessageTranslator.send(target, notificationMessage);
         });
+
         event.setCancelled(true);
     }
 }

@@ -12,8 +12,10 @@ import java.util.*;
 public class Storage {
 
     public static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
+    public static final List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
+
     public static String TOKEN, SERVER_NAME, CURRENT_VERSION, NEWER_VERSION;
-    public static boolean OUTDATED = false;
+    public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = false;
 
     public static void loadAll(boolean loadBlacklist) {
         loadConfig();
@@ -64,6 +66,7 @@ public class Storage {
             public static CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
             public static CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
             public static CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
+            public static CustomProtocolPingSection CUSTOM_PROTOCOL_PING = new CustomProtocolPingSection();
             public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
             public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
             public static TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();

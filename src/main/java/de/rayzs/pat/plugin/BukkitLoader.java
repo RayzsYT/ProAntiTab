@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.commands.BukkitCommand;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitBlockCommandListener;
@@ -39,10 +40,10 @@ public class BukkitLoader extends JavaPlugin {
         logger = getLogger();
 
         Reflection.initialize(getServer());
-        Storage.CURRENT_VERSION_NAME = getDescription().getVersion();
+        Storage.CURRENT_VERSION = getDescription().getVersion();
 
         de.rayzs.pat.api.storage.Storage.loadAll(true);
-        Storage.load(true);
+        Storage.loadAll(true);
 
         if(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) MessageTranslator.enablePlaceholderSupport();
         MessageTranslator.initialize();
@@ -51,7 +52,7 @@ public class BukkitLoader extends JavaPlugin {
 
         PluginManager manager = getServer().getPluginManager();
 
-        if(Storage.BUNGEECORD)
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             Bukkit.getScheduler().scheduleSyncRepeatingTask(this, ClientCommunication::sendRequest, 40, 20*10);
         else {
             loaded = true;
@@ -69,7 +70,7 @@ public class BukkitLoader extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if(!Storage.BUNGEECORD) PacketAnalyzer.uninjectAll();
+        if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) PacketAnalyzer.uninjectAll();
         MessageTranslator.closeAudiences();
     }
 
@@ -83,34 +84,39 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public void startUpdaterTask() {
-        if (!Storage.UPDATE_ENABLED || Storage.BUNGEECORD) return;
+        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
         updaterTaskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
-            Storage.NEWEST_VERSION_NAME = result;
+            Storage.NEWER_VERSION = result;
 
-            if (!Storage.NEWEST_VERSION_NAME.equals(Storage.CURRENT_VERSION_NAME)) {
+            if (!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
                 Bukkit.getScheduler().cancelTask(updaterTaskId);
                 if (result.equals("unknown")) {
                     Logger.warning("Failed reaching web host! (firewall enabled? website down?)");
                 } else if (result.equals("exception")) {
                     Logger.warning("Failed creating web instance! (outdated java version?)");
                 } else {
-                    Storage.OUTDATED_VERSION = true;
-                    Storage.UPDATE_NOTIFICATION.forEach(message -> Logger.warning(message.replace("&", "§")));
+                    Storage.OUTDATED = true;
+                    Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
                 }
             }
-        }, 20L, 20L * Storage.UPDATE_PERIOD);
+        }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
     }
 
-    public static void synchronizeCommandData(DataConverter.CommandsPacket packet) {
+    public static void synchronizeCommandData(DataConverter.CommandsPacket packet, DataConverter.UnknownCommandPacket unknownCommandPacket) {
         ClientCommunication.sendFeedback();
 
-        if (!Storage.BLOCKED_COMMANDS_LIST.containsAll(packet.getCommands()) || !packet.getCommands().containsAll(Storage.BLOCKED_COMMANDS_LIST))
-            Storage.BLOCKED_COMMANDS_LIST = packet.getCommands();
+        if (!Storage.BLACKLIST.getCommands().containsAll(packet.getCommands()) || !packet.getCommands().containsAll(Storage.BLACKLIST.getCommands()))
+            Storage.BLACKLIST.setList(packet.getCommands());
 
-        if (Storage.TURN_BLACKLIST_TO_WHITELIST != packet.turnBlacklistToWhitelistEnabled())
-            Storage.TURN_BLACKLIST_TO_WHITELIST = packet.turnBlacklistToWhitelistEnabled();
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != packet.turnBlacklistToWhitelistEnabled())
+            Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = packet.turnBlacklistToWhitelistEnabled();
+
+        if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
+            Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = unknownCommandPacket.isEnabled();
+
+        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
 
         if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(packet.getCommands());
         if(!loaded) {
@@ -127,7 +133,7 @@ public class BukkitLoader extends JavaPlugin {
     public static List<String> getNotBlockedCommands() {
         List<String> commands = new ArrayList<>();
         Bukkit.getHelpMap().getHelpTopics().stream()
-                .filter(topic -> !topic.getName().contains(":") && topic.getName().startsWith("/") && !Storage.isBlocked(topic.getName().replaceFirst("/", ""), false))
+                .filter(topic -> !topic.getName().contains(":") && topic.getName().startsWith("/") && !Storage.BLACKLIST.isListed(topic.getName().replaceFirst("/", "")))
                 .forEach(topic -> commands.add(topic.getName().replaceFirst("/", "")));
         return commands;
     }

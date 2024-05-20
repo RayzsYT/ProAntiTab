@@ -1,14 +1,16 @@
 - Fix 1.8.8 Support
 - New and better storage.yml overlay
+- New feature "Custom-Protocol-Ping"
+- New commands
+- Per-Server commands & groups
 - Remove /pat for proxy
 - Fix gold (&6) color
 - Fix false version detection
 - Fix Paper 1.20.6 support
 - Fix %server% Placeholder at CustomServerBrand for Bungeecord servers
+- Sync UnknownCommand
 
 Missing:
-- Check if player is on server
-- Sync new data
 - Create command to add to servers (Proxy only)
 
 https://haste.rayzs.de/royayuluge.yaml

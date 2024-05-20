@@ -1,5 +1,7 @@
 package de.rayzs.pat.utils;
 
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import oracle.jrockit.jfr.jdkevents.ThrowableTracer;
@@ -104,6 +106,7 @@ public class DataConverter {
 
         private final CommandsPacket commandsPacket;
         private final GroupsPacket groupsPacket;
+        private final UnknownCommandPacket unknownCommandPacket;
         private final String proxyToken, serverId;
 
         public PacketBundle(String proxyToken, String serverId, CommandsPacket commandsPacket, GroupsPacket groupsPacket) {
@@ -111,6 +114,7 @@ public class DataConverter {
             this.serverId = serverId;
             this.commandsPacket = commandsPacket;
             this.groupsPacket = groupsPacket;
+            this.unknownCommandPacket = new UnknownCommandPacket();
         }
 
         public boolean isToken(String token) {
@@ -131,6 +135,27 @@ public class DataConverter {
 
         public GroupsPacket getGroupsPacket() {
             return groupsPacket;
+        }
+
+        public UnknownCommandPacket getUnknownCommandPacket() { return unknownCommandPacket; }
+    }
+
+    public static class UnknownCommandPacket {
+
+        private final MultipleMessagesHelper message;
+        private final boolean enabled;
+
+        public UnknownCommandPacket() {
+            enabled = Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED;
+            message = Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE;
+        }
+
+        public MultipleMessagesHelper getMessage() {
+            return message;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
         }
     }
 

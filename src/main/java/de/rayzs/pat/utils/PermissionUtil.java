@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.group.GroupManager;
 
 public class PermissionUtil {
@@ -22,6 +23,13 @@ public class PermissionUtil {
                 || hasPermission(targetObj, "bypass." + command.toLowerCase())
                 || hasServerPermission(targetObj, "bypass." + command.toLowerCase())
                 || GroupManager.canAccessCommand(targetObj, command);
+    }
+
+    public static boolean hasBypassPermission(Object targetObj, String command, String server) {
+        return hasBypassPermission(targetObj)
+                || hasPermission(targetObj, "bypass." + command.toLowerCase())
+                || hasServerPermission(targetObj, "bypass." + command.toLowerCase())
+                || GroupManager.canAccessCommand(targetObj, command, server);
     }
 
     public static boolean hasServerPermission(Object targetObj, String permission) {
@@ -51,7 +59,7 @@ public class PermissionUtil {
         boolean permitted = hasPermission(targetObj, command);
         if(!permitted) {
             if(targetObj instanceof CommandSender)
-                ((CommandSender) targetObj).sendMessage(Storage.NO_PERMISSIONS.replace("%permission%", "proantitab." + command));
+                ((CommandSender) targetObj).sendMessage(Storage.ConfigSections.Messages.NO_PERMISSION.MESSAGE.replace("%permission%", "proantitab." + command));
         }
         return permitted;
     }

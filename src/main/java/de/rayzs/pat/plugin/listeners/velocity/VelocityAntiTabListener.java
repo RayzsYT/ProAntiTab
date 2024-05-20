@@ -6,8 +6,8 @@ import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.PermissionUtil;
-import de.rayzs.pat.utils.Storage;
 
 public class VelocityAntiTabListener {
 
@@ -23,7 +23,7 @@ public class VelocityAntiTabListener {
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getSuggestions().removeIf(command -> Storage.hasNoAccess(player, command));
+        event.getSuggestions().removeIf(command -> Storage.BLACKLIST.isBlocked(player, command));
     }
 
     @Subscribe (order = PostOrder.LAST)
@@ -32,7 +32,7 @@ public class VelocityAntiTabListener {
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getRootNode().getChildren().removeIf(command -> Storage.hasNoAccess(player, command.getName()));
+        event.getRootNode().getChildren().removeIf(command -> Storage.BLACKLIST.isBlocked(player, command.getName()));
     }
 
     public static void updateCommands() {

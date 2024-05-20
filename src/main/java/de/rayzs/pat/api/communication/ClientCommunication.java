@@ -35,7 +35,7 @@ public class ClientCommunication {
 
             ClientInfo client = getClientById(requestPacket.getServerId());
             if (client == null) {
-                client = new ClientInfo(requestPacket.getServerId(), serverName);
+                client = new ClientInfo(serverObj, requestPacket.getServerId(), serverName);
                 QUEUE_CLIENTS.put(requestPacket.getServerId(), client);
             } else if (!client.getName().equals(serverName)) client.setName(serverName);
 
@@ -76,10 +76,16 @@ public class ClientCommunication {
         if(packet instanceof DataConverter.PacketBundle) {
             DataConverter.BackendDataPacket backendDataPacket = (DataConverter.BackendDataPacket) packet;
             if(!backendDataPacket.isToken(Storage.TOKEN)) return;
+
             DataConverter.PacketBundle packetBundle =  (DataConverter.PacketBundle) packet;
             DataConverter.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
             DataConverter.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
-            BukkitLoader.synchronizeCommandData(commandsPacket);
+            DataConverter.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
+
+            List<String> commands = new ArrayList<>();
+
+
+            BukkitLoader.synchronizeCommandData(commandsPacket, unknownCommandPacket);
             BukkitLoader.synchronizeGroupData(groupsPacket);
         }
     }
@@ -102,8 +108,6 @@ public class ClientCommunication {
         DataConverter.CommandsPacket commandsPacket = new DataConverter.CommandsPacket();
         DataConverter.GroupsPacket groupsPacket = new DataConverter.GroupsPacket(GroupManager.getGroups());
         DataConverter.PacketBundle bundle = new DataConverter.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
-
-
 
         if(clientInfo == null) sendPacket(bundle);
         else clientInfo.sendBytes(DataConverter.convertToBytes(bundle));

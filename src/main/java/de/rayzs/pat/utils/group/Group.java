@@ -44,6 +44,10 @@ public class Group {
         generalGroupBlacklist.clear().save();
     }
 
+    public Set<String> getServerNames() {
+        return serverGroupBlacklist.keySet();
+    }
+
     public void clear(String server) {
         GroupBlacklist serverGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName, server);
         serverGroupBlacklist.clear().save();

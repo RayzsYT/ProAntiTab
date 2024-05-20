@@ -5,10 +5,13 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.PermissionUtil;
-import de.rayzs.pat.utils.Storage;
+import org.bukkit.Bukkit;
+
+import java.util.List;
 
 public class VelocityBlockCommandListener {
 
@@ -20,43 +23,47 @@ public class VelocityBlockCommandListener {
 
     @Subscribe
     public void onPlayerChat(CommandExecuteEvent event) {
-        if(!Storage.CANCEL_COMMANDS || !event.getResult().isAllowed()) return;
-
+        if(!event.getResult().isAllowed()) return;
         CommandSource commandSource = event.getCommandSource();
 
         if(!(commandSource instanceof Player)) return;
 
         Player player = (Player) commandSource;
         String command = event.getCommand(),
-                serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown",
-                alertMessage = Storage.NOTIFY_ALERT.replace("%player%", player.getUsername()).replace("%command%", command).replace("%server%", serverName);
+                serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown";
+        List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
-        if(Storage.isPluginsCommand(command) && Storage.USE_CUSTOM_PLUGINS && !PermissionUtil.hasBypassPermission(player, command)) {
-            for (String line : Storage.CUSTOM_PLUGINS) MessageTranslator.send(player, line.replace("%command%", command.replaceFirst("/", "")));
-            event.setResult(CommandExecuteEvent.CommandResult.denied());
+        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
-            if(Storage.CONSOLE_NOTIFICATION_ENABLED) Logger.info(alertMessage);
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent() && server.getPlayer(uuid).get().isActive()).forEach(uuid -> {
-                MessageTranslator.send(server.getPlayer(uuid).get(), alertMessage);
+            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
+                org.bukkit.entity.Player target = Bukkit.getServer().getPlayer(uuid);
+                MessageTranslator.send(target, notificationMessage);
             });
-            return;
-        }
-
-        if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
-            if(Storage.isBlocked(command, true)) return;
-            if(PermissionUtil.hasBypassPermission(player, command)) return;
-
-            for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", command.replaceFirst("/", "")));
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
 
-        if(!Storage.isBlocked(command, false) || PermissionUtil.hasBypassPermission(player, command)) return;
-        for (String line : Storage.CANCEL_COMMANDS_MESSAGE) MessageTranslator.send(player, line.replace("%command%", command.replaceFirst("/", "")));
+        if(!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return;
+        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
-        if(Storage.CONSOLE_NOTIFICATION_ENABLED) MessageTranslator.send(server.getConsoleCommandSource(), alertMessage);
-        Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent() && server.getPlayer(uuid).get().isActive()).forEach(uuid -> {
-            MessageTranslator.send(server.getPlayer(uuid).get(), alertMessage);
+        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+            if(Storage.BLACKLIST.isListed(command, true)) return;
+            if(PermissionUtil.hasBypassPermission(player, command)) return;
+            MessageTranslator.send(player, cancelCommandMessage);
+            event.setResult(CommandExecuteEvent.CommandResult.denied());
+            return;
+        }
+
+        if (!Storage.BLACKLIST.isBlocked(player, command)) return;
+        if (PermissionUtil.hasBypassPermission(player, command)) return;
+        MessageTranslator.send(player, cancelCommandMessage);
+
+        if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+        Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
+            org.bukkit.entity.Player target = Bukkit.getServer().getPlayer(uuid);
+            MessageTranslator.send(target, notificationMessage);
         });
 
         event.setResult(CommandExecuteEvent.CommandResult.denied());

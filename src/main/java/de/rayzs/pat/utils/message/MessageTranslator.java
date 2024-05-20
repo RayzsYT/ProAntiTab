@@ -2,6 +2,7 @@ package de.rayzs.pat.utils.message;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.message.translators.*;
 import java.util.*;
@@ -48,15 +49,6 @@ public class MessageTranslator {
         placeholderSupport = true;
     }
 
-    public static String replaceMessage(String text) {
-        return replaceMessage(null, text);
-    }
-
-    public static String replaceMessage(Object playerObj, String text) {
-        text = text.replace("&", "§").replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
-        return !placeholderSupport || playerObj == null || Reflection.isProxyServer() ? text : PlaceholderReplacer.replace(playerObj, text);
-    }
-
     public static String translateLegacy(String text) {
         text = replaceMessage(text);
         if(!text.contains("§")) return text;
@@ -77,12 +69,25 @@ public class MessageTranslator {
         return text;
     }
 
+    public static void send(Object target, MultipleMessagesHelper texts) {
+        texts.getLines().forEach(text -> send(target, text));
+    }
+
+    public static void send(Object target, MultipleMessagesHelper texts, String... replacements) {
+        texts.getLines().forEach(text -> send(target, text, replacements));
+    }
+
     public static void send(Object target, List<String> texts) {
         texts.forEach(text -> send(target, text));
     }
 
-    public static void send(Object target, String text) {
-        text = replaceMessage(target, text);
+    public static void send(Object target, List<String> texts, String... replacements) {
+        texts = replaceMessageList(texts, replacements);
+        texts.forEach(text -> send(target, text));
+    }
+
+    public static void send(Object target, String text, String... replacements) {
+        text = replaceMessageString(text, replacements);
         if(translator == null) {
             CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
             sender.sendMessage(text);
@@ -90,6 +95,67 @@ public class MessageTranslator {
         }
 
         translator.send(target, text);
+    }
+
+    public static String replaceMessage(String text) {
+        return replaceMessage(null, text);
+    }
+
+    public static String replaceMessage(Object playerObj, String text) {
+        text = text.replace("&", "§").replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
+        return !placeholderSupport || playerObj == null || Reflection.isProxyServer() ? text : PlaceholderReplacer.replace(playerObj, text);
+    }
+
+    public static String replaceMessageString(String rawText, String... replacements) {
+        final HashMap<String, String> REPLACEMENTS = new HashMap<>();
+
+        String firstReplacementInput = null, secondReplacementInput = null;
+        for (String replacement : replacements) {
+            if (firstReplacementInput == null) firstReplacementInput = replacement;
+            else secondReplacementInput = replacement;
+
+            if (firstReplacementInput != null && secondReplacementInput != null) {
+                REPLACEMENTS.put(firstReplacementInput, secondReplacementInput);
+                firstReplacementInput = null;
+                secondReplacementInput = null;
+            }
+        }
+
+        String text = rawText;
+        for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
+            text = text.replace(entry.getKey(), entry.getValue());
+
+        return replaceMessage(rawText);
+    }
+
+    public static List<String> replaceMessageList(MultipleMessagesHelper rawText, String... replacements) {
+        return replaceMessageList(rawText.getLines(), replacements);
+    }
+
+    public static List<String> replaceMessageList(List<String> rawText, String... replacements) {
+        final HashMap<String, String> REPLACEMENTS = new HashMap<>();
+        List<String> result = new ArrayList<>();
+
+        String firstReplacementInput = null, secondReplacementInput = null;
+        for (String replacement : replacements) {
+            if (firstReplacementInput == null) firstReplacementInput = replacement;
+            else secondReplacementInput = replacement;
+
+            if(firstReplacementInput != null && secondReplacementInput != null) {
+                REPLACEMENTS.put(firstReplacementInput, secondReplacementInput);
+                firstReplacementInput = null;
+                secondReplacementInput = null;
+            }
+        }
+
+        rawText.forEach(text -> {
+            for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
+                text = text.replace(entry.getKey(), entry.getValue());
+            String resultText = replaceMessage(text);
+            result.add(resultText);
+        });
+
+        return result;
     }
 
     public static String translateIntoMiniMessage(String text) {

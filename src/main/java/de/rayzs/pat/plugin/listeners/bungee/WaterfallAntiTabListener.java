@@ -1,7 +1,7 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.PermissionUtil;
-import de.rayzs.pat.utils.Storage;
 import io.github.waterfallmc.waterfall.event.ProxyDefineCommandsEvent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
@@ -17,6 +17,6 @@ public class WaterfallAntiTabListener implements Listener {
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getCommands().entrySet().removeIf(entry -> Storage.hasNoAccess(player, entry.getKey()));
+        event.getCommands().entrySet().removeIf(entry -> Storage.BLACKLIST.isBlocked(player, entry.getKey()));
     }
 }

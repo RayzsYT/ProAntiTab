@@ -1,8 +1,8 @@
 package de.rayzs.pat.api.brand.impl;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.PacketUtils;
-import de.rayzs.pat.utils.Storage;
 import de.rayzs.pat.api.brand.ServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
@@ -18,23 +18,21 @@ public class BungeeServerBrand implements ServerBrand {
 
     private static final ProxyServer SERVER = BungeeLoader.getPlugin().getProxy();
     private static ScheduledTask TASK;
-    private static String BRAND;
+    private static String BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0);
 
-    public BungeeServerBrand() {
-        if (!Storage.USE_CUSTOM_BRAND) return;
-    }
+    public BungeeServerBrand() { }
 
     @Override
     public void initializeTask() {
         if(TASK != null) TASK.cancel();
-        if(!Storage.USE_CUSTOM_BRAND || Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY == -1) return;
+        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) return;
 
         AtomicInteger animationState = new AtomicInteger(0);
         TASK = SERVER.getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
-            if(animationState.getAndIncrement() >= Storage.CUSTOM_SERVER_BRANDS.size() - 1) animationState.set(0);
-            BRAND = MessageTranslator.replaceMessage(Storage.CUSTOM_SERVER_BRANDS.get(animationState.get())) + "§r";
+            if(animationState.getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1) animationState.set(0);
+            BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get())) + "§r";
             SERVER.getPlayers().forEach(this::send);
-        }, 1, Storage.CUSTOM_SERVER_BRAND_REPEAT_DELAY, TimeUnit.MILLISECONDS);
+        }, 1, Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -42,7 +40,7 @@ public class BungeeServerBrand implements ServerBrand {
 
     @Override
     public void send(Object playerObj) {
-        if (!(playerObj instanceof ProxiedPlayer) || !Storage.USE_CUSTOM_BRAND) return;
+        if (!(playerObj instanceof ProxiedPlayer) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
         ProxiedPlayer player = (ProxiedPlayer) playerObj;
 
         String serverName = "", playerName = player.getName(), customBrand;

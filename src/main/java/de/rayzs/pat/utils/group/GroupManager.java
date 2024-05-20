@@ -24,6 +24,11 @@ public class GroupManager {
         ).findFirst().orElse(null) != null;
     }
 
+    public static boolean canAccessCommand(Object targetObj, String command, String server) {
+        return GROUPS.stream().filter(group -> group.contains(command) && group.hasPermission(targetObj)
+        ).findFirst().orElse(null) != null;
+    }
+
     public static void setGroup(String groupName, List<String> commands) {
         if(groupName.length() < 1) return;
         Group group = registerAndGetGroup(groupName);
@@ -93,15 +98,33 @@ public class GroupManager {
         return result;
     }
 
-    public static List<String> getGroupByNameOnlyIncludingCommand(String command) {
+    public static List<String> getGroupsByServer(String command) {
         List<String> result = new ArrayList<>();
         GROUPS.stream().filter(group -> group.contains(command)).forEach(group -> result.add(group.getGroupName()));
         return result;
     }
 
-    public static List<String> getGroupByNameNotIncludingCommand(String command) {
+    public static List<String> getGroupsByNameOnlyIncludingCommand(String command) {
+        List<String> result = new ArrayList<>();
+        GROUPS.stream().filter(group -> group.contains(command)).forEach(group -> result.add(group.getGroupName()));
+        return result;
+    }
+
+    public static List<String> getGroupsByNameOnlyIncludingCommand(String command, String server) {
+        List<String> result = new ArrayList<>();
+        GROUPS.stream().filter(group -> group.contains(command, server)).forEach(group -> result.add(group.getGroupName()));
+        return result;
+    }
+
+    public static List<String> getGroupsByNameNotIncludingCommand(String command) {
         List<String> result = new ArrayList<>();
         GROUPS.stream().filter(group -> !group.contains(command)).forEach(group -> result.add(group.getGroupName()));
+        return result;
+    }
+
+    public static List<String> getGroupsByNameNotIncludingCommand(String command, String server) {
+        List<String> result = new ArrayList<>();
+        GROUPS.stream().filter(group -> !group.contains(command, server)).forEach(group -> result.add(group.getGroupName()));
         return result;
     }
 

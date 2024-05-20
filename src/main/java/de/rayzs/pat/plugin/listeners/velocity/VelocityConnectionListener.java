@@ -4,11 +4,10 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.PermissionUtil;
-import de.rayzs.pat.utils.Storage;
-
 import java.util.concurrent.TimeUnit;
 
 public class VelocityConnectionListener {
@@ -24,11 +23,10 @@ public class VelocityConnectionListener {
     @Subscribe
     public void onServerPreConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
-        if(Storage.OUTDATED_VERSION && (PermissionUtil.hasPermission(player, "update"))) {
+        if(Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
             server.getScheduler().buildTask(loader, () -> {
-                if (player.isActive()) {
-                    Storage.UPDATE_NOTIFICATION.forEach(message -> MessageTranslator.send(player, message));
-                }
+                if (player.isActive())
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED);
             }).delay(1, TimeUnit.SECONDS).schedule();
         }
     }

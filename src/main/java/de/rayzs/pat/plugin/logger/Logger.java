@@ -4,6 +4,8 @@ import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
+
+import java.util.List;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 
@@ -15,6 +17,9 @@ public class Logger {
                     ? BungeeLoader.getPluginLogger()
                     : BukkitLoader.getPluginLogger();
 
+
+    public static void info(List<String> texts) { texts.forEach(text -> send(Priority.INFO, text)); }
+    public static void warning(List<String> texts) { texts.forEach(text -> send(Priority.WARNING, text)); }
     public static void info(String text) { send(Priority.INFO, text); }
     public static void warning(String text) { send(Priority.WARNING, text); }
 
