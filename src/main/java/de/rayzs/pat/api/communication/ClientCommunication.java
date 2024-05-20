@@ -32,18 +32,18 @@ public class ClientCommunication {
         clientInfo.sendBytes(DataConverter.convertToBytes(packet));
     }
 
-    public static void receiveInformation(String serverName, Object packet, Object serverObj) {
+    public static void receiveInformation(String serverName, Object packet) {
         if(packet instanceof DataConverter.RequestPacket) {
             DataConverter.RequestPacket requestPacket = (DataConverter.RequestPacket) packet;
             if (!requestPacket.isToken(Storage.TOKEN)) return;
 
-            ClientInfo client = getClientById(requestPacket.getServerId());
+            ClientInfo client = getClientByName(serverName);
             if (client == null) {
                 client = Reflection.isVelocityServer() ? new VelocityClientInfo(requestPacket.getServerId(), serverName) : new BungeeClientInfo(requestPacket.getServerId(), serverName);
                 CLIENTS.add(client);
             }
 
-            if (!client.getName().equals(serverName)) client.setName(serverName);
+            if (!client.compareId(requestPacket.getServerId())) client.setId(requestPacket.getServerId());
 
             syncData(client.getId());
             return;
@@ -61,13 +61,13 @@ public class ClientCommunication {
             if (!feedbackPacket.isToken(Storage.TOKEN)) return;
             String serverId = feedbackPacket.getServerId();
 
-            ClientInfo client = getClientById(feedbackPacket.getServerId());
+            ClientInfo client = getClientByName(serverName);
             if (client == null) {
                 client = Reflection.isVelocityServer() ? new VelocityClientInfo(feedbackPacket.getServerId(), serverName) : new BungeeClientInfo(feedbackPacket.getServerId(), serverName);
                 CLIENTS.add(client);
             }
 
-            if (!client.getName().equals(serverName)) client.setName(serverName);
+            if (!client.compareId(feedbackPacket.getServerId())) client.setId(feedbackPacket.getServerId());
 
             if (client.hasSentFeedback()) return;
             client.setFeedback(true);
@@ -143,6 +143,10 @@ public class ClientCommunication {
 
     public static ClientInfo getClientById(String id) {
         return CLIENTS.isEmpty() ? null : CLIENTS.stream().filter(client -> client != null && client.compareId(id)).findFirst().orElse(null);
+    }
+
+    public static ClientInfo getClientByName(String name) {
+        return CLIENTS.isEmpty() ? null : CLIENTS.stream().filter(client -> client != null && client.getName().equals(name)).findFirst().orElse(null);
     }
 
     public static ClientInfo getQueueClientById(String id) {
