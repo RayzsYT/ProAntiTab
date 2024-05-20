@@ -1,5 +1,7 @@
 package de.rayzs.pat.utils.group;
 
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 
@@ -8,7 +10,13 @@ public class GroupManager {
     private static final List<Group> GROUPS = new ArrayList<>();
 
     public static void initialize() {
-        Storage.STORAGE.getKeys(true).stream().filter(key -> !key.equals("commands")).forEach(GroupManager::registerGroup);
+        Storage.Files.STORAGE.getKeys(true).stream().filter(key -> key.startsWith("groups.")).forEach(key -> {
+            String[] args = key.split("\\.");
+            if(args.length >= 1) {
+                String groupName = args[1];
+                GroupManager.registerGroup(groupName);
+            }
+        });
     }
 
     public static boolean canAccessCommand(Object targetObj, String command) {
@@ -41,16 +49,33 @@ public class GroupManager {
         group.add(command);
     }
 
+    public static void addToGroup(String groupName, String command, String server) {
+        Group group = getGroupByName(groupName);
+        if(groupName == null) return;
+        group.add(command, server);
+    }
+
     public static void removeFromGroup(String groupName, String command) {
         Group group = getGroupByName(groupName);
         if(groupName == null) return;
         group.remove(command);
     }
 
+    public static void removeFromGroup(String groupName, String command, String server) {
+        Group group = getGroupByName(groupName);
+        if(groupName == null) return;
+        group.remove(command, server);
+    }
+
     public static void unregisterGroup(String groupName) {
+        unregisterGroup(groupName, null);
+    }
+
+    public static void unregisterGroup(String groupName, String server) {
         Group group = getGroupByName(groupName);
         if(group == null) return;
-        Storage.STORAGE.setAndSave(group.getGroupName(), null);
+        if(server != null) group.deleteGroup(server);
+        else group.deleteGroup();
         GROUPS.remove(group);
     }
 

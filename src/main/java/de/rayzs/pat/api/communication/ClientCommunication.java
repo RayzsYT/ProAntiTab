@@ -79,9 +79,6 @@ public class ClientCommunication {
             DataConverter.PacketBundle packetBundle =  (DataConverter.PacketBundle) packet;
             DataConverter.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
             DataConverter.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
-
-            GroupManager.getcom
-
             BukkitLoader.synchronizeCommandData(commandsPacket);
             BukkitLoader.synchronizeGroupData(groupsPacket);
         }
@@ -105,6 +102,8 @@ public class ClientCommunication {
         DataConverter.CommandsPacket commandsPacket = new DataConverter.CommandsPacket();
         DataConverter.GroupsPacket groupsPacket = new DataConverter.GroupsPacket(GroupManager.getGroups());
         DataConverter.PacketBundle bundle = new DataConverter.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
+
+
 
         if(clientInfo == null) sendPacket(bundle);
         else clientInfo.sendBytes(DataConverter.convertToBytes(bundle));

@@ -1,7 +1,7 @@
 package de.rayzs.pat.api.storage.blacklist.impl;
 
 import de.rayzs.pat.api.storage.StorageTemplate;
-import de.rayzs.pat.api.storage.templates.BlacklistStorage;
+import de.rayzs.pat.api.storage.storages.BlacklistStorage;
 
 import java.util.List;
 

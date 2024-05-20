@@ -2,7 +2,7 @@ package de.rayzs.pat.api.storage;
 
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
-import de.rayzs.pat.api.storage.templates.ConfigStorage;
+import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.utils.configuration.*;

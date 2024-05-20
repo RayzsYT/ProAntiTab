@@ -1,4 +1,4 @@
-package de.rayzs.pat.api.storage.templates;
+package de.rayzs.pat.api.storage.storages;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.StorageTemplate;

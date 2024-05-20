@@ -1,6 +1,6 @@
 package de.rayzs.pat.utils.configuration.helper;
 
-import de.rayzs.pat.api.storage.templates.ConfigStorage;
+import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 
 public class ConfigSectionHelper<T> {
