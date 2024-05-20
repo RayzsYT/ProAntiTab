@@ -41,6 +41,7 @@ public class VelocityLoader {
     private final EventManager manager;
     private final VelocityMetrics.Factory metricsFactory;
     private ScheduledTask task;
+    private static boolean checkUpdate = false;
 
     @Inject
     public VelocityLoader(ProxyServer server, VelocityMetrics.Factory metricsFactory) {
@@ -98,6 +99,11 @@ public class VelocityLoader {
                 } else {
                     Storage.OUTDATED = true;
                     MessageTranslator.send(server.getConsoleCommandSource(), Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
+                }
+            } else {
+                if(!checkUpdate) {
+                    checkUpdate = true;
+                    Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
                 }
             }
         }).delay(1, TimeUnit.SECONDS).repeat(Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.SECONDS).schedule();

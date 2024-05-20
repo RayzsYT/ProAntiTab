@@ -23,6 +23,7 @@ public class BungeeLoader extends Plugin {
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
     private ScheduledTask updaterTask;
+    private static boolean checkUpdate = false;
 
     @Override
     public void onLoad() {
@@ -97,6 +98,11 @@ public class BungeeLoader extends Plugin {
                 } else {
                     Storage.OUTDATED = true;
                     Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
+                }
+            } else {
+                if(!checkUpdate) {
+                    checkUpdate = true;
+                    Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
                 }
             }
         }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);

@@ -25,7 +25,7 @@ public class BukkitLoader extends JavaPlugin {
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
-    private static boolean loaded = false;
+    private static boolean loaded = false, checkUpdate = false;
     private int updaterTaskId;
 
     @Override
@@ -98,6 +98,11 @@ public class BukkitLoader extends JavaPlugin {
                 } else {
                     Storage.OUTDATED = true;
                     Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
+                }
+            } else {
+                if(!checkUpdate) {
+                    checkUpdate = true;
+                    Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
                 }
             }
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
