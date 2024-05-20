@@ -1,17 +1,23 @@
-commands:
-  - help
-  - '?'
-  - about
-  - ver
-  - version
-  - icanhasbukkit
-  - pl
-  - plugins
-  - bungee
-  - gfind
-  - server
-  - glist
-
-examplegroup:
-  - help
-  - '?'
+general:
+  commands:
+    - pl
+    - plugins
+    - help
+    - about
+    - icanhasbukkit
+    - '?'
+    - ver
+    - version
+    - tell
+    - glist
+    - gfind
+    - server
+groups:
+  examplegroup:
+    commands:
+      - help
+      - '?'
+  examplegroup2:
+    commands:
+      - tell
+      - msg

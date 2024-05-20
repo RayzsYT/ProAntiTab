@@ -20,7 +20,7 @@ public class HelpSection extends ConfigStorage {
         MESSAGE = new MultipleMessagesHelper(this, null, Reflection.isProxyServer() ?
                 Arrays.asList(
                         "&7Available commands are: &f/%label%&7..."
-                        , "§7format: &8<optional> (required)"
+                        , "§7Format: &8<optional> (required)"
                         , "&f  reload &7to reload the plugin"
                         , "&f  notify &7to get alerted"
                         , "&f  creategroup (group) &7Create a group"
@@ -32,7 +32,7 @@ public class HelpSection extends ConfigStorage {
                 :
                 Arrays.asList(
                         "&7Available commands are: &f/%label%&7..."
-                        , "§7format: &8<optional> (required)"
+                        , "§7Format: &8<optional> (required)"
                         , "&f  reload &7to reload the plugin"
                         , "&f  notify &7to get alerted"
                         , "&f  creategroup (group) &7Create a group"
@@ -41,7 +41,7 @@ public class HelpSection extends ConfigStorage {
                         , "&f  listgroups (optional: server) &7List all groups"
                         , "&f  add/rem (command) &8<group> &7to manage the list"
                         , "&f  clear &8<group> &7to clear the list"
-                        , "&7For a specific server:"
+                        , "&7 For a specific server:"
                         , "&f  serv add/rem (command) (server) &8<group>"
                         , "&f  serv clear (server) &8<group>"
                 ));
