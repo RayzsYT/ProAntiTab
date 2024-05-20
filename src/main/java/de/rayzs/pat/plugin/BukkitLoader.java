@@ -51,7 +51,7 @@ public class BukkitLoader extends JavaPlugin {
 
         PluginManager manager = getServer().getPluginManager();
 
-        if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
                 if(loaded) ClientCommunication.sendRequest();
             }, 40, 20 * 10);
@@ -71,7 +71,7 @@ public class BukkitLoader extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) PacketAnalyzer.uninjectAll();
+        PacketAnalyzer.uninjectAll();
         MessageTranslator.closeAudiences();
     }
 
