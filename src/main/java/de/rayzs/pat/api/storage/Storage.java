@@ -14,7 +14,7 @@ public class Storage {
     public static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
     public static final List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
 
-    public static String TOKEN, SERVER_NAME, CURRENT_VERSION, NEWER_VERSION;
+    public static String TOKEN = "", SERVER_NAME = "", CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = false;
 
     public static void loadAll(boolean loadBlacklist) {
@@ -24,7 +24,7 @@ public class Storage {
     }
 
     public static void loadToken() {
-        TOKEN = Reflection.isProxyServer() ? (String) Files.TOKEN.getOrSet("token", UUID.randomUUID()) : ConfigSections.Settings.HANDLE_THROUGH_PROXY.TOKEN;
+        TOKEN = Reflection.isProxyServer() ? (String) Files.TOKEN.getOrSet("token", UUID.randomUUID().toString()) : ConfigSections.Settings.HANDLE_THROUGH_PROXY.TOKEN;
     }
 
     public static void loadConfig() {
@@ -73,8 +73,8 @@ public class Storage {
         public static class Settings {
 
             public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
-            public static CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
             public static CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
+            public static CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
             public static CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
             public static CustomProtocolPingSection CUSTOM_PROTOCOL_PING = new CustomProtocolPingSection();
             public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();

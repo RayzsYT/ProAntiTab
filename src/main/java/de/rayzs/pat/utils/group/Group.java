@@ -4,9 +4,11 @@ import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.utils.PermissionUtil;
+
+import java.io.Serializable;
 import java.util.*;
 
-public class Group {
+public class Group implements Serializable {
 
     private final HashMap<String, GroupBlacklist> serverGroupBlacklist = new HashMap<>();
 

@@ -46,7 +46,7 @@ public class DataConverter {
 
     public interface CommunicationPacket {}
 
-    public static class BackendDataPacket implements CommunicationPacket {
+    public static class BackendDataPacket implements CommunicationPacket, Serializable {
         private final String proxyToken, serverName, serverId;
 
         public BackendDataPacket(String proxyToken, String serverId, String serverName) {
@@ -68,7 +68,7 @@ public class DataConverter {
         }
     }
 
-    public static class FeedbackPacket implements CommunicationPacket {
+    public static class FeedbackPacket implements CommunicationPacket, Serializable {
         private final String proxyToken, serverId;
 
         public FeedbackPacket(String proxyToken, String serverId) {
@@ -85,7 +85,7 @@ public class DataConverter {
         }
     }
 
-    public static class RequestPacket implements CommunicationPacket {
+    public static class RequestPacket implements CommunicationPacket, Serializable {
         private final String proxyToken, serverId;
 
         public RequestPacket(String proxyToken, String serverId) {
@@ -102,7 +102,7 @@ public class DataConverter {
         }
     }
 
-    public static class PacketBundle implements CommunicationPacket {
+    public static class PacketBundle implements CommunicationPacket, Serializable {
 
         private final CommandsPacket commandsPacket;
         private final GroupsPacket groupsPacket;
@@ -140,7 +140,7 @@ public class DataConverter {
         public UnknownCommandPacket getUnknownCommandPacket() { return unknownCommandPacket; }
     }
 
-    public static class UnknownCommandPacket {
+    public static class UnknownCommandPacket implements Serializable {
 
         private final MultipleMessagesHelper message;
         private final boolean enabled;
@@ -159,7 +159,7 @@ public class DataConverter {
         }
     }
 
-    public static class CommandsPacket {
+    public static class CommandsPacket implements Serializable {
 
         private List<String> commands;
         private boolean turnBlacklistToWhitelist;
@@ -181,7 +181,7 @@ public class DataConverter {
         }
     }
 
-    public static class GroupsPacket {
+    public static class GroupsPacket implements Serializable {
 
         private final List<Group> groups;
 

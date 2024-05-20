@@ -1,9 +1,11 @@
 package de.rayzs.pat.utils.configuration.helper;
 
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
+
+import java.io.Serializable;
 import java.util.*;
 
-public class MultipleMessagesHelper {
+public class MultipleMessagesHelper implements Serializable {
 
     private final ArrayList<String> lines;
 

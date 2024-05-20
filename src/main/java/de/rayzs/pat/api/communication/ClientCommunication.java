@@ -1,5 +1,8 @@
 package de.rayzs.pat.api.communication;
 
+import de.rayzs.pat.api.communication.client.ClientInfo;
+import de.rayzs.pat.api.communication.client.impl.BungeeClientInfo;
+import de.rayzs.pat.api.communication.client.impl.VelocityClientInfo;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.communication.impl.*;
 import de.rayzs.pat.api.storage.Storage;
@@ -36,7 +39,7 @@ public class ClientCommunication {
 
             ClientInfo client = getClientById(requestPacket.getServerId());
             if (client == null) {
-                client = new ClientInfo(serverObj, requestPacket.getServerId(), serverName);
+                client = Reflection.isVelocityServer() ? new VelocityClientInfo(serverObj, requestPacket.getServerId(), serverName) : new BungeeClientInfo(serverObj, requestPacket.getServerId(), serverName);
                 QUEUE_CLIENTS.put(requestPacket.getServerId(), client);
             } else if (!client.getName().equals(serverName)) client.setName(serverName);
 
@@ -60,11 +63,17 @@ public class ClientCommunication {
             ClientInfo client = getClientById(serverId);
             if(client == null) {
                 client = getQueueClientById(serverId);
-                if(serverId != null) CLIENTS.add(client);
-                else return;
+                if(client != null) CLIENTS.add(client);
+                else {
+                    client = getClientById(feedbackPacket.getServerId());
+                    if (client == null) {
+                        client = Reflection.isVelocityServer() ? new VelocityClientInfo(serverObj, feedbackPacket.getServerId(), serverName) : new BungeeClientInfo(serverObj, feedbackPacket.getServerId(), serverName);
+                        CLIENTS.add(client);
+                    } else if (!client.getName().equals(serverName)) client.setName(serverName);
+                }
             }
 
-            if (client == null || client.hasSentFeedback()) return;
+            if (client.hasSentFeedback()) return;
             client.setFeedback(true);
             client.syncTime();
             SERVER_DATA_SYNC_COUNT++;
@@ -129,7 +138,7 @@ public class ClientCommunication {
     }
 
     public static ClientInfo getClientById(String id) {
-        return CLIENTS.stream().filter(client -> client.compareId(id)).findFirst().orElse(null);
+        return CLIENTS.isEmpty() ? null : CLIENTS.stream().filter(client -> client != null && client.compareId(id)).findFirst().orElse(null);
     }
 
     public static ClientInfo getQueueClientById(String id) {

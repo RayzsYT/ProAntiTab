@@ -1,10 +1,8 @@
-package de.rayzs.pat.api.communication;
+package de.rayzs.pat.api.communication.client;
 
-import de.rayzs.pat.api.communication.impl.VelocityClient;
-import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.TimeConverter;
 
-public class ClientInfo {
+public abstract class ClientInfo {
 
     private String id, name;
 
@@ -32,10 +30,7 @@ public class ClientInfo {
         this.id = serverId;
     }
 
-    public void sendBytes(byte[] bytes) {
-        if(Reflection.isVelocityServer()) ((com.velocitypowered.api.proxy.server.RegisteredServer) serverObj).sendPluginMessage(VelocityClient.getIdentifier(), bytes);
-        else if(Reflection.isProxyServer()) ((net.md_5.bungee.api.config.ServerInfo) serverObj).sendData(Client.CHANNEL_NAME, bytes);
-    }
+    public abstract void sendBytes(byte[] bytes);
 
     public String getName() {
         return name;
@@ -59,5 +54,13 @@ public class ClientInfo {
 
     public boolean hasSentFeedback() {
         return sentFeedback;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Object getServerObj() {
+        return serverObj;
     }
 }

@@ -109,21 +109,24 @@ public class MessageTranslator {
     public static String replaceMessageString(String rawText, String... replacements) {
         final HashMap<String, String> REPLACEMENTS = new HashMap<>();
 
-        String firstReplacementInput = null, secondReplacementInput = null;
-        for (String replacement : replacements) {
-            if (firstReplacementInput == null) firstReplacementInput = replacement;
-            else secondReplacementInput = replacement;
+        if(replacements != null) {
+            String firstReplacementInput = null, secondReplacementInput = null;
+            for (String replacement : replacements) {
+                if (firstReplacementInput == null) firstReplacementInput = replacement;
+                else secondReplacementInput = replacement;
 
-            if (firstReplacementInput != null && secondReplacementInput != null) {
-                REPLACEMENTS.put(firstReplacementInput, secondReplacementInput);
-                firstReplacementInput = null;
-                secondReplacementInput = null;
+                if (firstReplacementInput != null && secondReplacementInput != null) {
+                    REPLACEMENTS.put(firstReplacementInput, secondReplacementInput);
+                    firstReplacementInput = null;
+                    secondReplacementInput = null;
+                }
             }
         }
 
         String text = rawText;
-        for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
-            text = text.replace(entry.getKey(), entry.getValue());
+        if(replacements != null)
+            for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
+                text = text.replace(entry.getKey(), entry.getValue());
 
         return replaceMessage(rawText);
     }
@@ -136,21 +139,24 @@ public class MessageTranslator {
         final HashMap<String, String> REPLACEMENTS = new HashMap<>();
         List<String> result = new ArrayList<>();
 
-        String firstReplacementInput = null, secondReplacementInput = null;
-        for (String replacement : replacements) {
-            if (firstReplacementInput == null) firstReplacementInput = replacement;
-            else secondReplacementInput = replacement;
+        if(replacements != null) {
+            String firstReplacementInput = null, secondReplacementInput = null;
+            for (String replacement : replacements) {
+                if (firstReplacementInput == null) firstReplacementInput = replacement;
+                else secondReplacementInput = replacement;
 
-            if(firstReplacementInput != null && secondReplacementInput != null) {
-                REPLACEMENTS.put(firstReplacementInput, secondReplacementInput);
-                firstReplacementInput = null;
-                secondReplacementInput = null;
+                if (firstReplacementInput != null && secondReplacementInput != null) {
+                    REPLACEMENTS.put(firstReplacementInput, secondReplacementInput);
+                    firstReplacementInput = null;
+                    secondReplacementInput = null;
+                }
             }
         }
 
         rawText.forEach(text -> {
-            for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
-                text = text.replace(entry.getKey(), entry.getValue());
+            if(replacements != null)
+                for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
+                    text = text.replace(entry.getKey(), entry.getValue());
             String resultText = replaceMessage(text);
             result.add(resultText);
         });

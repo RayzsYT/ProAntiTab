@@ -106,7 +106,9 @@ public class BukkitLoader extends JavaPlugin {
     public static void synchronizeCommandData(DataConverter.CommandsPacket packet, DataConverter.UnknownCommandPacket unknownCommandPacket) {
         ClientCommunication.sendFeedback();
 
-        if (!Storage.BLACKLIST.getCommands().containsAll(packet.getCommands()) || !packet.getCommands().containsAll(Storage.BLACKLIST.getCommands()))
+        if(packet.getCommands() == null || packet.getCommands().isEmpty())
+            Storage.BLACKLIST.setList(new ArrayList<>());
+        else if (!Storage.BLACKLIST.getCommands().containsAll(packet.getCommands()) || !packet.getCommands().containsAll(Storage.BLACKLIST.getCommands()))
             Storage.BLACKLIST.setList(packet.getCommands());
 
         if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != packet.turnBlacklistToWhitelistEnabled())
@@ -117,7 +119,7 @@ public class BukkitLoader extends JavaPlugin {
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
 
-        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(packet.getCommands());
+        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(Storage.BLACKLIST.getCommands());
         if(!loaded) {
             loaded = true;
             Logger.info("First data has arrived successfully!");
