@@ -20,26 +20,30 @@ public class HelpSection extends ConfigStorage {
         MESSAGE = new MultipleMessagesHelper(this, null, Reflection.isProxyServer() ?
                 Arrays.asList(
                         "&7Available commands are: &f/%label%&7..."
+                        , "§7format: &8<optional> &f(required)"
                         , "&f  reload &7to reload the plugin"
-                        , "&f  stats &7view when data has been synced"
                         , "&f  notify &7to get alerted"
-                        , "&f  listgroups &7List all groups"
                         , "&f  creategroup (group) &7Create a group"
                         , "&f  deletegroup (group) &7Delete a group"
                         , "&f  list &8(optional: group) &7to see all listed commands"
-                        , "&f  clear &8(optional: group) &7to clear the list"
-                        , "&f  add/remove (command) &8(optional: group) &7to manage the list")
+                        , "&f  listgroups &7List all groups"
+                        , "&f  add/rem (command) &8<group> &7to manage the list"
+                        , "&f  clear &8<group> &7to clear the list")
                 :
                 Arrays.asList(
                         "&7Available commands are: &f/%label%&7..."
+                        , "§7format: &8<optional> (required)"
                         , "&f  reload &7to reload the plugin"
                         , "&f  notify &7to get alerted"
-                        , "&f  listgroups &7List all groups"
                         , "&f  creategroup (group) &7Create a group"
                         , "&f  deletegroup (group) &7Delete a group"
                         , "&f  list &8(optional: group) &7to see all listed commands"
-                        , "&f  clear &8(optional: group) &7to clear the list"
-                        , "&f  add/remove (command) &8(optional: group) &7to manage the list"
+                        , "&f  listgroups (optional: server) &7List all groups"
+                        , "&f  add/rem (command) &8<group> &7to manage the list"
+                        , "&f  clear &8<group> &7to clear the list"
+                        , "&7For server specific:"
+                        , "&f  serv add/rem (command) &8<group>"
+                        , "&f  serv clear &8<group>"
                 ));
     }
 }

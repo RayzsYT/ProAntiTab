@@ -28,8 +28,8 @@ public class Storage {
     }
 
     public static void loadConfig() {
-        ConfigSections.Messages.initialize();
         ConfigSections.Settings.initialize();
+        ConfigSections.Messages.initialize();
         ConfigSections.SECTIONS.forEach(ConfigStorage::load);
     }
 
@@ -70,6 +70,20 @@ public class Storage {
 
         public static List<ConfigStorage> SECTIONS = new ArrayList<>();
 
+        public static class Settings {
+
+            public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
+            public static CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
+            public static CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
+            public static CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
+            public static CustomProtocolPingSection CUSTOM_PROTOCOL_PING = new CustomProtocolPingSection();
+            public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
+            public static TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
+            public static UpdateSection UPDATE = new UpdateSection();
+
+            public static void initialize() {}
+        }
+
         public static class Messages {
 
             public static BlacklistSection BLACKLIST = new BlacklistSection();
@@ -81,20 +95,6 @@ public class Storage {
             public static OnlyForProxySection NO_PROXY = new OnlyForProxySection();
             public static ReloadSection RELOAD = new ReloadSection();
             public static StatsSection STATS_SECTION = new StatsSection();
-
-            public static void initialize() {}
-        }
-
-        public static class Settings {
-
-            public static CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
-            public static CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
-            public static CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
-            public static CustomProtocolPingSection CUSTOM_PROTOCOL_PING = new CustomProtocolPingSection();
-            public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
-            public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
-            public static TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
-            public static UpdateSection UPDATE = new UpdateSection();
 
             public static void initialize() {}
         }
