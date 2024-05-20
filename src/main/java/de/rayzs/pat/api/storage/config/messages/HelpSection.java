@@ -20,7 +20,7 @@ public class HelpSection extends ConfigStorage {
         MESSAGE = new MultipleMessagesHelper(this, null, Reflection.isProxyServer() ?
                 Arrays.asList(
                         "&7Available commands are: &f/%label%&7..."
-                        , "§7format: &8<optional> &f(required)"
+                        , "§7format: &8<optional> (required)"
                         , "&f  reload &7to reload the plugin"
                         , "&f  notify &7to get alerted"
                         , "&f  creategroup (group) &7Create a group"
