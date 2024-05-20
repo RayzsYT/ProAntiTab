@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.process;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
@@ -8,6 +9,8 @@ import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.api.communication.ClientInfo;
 import de.rayzs.pat.utils.group.*;
+import de.rayzs.pat.utils.message.MessageTranslator;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -16,8 +19,17 @@ public class CommandProcess {
     private static final ExpireCache<UUID, String> CONFIRMATION = new ExpireCache<>(4, TimeUnit.SECONDS);
 
     public static void handleCommand(Object senderObj, String[] args, String label) {
+
         CommandSender sender = new CommandSender(senderObj);
-        UUID uuid = sender.getUniqueId();
+
+        if(args.length >= 1) {
+            Storage.loadAll(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED);
+            CustomServerBrand.initialize();
+            handleChange();
+            sender.sendMessage("Reloaded!");
+        } else for (String line : Storage.ConfigSections.Messages.HELP.MESSAGE.getLines()) sender.sendMessage(line.replace("%label%", label));
+
+        /*UUID uuid = sender.getUniqueId();
         int length = args.length;
         String task, sub, extra, confirmationString;
         Group group;
@@ -297,10 +309,10 @@ public class CommandProcess {
             sender.sendMessage(Storage.COMMAND_UNKNOWN);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
-        }
+        }*/
     }
 
-    public static List<String> handleTabComplete(Object senderObj, String[] args) {
+    public static List<String> handleTabComplete(Object senderObj, String[] args) {/*
         CommandSender sender = new CommandSender(senderObj);
         final List<String> suggestions = new ArrayList<>(), result = new ArrayList<>();
         final boolean backend = Storage.BUNGEECORD && !Reflection.isProxyServer();
@@ -332,12 +344,13 @@ public class CommandProcess {
         }
 
         suggestions.stream().filter(suggestion -> suggestion.startsWith(args[args.length-1].toLowerCase())).forEach(result::add);
-        return result;
+        return result;*/
+        return Arrays.asList("nothing to see");
     }
 
     private static void handleChange() {
         if(Reflection.isProxyServer()) {
-            ClientCommunication.synchronizeInformation();
+            ClientCommunication.syncData();
             if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
         } else {
             if (Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
