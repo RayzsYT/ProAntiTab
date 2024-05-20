@@ -9,15 +9,11 @@ public abstract class ClientInfo {
     private boolean sentFeedback = false;
     private long syncTime = System.currentTimeMillis();
 
-    private final Object serverObj;
-
-    public ClientInfo(Object serverObj, String serverId) {
-        this.serverObj = serverObj;
+    public ClientInfo(String serverId) {
         this.id = serverId;
     }
 
-    public ClientInfo(Object serverObj, String serverId, String name) {
-        this.serverObj = serverObj;
+    public ClientInfo(String serverId, String name) {
         this.id = serverId;
         this.name = name;
     }
@@ -58,9 +54,5 @@ public abstract class ClientInfo {
 
     public String getId() {
         return id;
-    }
-
-    public Object getServerObj() {
-        return serverObj;
     }
 }

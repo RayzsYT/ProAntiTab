@@ -2,26 +2,21 @@ package de.rayzs.pat.api.communication.client.impl;
 
 import de.rayzs.pat.api.communication.Client;
 import de.rayzs.pat.api.communication.client.ClientInfo;
-import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.ProxyServer;
 
 public class BungeeClientInfo extends ClientInfo {
 
-    public BungeeClientInfo(Object serverObj, String serverId) {
-        super(serverObj, serverId);
+    public BungeeClientInfo(String serverId) {
+        super(serverId);
     }
 
-    public BungeeClientInfo(Object serverObj, String serverId, String name) {
-        super(serverObj, serverId, name);
+    public BungeeClientInfo(String serverId, String name) {
+        super(serverId, name);
     }
 
     @Override
     public void sendBytes(byte[] bytes) {
-        ((Server) getServerObj()).sendData(Client.CHANNEL_NAME, bytes);
-    }
-
-    @Override
-    public Object getServerObj() {
-        return super.getServerObj();
+        ProxyServer.getInstance().getServers().entrySet().stream().filter(entry -> entry.getKey().equals(getName())).forEach(entry -> entry.getValue().sendData(Client.CHANNEL_NAME, bytes));
     }
 
     @Override

@@ -2,25 +2,21 @@ package de.rayzs.pat.api.communication.client.impl;
 
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.communication.impl.VelocityClient;
+import de.rayzs.pat.plugin.VelocityLoader;
 
 public class VelocityClientInfo extends ClientInfo {
 
-    public VelocityClientInfo(Object serverObj, String serverId) {
-        super(serverObj, serverId);
+    public VelocityClientInfo(String serverId) {
+        super(serverId);
     }
 
-    public VelocityClientInfo(Object serverObj, String serverId, String name) {
-        super(serverObj, serverId, name);
+    public VelocityClientInfo(String serverId, String name) {
+        super(serverId, name);
     }
 
     @Override
     public void sendBytes(byte[] bytes) {
-        ((com.velocitypowered.api.proxy.server.RegisteredServer) getServerObj()).sendPluginMessage(VelocityClient.getIdentifier(), bytes);
-    }
-
-    @Override
-    public Object getServerObj() {
-        return super.getServerObj();
+        VelocityLoader.getServer().getAllServers().stream().filter(server -> server.getServerInfo().getName().equals(getName())).forEach(server -> server.sendPluginMessage(VelocityClient.getIdentifier(), bytes));
     }
 
     @Override
