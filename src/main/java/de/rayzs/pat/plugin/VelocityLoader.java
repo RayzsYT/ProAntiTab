@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "1.6.1",
+version = "1.7.0",
 authors = "Rayzs_YT",
 description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.",
 dependencies = {
