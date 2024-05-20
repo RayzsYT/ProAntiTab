@@ -18,6 +18,7 @@ public class Group implements Serializable {
     public Group(String groupName) {
         this.groupName = groupName;
         this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
+        this.generalGroupBlacklist.load();
     }
 
     public String getGroupName() {
@@ -85,6 +86,7 @@ public class Group implements Serializable {
         GroupBlacklist groupBlacklist = null;
         if(!serverGroupBlacklist.containsKey(server)) {
             groupBlacklist = BlacklistCreator.createGroupBlacklist(groupName, server);
+            groupBlacklist.load();
             serverGroupBlacklist.put(server, groupBlacklist);
         }
 
