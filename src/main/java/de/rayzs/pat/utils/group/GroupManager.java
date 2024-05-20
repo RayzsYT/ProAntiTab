@@ -98,6 +98,12 @@ public class GroupManager {
         return result;
     }
 
+    public static List<String> getGroupNames(String server) {
+        List<String> result = new ArrayList<>();
+        getGroupsByServer(server).forEach(group -> result.add(group.getGroupName()));
+        return result;
+    }
+
     public static List<Group> getGroupsByServer(String server) {
         List<Group> result = new ArrayList<>();
         GROUPS.stream().filter(group -> Storage.isServer(server, group.getServerNames())).forEach(result::add);
