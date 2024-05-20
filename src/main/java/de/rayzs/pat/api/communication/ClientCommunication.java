@@ -25,18 +25,14 @@ public class ClientCommunication {
     public static int SERVER_DATA_SYNC_COUNT = 0;
 
     public static void sendPacket(Object packet) {
-        System.out.println("OUT: " + packet.getClass().getSimpleName());
         CLIENT.send(packet);
     }
 
     public static void sendPacket(ClientInfo clientInfo, Object packet) {
-        System.out.println("OUT: (" + clientInfo.getName() + ") " + packet.getClass().getSimpleName());
         clientInfo.sendBytes(DataConverter.convertToBytes(packet));
     }
 
     public static void receiveInformation(String serverName, Object packet, Object serverObj) {
-        System.out.println("IN: " + packet.getClass().getSimpleName());
-
         if(packet instanceof DataConverter.RequestPacket) {
             DataConverter.RequestPacket requestPacket = (DataConverter.RequestPacket) packet;
             if (!requestPacket.isToken(Storage.TOKEN)) return;
@@ -127,14 +123,10 @@ public class ClientCommunication {
 
         commandsPacket.setCommands(commands);
         bundle = new DataConverter.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
-
-        System.out.println("PERSONAL PACKED");
-
         clientInfo.sendBytes(DataConverter.convertToBytes(bundle));
     }
 
     public static void sendRequest() {
-        System.out.println(System.currentTimeMillis() - LAST_SENT_REQUEST);
         if(System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
             LAST_SENT_REQUEST = System.currentTimeMillis();
             sendPacket(new DataConverter.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
