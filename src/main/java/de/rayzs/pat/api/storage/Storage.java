@@ -14,7 +14,7 @@ public class Storage {
     public static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
     public static final List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
 
-    public static String TOKEN = "", SERVER_NAME = "", CURRENT_VERSION = "", NEWER_VERSION = "";
+    public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = false;
 
     public static void loadAll(boolean loadBlacklist) {
