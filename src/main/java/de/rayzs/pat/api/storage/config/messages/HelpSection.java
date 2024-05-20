@@ -38,7 +38,7 @@ public class HelpSection extends ConfigStorage {
                         , "&f  creategroup (group) &7Create a group"
                         , "&f  deletegroup (group) &7Delete a group"
                         , "&f  list &8(optional: group) &7to see all listed commands"
-                        , "&f  listgroups (optional: server) &7List all groups"
+                        , "&f  listgroups &8(optional: server) &7List all groups"
                         , "&f  add/rem (command) &8<group> &7to manage the list"
                         , "&f  clear &8<group> &7to clear the list"
                         , "&7 For a specific server:"
