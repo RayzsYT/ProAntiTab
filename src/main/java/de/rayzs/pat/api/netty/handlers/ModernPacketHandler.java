@@ -25,8 +25,17 @@ public class ModernPacketHandler implements PacketHandler {
 
     @Override
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
-        Method suggestionsMethod = Reflection.getMethodsByReturnType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
-        if(suggestionsMethod == null) return false;
+        Object suggestionObj;
+
+        if (Reflection.getMinor() < 17) {
+            Field suggestionsField = Reflection.getFieldsByType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
+            if (suggestionsField == null) return false;
+            suggestionObj = suggestionsField.get(packetObj);
+        } else {
+            Method suggestionsMethod = Reflection.getMethodsByReturnType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
+            if (suggestionsMethod == null) return false;
+            suggestionObj = suggestionsMethod.invoke(packetObj);
+        }
 
         String input = PacketAnalyzer.getPlayerInput(player);
 
@@ -45,7 +54,7 @@ public class ModernPacketHandler implements PacketHandler {
                     || Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED && !Storage.BLACKLIST.isListed(input, false) && !PermissionUtil.hasBypassPermission(player, input);
         }
 
-        Suggestions suggestions = (Suggestions) suggestionsMethod.invoke(packetObj);
+        Suggestions suggestions = (Suggestions) suggestionObj;
         if(input.length() < 1 && Reflection.isWeird() || cancelsBeforeHand && Reflection.isWeird())
             return false;
         else if(cancelsBeforeHand)
