@@ -33,6 +33,30 @@ public class Storage {
         ConfigSections.SECTIONS.forEach(ConfigStorage::load);
     }
 
+    public static boolean isServer(String originServer, Set<String> targetServers) {
+        List<String> list = new ArrayList<>(targetServers);
+        return isServer(originServer, list);
+    }
+
+    public static boolean isServer(String originServer, List<String> targetServers) {
+        for (String targetServer : targetServers)
+            if(isServer(originServer, targetServer))
+                return true;
+        return false;
+    }
+
+    public static boolean isServer(String originServer, String targetServer) {
+        originServer = originServer.toLowerCase();
+        targetServer = targetServer.toLowerCase();
+
+        if(originServer.endsWith("*")) {
+            originServer = originServer.replace("*", "");
+            return targetServer.startsWith(originServer);
+        }
+
+        return originServer.equals(targetServer);
+    }
+
     public static class Files {
         public static final ConfigurationBuilder
                 CONFIGURATION = Configurator.get("settings"),

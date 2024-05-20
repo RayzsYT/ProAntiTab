@@ -98,9 +98,9 @@ public class GroupManager {
         return result;
     }
 
-    public static List<String> getGroupsByServer(String command) {
-        List<String> result = new ArrayList<>();
-        GROUPS.stream().filter(group -> group.contains(command)).forEach(group -> result.add(group.getGroupName()));
+    public static List<Group> getGroupsByServer(String server) {
+        List<Group> result = new ArrayList<>();
+        GROUPS.stream().filter(group -> Storage.isServer(server, group.getServerNames())).forEach(result::add);
         return result;
     }
 

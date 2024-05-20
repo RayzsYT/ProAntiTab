@@ -6,6 +6,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.DataConverter;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 
 import java.util.*;
@@ -74,16 +75,12 @@ public class ClientCommunication {
         }
 
         if(packet instanceof DataConverter.PacketBundle) {
-            DataConverter.BackendDataPacket backendDataPacket = (DataConverter.BackendDataPacket) packet;
-            if(!backendDataPacket.isToken(Storage.TOKEN)) return;
-
             DataConverter.PacketBundle packetBundle =  (DataConverter.PacketBundle) packet;
+            if(!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString())) return;
+
             DataConverter.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
             DataConverter.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
             DataConverter.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
-
-            List<String> commands = new ArrayList<>();
-
 
             BukkitLoader.synchronizeCommandData(commandsPacket, unknownCommandPacket);
             BukkitLoader.synchronizeGroupData(groupsPacket);
@@ -108,9 +105,16 @@ public class ClientCommunication {
         DataConverter.CommandsPacket commandsPacket = new DataConverter.CommandsPacket();
         DataConverter.GroupsPacket groupsPacket = new DataConverter.GroupsPacket(GroupManager.getGroups());
         DataConverter.PacketBundle bundle = new DataConverter.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
+        List<String> commands = new ArrayList<>(Storage.BLACKLIST.getCommands());
 
         if(clientInfo == null) sendPacket(bundle);
-        else clientInfo.sendBytes(DataConverter.convertToBytes(bundle));
+        else {
+            String serverName = clientInfo.getName();
+            List<Group> groups = GroupManager.getGroupsByServer(serverName);
+            groups.forEach(group -> commands.addAll(group.getCommands(serverName)));
+            commandsPacket.setCommands(commands);
+            clientInfo.sendBytes(DataConverter.convertToBytes(bundle));
+        }
     }
 
     public static void sendRequest() {
