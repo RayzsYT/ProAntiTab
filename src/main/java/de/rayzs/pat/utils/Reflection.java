@@ -21,7 +21,7 @@ public class Reflection {
             loadAges();
             loadVersionEnum();
             legacy = minor <= 16;
-            weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() >= 20;
+            weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() > 20;
             proxy = false;
         } catch (Throwable ignored) { proxy = true; }
 
