@@ -18,9 +18,8 @@ public class BukkitPlayerConnectionListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !BukkitLoader.isLoaded()) {
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !BukkitLoader.isLoaded())
             Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), ClientCommunication::sendRequest, 5);
-        }
 
         CustomServerBrand.preparePlayer(player);
         CustomServerBrand.sendBrandToPlayer(player);
