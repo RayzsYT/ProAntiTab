@@ -116,7 +116,7 @@ help:
   - '&f  notify &7to get alerted'
   - '&f  creategroup (group) &7Create a group'
   - '&f  deletegroup (group) &7Delete a group'
-  - '&f  list &8(optional: group) &7to see all listed commands'
+  - '&f  list &8(group) &7to see all listed commands'
   - '&f  listgroups &7List all groups'
   - '&f  add/rem (command) &8<group> &7to manage the list'
   - '&f  clear &8<group> &7to clear the list'
