@@ -134,7 +134,7 @@ blacklist:
   list:
     message: '&7Listed commands (&f%size%&7)&8: &f%commands%'
     splitter: '&7, '
-    command: '&f'
+    command: '&f%command%'
 
   add:
     success: '&aSuccessfully added %command% into the list!'
@@ -158,12 +158,12 @@ group:
   list:
     message: '&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%'
     splitter: '&7, '
-    command: '&f'
+    command: '&f%command%'
 
   list-groups:
     message: '&7All groups (&f%size%&7)&8: &f%groups%'
     splitter: '&7, '
-    command: '&f'
+    command: '&f%group%'
 
   add:
     success: '&aSuccessfully added %command% into the list of group %group%!'

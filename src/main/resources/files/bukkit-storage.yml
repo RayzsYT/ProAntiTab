@@ -1,13 +1,20 @@
-commands:
-  - help
-  - '?'
-  - about
-  - ver
-  - version
-  - icanhasbukkit
-  - pl
-  - plugins
-
-examplegroup:
-  - help
-  - '?'
+general:
+  commands:
+    - pl
+    - plugins
+    - help
+    - about
+    - icanhasbukkit
+    - '?'
+    - ver
+    - version
+    - tell
+groups:
+  examplegroup:
+    commands:
+      - help
+      - '?'
+  examplegroup2:
+    commands:
+      - tell
+      - msg
