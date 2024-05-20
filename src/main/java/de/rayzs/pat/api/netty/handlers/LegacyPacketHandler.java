@@ -1,5 +1,6 @@
 package de.rayzs.pat.api.netty.handlers;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.netty.PacketAnalyzer;
 import de.rayzs.pat.api.netty.PacketHandler;
@@ -38,8 +39,8 @@ public class LegacyPacketHandler implements PacketHandler {
             input = input.replace("/", "");
             if(input.contains(" ")) input = input.split(" ")[0];
 
-            cancelsBeforeHand = Storage.isBlocked(input, true) && !PermissionUtil.hasBypassPermission(player, input)
-                    || Storage.isBlocked(input, false) && !PermissionUtil.hasBypassPermission(player, input);
+            cancelsBeforeHand = Storage.BLACKLIST.isListed(input, true) && !PermissionUtil.hasBypassPermission(player, input)
+                    || Storage.BLACKLIST.isListed(input, false) && !PermissionUtil.hasBypassPermission(player, input);
         }
 
         for (Field field : Reflection.getFields(packetObj)) {
@@ -56,8 +57,8 @@ public class LegacyPacketHandler implements PacketHandler {
                 for (String s : tR) {
                     tempName = s.replaceFirst("/", "");
 
-                    if(Storage.TURN_BLACKLIST_TO_WHITELIST) {
-                        if(!Storage.isBlocked(tempName, true)) continue;
+                    if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+                        if(!Storage.BLACKLIST.isListed(tempName, true)) continue;
                         if(PermissionUtil.hasBypassPermission(player, tempName)) continue;
                         newResultList.add(s);
                         continue;
@@ -65,8 +66,8 @@ public class LegacyPacketHandler implements PacketHandler {
 
                     if (tempName.contains(":")) tempName = tempName.split(":")[1];
 
-                    if (!Storage.isBlocked(tempName, false)
-                            || Storage.isBlocked(tempName, false)
+                    if (!Storage.BLACKLIST.isListed(tempName, false)
+                            || Storage.BLACKLIST.isListed(tempName, false)
                             && PermissionUtil.hasBypassPermission(player, tempName))
                         newResultList.add(s);
                 }
