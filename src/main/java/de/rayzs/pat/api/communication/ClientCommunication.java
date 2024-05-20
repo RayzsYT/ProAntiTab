@@ -148,4 +148,10 @@ public class ClientCommunication {
     public static void resetAllFeedbacks() {
         CLIENTS.forEach(client -> client.setFeedback(false));
     }
+
+    public static List<String> getRegisteredServerNames() {
+        List<String> result = new ArrayList<>();
+        CLIENTS.stream().filter(client -> client != null && client.getName() != null).forEach(client -> result.add(client.getName()));
+        return result;
+    }
 }
