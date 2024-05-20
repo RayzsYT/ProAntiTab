@@ -192,18 +192,18 @@ group:
   list:
     message: '&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%'
     splitter: '&7, '
-    command: '&f'
+    command: '&f%command%'
     message-server: '&7Listed commands of group %group% from %server% (&f%size%&7)&8: &f%commands%'
     splitter-server: '&7, '
-    command-server: '&f'
+    command-server: '&f%command%'
 
   list-groups:
     message: '&7All groups (&f%size%&7)&8: &f%groups%'
     splitter: '&7, '
-    command: '&f'
+    command: '&f%group%'
     message-server: '&7All groups from %server% (&f%size%&7)&8: &f%groups%'
     splitter-server: '&7, '
-    command-server: '&f'
+    command-server: '&f%group%'
 
   add:
     success: '&aSuccessfully added %command% into the list of group %group%!'

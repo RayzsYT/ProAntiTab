@@ -1,7 +1,8 @@
 - Fix 1.8.8 Support
-- New and better storage.yml overlay
+- Fix 1.16.5 Support
+- New storage.yml overlay
 - New feature "Custom-Protocol-Ping"
-- New commands
+- New commands (for proxy-servers only)
 - Per-Server commands & groups
 - Remove /pat for proxy
 - Fix gold (&6) color

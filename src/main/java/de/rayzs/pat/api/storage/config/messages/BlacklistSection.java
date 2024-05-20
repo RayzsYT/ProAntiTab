@@ -27,7 +27,7 @@ public class BlacklistSection extends ConfigStorage {
 
         LIST_MESSAGE = new ConfigSectionHelper<String>(this, "list.message", "&7Listed commands (&f%size%&7)&8: &f%commands%").getOrSet();
         LIST_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter", "&7, ").getOrSet();
-        LIST_COMMAND = new ConfigSectionHelper<String>(this, "list.command", "&f").getOrSet();
+        LIST_COMMAND = new ConfigSectionHelper<String>(this, "list.command", "&f%command%").getOrSet();
 
         ADD_SUCCESS = new ConfigSectionHelper<String>(this, "add.success", "&aSuccessfully added %command% into the list!").getOrSet();
         ADD_FAILED = new ConfigSectionHelper<String>(this, "add.failed", "&c%command% is already in the list!").getOrSet();
@@ -41,7 +41,7 @@ public class BlacklistSection extends ConfigStorage {
 
         LIST_SERVER_MESSAGE = new ConfigSectionHelper<String>(this, "list.message-server", "&7Listed commands of %server% (&f%size%&7)&8: &f%commands%").getOrSet();
         LIST_SERVER_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter-server", "&7, ").getOrSet();
-        LIST_SERVER_COMMAND = new ConfigSectionHelper<String>(this, "list.command-server", "&f").getOrSet();
+        LIST_SERVER_COMMAND = new ConfigSectionHelper<String>(this, "list.command-server", "&f%command%").getOrSet();
 
         ADD_SERVER_SUCCESS = new ConfigSectionHelper<String>(this, "add.success-server", "&aSuccessfully added %command% into the list of %server%!").getOrSet();
         ADD_SERVER_FAILED = new ConfigSectionHelper<String>(this, "add.failed-server", "&c%command% is already in the list of %server%!").getOrSet();

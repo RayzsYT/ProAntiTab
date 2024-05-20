@@ -61,11 +61,11 @@ public class GroupSection extends ConfigStorage {
 
         LIST_SERVER_MESSAGE = new ConfigSectionHelper<String>(this, "list.message-server", "&7Listed commands of group %group% from %server% (&f%size%&7)&8: &f%commands%").getOrSet();
         LIST_SERVER_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter-server", "&7, ").getOrSet();
-        LIST_SERVER_COMMAND = new ConfigSectionHelper<String>(this, "list.command-server", "&f").getOrSet();
+        LIST_SERVER_COMMAND = new ConfigSectionHelper<String>(this, "list.command-server", "&f%group%").getOrSet();
 
         LIST_GROUP_SERVER_MESSAGE = new ConfigSectionHelper<String>(this, "list-groups.message-server", "&7All groups from %server% (&f%size%&7)&8: &f%groups%").getOrSet();
         LIST_GROUP_SERVER_SPLITTER = new ConfigSectionHelper<String>(this, "list-groups.splitter-server", "&7, ").getOrSet();
-        LIST_GROUP_SERVER_GROUPS = new ConfigSectionHelper<String>(this, "list-groups.command-server", "&f").getOrSet();
+        LIST_GROUP_SERVER_GROUPS = new ConfigSectionHelper<String>(this, "list-groups.command-server", "&f%group%").getOrSet();
 
         ADD_SERVER_SUCCESS = new ConfigSectionHelper<String>(this, "add.success-server", "&aSuccessfully added %command% into the list of group %group% for %server%!").getOrSet();
         ADD_SERVER_FAILED = new ConfigSectionHelper<String>(this, "add.failed-server", "&c%command% is already in the list of group %group% of %server%!").getOrSet();
