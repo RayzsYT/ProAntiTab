@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
+import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.netty.PacketAnalyzer;
@@ -16,6 +17,15 @@ public class BukkitPlayerConnectionListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+
+        System.out.println(BukkitLoader.isLoaded());
+
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !BukkitLoader.isLoaded()) {
+            Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
+                System.out.println("SENT");
+                ClientCommunication.sendRequest();
+            }, 5);
+        }
 
         CustomServerBrand.preparePlayer(player);
         CustomServerBrand.sendBrandToPlayer(player);

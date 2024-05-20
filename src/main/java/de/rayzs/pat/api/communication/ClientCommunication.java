@@ -21,30 +21,35 @@ public class ClientCommunication {
     private static final UUID SERVER_ID = UUID.randomUUID();
     public static final List<ClientInfo> CLIENTS = new ArrayList<>();
     private static final ExpireCache<String, ClientInfo> QUEUE_CLIENTS = new ExpireCache<>(15, TimeUnit.SECONDS);
-    public static long LAST_DATA_UPDATE = System.currentTimeMillis();
+    public static long LAST_DATA_UPDATE = System.currentTimeMillis(), LAST_SENT_REQUEST = 0;
     public static int SERVER_DATA_SYNC_COUNT = 0;
 
     public static void sendPacket(Object packet) {
+        System.out.println("OUT: " + packet.getClass().getSimpleName());
         CLIENT.send(packet);
     }
 
     public static void sendPacket(ClientInfo clientInfo, Object packet) {
+        System.out.println("OUT: (" + clientInfo.getName() + ") " + packet.getClass().getSimpleName());
         clientInfo.sendBytes(DataConverter.convertToBytes(packet));
     }
 
     public static void receiveInformation(String serverName, Object packet, Object serverObj) {
+        System.out.println("IN: " + packet.getClass().getSimpleName());
+
         if(packet instanceof DataConverter.RequestPacket) {
             DataConverter.RequestPacket requestPacket = (DataConverter.RequestPacket) packet;
             if (!requestPacket.isToken(Storage.TOKEN)) return;
 
             ClientInfo client = getClientById(requestPacket.getServerId());
             if (client == null) {
-                client = Reflection.isVelocityServer() ? new VelocityClientInfo(serverObj, requestPacket.getServerId(), serverName) : new BungeeClientInfo(serverObj, requestPacket.getServerId(), serverName);
-                QUEUE_CLIENTS.put(requestPacket.getServerId(), client);
-            } else if (!client.getName().equals(serverName)) client.setName(serverName);
+                client = Reflection.isVelocityServer() ? new VelocityClientInfo(requestPacket.getServerId(), serverName) : new BungeeClientInfo(requestPacket.getServerId(), serverName);
+                CLIENTS.add(client);
+            }
 
+            if (!client.getName().equals(serverName)) client.setName(serverName);
 
-            syncData(requestPacket.getServerId());
+            syncData(client.getId());
             return;
         }
 
@@ -60,18 +65,13 @@ public class ClientCommunication {
             if (!feedbackPacket.isToken(Storage.TOKEN)) return;
             String serverId = feedbackPacket.getServerId();
 
-            ClientInfo client = getClientById(serverId);
-            if(client == null) {
-                client = getQueueClientById(serverId);
-                if(client != null) CLIENTS.add(client);
-                else {
-                    client = getClientById(feedbackPacket.getServerId());
-                    if (client == null) {
-                        client = Reflection.isVelocityServer() ? new VelocityClientInfo(serverObj, feedbackPacket.getServerId(), serverName) : new BungeeClientInfo(serverObj, feedbackPacket.getServerId(), serverName);
-                        CLIENTS.add(client);
-                    } else if (!client.getName().equals(serverName)) client.setName(serverName);
-                }
+            ClientInfo client = getClientById(feedbackPacket.getServerId());
+            if (client == null) {
+                client = Reflection.isVelocityServer() ? new VelocityClientInfo(feedbackPacket.getServerId(), serverName) : new BungeeClientInfo(feedbackPacket.getServerId(), serverName);
+                CLIENTS.add(client);
             }
+
+            if (!client.getName().equals(serverName)) client.setName(serverName);
 
             if (client.hasSentFeedback()) return;
             client.setFeedback(true);
@@ -102,33 +102,45 @@ public class ClientCommunication {
 
     public static void syncData(String serverId) {
         LAST_DATA_UPDATE = System.currentTimeMillis();
-        ClientInfo clientInfo = null;
+        ClientInfo clientInfo;
         if(serverId == null) {
             resetAllFeedbacks();
             SERVER_DATA_SYNC_COUNT = 0;
+            CLIENTS.forEach(currentClient -> syncData(currentClient.getId()));
+            return;
         } else {
             clientInfo = getClientById(serverId);
             SERVER_DATA_SYNC_COUNT = SERVER_DATA_SYNC_COUNT -1;
+            if(SERVER_DATA_SYNC_COUNT <= 0) SERVER_DATA_SYNC_COUNT = 0;
         }
 
         DataConverter.CommandsPacket commandsPacket = new DataConverter.CommandsPacket();
-        DataConverter.GroupsPacket groupsPacket = new DataConverter.GroupsPacket(GroupManager.getGroups());
-        DataConverter.PacketBundle bundle = new DataConverter.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
+        DataConverter.GroupsPacket groupsPacket;
+        DataConverter.PacketBundle bundle;
         List<String> commands = new ArrayList<>(Storage.BLACKLIST.getCommands());
 
-        if(clientInfo == null) sendPacket(bundle);
-        else {
-            String serverName = clientInfo.getName();
-            List<Group> groups = GroupManager.getGroupsByServer(serverName);
-            groups.forEach(group -> commands.addAll(group.getCommands(serverName)));
-            commandsPacket.setCommands(commands);
-            clientInfo.sendBytes(DataConverter.convertToBytes(bundle));
-        }
+        String serverName = clientInfo.getName();
+        List<Group> groups = GroupManager.getGroupsByServer(serverName),
+                newGroupList = new ArrayList<>();
+        groups.forEach(oldGroup -> newGroupList.add(new Group(oldGroup.getGroupName(), oldGroup.getCommands(serverName))));
+        groupsPacket = new DataConverter.GroupsPacket(GroupManager.getGroups());
+
+        commandsPacket.setCommands(commands);
+        bundle = new DataConverter.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
+
+        System.out.println("PERSONAL PACKED");
+
+        clientInfo.sendBytes(DataConverter.convertToBytes(bundle));
     }
 
     public static void sendRequest() {
-        sendPacket(new DataConverter.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
+        System.out.println(System.currentTimeMillis() - LAST_SENT_REQUEST);
+        if(System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
+            LAST_SENT_REQUEST = System.currentTimeMillis();
+            sendPacket(new DataConverter.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
+        }
     }
+
     public static void sendFeedback() {
         sendPacket(new DataConverter.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString()));
     }

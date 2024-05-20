@@ -51,10 +51,12 @@ public class BukkitLoader extends JavaPlugin {
 
         PluginManager manager = getServer().getPluginManager();
 
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(this, ClientCommunication::sendRequest, 40, 20*10);
+        if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+            Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
+                if(loaded) ClientCommunication.sendRequest();
+            }, 40, 20 * 10);
+
         else {
-            loaded = true;
             GroupManager.initialize();
             PacketAnalyzer.injectAll();
         }
@@ -109,6 +111,9 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public static void synchronizeCommandData(DataConverter.CommandsPacket packet, DataConverter.UnknownCommandPacket unknownCommandPacket) {
+
+        packet.getCommands().forEach(c -> System.out.println("COMMANDS: " + c));
+
         ClientCommunication.sendFeedback();
 
         if(packet.getCommands() == null || packet.getCommands().isEmpty())

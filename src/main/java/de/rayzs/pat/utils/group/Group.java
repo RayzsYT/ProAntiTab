@@ -21,6 +21,12 @@ public class Group implements Serializable {
         this.generalGroupBlacklist.load();
     }
 
+    public Group(String groupName, List<String> commands) {
+        this.groupName = groupName;
+        this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
+        this.generalGroupBlacklist.setList(commands);
+    }
+
     public String getGroupName() {
         return groupName;
     }

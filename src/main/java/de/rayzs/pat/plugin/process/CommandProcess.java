@@ -26,7 +26,7 @@ public class CommandProcess {
         int length = args.length;
         String task, sub, extra, confirmationString;
         Group group;
-        boolean bool, backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
+        boolean bool, backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || !Reflection.isProxyServer();
 
         if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
 
@@ -186,6 +186,27 @@ public class CommandProcess {
                             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_MESSAGE.replace("%size%", String.valueOf(group.getCommands().size())).replace("%commands%", blacklistedCommandBuilder.toString()).replace("%group%", group.getGroupName()));
                             return;
 
+                        case "listgroups":
+                        case "lg":
+
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "listgroups")) return;
+
+                            if(!Reflection.isProxyServer()) {
+                                sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                                return;
+                            }
+
+                            StringBuilder groupsBuilder = new StringBuilder();
+                            for (int i = 0; i < GroupManager.getGroupNames(sub.toLowerCase()).size(); i++) {
+                                bool = (i >= GroupManager.getGroupNames(sub.toLowerCase()).size() - 1);
+                                groupsBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_GROUPS.replace("%group%",GroupManager.getGroupNames(sub.toLowerCase()).get(i)));
+                                if (!bool)
+                                    groupsBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_SPLITTER);
+                            }
+
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_MESSAGE.replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(GroupManager.getGroupNames(sub.toLowerCase()).size())).replace("%groups%", groupsBuilder.toString()));
+                            return;
+
                         case "creategroup":
                         case "cg":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "creategroup")) return;
@@ -295,6 +316,20 @@ public class CommandProcess {
                             return;
                     }
 
+                case 5:
+                    if(backend) {
+                        sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                        return;
+                    }
+
+                    task = args[1].toLowerCase();
+                    sub = args[2].toLowerCase();
+                    extra = args[3].toLowerCase();
+
+                    if(args[0].equals("serv") || args[0].equals("server")) {
+
+                    }
+
                 default:
                     for (String line : Storage.ConfigSections.Messages.HELP.MESSAGE.getLines()) sender.sendMessage(line.replace("&", "§").replace("%label%", label));
             }
@@ -308,7 +343,7 @@ public class CommandProcess {
     public static List<String> handleTabComplete(Object senderObj, String[] args) {
         CommandSender sender = new CommandSender(senderObj);
         final List<String> suggestions = new ArrayList<>(), result = new ArrayList<>();
-        final boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
+        final boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || !Reflection.isProxyServer();
 
         switch (args.length) {
             case 1:
@@ -327,6 +362,7 @@ public class CommandProcess {
                 if(!backend && Arrays.asList("deletegroup", "dg").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "deletegroup")) suggestions.addAll(GroupManager.getGroupNames());
                 if(!backend && args[0].equals("clear") && PermissionUtil.hasPermission(sender, "clear")) suggestions.addAll(GroupManager.getGroupNames());
                 if(!backend && Arrays.asList("ls", "list").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "list")) suggestions.addAll(GroupManager.getGroupNames());
+                if(Reflection.isProxyServer() && Arrays.asList("lg", "listgroups").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "listgroups")) suggestions.addAll(ClientCommunication.getRegisteredServerNames());
                 if(!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer()) suggestions.addAll(BukkitLoader.getNotBlockedCommands());
                 if(!backend && Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(Storage.BLACKLIST.getCommands());
                 break;
