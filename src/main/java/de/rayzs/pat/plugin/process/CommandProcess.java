@@ -166,7 +166,6 @@ public class CommandProcess {
                     sub = args[1];
                     bool = Storage.BLACKLIST.isListed(sub);
                     switch (task) {
-
                         case "ls":
                         case "list":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
