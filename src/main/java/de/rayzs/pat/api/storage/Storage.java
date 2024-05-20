@@ -24,7 +24,7 @@ public class Storage {
     }
 
     public static void loadToken() {
-        TOKEN = Reflection.isProxyServer() ? (String) Files.TOKEN.getOrSet("token", "insert-token-of-proxy-here") : ConfigSections.Settings.HANDLE_THROUGH_PROXY.TOKEN;
+        TOKEN = Reflection.isProxyServer() ? (String) Files.TOKEN.getOrSet("token", UUID.randomUUID()) : ConfigSections.Settings.HANDLE_THROUGH_PROXY.TOKEN;
     }
 
     public static void loadConfig() {
