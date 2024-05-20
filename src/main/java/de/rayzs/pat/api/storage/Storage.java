@@ -59,8 +59,8 @@ public class Storage {
 
     public static class Files {
         public static final ConfigurationBuilder
-                CONFIGURATION = Configurator.get("settings"),
-                STORAGE = Configurator.get("blacklist"),
+                CONFIGURATION = Configurator.get("config"),
+                STORAGE = Configurator.get("storage"),
                 TOKEN = Configurator.get("token");
 
         public static void initialize() {}
