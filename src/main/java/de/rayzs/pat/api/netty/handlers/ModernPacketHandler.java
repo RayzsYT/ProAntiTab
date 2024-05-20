@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.netty.handlers;
 
 import com.mojang.brigadier.suggestion.Suggestions;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.netty.*;
 import org.bukkit.entity.Player;
@@ -40,8 +41,8 @@ public class ModernPacketHandler implements PacketHandler {
             String[] split = input.split(" ");
             if(input.contains(" ")) input = split[0];
 
-            cancelsBeforeHand = !Storage.TURN_BLACKLIST_TO_WHITELIST && Storage.isBlocked(input, true) && !PermissionUtil.hasBypassPermission(player, input)
-                    || Storage.TURN_BLACKLIST_TO_WHITELIST && !Storage.isBlocked(input, false) && !PermissionUtil.hasBypassPermission(player, input);
+            cancelsBeforeHand = !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED && Storage.BLACKLIST.isListed(input, true) && !PermissionUtil.hasBypassPermission(player, input)
+                    || Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED && !Storage.BLACKLIST.isListed(input, false) && !PermissionUtil.hasBypassPermission(player, input);
         }
 
         Suggestions suggestions = (Suggestions) suggestionsMethod.invoke(packetObj);
@@ -54,9 +55,7 @@ public class ModernPacketHandler implements PacketHandler {
 
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
-                if (Storage.TURN_BLACKLIST_TO_WHITELIST)
-                    return !Storage.isBlocked(command, true) && !PermissionUtil.hasBypassPermission(player, command);
-                else return Storage.isBlocked(command, false) && !PermissionUtil.hasBypassPermission(player, command);
+                return Storage.BLACKLIST.isBlocked(player, command);
             });
         }
 
