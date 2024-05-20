@@ -21,8 +21,8 @@ public class ClientCommunication {
     private static final UUID SERVER_ID = UUID.randomUUID();
     public static final List<ClientInfo> CLIENTS = new ArrayList<>();
     private static final ExpireCache<String, ClientInfo> QUEUE_CLIENTS = new ExpireCache<>(15, TimeUnit.SECONDS);
-    private static long LAST_DATA_UPDATE = System.currentTimeMillis();
-    private static int SERVER_DATA_SYNC_COUNT = 0;
+    public static long LAST_DATA_UPDATE = System.currentTimeMillis();
+    public static int SERVER_DATA_SYNC_COUNT = 0;
 
     public static void sendPacket(Object packet) {
         CLIENT.send(packet);
