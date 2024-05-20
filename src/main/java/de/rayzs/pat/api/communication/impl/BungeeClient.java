@@ -37,7 +37,7 @@ public class BungeeClient implements Client, Listener {
             if(!DataConverter.isPacket(packetObj)) return;
 
             Server server = (Server) event.getSender();
-            ClientCommunication.receiveInformation(server.getInfo().getName(), packetObj, server);
+            ClientCommunication.receiveInformation(server.getInfo().getName(), packetObj);
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
 }

@@ -36,7 +36,7 @@ public class VelocityClient implements Client {
         if(!DataConverter.isPacket(packetObj)) return;
 
         ServerConnection server = (ServerConnection) event.getSource();
-        ClientCommunication.receiveInformation(server.getServerInfo().getName(), packetObj, server);
+        ClientCommunication.receiveInformation(server.getServerInfo().getName(), packetObj);
     }
 
     public static MinecraftChannelIdentifier getIdentifier() {
