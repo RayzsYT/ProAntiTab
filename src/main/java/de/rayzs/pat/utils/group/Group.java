@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.group;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
@@ -10,7 +11,6 @@ import java.util.*;
 
 public class Group implements Serializable {
 
-    private final HashMap<String, GroupBlacklist> serverGroupBlacklist = new HashMap<>();
 
     private final GroupBlacklist generalGroupBlacklist;
     private final String groupName;
@@ -53,10 +53,6 @@ public class Group implements Serializable {
         generalGroupBlacklist.clear().save();
     }
 
-    public Set<String> getServerNames() {
-        return serverGroupBlacklist.keySet();
-    }
-
     public void clear(String server) {
         GroupBlacklist serverGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName, server);
         serverGroupBlacklist.clear().save();
@@ -75,7 +71,7 @@ public class Group implements Serializable {
     }
 
     public boolean contains(String command, String server) {
-        return generalGroupBlacklist.isListed(command) || getOrCreateGroupBlacklist(server).isListed(command);
+        return generalGroupBlacklist.isListed(command) || GroupManager.getOrCreateGroupList(groupName, server).getOrCreateGroupBlacklist(server).isListed(command);
     }
 
     public List<String> getCommands() {
@@ -84,19 +80,9 @@ public class Group implements Serializable {
 
     public List<String> getCommands(String server) {
         List<String> commands = new ArrayList<>(generalGroupBlacklist.getCommands());
-        commands.addAll(getOrCreateGroupBlacklist(server).getCommands());
+        GroupServer groupServer = GroupManager.getOrCreateGroupList(getGroupName(), server);
+        commands.addAll(groupServer.getOrCreateGroupBlacklist(server).getCommands());
         return commands;
-    }
-
-    public GroupBlacklist getOrCreateGroupBlacklist(String server) {
-        GroupBlacklist groupBlacklist = null;
-        if(!serverGroupBlacklist.containsKey(server)) {
-            groupBlacklist = BlacklistCreator.createGroupBlacklist(groupName, server);
-            groupBlacklist.load();
-            serverGroupBlacklist.put(server, groupBlacklist);
-        }
-
-        return serverGroupBlacklist.getOrDefault(server, groupBlacklist);
     }
 
     public void deleteGroup() {
@@ -104,9 +90,7 @@ public class Group implements Serializable {
     }
 
     public void deleteGroup(String server) {
-        GroupBlacklist groupBlacklist = server == null ? generalGroupBlacklist : serverGroupBlacklist.get(server);
-        if(groupBlacklist == null) return;
-        groupBlacklist.getConfig().setAndSave("groups." + groupName + (server != null ? "." + server : ""), null);
+        Storage.Files.STORAGE.setAndSave("groups." + groupName + (server != null ? "." + server : ""), null);
     }
 
     public ConfigurationBuilder getConfig() {

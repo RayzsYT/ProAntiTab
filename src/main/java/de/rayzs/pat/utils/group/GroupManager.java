@@ -1,12 +1,15 @@
 package de.rayzs.pat.utils.group;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 
 public class GroupManager {
 
     private static final List<Group> GROUPS = new ArrayList<>();
+    private static final HashMap<String, GroupServer> SERVER_GROUP_BLACKLIST = new HashMap<>();
 
     public static void initialize() {
         if(Reflection.isProxyServer()) Storage.Files.STORAGE.getKeys("groups", true).forEach(GroupManager::registerGroup);
@@ -106,7 +109,10 @@ public class GroupManager {
 
     public static List<Group> getGroupsByServer(String server) {
         List<Group> result = new ArrayList<>();
-        GROUPS.stream().filter(group -> Storage.isServer(server, group.getServerNames())).forEach(result::add);
+        GROUPS.stream().filter(group -> SERVER_GROUP_BLACKLIST.containsKey(group.getGroupName())).forEach(group -> {
+            GroupServer groupServer = SERVER_GROUP_BLACKLIST.get(group.getGroupName());
+            groupServer.getAllServers().stream().filter(currentServer -> Storage.isServer(server, currentServer)).forEach(currentServer -> result.add(getGroupByName(groupServer.getGroupName())));
+        });
         return result;
     }
 
@@ -132,6 +138,17 @@ public class GroupManager {
         List<String> result = new ArrayList<>();
         GROUPS.stream().filter(group -> !group.contains(command, server)).forEach(group -> result.add(group.getGroupName()));
         return result;
+    }
+
+    public static GroupServer getOrCreateGroupList(String groupName, String server) {
+        GroupServer groupServer = null;
+        if(!SERVER_GROUP_BLACKLIST.containsKey(server)) {
+            System.out.println("New groupserver: " + groupName);
+            groupServer = new GroupServer(groupName);
+            SERVER_GROUP_BLACKLIST.put(server, groupServer);
+        } else System.out.println("Already existing groupserver: " + groupName);
+
+        return SERVER_GROUP_BLACKLIST.getOrDefault(server, groupServer);
     }
 
     public static TinyGroup convertToTinyGroup(String groupName, List<String> commands) {

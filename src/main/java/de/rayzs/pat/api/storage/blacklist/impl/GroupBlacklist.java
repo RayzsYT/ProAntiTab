@@ -6,7 +6,7 @@ import de.rayzs.pat.api.storage.storages.BlacklistStorage;
 import java.io.Serializable;
 import java.util.List;
 
-public class GroupBlacklist extends BlacklistStorage implements Serializable {
+public class GroupBlacklist extends BlacklistStorage {
 
     public GroupBlacklist(String group, String navigatePath) { super("groups." + group + navigatePath); }
 
@@ -21,9 +21,7 @@ public class GroupBlacklist extends BlacklistStorage implements Serializable {
     }
 
     @Override
-    public BlacklistStorage remove(String command) {
-        return super.remove(command);
-    }
+    public BlacklistStorage remove(String command) { return super.remove(command); }
 
     @Override
     public BlacklistStorage clear() {

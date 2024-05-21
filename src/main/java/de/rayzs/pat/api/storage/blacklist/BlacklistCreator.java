@@ -14,11 +14,11 @@ public class BlacklistCreator {
     }
 
     public static GroupBlacklist createGroupBlacklist(String group) {
-        return createGroupBlacklist(group, null);
+        return new GroupBlacklist(group, ".commands");
     }
 
     public static GroupBlacklist createGroupBlacklist(String group, String server) {
-        return new GroupBlacklist(group, (server != null ? ".servers." + server : ".commands"));
+        return new GroupBlacklist(group, (server != null ? ".servers." + server : "") + ".commands");
     }
 
     public static boolean exist(String server) {
