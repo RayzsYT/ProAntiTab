@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.process;
 
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
@@ -24,7 +25,7 @@ public class CommandProcess {
 
         UUID uuid = sender.getUniqueId();
         int length = args.length;
-        String task, sub, extra, confirmationString;
+        String task, sub, extra, subExtra, confirmationString;
         Group group;
         boolean bool, backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || !Reflection.isProxyServer();
 
@@ -296,7 +297,7 @@ public class CommandProcess {
                     switch (task) {
 
                         case "add":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
                             if (!bool) {
                                 group.add(sub);
                                 handleChange();
@@ -307,16 +308,35 @@ public class CommandProcess {
                         case "remove":
                         case "rem":
                         case "rm":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
                             if (bool) {
                                 group.remove(sub);
                                 handleChange();
                             }
                             sender.sendMessage((!bool ? Storage.ConfigSections.Messages.GROUP.REMOVE_FAILED : Storage.ConfigSections.Messages.GROUP.REMOVE_SUCCESS).replace("%command%", sub).replace("%group%", extra));
                             return;
+
+                        case "clear":
+                            if(!Reflection.isProxyServer()) {
+                                sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                                return;
+                            }
+
+                            confirmationString = "clear-server " + sub;
+
+                            if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                                Storage.Blacklist.getBlacklist(sub).clear().save();
+                                handleChange();
+                                sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER.replace("%server%", sub));
+                            } else {
+                                CONFIRMATION.put(uuid, confirmationString);
+                                sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_CONFIRM.replace("%server%", sub));
+                            }
+
+                            return;
                     }
 
-                case 5:
+                case 4:
                     if(backend) {
                         sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                         return;
@@ -328,8 +348,112 @@ public class CommandProcess {
 
                     if(args[0].equals("serv") || args[0].equals("server")) {
 
+                        if (!Reflection.isProxyServer()) {
+                            sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                            return;
+                        }
+
+                        switch (task) {
+                            case "add":
+                                if (!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
+
+                                bool = Storage.Blacklist.getBlacklist(sub).isListed(extra);
+                                if (!bool) {
+                                    Storage.Blacklist.getBlacklist(sub).add(extra).save();
+                                    handleChange();
+                                }
+
+                                sender.sendMessage((bool ? Storage.ConfigSections.Messages.BLACKLIST.ADD_SERVER_FAILED : Storage.ConfigSections.Messages.BLACKLIST.ADD_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra));
+                                return;
+
+                            case "remove":
+                            case "rem":
+                            case "rm":
+                                if (!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
+
+                                bool = !Storage.Blacklist.getBlacklist(sub).isListed(extra);
+                                if (!bool) {
+                                    Storage.Blacklist.getBlacklist(sub).add(extra).save();
+                                    handleChange();
+                                }
+
+                                sender.sendMessage((bool ? Storage.ConfigSections.Messages.BLACKLIST.REMOVE_SERVER_FAILED : Storage.ConfigSections.Messages.BLACKLIST.REMOVE_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra));
+                                return;
+
+                            case "clear":
+                                confirmationString = "clear-server-group " + sub + " " + extra;
+
+                                if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                                    for (Group groups : GroupManager.getGroupsByServer(sub))
+                                        groups.clear(sub);
+
+                                    handleChange();
+                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER.replace("%group%", extra).replace("%server%", sub));
+                                } else {
+                                    CONFIRMATION.put(uuid, confirmationString);
+                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER_CONFIRM.replace("%group%", extra).replace("%server%", sub));
+                                }
+
+                                return;
+                        }
                     }
 
+                case 5:
+                    if(backend) {
+                        sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                        return;
+                    }
+
+                    task = args[1].toLowerCase();
+                    sub = args[2].toLowerCase();
+                    extra = args[3].toLowerCase();
+                    subExtra = args[4].toLowerCase();
+
+                    if(args[0].equals("serv") || args[0].equals("server")) {
+
+                        if(!Reflection.isProxyServer()) {
+                            sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                            return;
+                        }
+
+                        switch (task) {
+                            case "add":
+                                if (!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
+
+                                group = GroupManager.getGroupByName(subExtra);
+                                if(group == null) {
+                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", extra));
+                                    return;
+                                }
+
+                                bool = group.contains(extra, sub);
+                                if (!bool) {
+                                    group.add(extra, sub);
+                                    handleChange();
+                                }
+
+                                sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.ADD_SERVER_FAILED : Storage.ConfigSections.Messages.GROUP.ADD_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra).replace("%group%", subExtra));
+                                break;
+
+                            case "remove": case "rem": case "rm":
+                                if (!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
+
+                                group = GroupManager.getGroupByName(subExtra);
+                                if(group == null) {
+                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", extra));
+                                    return;
+                                }
+
+                                bool = !group.contains(extra, sub);
+                                if (!bool) {
+                                    group.remove(extra, sub);
+                                    handleChange();
+                                }
+
+                                sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.REMOVE_SERVER_FAILED : Storage.ConfigSections.Messages.GROUP.REMOVE_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra).replace("%group%", subExtra));
+                                return;
+                        }
+                    }
                 default:
                     for (String line : Storage.ConfigSections.Messages.HELP.MESSAGE.getLines()) sender.sendMessage(line.replace("&", "§").replace("%label%", label));
             }
@@ -405,10 +529,8 @@ public class CommandProcess {
 
             case 4:
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
-                    if (args[1].equals("add") && PermissionUtil.hasPermission(sender, "add"))
-                        suggestions.addAll(Arrays.asList("LOADING"));
                     if (Arrays.asList("remove", "rem", "rm").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) {
-                        suggestions.addAll(Arrays.asList("LOADING"));
+                        suggestions.addAll(Storage.Blacklist.getBlacklist(args[3]).getCommands());
                     }
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
                         suggestions.addAll(GroupManager.getGroupNames(args[3]));
