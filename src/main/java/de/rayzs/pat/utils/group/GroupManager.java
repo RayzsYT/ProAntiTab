@@ -1,7 +1,6 @@
 package de.rayzs.pat.utils.group;
 
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 
@@ -10,7 +9,8 @@ public class GroupManager {
     private static final List<Group> GROUPS = new ArrayList<>();
 
     public static void initialize() {
-        Storage.Files.STORAGE.getKeys(true).stream().filter(key -> key.startsWith("groups.")).forEach(key -> {
+        if(Reflection.isProxyServer()) Storage.Files.STORAGE.getKeys("groups", true).forEach(GroupManager::registerGroup);
+        else Storage.Files.STORAGE.getKeys(true).stream().filter(key -> key.startsWith("groups.")).forEach(key -> {
             String[] args = key.split("\\.");
             if(args.length >= 1) {
                 String groupName = args[1];
