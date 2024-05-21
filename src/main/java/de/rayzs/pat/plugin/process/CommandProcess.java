@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.process;
 
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
@@ -282,6 +283,36 @@ public class CommandProcess {
                         return;
                     }
 
+                    if(args[0].equals("serv") || args[0].equals("server")) {
+                        task = args[1].toLowerCase();
+                        sub = args[2].toLowerCase();
+
+                        switch (task) {
+                            case "clear":
+                                if (!Reflection.isProxyServer()) {
+                                    sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                                    return;
+                                }
+
+                                if(!BlacklistCreator.exist(sub)) {
+                                    sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_NOT_FOUND.replace("%server%", sub));
+                                    return;
+                                }
+
+                                confirmationString = "clear-server " + sub;
+
+                                if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                                    Storage.Blacklist.getBlacklist(sub).clear().save();
+                                    handleChange();
+                                    sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER.replace("%server%", sub));
+                                } else {
+                                    CONFIRMATION.put(uuid, confirmationString);
+                                    sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_CONFIRM.replace("%server%", sub));
+                                }
+                                return;
+                        }
+                    }
+
                     task = args[0].toLowerCase();
                     sub = args[1].toLowerCase();
                     extra = args[2].toLowerCase();
@@ -314,25 +345,6 @@ public class CommandProcess {
                                 handleChange();
                             }
                             sender.sendMessage((!bool ? Storage.ConfigSections.Messages.GROUP.REMOVE_FAILED : Storage.ConfigSections.Messages.GROUP.REMOVE_SUCCESS).replace("%command%", sub).replace("%group%", extra));
-                            return;
-
-                        case "clear":
-                            if(!Reflection.isProxyServer()) {
-                                sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
-                                return;
-                            }
-
-                            confirmationString = "clear-server " + sub;
-
-                            if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
-                                Storage.Blacklist.getBlacklist(sub).clear().save();
-                                handleChange();
-                                sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER.replace("%server%", sub));
-                            } else {
-                                CONFIRMATION.put(uuid, confirmationString);
-                                sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_CONFIRM.replace("%server%", sub));
-                            }
-
                             return;
                     }
 
@@ -381,17 +393,18 @@ public class CommandProcess {
                                 return;
 
                             case "clear":
-                                confirmationString = "clear-server " + sub + " " + extra;
+                                confirmationString = "clear-server-group " + sub + " " + extra;
 
                                 if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
-                                    Storage.Blacklist.getBlacklist(sub).clear();
+                                    for (Group groups : GroupManager.getGroupsByServer(sub))
+                                        groups.clear(sub);
+
                                     handleChange();
-                                    sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER.replace("%server%", sub));
+                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER.replace("%group%", extra).replace("%server%", sub));
                                 } else {
                                     CONFIRMATION.put(uuid, confirmationString);
-                                    sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_CONFIRM.replace("%server%", sub));
+                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER_CONFIRM.replace("%group%", extra).replace("%server%", sub));
                                 }
-
                                 return;
                         }
                     }
@@ -431,7 +444,7 @@ public class CommandProcess {
                                 }
 
                                 sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.ADD_SERVER_FAILED : Storage.ConfigSections.Messages.GROUP.ADD_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra).replace("%group%", subExtra));
-                                break;
+                                return;
 
                             case "remove": case "rem": case "rm":
                                 if (!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
@@ -449,22 +462,6 @@ public class CommandProcess {
                                 }
 
                                 sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.REMOVE_SERVER_FAILED : Storage.ConfigSections.Messages.GROUP.REMOVE_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra).replace("%group%", subExtra));
-                                return;
-
-                            case "clear":
-                                confirmationString = "clear-server-group " + sub + " " + extra;
-
-                                if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
-                                    for (Group groups : GroupManager.getGroupsByServer(sub))
-                                        groups.clear(sub);
-
-                                    handleChange();
-                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER.replace("%group%", extra).replace("%server%", sub));
-                                } else {
-                                    CONFIRMATION.put(uuid, confirmationString);
-                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER_CONFIRM.replace("%group%", extra).replace("%server%", sub));
-                                }
-
                                 return;
                         }
                     }
@@ -533,28 +530,28 @@ public class CommandProcess {
                     suggestions.addAll(GroupManager.getGroupsByNameOnlyIncludingCommand(args[1]));
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
                     if (args[1].equals("add") && PermissionUtil.hasPermission(sender, "add"))
-                        suggestions.addAll(ClientCommunication.getRegisteredServerNames());
+                        suggestions.addAll(Storage.Blacklist.getBlacklistServers());
                     if (Arrays.asList("remove", "rem", "rm").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove"))
-                        suggestions.addAll(ClientCommunication.getRegisteredServerNames());
+                        suggestions.addAll(Storage.Blacklist.getBlacklistServers());
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
-                        suggestions.addAll(ClientCommunication.getRegisteredServerNames());
+                        suggestions.addAll(Storage.Blacklist.getBlacklistServers());
                 }
                 break;
 
             case 4:
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
                     if (Arrays.asList("remove", "rem", "rm").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) {
-                        suggestions.addAll(Storage.Blacklist.getBlacklist(args[3]).getCommands());
+                        suggestions.addAll(Storage.Blacklist.getBlacklist(args[2]).getCommands());
                     }
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
-                        suggestions.addAll(GroupManager.getGroupNames(args[3]));
+                        suggestions.addAll(GroupManager.getGroupNames(args[2]));
                 }
                 break;
 
             case 5:
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
-                        suggestions.addAll(GroupManager.getGroupNames(args[3]));
+                        suggestions.addAll(GroupManager.getGroupNames(args[2]));
                 }
                 break;
 

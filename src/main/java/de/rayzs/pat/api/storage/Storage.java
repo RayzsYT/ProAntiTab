@@ -116,6 +116,10 @@ public class Storage {
             });
         }
 
+        public static List<String> getBlacklistServers() {
+            return new ArrayList<>(SERVER_BLACKLISTS.keySet());
+        }
+
         public static GeneralBlacklist getBlacklist() {
             return BLACKLIST;
         }

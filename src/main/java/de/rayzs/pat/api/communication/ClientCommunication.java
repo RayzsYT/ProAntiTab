@@ -121,10 +121,7 @@ public class ClientCommunication {
 
         if(clientInfo != null && clientInfo.getName() != null) {
             List<GeneralBlacklist> serverBlacklists = Storage.Blacklist.getBlacklists(clientInfo.getName());
-            serverBlacklists.stream().filter(serverBlacklist -> serverBlacklist != null && serverBlacklist.getCommands() != null).forEach(serverBlacklist -> {
-                commands.addAll(serverBlacklist.getCommands());
-                System.out.println("ADDING EXTRA SERVER COMMANDS " + serverBlacklist.getNavigatePath());
-            });
+            serverBlacklists.stream().filter(serverBlacklist -> serverBlacklist != null && serverBlacklist.getCommands() != null).forEach(serverBlacklist -> commands.addAll(serverBlacklist.getCommands()));
         }
 
         String serverName = clientInfo.getName();
@@ -142,6 +139,7 @@ public class ClientCommunication {
 
     public static void sendRequest() {
         if(System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
+            System.out.println("SEND REQUEST");
             LAST_SENT_REQUEST = System.currentTimeMillis();
             sendPacket(new DataConverter.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
         }
