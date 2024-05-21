@@ -145,7 +145,7 @@ stats:
 
 blacklist:
   clear: '&aList has been cleared!'
-  clear-server: '&aList has been cleared!'
+  clear-server: '&aList has been cleared for the server %server%!'
   clear-server-not-found: '&cThe server %server% does not have any commands!'
 
   clear-confirmation: '&4Warning! &7This command will &cclear the entire list&7! &7Repeat the &esame command &7to confirm this action.'
@@ -158,37 +158,36 @@ blacklist:
 
     message-server: '&7Listed commands of %server% (&f%size%&7)&8: &f%commands%'
     splitter-server: '&7, '
-    command-server: '&f%server%'
+    command-server: '&f%command%'
 
   add:
-    success: '&aSuccessfully added %command% into the list!'
+    success: '&aSuccessfully added %command% to the list!'
     failed: '&c%command% is already in the list!'
-    success-server: '&aSuccessfully added %command% into the list of %server%!'
+    success-server: '&aSuccessfully added %command% to the list of %server%!'
     failed-server: '&c%command% is already in the list of %server%!'
-
 
   remove:
     success: '&aSuccessfully removed %command% from the list!'
     failed: '&c%command% is not listed!'
     success-server: '&aSuccessfully removed %command% from the list of %server%!'
-    failed-server: '&c%command% is not the list of %server%!'
+    failed-server: '&c%command% is not in the list of %server%!'
 
 group:
   create: '&aGroup %group% has been created!'
-  already-exist: '&cGroup %group% already exist!'
+  already-exist: '&cGroup %group% already exists!'
   does-not-exist: '&cGroup %group% does not exist!'
   delete: '&cGroup %group% has been deleted!'
-  delete-confirmation: '&4Warning! &7This command will &cdelete the group with the whole list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
+  delete-confirmation: '&4Warning! &7This command will &cdelete the group with the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
   clear: '&aList of group %group% has been cleared!'
   clear-confirmation: '&4Warning! &7This command will &cclear the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
 
   create-server: '&aGroup %group% for %server% has been created!'
-  already-exist-server: '&cGroup %group% for %server% already exist!'
+  already-exist-server: '&cGroup %group% for %server% already exists!'
   does-not-exist-server: '&cGroup %group% of %server% does not exist!'
   delete-server: '&cGroup %group% of %server% has been deleted!'
-  delete-confirmation-server: '&4Warning! &7This command will &cdelete the group of the server %server% with the whole list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
+  delete-confirmation-server: '&4Warning! &7This command will &cdelete the group of the server %server% with the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
   clear-server: '&aList of group %group% from %server% has been cleared!'
-  clear-confirmation-server: '&4Warning! &7This command will &cclear the entire list &7of this group for %server%! &7Repeat the &esame command &7to confirm this action.'
+  clear-confirmation-server: '&4Warning! &7This command will &cclear the entire list&7 of this group for %server%! &7Repeat the &esame command &7to confirm this action.'
 
   list:
     message: '&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%'
@@ -207,9 +206,9 @@ group:
     command-server: '&f%group%'
 
   add:
-    success: '&aSuccessfully added %command% into the list of group %group%!'
+    success: '&aSuccessfully added %command% to the list of group %group%!'
     failed: '&c%command% is already in the list of group %group%!'
-    success-server: '&aSuccessfully added %command% into the list of group %group% for %server%!'
+    success-server: '&aSuccessfully added %command% to the list of group %group% for %server%!'
     failed-server: '&c%command% is already in the list of group %group% of %server%!'
 
   remove:

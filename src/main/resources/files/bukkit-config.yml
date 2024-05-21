@@ -137,7 +137,7 @@ blacklist:
     command: '&f%command%'
 
   add:
-    success: '&aSuccessfully added %command% into the list!'
+    success: '&aSuccessfully added %command% to the list!'
     failed: '&c%command% is already in the list!'
 
   remove:
@@ -146,11 +146,11 @@ blacklist:
 
 group:
   create: '&aGroup %group% has been created!'
-  already-exist: '&cGroup %group% already exist!'
+  already-exist: '&cGroup %group% already exists!'
   does-not-exist: '&cGroup %group% does not exist!'
 
   delete: '&cGroup %group% has been deleted!'
-  delete-confirmation: '&4Warning! &7This command will &cdelete the group with the whole list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
+  delete-confirmation: '&4Warning! &7This command will &cdelete the group with the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
 
   clear: '&aList of group %group% has been cleared!'
   clear-confirmation: '&4Warning! &7This command will &cclear the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
@@ -166,7 +166,7 @@ group:
     command: '&f%group%'
 
   add:
-    success: '&aSuccessfully added %command% into the list of group %group%!'
+    success: '&aSuccessfully added %command% to the list of group %group%!'
     failed: '&c%command% is already in the list of group %group%!'
 
   remove:
