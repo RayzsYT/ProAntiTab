@@ -159,11 +159,11 @@ public class Storage {
         }
 
         public static boolean isBlocked(Object targetObj, String command) {
-            return isBlocked(targetObj, command);
+            return BLACKLIST.isBlocked(targetObj, command);
         }
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive) {
-            return isBlocked(targetObj, command, intensive);
+            return BLACKLIST.isBlocked(targetObj, command, intensive);
         }
     }
 }
