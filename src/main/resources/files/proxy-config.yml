@@ -146,6 +146,7 @@ stats:
 blacklist:
   clear: '&aList has been cleared!'
   clear-server: '&aList has been cleared!'
+  clear-server-not-found: '&cThe server %server% does not have any commands!'
 
   clear-confirmation: '&4Warning! &7This command will &cclear the entire list&7! &7Repeat the &esame command &7to confirm this action.'
   clear-confirmation-server: '&4Warning! &7This command will &cclear the entire list of this server&7! &7Repeat the &esame command &7to confirm this action.'

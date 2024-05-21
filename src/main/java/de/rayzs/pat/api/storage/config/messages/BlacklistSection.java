@@ -6,7 +6,7 @@ import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class BlacklistSection extends ConfigStorage {
 
-    public String CLEAR, CLEAR_CONFIRM, CLEAR_SERVER, CLEAR_SERVER_CONFIRM;
+    public String CLEAR, CLEAR_CONFIRM, CLEAR_SERVER, CLEAR_SERVER_CONFIRM, CLEAR_SERVER_NOT_FOUND;
     public String LIST_MESSAGE, LIST_SPLITTER, LIST_COMMAND, LIST_SERVER_MESSAGE, LIST_SERVER_SPLITTER, LIST_SERVER_COMMAND;
 
     public String ADD_SUCCESS, ADD_FAILED;
@@ -38,6 +38,7 @@ public class BlacklistSection extends ConfigStorage {
 
         CLEAR_SERVER = new ConfigSectionHelper<String>(this, "clear-server", "&aList has been cleared!").getOrSet();
         CLEAR_SERVER_CONFIRM = new ConfigSectionHelper<String>(this, "clear-confirmation-server", "&4Warning! &7This command will &cclear the entire list of this server&7! &7Repeat the &esame command &7to confirm this action.").getOrSet();
+        CLEAR_SERVER_NOT_FOUND = new ConfigSectionHelper<String>(this, "clear-server-not-found", "&cThe server %server% does not have any commands!").getOrSet();
 
         LIST_SERVER_MESSAGE = new ConfigSectionHelper<String>(this, "list.message-server", "&7Listed commands of %server% (&f%size%&7)&8: &f%commands%").getOrSet();
         LIST_SERVER_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter-server", "&7, ").getOrSet();
