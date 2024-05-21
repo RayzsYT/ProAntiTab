@@ -87,7 +87,7 @@ public class CommandProcess {
                             confirmationString = "clear";
 
                             if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
-                                Storage.BLACKLIST.clear().save();
+                                Storage.Blacklist.getBlacklist().clear().save();
                                 handleChange();
                                 sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR);
                             } else {
@@ -126,13 +126,13 @@ public class CommandProcess {
                             }
 
                             StringBuilder blacklistedCommandBuilder = new StringBuilder();
-                            for (int i = 0; i < Storage.BLACKLIST.getCommands().size(); i++) {
-                                bool = (i >= Storage.BLACKLIST.getCommands().size() - 1);
-                                blacklistedCommandBuilder.append(Storage.ConfigSections.Messages.BLACKLIST.LIST_COMMAND.replace("%command%", Storage.BLACKLIST.getCommands().get(i)));
+                            for (int i = 0; i < Storage.Blacklist.getBlacklist().getCommands().size(); i++) {
+                                bool = (i >= Storage.Blacklist.getBlacklist().getCommands().size() - 1);
+                                blacklistedCommandBuilder.append(Storage.ConfigSections.Messages.BLACKLIST.LIST_COMMAND.replace("%command%", Storage.Blacklist.getBlacklist().getCommands().get(i)));
                                 if (!bool)
                                     blacklistedCommandBuilder.append(Storage.ConfigSections.Messages.BLACKLIST.LIST_SPLITTER);
                             }
-                            sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.LIST_MESSAGE.replace("%size%", String.valueOf(Storage.BLACKLIST.getCommands().size())).replace("%commands%", blacklistedCommandBuilder.toString()));
+                            sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.LIST_MESSAGE.replace("%size%", String.valueOf(Storage.Blacklist.getBlacklist().getCommands().size())).replace("%commands%", blacklistedCommandBuilder.toString()));
                             return;
 
                         case "listgroups":
@@ -164,7 +164,7 @@ public class CommandProcess {
 
                     task = args[0].toLowerCase();
                     sub = args[1];
-                    bool = Storage.BLACKLIST.isListed(sub);
+                    bool = Storage.Blacklist.isListed(sub);
                     switch (task) {
                         case "ls":
                         case "list":
@@ -256,7 +256,7 @@ public class CommandProcess {
                         case "add":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
                             if (!bool) {
-                                Storage.BLACKLIST.add(sub).save();
+                                Storage.Blacklist.getBlacklist().add(sub).save();
                                 handleChange();
                             }
 
@@ -268,7 +268,7 @@ public class CommandProcess {
                         case "rm":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
                             if (bool) {
-                                Storage.BLACKLIST.remove(sub).save();
+                                Storage.Blacklist.getBlacklist().remove(sub).save();
                                 handleChange();
                             }
                             sender.sendMessage((!bool ? Storage.ConfigSections.Messages.BLACKLIST.REMOVE_FAILED : Storage.ConfigSections.Messages.BLACKLIST.REMOVE_SUCCESS).replace("%command%", sub));
@@ -385,7 +385,7 @@ public class CommandProcess {
                 if (!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer())
                     suggestions.addAll(BukkitLoader.getNotBlockedCommands());
                 if (!backend && Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove"))
-                    suggestions.addAll(Storage.BLACKLIST.getCommands());
+                    suggestions.addAll(Storage.Blacklist.getBlacklist().getCommands());
                 break;
 
             case 3:

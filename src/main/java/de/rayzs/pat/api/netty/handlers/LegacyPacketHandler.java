@@ -39,8 +39,8 @@ public class LegacyPacketHandler implements PacketHandler {
             input = input.replace("/", "");
             if(input.contains(" ")) input = input.split(" ")[0];
 
-            cancelsBeforeHand = Storage.BLACKLIST.isListed(input, true) && !PermissionUtil.hasBypassPermission(player, input)
-                    || Storage.BLACKLIST.isListed(input, false) && !PermissionUtil.hasBypassPermission(player, input);
+            cancelsBeforeHand = Storage.Blacklist.isListed(input, true) && !PermissionUtil.hasBypassPermission(player, input)
+                    || Storage.Blacklist.isListed(input, false) && !PermissionUtil.hasBypassPermission(player, input);
         }
 
         for (Field field : Reflection.getFields(packetObj)) {
@@ -58,7 +58,7 @@ public class LegacyPacketHandler implements PacketHandler {
                     tempName = s.replaceFirst("/", "");
 
                     if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-                        if(!Storage.BLACKLIST.isListed(tempName, true)) continue;
+                        if(!Storage.Blacklist.isListed(tempName, true)) continue;
                         if(PermissionUtil.hasBypassPermission(player, tempName)) continue;
                         newResultList.add(s);
                         continue;
@@ -66,8 +66,8 @@ public class LegacyPacketHandler implements PacketHandler {
 
                     if (tempName.contains(":")) tempName = tempName.split(":")[1];
 
-                    if (!Storage.BLACKLIST.isListed(tempName, false)
-                            || Storage.BLACKLIST.isListed(tempName, false)
+                    if (!Storage.Blacklist.isListed(tempName, false)
+                            || Storage.Blacklist.isListed(tempName, false)
                             && PermissionUtil.hasBypassPermission(player, tempName))
                         newResultList.add(s);
                 }

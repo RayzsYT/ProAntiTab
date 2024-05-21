@@ -49,14 +49,14 @@ public class VelocityBlockCommandListener {
         List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(Storage.BLACKLIST.isListed(command, true)) return;
+            if(Storage.Blacklist.isListed(command, true, player.getCurrentServer().get().getServerInfo().getName())) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
             MessageTranslator.send(player, cancelCommandMessage);
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
 
-        if (!Storage.BLACKLIST.isBlocked(player, command)) return;
+        if (!Storage.Blacklist.isBlocked(player, command, player.getCurrentServer().get().getServerInfo().getName())) return;
         if (PermissionUtil.hasBypassPermission(player, command)) return;
         MessageTranslator.send(player, cancelCommandMessage);
 

@@ -114,7 +114,9 @@ public class ClientCommunication {
         DataConverter.CommandsPacket commandsPacket = new DataConverter.CommandsPacket();
         DataConverter.GroupsPacket groupsPacket;
         DataConverter.PacketBundle bundle;
-        List<String> commands = new ArrayList<>(Storage.BLACKLIST.getCommands());
+        List<String> commands = new ArrayList<>(Storage.Blacklist.getBlacklist().getCommands());
+        if(clientInfo != null && clientInfo.getName() != null)
+            commands.addAll(Storage.Blacklist.getBlacklist(clientInfo.getName()).getCommands());
 
         String serverName = clientInfo.getName();
         List<Group> groups = GroupManager.getGroupsByServer(serverName),

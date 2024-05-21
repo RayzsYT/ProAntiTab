@@ -11,7 +11,6 @@ import java.util.*;
 
 public class Storage {
 
-    public static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
     public static final List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
 
     public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
@@ -20,7 +19,7 @@ public class Storage {
     public static void loadAll(boolean loadBlacklist) {
         loadConfig();
         loadToken();
-        if(loadBlacklist) BLACKLIST.load();
+        if(loadBlacklist) Blacklist.loadAll();
     }
 
     public static void loadToken() {
@@ -97,6 +96,74 @@ public class Storage {
             public static StatsSection STATS = new StatsSection();
 
             public static void initialize() {}
+        }
+    }
+
+    public static class Blacklist {
+
+        private static HashMap<String, GeneralBlacklist> SERVER_BLACKLISTS = new HashMap<>();
+        private static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
+
+        public static void loadAll() {
+            SERVER_BLACKLISTS.clear();
+            BLACKLIST.load();
+
+            if(!Reflection.isProxyServer()) return;
+            BLACKLIST.getConfig().getKeys(true).stream().filter(key -> key.startsWith("general.servers.")).forEach(key -> {
+                String[] args = key.split("\\.");
+                if(args.length >= 2) {
+                    String serverName = args[2];
+                    System.out.println("SERVERNAME: " + serverName);
+                    getBlacklist(serverName);
+                }
+            });
+        }
+
+        public static GeneralBlacklist getBlacklist() {
+            return BLACKLIST;
+        }
+
+        public static GeneralBlacklist getBlacklist(String server) {
+            GeneralBlacklist blacklist = null;
+            if(!SERVER_BLACKLISTS.containsKey(server)) {
+                blacklist = BlacklistCreator.createGeneralBlacklist(server);
+                blacklist.load();
+                SERVER_BLACKLISTS.put(server, blacklist);
+            }
+
+            return SERVER_BLACKLISTS.getOrDefault(server, blacklist);
+        }
+
+        public static boolean isListed(String command, String server) {
+            return BLACKLIST.isListed(command) || getBlacklist(server).isListed(command);
+        }
+
+        public static boolean isListed(String command, boolean intensive, String server) {
+            return BLACKLIST.isListed(command, intensive) || getBlacklist(server).isListed(command, intensive);
+        }
+
+        public static boolean isBlocked(Object targetObj, String command, String server) {
+            return isBlocked(targetObj, command) || getBlacklist(server).isBlocked(targetObj, command);
+        }
+
+        public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server) {
+            return isBlocked(targetObj, command, intensive) || getBlacklist(server).isBlocked(targetObj, command, intensive);
+        }
+
+        public static boolean isListed(String command) {
+            return BLACKLIST.isListed(command);
+        }
+
+        public static boolean isListed(String command, boolean intensive) {
+            return BLACKLIST.isListed(command, intensive);
+        }
+
+        public static boolean isBlocked(Object targetObj, String command) {
+            return isBlocked(targetObj, command);
+        }
+
+        public static boolean isBlocked(Object targetObj, String command, boolean intensive) {
+            return isBlocked(targetObj, command, intensive);
         }
     }
 }

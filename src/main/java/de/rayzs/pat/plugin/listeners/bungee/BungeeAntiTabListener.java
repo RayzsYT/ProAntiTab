@@ -17,7 +17,7 @@ public class BungeeAntiTabListener implements Listener {
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getSuggestions().removeIf(command -> Storage.BLACKLIST.isBlocked(player, command));
+        event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, player.getServer().getInfo().getName()));
     }
 
     @EventHandler
@@ -27,6 +27,6 @@ public class BungeeAntiTabListener implements Listener {
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getSuggestions().removeIf(command -> Storage.BLACKLIST.isBlocked(player, command));
+        event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, player.getServer().getInfo().getName()));
     }
 }
