@@ -84,18 +84,13 @@ public class Group implements Serializable {
 
     public GroupBlacklist getOrCreateGroupBlacklist(String server) {
         GroupBlacklist groupBlacklist;
-        if(!groupServerBlacklist.containsKey(server)) {
+        if(groupServerBlacklist.containsKey(server)) groupBlacklist = groupServerBlacklist.get(server);
+        else {
             groupBlacklist = BlacklistCreator.createGroupBlacklist(groupName, server);
             groupServerBlacklist.put(server, groupBlacklist);
-            System.out.println("NEW: " + server + " | " + groupBlacklist.getNavigatePath());
-        } else {
-            groupBlacklist = groupServerBlacklist.get(server);
-            System.out.println("EXIST: " + server + " | " + groupBlacklist.getNavigatePath());
         }
 
         groupBlacklist.load();
-
-        System.out.println("#A " + groupBlacklist.getCommands().size());
         return groupBlacklist;
     }
 
@@ -108,27 +103,6 @@ public class Group implements Serializable {
         commands.addAll(getOrCreateGroupBlacklist(server).getCommands());
         return commands;
     }
-
-    /*
-    public boolean contains(String command, String server) {
-        return generalGroupBlacklist.isListed(command) || GroupManager.getOrCreateGroupList(groupName, server).getOrCreateGroupBlacklist(server).isListed(command);
-    }
-
-
-    public boolean containsOnServer(String command, String server) {
-        GroupBlacklist groupBlacklist = GroupManager.getOrCreateGroupList(groupName, server).getOrCreateGroupBlacklist(server);
-        System.out.println("Watching group: " + groupName + " (" + command + ":" + server + ")");
-        groupBlacklist.getCommands().forEach(a -> System.out.println("ROFL: " + a));
-        return GroupManager.getOrCreateGroupList(groupName, server).getOrCreateGroupBlacklist(server).isListed(command);
-    }
-
-    public List<String> getCommands(String server) {
-        List<String> commands = new ArrayList<>(generalGroupBlacklist.getCommands());
-        GroupServer groupServer = GroupManager.getOrCreateGroupList(getGroupName(), server);
-        commands.addAll(groupServer.getOrCreateGroupBlacklist(server).getCommands());
-        return commands;
-    }
-     */
 
     public void deleteGroup() {
         deleteGroup(null);
