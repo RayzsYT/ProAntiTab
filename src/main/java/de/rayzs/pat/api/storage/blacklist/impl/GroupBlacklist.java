@@ -3,9 +3,10 @@ package de.rayzs.pat.api.storage.blacklist.impl;
 import de.rayzs.pat.api.storage.StorageTemplate;
 import de.rayzs.pat.api.storage.storages.BlacklistStorage;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class GroupBlacklist extends BlacklistStorage {
+public class GroupBlacklist extends BlacklistStorage implements Serializable {
 
     public GroupBlacklist(String group, String navigatePath) { super("groups." + group + navigatePath); }
 

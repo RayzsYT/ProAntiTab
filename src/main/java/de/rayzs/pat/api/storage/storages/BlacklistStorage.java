@@ -3,9 +3,10 @@ package de.rayzs.pat.api.storage.storages;
 import de.rayzs.pat.api.storage.*;
 import de.rayzs.pat.utils.PermissionUtil;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class BlacklistStorage extends StorageTemplate {
+public class BlacklistStorage extends StorageTemplate implements Serializable {
 
     private List<String> commands = new ArrayList<>();
 

@@ -134,6 +134,14 @@ public class GroupManager {
         return result;
     }
 
+    public static TinyGroup convertToTinyGroup(String groupName, List<String> commands) {
+        return new TinyGroup(groupName, commands);
+    }
+
+    public static Group convertToGroup(TinyGroup group) {
+        return new Group(group.getGroupName(), group.getCommands());
+    }
+
     public static void clearAllGroups() {
         GROUPS.clear();
     }

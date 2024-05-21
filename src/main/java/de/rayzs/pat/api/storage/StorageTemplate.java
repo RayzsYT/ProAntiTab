@@ -2,7 +2,9 @@ package de.rayzs.pat.api.storage;
 
 import de.rayzs.pat.utils.configuration.*;
 
-public abstract class StorageTemplate {
+import java.io.Serializable;
+
+public abstract class StorageTemplate implements Serializable {
 
     private final String navigatePath;
     private final ConfigurationBuilder configuration;

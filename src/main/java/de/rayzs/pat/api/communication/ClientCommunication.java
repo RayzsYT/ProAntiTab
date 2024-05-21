@@ -12,6 +12,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.DataConverter;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.TinyGroup;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 
@@ -125,10 +126,12 @@ public class ClientCommunication {
         }
 
         String serverName = clientInfo.getName();
-        List<Group> groups = GroupManager.getGroupsByServer(serverName),
-                newGroupList = new ArrayList<>();
-        groups.forEach(oldGroup -> newGroupList.add(new Group(oldGroup.getGroupName(), oldGroup.getCommands(serverName))));
-        groupsPacket = new DataConverter.GroupsPacket(GroupManager.getGroups());
+        List<Group> groups = GroupManager.getGroupsByServer(serverName);
+        GroupManager.getGroups().stream().filter(group -> !groups.contains(group)).forEach(groups::add);
+        List<TinyGroup> newGroupList = new ArrayList<>();
+
+        groups.forEach(oldGroup -> newGroupList.add(GroupManager.convertToTinyGroup(oldGroup.getGroupName(), oldGroup.getCommands(serverName))));
+        groupsPacket = new DataConverter.GroupsPacket(newGroupList);
 
         commandsPacket.setTurnBlacklistToWhitelist(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         commandsPacket.setCommands(commands);

@@ -183,13 +183,13 @@ public class DataConverter {
 
     public static class GroupsPacket implements Serializable {
 
-        private final List<Group> groups;
+        private final List<TinyGroup> groups;
 
-        public GroupsPacket(List<Group> groups) {
+        public GroupsPacket(List<TinyGroup> groups) {
             this.groups = groups;
         }
 
-        public List<Group> getGroups() {
+        public List<TinyGroup> getGroups() {
             return groups;
         }
     }

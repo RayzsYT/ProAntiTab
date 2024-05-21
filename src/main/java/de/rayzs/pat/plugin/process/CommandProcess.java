@@ -557,7 +557,7 @@ public class CommandProcess {
 
             case 6:
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
-                    if (args[1].equals("add") && PermissionUtil.hasPermission(sender, "add")) suggestions.addAll(GroupManager.getGroupNames(args[2]));
+                    if (args[1].equals("add") && PermissionUtil.hasPermission(sender, "add")) suggestions.addAll(GroupManager.getGroupNames());
                     if (Arrays.asList("remove", "rem", "rm").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(GroupManager.getGroupNames(args[2]));
                 }
         }
