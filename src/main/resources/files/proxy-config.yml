@@ -170,7 +170,7 @@ blacklist:
     success: '&aSuccessfully removed %command% from the list!'
     failed: '&c%command% is not listed!'
     success-server: '&aSuccessfully removed %command% from the list of %server%!'
-    failed-server: '&c%command% is in the list of %server%!'
+    failed-server: '&c%command% is not the list of %server%!'
 
 group:
   create: '&aGroup %group% has been created!'

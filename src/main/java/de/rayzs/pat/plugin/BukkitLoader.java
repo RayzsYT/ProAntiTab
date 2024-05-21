@@ -121,6 +121,8 @@ public class BukkitLoader extends JavaPlugin {
         else if (!Storage.Blacklist.getBlacklist().getCommands().containsAll(packet.getCommands()) || !packet.getCommands().containsAll(Storage.Blacklist.getBlacklist().getCommands()))
             Storage.Blacklist.getBlacklist().setList(packet.getCommands());
 
+        System.out.println("--> " + packet.turnBlacklistToWhitelistEnabled());
+
         if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != packet.turnBlacklistToWhitelistEnabled())
             Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = packet.turnBlacklistToWhitelistEnabled();
 

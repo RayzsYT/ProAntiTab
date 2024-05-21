@@ -56,6 +56,7 @@ public class BlacklistStorage extends StorageTemplate {
     }
 
     public BlacklistStorage add(String command) {
+        getConfig().reload();
         command = command.toLowerCase();
         if(!commands.contains(command))
             commands.add(command);
@@ -63,12 +64,14 @@ public class BlacklistStorage extends StorageTemplate {
     }
 
     public BlacklistStorage remove(String command) {
+        getConfig().reload();
         command = command.toLowerCase();
         commands.remove(command);
         return this;
     }
 
     public BlacklistStorage clear() {
+        getConfig().reload();
         commands.clear();
         return this;
     }

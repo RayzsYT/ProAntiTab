@@ -67,7 +67,7 @@ public class BungeeLoader extends Plugin {
         ProxyServer.getInstance().getScheduler().schedule(this, () -> {
             ClientCommunication.syncData();
             ClientCommunication.syncData();
-        }, 2, TimeUnit.SECONDS);
+        }, 5, TimeUnit.SECONDS);
     }
 
     @Override

@@ -115,6 +115,11 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
     }
 
     @Override
+    public Collection<String> getKeys(String section, boolean deep) {
+        return this.configuration.getConfigurationSection(section).getKeys(deep);
+    }
+
+    @Override
     public File getFile() {
         return file;
     }

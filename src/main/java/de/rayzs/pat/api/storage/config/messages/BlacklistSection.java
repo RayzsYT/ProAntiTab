@@ -47,6 +47,6 @@ public class BlacklistSection extends ConfigStorage {
         ADD_SERVER_FAILED = new ConfigSectionHelper<String>(this, "add.failed-server", "&c%command% is already in the list of %server%!").getOrSet();
 
         REMOVE_SERVER_SUCCESS = new ConfigSectionHelper<String>(this, "remove.success-server", "&aSuccessfully removed %command% from the list of %server%!").getOrSet();
-        REMOVE_SERVER_FAILED = new ConfigSectionHelper<String>(this, "remove.failed-server", "&c%command% is in the list of %server%!").getOrSet();
+        REMOVE_SERVER_FAILED = new ConfigSectionHelper<String>(this, "remove.failed-server", "&c%command% is not the list of %server%!").getOrSet();
     }
 }

@@ -373,7 +373,7 @@ public class CommandProcess {
 
                                 bool = !Storage.Blacklist.getBlacklist(sub).isListed(extra);
                                 if (!bool) {
-                                    Storage.Blacklist.getBlacklist(sub).add(extra).save();
+                                    Storage.Blacklist.getBlacklist(sub).remove(extra).save();
                                     handleChange();
                                 }
 

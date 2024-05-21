@@ -122,6 +122,11 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
     }
 
     @Override
+    public Collection<String> getKeys(String section, boolean deep) {
+        return this.configuration.getSection(section).getKeys();
+    }
+
+    @Override
     public File getFile() {
         return file;
     }

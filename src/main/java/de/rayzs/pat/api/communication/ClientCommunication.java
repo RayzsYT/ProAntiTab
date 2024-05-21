@@ -3,6 +3,9 @@ package de.rayzs.pat.api.communication;
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.communication.client.impl.BungeeClientInfo;
 import de.rayzs.pat.api.communication.client.impl.VelocityClientInfo;
+import de.rayzs.pat.api.storage.StorageTemplate;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.communication.impl.*;
 import de.rayzs.pat.api.storage.Storage;
@@ -115,8 +118,14 @@ public class ClientCommunication {
         DataConverter.GroupsPacket groupsPacket;
         DataConverter.PacketBundle bundle;
         List<String> commands = new ArrayList<>(Storage.Blacklist.getBlacklist().getCommands());
-        if(clientInfo != null && clientInfo.getName() != null)
-            commands.addAll(Storage.Blacklist.getBlacklist(clientInfo.getName()).getCommands());
+
+        if(clientInfo != null && clientInfo.getName() != null) {
+            List<GeneralBlacklist> serverBlacklists = Storage.Blacklist.getBlacklists(clientInfo.getName());
+            serverBlacklists.stream().filter(serverBlacklist -> serverBlacklist != null && serverBlacklist.getCommands() != null).forEach(serverBlacklist -> {
+                commands.addAll(serverBlacklist.getCommands());
+                System.out.println("ADDING EXTRA SERVER COMMANDS " + serverBlacklist.getNavigatePath());
+            });
+        }
 
         String serverName = clientInfo.getName();
         List<Group> groups = GroupManager.getGroupsByServer(serverName),
@@ -124,7 +133,9 @@ public class ClientCommunication {
         groups.forEach(oldGroup -> newGroupList.add(new Group(oldGroup.getGroupName(), oldGroup.getCommands(serverName))));
         groupsPacket = new DataConverter.GroupsPacket(GroupManager.getGroups());
 
+        commandsPacket.setTurnBlacklistToWhitelist(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         commandsPacket.setCommands(commands);
+
         bundle = new DataConverter.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
         clientInfo.sendBytes(DataConverter.convertToBytes(bundle));
     }

@@ -52,7 +52,6 @@ public class Storage {
             originServer = originServer.replace("*", "");
             return targetServer.startsWith(originServer);
         }
-
         return originServer.equals(targetServer);
     }
 
@@ -109,13 +108,11 @@ public class Storage {
             BLACKLIST.load();
 
             if(!Reflection.isProxyServer()) return;
-            BLACKLIST.getConfig().getKeys(true).stream().filter(key -> key.startsWith("general.servers.")).forEach(key -> {
-                String[] args = key.split("\\.");
-                if(args.length >= 2) {
-                    String serverName = args[2];
-                    System.out.println("SERVERNAME: " + serverName);
-                    getBlacklist(serverName);
-                }
+
+            BLACKLIST.getConfig().getKeys("general.servers", true).forEach(key -> {
+                    GeneralBlacklist blacklist = BlacklistCreator.createGeneralBlacklist(key);
+                    blacklist.load();
+                    SERVER_BLACKLISTS.put(key, blacklist);
             });
         }
 
@@ -124,30 +121,57 @@ public class Storage {
         }
 
         public static GeneralBlacklist getBlacklist(String server) {
-            GeneralBlacklist blacklist = null;
+            GeneralBlacklist blacklist;
+
             if(!SERVER_BLACKLISTS.containsKey(server)) {
                 blacklist = BlacklistCreator.createGeneralBlacklist(server);
                 blacklist.load();
                 SERVER_BLACKLISTS.put(server, blacklist);
-            }
+            } else blacklist = SERVER_BLACKLISTS.get(server);
 
             return SERVER_BLACKLISTS.getOrDefault(server, blacklist);
         }
 
+        public static List<GeneralBlacklist> getBlacklists(String server) {
+            List<GeneralBlacklist> blacklists = new ArrayList<>();
+            SERVER_BLACKLISTS.entrySet().stream().filter(entry -> entry.getKey().endsWith("*") ? isServer(entry.getKey(), server) : entry.getKey().equals(server)).forEach(entry -> blacklists.add(entry.getValue()));
+            return blacklists;
+        }
+
         public static boolean isListed(String command, String server) {
-            return BLACKLIST.isListed(command) || getBlacklist(server).isListed(command);
+            boolean blocked = isBlocked(command, server);
+            if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
+                blocked = blacklist.isBlocked(command, server);
+                if(blocked) break;
+            }
+            return blocked;
         }
 
         public static boolean isListed(String command, boolean intensive, String server) {
-            return BLACKLIST.isListed(command, intensive) || getBlacklist(server).isListed(command, intensive);
+            boolean blocked = isListed(command, intensive);
+            if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
+                blocked = blacklist.isListed(command, intensive);
+                if(blocked) break;
+            }
+            return blocked;
         }
 
         public static boolean isBlocked(Object targetObj, String command, String server) {
-            return isBlocked(targetObj, command) || getBlacklist(server).isBlocked(targetObj, command);
+            boolean blocked = isBlocked(targetObj, command);
+            if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
+                blocked = blacklist.isBlocked(targetObj, command);
+                if(blocked) break;
+            }
+            return blocked;
         }
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server) {
-            return isBlocked(targetObj, command, intensive) || getBlacklist(server).isBlocked(targetObj, command, intensive);
+            boolean blocked = isBlocked(targetObj, command, intensive);
+            if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
+                blocked = blacklist.isBlocked(targetObj, command, intensive);
+                if(blocked) break;
+            }
+            return blocked;
         }
 
         public static boolean isListed(String command) {
@@ -164,6 +188,10 @@ public class Storage {
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive) {
             return BLACKLIST.isBlocked(targetObj, command, intensive);
+        }
+
+        public static boolean isTabable(Object targetObj, String command) {
+            return BLACKLIST.isBlocked(targetObj, command, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         }
     }
 }
