@@ -100,12 +100,13 @@ public class ClientCommunication {
         LAST_DATA_UPDATE = System.currentTimeMillis();
         ClientInfo clientInfo;
         if(serverId == null) {
-            resetAllFeedbacks();
             SERVER_DATA_SYNC_COUNT = 0;
             CLIENTS.forEach(currentClient -> syncData(currentClient.getId()));
             return;
         } else {
             clientInfo = getClientById(serverId);
+            if(clientInfo != null) clientInfo.setFeedback(false);
+
             SERVER_DATA_SYNC_COUNT = SERVER_DATA_SYNC_COUNT -1;
             if(SERVER_DATA_SYNC_COUNT <= 0) SERVER_DATA_SYNC_COUNT = 0;
         }
