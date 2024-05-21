@@ -8,7 +8,6 @@ import java.util.*;
 public class GroupManager {
 
     private static final List<Group> GROUPS = new ArrayList<>();
-    //private static final HashMap<String, GroupServer> SERVER_GROUP_BLACKLIST = new HashMap<>();
 
     public static void initialize() {
         if(Reflection.isProxyServer()) Storage.Files.STORAGE.getKeys("groups", true).forEach(GroupManager::registerGroup);
@@ -140,25 +139,8 @@ public class GroupManager {
         return result;
     }
 
-    /*
-    public static GroupServer getOrCreateGroupList(String groupName, String server) {
-        GroupServer groupServer = null;
-        if(!SERVER_GROUP_BLACKLIST.containsKey(server)) {
-            System.out.println("New groupserver: " + groupName);
-            groupServer = new GroupServer(groupName);
-            SERVER_GROUP_BLACKLIST.put(server, groupServer);
-        } else System.out.println("Already existing groupserver: " + groupName);
-
-        return SERVER_GROUP_BLACKLIST.getOrDefault(server, groupServer);
-    }
-*/
-
     public static TinyGroup convertToTinyGroup(String groupName, List<String> commands) {
         return new TinyGroup(groupName, commands);
-    }
-
-    public static Group convertToGroup(TinyGroup group) {
-        return new Group(group.getGroupName(), group.getCommands());
     }
 
     public static void clearAllGroups() {

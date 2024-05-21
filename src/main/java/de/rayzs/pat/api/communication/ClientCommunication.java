@@ -70,7 +70,6 @@ public class ClientCommunication {
             }
 
             if (!client.compareId(feedbackPacket.getServerId())) client.setId(feedbackPacket.getServerId());
-
             if (client.hasSentFeedback()) return;
             client.setFeedback(true);
             client.syncTime();
