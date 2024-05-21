@@ -117,9 +117,9 @@ public class BukkitLoader extends JavaPlugin {
         ClientCommunication.sendFeedback();
 
         if(packet.getCommands() == null || packet.getCommands().isEmpty())
-            Storage.BLACKLIST.setList(new ArrayList<>());
-        else if (!Storage.BLACKLIST.getCommands().containsAll(packet.getCommands()) || !packet.getCommands().containsAll(Storage.BLACKLIST.getCommands()))
-            Storage.BLACKLIST.setList(packet.getCommands());
+            Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
+        else if (!Storage.Blacklist.getBlacklist().getCommands().containsAll(packet.getCommands()) || !packet.getCommands().containsAll(Storage.Blacklist.getBlacklist().getCommands()))
+            Storage.Blacklist.getBlacklist().setList(packet.getCommands());
 
         if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != packet.turnBlacklistToWhitelistEnabled())
             Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = packet.turnBlacklistToWhitelistEnabled();
@@ -129,7 +129,7 @@ public class BukkitLoader extends JavaPlugin {
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
 
-        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(Storage.BLACKLIST.getCommands());
+        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
         if(!loaded) {
             loaded = true;
             Logger.info("First data has arrived successfully!");
@@ -144,7 +144,7 @@ public class BukkitLoader extends JavaPlugin {
     public static List<String> getNotBlockedCommands() {
         List<String> commands = new ArrayList<>();
         Bukkit.getHelpMap().getHelpTopics().stream()
-                .filter(topic -> !topic.getName().contains(":") && topic.getName().startsWith("/") && !Storage.BLACKLIST.isListed(topic.getName().replaceFirst("/", "")))
+                .filter(topic -> !topic.getName().contains(":") && topic.getName().startsWith("/") && !Storage.Blacklist.getBlacklist().isListed(topic.getName().replaceFirst("/", "")))
                 .forEach(topic -> commands.add(topic.getName().replaceFirst("/", "")));
         return commands;
     }
