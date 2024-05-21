@@ -381,17 +381,15 @@ public class CommandProcess {
                                 return;
 
                             case "clear":
-                                confirmationString = "clear-server-group " + sub + " " + extra;
+                                confirmationString = "clear-server " + sub + " " + extra;
 
                                 if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
-                                    for (Group groups : GroupManager.getGroupsByServer(sub))
-                                        groups.clear(sub);
-
+                                    Storage.Blacklist.getBlacklist(sub).clear();
                                     handleChange();
-                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER.replace("%group%", extra).replace("%server%", sub));
+                                    sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER.replace("%server%", sub));
                                 } else {
                                     CONFIRMATION.put(uuid, confirmationString);
-                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER_CONFIRM.replace("%group%", extra).replace("%server%", sub));
+                                    sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_CONFIRM.replace("%server%", sub));
                                 }
 
                                 return;
@@ -451,6 +449,22 @@ public class CommandProcess {
                                 }
 
                                 sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.REMOVE_SERVER_FAILED : Storage.ConfigSections.Messages.GROUP.REMOVE_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra).replace("%group%", subExtra));
+                                return;
+
+                            case "clear":
+                                confirmationString = "clear-server-group " + sub + " " + extra;
+
+                                if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                                    for (Group groups : GroupManager.getGroupsByServer(sub))
+                                        groups.clear(sub);
+
+                                    handleChange();
+                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER.replace("%group%", extra).replace("%server%", sub));
+                                } else {
+                                    CONFIRMATION.put(uuid, confirmationString);
+                                    sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER_CONFIRM.replace("%group%", extra).replace("%server%", sub));
+                                }
+
                                 return;
                         }
                     }
