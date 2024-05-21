@@ -1,4 +1,4 @@
-package de.rayzs.pat.utils;
+package de.rayzs.pat.utils.group;
 
 import java.io.Serializable;
 import java.util.List;

@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Group implements Serializable {
 
-
+    private final HashMap<String, GroupBlacklist> groupServerBlacklist = new HashMap<>();
     private final GroupBlacklist generalGroupBlacklist;
     private final String groupName;
 
@@ -37,6 +37,7 @@ public class Group implements Serializable {
 
     public void add(String command, String server) {
         GroupBlacklist serverGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName, server);
+        serverGroupBlacklist.load();
         serverGroupBlacklist.add(command).save();
     }
 
@@ -46,6 +47,7 @@ public class Group implements Serializable {
 
     public void remove(String command, String server) {
         GroupBlacklist serverGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName, server);
+        serverGroupBlacklist.load();
         serverGroupBlacklist.remove(command).save();
     }
 
@@ -56,6 +58,8 @@ public class Group implements Serializable {
     public void clear(String server) {
         GroupBlacklist serverGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName, server);
         serverGroupBlacklist.clear().save();
+        serverGroupBlacklist.load();
+        Storage.Files.STORAGE.reload();
     }
 
     public void setCommands(List<String> commands) {
@@ -71,7 +75,28 @@ public class Group implements Serializable {
     }
 
     public boolean contains(String command, String server) {
-        return generalGroupBlacklist.isListed(command) || GroupManager.getOrCreateGroupList(groupName, server).getOrCreateGroupBlacklist(server).isListed(command);
+        return generalGroupBlacklist.isListed(command) || getOrCreateGroupBlacklist(server).isListed(command);
+    }
+
+    public boolean containsOnServer(String command, String server) {
+        return getOrCreateGroupBlacklist(server).isListed(command);
+    }
+
+    public GroupBlacklist getOrCreateGroupBlacklist(String server) {
+        GroupBlacklist groupBlacklist;
+        if(!groupServerBlacklist.containsKey(server)) {
+            groupBlacklist = BlacklistCreator.createGroupBlacklist(groupName, server);
+            groupServerBlacklist.put(server, groupBlacklist);
+            System.out.println("NEW: " + server + " | " + groupBlacklist.getNavigatePath());
+        } else {
+            groupBlacklist = groupServerBlacklist.get(server);
+            System.out.println("EXIST: " + server + " | " + groupBlacklist.getNavigatePath());
+        }
+
+        groupBlacklist.load();
+
+        System.out.println("#A " + groupBlacklist.getCommands().size());
+        return groupBlacklist;
     }
 
     public List<String> getCommands() {
@@ -80,17 +105,40 @@ public class Group implements Serializable {
 
     public List<String> getCommands(String server) {
         List<String> commands = new ArrayList<>(generalGroupBlacklist.getCommands());
+        commands.addAll(getOrCreateGroupBlacklist(server).getCommands());
+        return commands;
+    }
+
+    /*
+    public boolean contains(String command, String server) {
+        return generalGroupBlacklist.isListed(command) || GroupManager.getOrCreateGroupList(groupName, server).getOrCreateGroupBlacklist(server).isListed(command);
+    }
+
+
+    public boolean containsOnServer(String command, String server) {
+        GroupBlacklist groupBlacklist = GroupManager.getOrCreateGroupList(groupName, server).getOrCreateGroupBlacklist(server);
+        System.out.println("Watching group: " + groupName + " (" + command + ":" + server + ")");
+        groupBlacklist.getCommands().forEach(a -> System.out.println("ROFL: " + a));
+        return GroupManager.getOrCreateGroupList(groupName, server).getOrCreateGroupBlacklist(server).isListed(command);
+    }
+
+    public List<String> getCommands(String server) {
+        List<String> commands = new ArrayList<>(generalGroupBlacklist.getCommands());
         GroupServer groupServer = GroupManager.getOrCreateGroupList(getGroupName(), server);
         commands.addAll(groupServer.getOrCreateGroupBlacklist(server).getCommands());
         return commands;
     }
+     */
 
     public void deleteGroup() {
         deleteGroup(null);
     }
 
     public void deleteGroup(String server) {
-        Storage.Files.STORAGE.setAndSave("groups." + groupName + (server != null ? "." + server : ""), null);
+        final String path = "groups." + groupName + (server != null ? "." + server : "");
+        Storage.Files.STORAGE.setAndSave(path + ".commands", null);
+        Storage.Files.STORAGE.setAndSave(path, null);
+        Storage.Files.STORAGE.reload();
     }
 
     public ConfigurationBuilder getConfig() {

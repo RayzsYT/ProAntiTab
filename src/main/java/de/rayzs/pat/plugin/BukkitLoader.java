@@ -53,7 +53,11 @@ public class BukkitLoader extends JavaPlugin {
 
         if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
-                if(Bukkit.getOnlinePlayers().size() >= 1 || loaded) ClientCommunication.sendRequest();
+                if(Bukkit.getOnlinePlayers().size() >= 1 || loaded) {
+                    if(System.currentTimeMillis() - ClientCommunication.LAST_BUKKIT_SYNC >= 500)
+                        loaded = false;
+                    ClientCommunication.sendRequest();
+                }
             }, Bukkit.getOnlinePlayers().size() >= 1 ? 20 : 40, 20 * 10);
 
         else {

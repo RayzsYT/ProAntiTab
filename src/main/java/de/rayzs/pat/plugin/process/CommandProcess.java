@@ -199,14 +199,14 @@ public class CommandProcess {
                             }
 
                             StringBuilder groupsBuilder = new StringBuilder();
-                            for (int i = 0; i < GroupManager.getGroupNames(sub.toLowerCase()).size(); i++) {
-                                bool = (i >= GroupManager.getGroupNames(sub.toLowerCase()).size() - 1);
-                                groupsBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_GROUPS.replace("%group%",GroupManager.getGroupNames(sub.toLowerCase()).get(i)));
+                            for (int i = 0; i < GroupManager.getGroupNamesByServer(sub.toLowerCase()).size(); i++) {
+                                bool = (i >= GroupManager.getGroupNamesByServer(sub.toLowerCase()).size() - 1);
+                                groupsBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_GROUPS.replace("%group%",GroupManager.getGroupNamesByServer(sub.toLowerCase()).get(i)));
                                 if (!bool)
                                     groupsBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_SPLITTER);
                             }
 
-                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_MESSAGE.replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(GroupManager.getGroupNames(sub.toLowerCase()).size())).replace("%groups%", groupsBuilder.toString()));
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_MESSAGE.replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(GroupManager.getGroupNamesByServer(sub.toLowerCase()).size())).replace("%groups%", groupsBuilder.toString()));
                             return;
 
                         case "creategroup":
@@ -437,7 +437,7 @@ public class CommandProcess {
                                     return;
                                 }
 
-                                bool = group.contains(extra, sub);
+                                bool = group.containsOnServer(extra, sub);
                                 if (!bool) {
                                     group.add(extra, sub);
                                     handleChange();
@@ -455,7 +455,7 @@ public class CommandProcess {
                                     return;
                                 }
 
-                                bool = !group.contains(extra, sub);
+                                bool = !group.containsOnServer(extra, sub);
                                 if (!bool) {
                                     group.remove(extra, sub);
                                     handleChange();
@@ -544,21 +544,21 @@ public class CommandProcess {
                         suggestions.addAll(Storage.Blacklist.getBlacklist(args[2]).getCommands());
                     }
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
-                        suggestions.addAll(GroupManager.getGroupNames(args[2]));
+                        suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));
                 }
                 break;
 
             case 5:
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
-                        suggestions.addAll(GroupManager.getGroupNames(args[2]));
+                        suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));
                 }
                 break;
 
             case 6:
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
                     if (args[1].equals("add") && PermissionUtil.hasPermission(sender, "add")) suggestions.addAll(GroupManager.getGroupNames());
-                    if (Arrays.asList("remove", "rem", "rm").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(GroupManager.getGroupNames(args[2]));
+                    if (Arrays.asList("remove", "rem", "rm").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));
                 }
         }
 

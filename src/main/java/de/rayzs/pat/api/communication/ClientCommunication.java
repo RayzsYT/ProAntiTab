@@ -3,8 +3,6 @@ package de.rayzs.pat.api.communication;
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.communication.client.impl.BungeeClientInfo;
 import de.rayzs.pat.api.communication.client.impl.VelocityClientInfo;
-import de.rayzs.pat.api.storage.StorageTemplate;
-import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.communication.impl.*;
@@ -12,7 +10,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.DataConverter;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.TinyGroup;
+import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 
@@ -25,7 +23,7 @@ public class ClientCommunication {
     private static final UUID SERVER_ID = UUID.randomUUID();
     public static final List<ClientInfo> CLIENTS = new ArrayList<>();
     private static final ExpireCache<String, ClientInfo> QUEUE_CLIENTS = new ExpireCache<>(15, TimeUnit.SECONDS);
-    public static long LAST_DATA_UPDATE = System.currentTimeMillis(), LAST_SENT_REQUEST = 0;
+    public static long LAST_DATA_UPDATE = System.currentTimeMillis(), LAST_SENT_REQUEST = 0, LAST_BUKKIT_SYNC = System.currentTimeMillis();
     public static int SERVER_DATA_SYNC_COUNT = 0;
 
     public static void sendPacket(Object packet) {
@@ -91,6 +89,7 @@ public class ClientCommunication {
             DataConverter.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
             DataConverter.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
 
+            LAST_BUKKIT_SYNC = System.currentTimeMillis();
             BukkitLoader.synchronizeCommandData(commandsPacket, unknownCommandPacket);
             BukkitLoader.synchronizeGroupData(groupsPacket);
         }
@@ -142,7 +141,6 @@ public class ClientCommunication {
 
     public static void sendRequest() {
         if(System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
-            System.out.println("SEND REQUEST");
             LAST_SENT_REQUEST = System.currentTimeMillis();
             sendPacket(new DataConverter.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
         }

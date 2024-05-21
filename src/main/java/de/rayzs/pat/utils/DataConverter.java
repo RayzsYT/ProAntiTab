@@ -2,13 +2,9 @@ package de.rayzs.pat.utils;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
-import de.rayzs.pat.utils.group.Group;
-import de.rayzs.pat.utils.group.GroupManager;
-import oracle.jrockit.jfr.jdkevents.ThrowableTracer;
-import org.apache.commons.lang3.SerializationUtils;
+import de.rayzs.pat.utils.group.TinyGroup;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.List;
 
 public class DataConverter {
