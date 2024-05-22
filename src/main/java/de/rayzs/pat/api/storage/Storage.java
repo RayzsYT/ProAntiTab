@@ -164,18 +164,12 @@ public class Storage {
         }
 
         public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj))) {
-                System.out.println("BYPASS PERMISSION 0");
-                return true;
-            } else System.out.println("Uwu");
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj))) return true;
             return false;
         }
 
         public static boolean isListed(Object playerObj, String command, boolean intensive, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj))) {
-                System.out.println("BYPASS PERMISSION 0");
-                return false;
-            } else System.out.println("Uwu");
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj))) return false;
 
             boolean blocked = isListed(command, intensive);
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
@@ -186,10 +180,7 @@ public class Storage {
         }
 
         public static boolean isBlocked(Object playerObj, String command, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), false) && group.hasPermission(playerObj))) {
-                System.out.println("BYPASS PERMISSION 1");
-                return false;
-            }
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), false) && group.hasPermission(playerObj))) return false;
 
             boolean blocked = isBlocked(playerObj, command);
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
@@ -200,10 +191,7 @@ public class Storage {
         }
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(targetObj))) {
-                System.out.println("BYPASS PERMISSION 2");
-                return false;
-            }
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(targetObj))) return false;
 
             boolean blocked = isBlocked(targetObj, command, intensive);
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
