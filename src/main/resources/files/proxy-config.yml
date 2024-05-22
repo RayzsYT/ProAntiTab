@@ -104,7 +104,7 @@ custom-server-brand:
 # Have fun editing them to your liking! ^^
 # Remember: PlaceholderAPI & MiniMessage works on all these messages! ^^
 
-prefix: '&8[&fPAT&8]'
+prefix: '&8[&4ProAntiTab&8]'
 no-permissions: '&cYou are not allowed to execute this command! Missing permission: &4proantitab.%permission%'
 command-failed: '&cFailed to execute this command! Use "/bpat" to see all available commands.'
 

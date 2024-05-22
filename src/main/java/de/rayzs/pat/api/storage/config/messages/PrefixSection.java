@@ -14,6 +14,6 @@ public class PrefixSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
-        PREFIX = new ConfigSectionHelper<String>(this, null, "&8[&fPAT&8]").getOrSet();
+        PREFIX = new ConfigSectionHelper<String>(this, null, "&8[&4ProAntiTab&8]").getOrSet();
     }
 }
