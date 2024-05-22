@@ -32,7 +32,7 @@ public class MessageTranslator {
         colors.put('f', "<white>");
         colors.put('m', "<st>");
         colors.put('k', "<obf>");
-        colors.put('n', "<reset>");
+        colors.put('r', "<reset>");
         colors.put('o', "<i>");
         colors.put('l', "<b>");
 
