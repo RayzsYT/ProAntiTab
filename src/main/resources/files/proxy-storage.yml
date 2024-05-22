@@ -1,28 +1,31 @@
-general:
-  global:
-    commands:
-      - help
-      - '?'
-      - about
-      - version
-      - icanhasbukkit
-      - pl
-      - plugins
-      - ver
-      - msg
-      - tell
-      - me
-    servers:
-      lobby-*:
-        - example-command-for-all-lobbies
-      factions-1:
-        - example-command-for-this-specific-server
+global:
+  commands:
+    - help
+    - '?'
+    - version
+    - icanhasbukkit
+    - pl
+    - plugins
+    - me
+    - about
+    - tell
+    - msg
+  servers:
+    lobby-*:
+      commands:
+        - exameple-command-for-all-lobbies
+    faction-1:
+      commands:
+        - exameple-command-for-this-specific-server
 groups:
   examplegroup:
     commands:
-      - example-command-for-this-group
+      - example-command-for-this-group-to-bypass
+      - another-example-command-for-this-group-to-bypass
     servers:
-      faction-1:
-        - example-command-for-this-specific-server
       lobby-*:
-        - example-command-for-all-lobbies
+        commands:
+          - example-command-to-bypass-in-this-group-for-this-server
+      factions-1:
+        commands:
+          - example-command-to-bypass-in-this-group-for-this-server

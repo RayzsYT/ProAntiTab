@@ -14,9 +14,7 @@ general:
 groups:
   examplegroup:
     commands:
-      - help
-      - '?'
-  examplegroup2:
-    commands:
+      - example-command-for-this-group-to-bypass
+      - second-example-command-for-this-group-to-bypass
       - tell
       - msg

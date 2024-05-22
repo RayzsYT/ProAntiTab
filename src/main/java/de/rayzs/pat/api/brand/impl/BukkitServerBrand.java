@@ -60,7 +60,7 @@ public class BukkitServerBrand implements ServerBrand {
         if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) return;
 
         AtomicInteger animationState = new AtomicInteger(0);
-        TASK = Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
+        TASK = Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
             if(animationState.getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1) animationState.set(0);
             BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get()) + "§r";
             Bukkit.getOnlinePlayers().forEach(this::send);

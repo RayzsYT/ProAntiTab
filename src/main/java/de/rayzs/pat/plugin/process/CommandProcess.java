@@ -33,6 +33,8 @@ public class CommandProcess {
 
         if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
 
+        for (String arg : args) if(arg.contains(".") || arg.contains("\"")) return;
+
         try {
             switch (length) {
                 case 1:

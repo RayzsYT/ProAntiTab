@@ -17,7 +17,7 @@ public class BukkitAntiTabListener implements Listener {
         if (PermissionUtil.hasBypassPermission(player)) return;
 
         if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !BukkitLoader.isLoaded()) event.getCommands().clear();
-        else event.getCommands().removeIf(command -> Storage.Blacklist.isBlocked(player, command, true));
+        else event.getCommands().removeIf(command -> Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED));
     }
 
     public static void updateCommands() {

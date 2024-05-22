@@ -8,7 +8,7 @@ import java.util.List;
 
 public class GroupBlacklist extends BlacklistStorage {
 
-    public GroupBlacklist(String group, String navigatePath) { super("groups." + group + navigatePath); }
+    public GroupBlacklist(String group, String navigatePath) { super("groups." + group + "." + navigatePath); }
 
     @Override
     public List<String> getCommands() {

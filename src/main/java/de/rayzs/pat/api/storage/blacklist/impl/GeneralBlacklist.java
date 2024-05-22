@@ -6,7 +6,7 @@ import java.util.List;
 
 public class GeneralBlacklist extends BlacklistStorage {
 
-    public GeneralBlacklist(String navigatePath) { super("general." + navigatePath); }
+    public GeneralBlacklist(String navigatePath) { super("global." + navigatePath); }
 
     @Override
     public List<String> getCommands() {

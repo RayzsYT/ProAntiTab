@@ -64,6 +64,7 @@ public class ModernPacketHandler implements PacketHandler {
 
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
+                System.out.println(command);
                 return Storage.Blacklist.isBlocked(player, command);
             });
         }
