@@ -550,16 +550,10 @@ public class CommandProcess {
 
             case 5:
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
-                    if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
-                        suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));
-                }
-                break;
-
-            case 6:
-                if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
                     if (args[1].equals("add") && PermissionUtil.hasPermission(sender, "add")) suggestions.addAll(GroupManager.getGroupNames());
                     if (Arrays.asList("remove", "rem", "rm").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));
                 }
+                break;
         }
 
         suggestions.stream().filter(suggestion -> suggestion.startsWith(args[args.length-1].toLowerCase())).forEach(result::add);
