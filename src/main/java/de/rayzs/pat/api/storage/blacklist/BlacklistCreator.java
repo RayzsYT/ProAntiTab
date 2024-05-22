@@ -2,11 +2,12 @@ package de.rayzs.pat.api.storage.blacklist;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.impl.*;
+import de.rayzs.pat.utils.Reflection;
 
 public class BlacklistCreator {
 
     public static GeneralBlacklist createGeneralBlacklist() {
-        return new GeneralBlacklist("global.commands");
+        return new GeneralBlacklist((Reflection.isProxyServer() ? "global." : "") + "commands");
     }
 
     public static GeneralBlacklist createGeneralBlacklist(String server) {
