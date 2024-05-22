@@ -1,14 +1,13 @@
 general:
   commands:
-    - pl
-    - plugins
     - help
-    - about
-    - icanhasbukkit
     - '?'
+    - about
     - ver
     - version
+    - icanhasbukkit
     - tell
+    - me
 groups:
   examplegroup:
     commands:
@@ -17,4 +16,4 @@ groups:
   examplegroup2:
     commands:
       - tell
-      - msg
+      - about
