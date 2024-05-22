@@ -9,12 +9,10 @@ general:
       - pl
       - plugins
       - ver
-  servers:
-    lobby-*:
-      commands:
+    servers:
+      lobby-*:
         - example-command-for-all-lobbies
-    faction-1:
-      commands:
+      factions-1:
         - example-command-for-this-specific-server
 groups:
   examplegroup:
@@ -22,8 +20,6 @@ groups:
       - example-command-for-this-group
     servers:
       faction-1:
-        commands:
-          - example-command-for-this-specific-server
+        - example-command-for-this-specific-server
       lobby-*:
-        commands:
-          - example-command-for-all-lobbies
+        - example-command-for-all-lobbies
