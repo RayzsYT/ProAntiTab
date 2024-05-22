@@ -5,8 +5,11 @@ import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
+import de.rayzs.pat.utils.PermissionUtil;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.group.GroupManager;
+
 import java.util.*;
 
 public class Storage {
@@ -160,16 +163,48 @@ public class Storage {
             return blocked;
         }
 
-        public static boolean isBlocked(Object targetObj, String command, String server) {
-            boolean blocked = isBlocked(targetObj, command);
+        public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, String server) {
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj))) {
+                System.out.println("BYPASS PERMISSION 0");
+                return true;
+            } else System.out.println("Uwu");
+            return false;
+        }
+
+        public static boolean isListed(Object playerObj, String command, boolean intensive, String server) {
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj))) {
+                System.out.println("BYPASS PERMISSION 0");
+                return false;
+            } else System.out.println("Uwu");
+
+            boolean blocked = isListed(command, intensive);
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                blocked = blacklist.isBlocked(targetObj, command);
+                blocked = blacklist.isListed(command, intensive);
+                if(blocked) break;
+            }
+            return blocked;
+        }
+
+        public static boolean isBlocked(Object playerObj, String command, String server) {
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), false) && group.hasPermission(playerObj))) {
+                System.out.println("BYPASS PERMISSION 1");
+                return false;
+            }
+
+            boolean blocked = isBlocked(playerObj, command);
+            if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
+                blocked = blacklist.isBlocked(playerObj, command);
                 if(blocked) break;
             }
             return blocked;
         }
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server) {
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(targetObj))) {
+                System.out.println("BYPASS PERMISSION 2");
+                return false;
+            }
+
             boolean blocked = isBlocked(targetObj, command, intensive);
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
                 blocked = blacklist.isBlocked(targetObj, command, intensive);
@@ -196,6 +231,29 @@ public class Storage {
 
         public static boolean isTabable(Object targetObj, String command) {
             return BLACKLIST.isBlocked(targetObj, command, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+        }
+
+        public static boolean isInListed(String command, List<String> commandList, boolean intensive) {
+            command = command.toLowerCase();
+            if(command.startsWith("/")) command = command.replaceFirst("/", "");
+
+            String[] split;
+            if(command.contains(" ")) {
+                split = command.split(" ");
+                if(split.length > 0) command = split[0];
+                command = command.split(" ")[0];
+            }
+
+            if(intensive && command.contains(":")) {
+                split = command.split(":");
+                if(split.length > 0)
+                    command = command.replaceFirst(split[0] + ":", "");
+            }
+
+            for (String commands : commandList)
+                if(commands.equals(command)) return true;
+
+            return false;
         }
     }
 }
