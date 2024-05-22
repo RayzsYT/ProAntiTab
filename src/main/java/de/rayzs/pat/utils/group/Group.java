@@ -110,7 +110,7 @@ public class Group implements Serializable {
 
     public void deleteGroup(String server) {
         final String path = "groups." + groupName + (server != null ? "." + server : "");
-        Storage.Files.STORAGE.setAndSave(path + ".commands", null);
+        //Storage.Files.STORAGE.setAndSave(path + ".commands", null);
         Storage.Files.STORAGE.setAndSave(path, null);
         Storage.Files.STORAGE.reload();
     }
