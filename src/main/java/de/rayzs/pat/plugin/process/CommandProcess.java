@@ -29,7 +29,7 @@ public class CommandProcess {
         int length = args.length;
         String task, sub, extra, subExtra, confirmationString;
         Group group;
-        boolean bool, backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || !Reflection.isProxyServer();
+        boolean bool, backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
 
         if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
 
@@ -480,7 +480,7 @@ public class CommandProcess {
     public static List<String> handleTabComplete(Object senderObj, String[] args) {
         CommandSender sender = new CommandSender(senderObj);
         final List<String> suggestions = new ArrayList<>(), result = new ArrayList<>();
-        final boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || !Reflection.isProxyServer();
+        final boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
 
         switch (args.length) {
             case 1:
