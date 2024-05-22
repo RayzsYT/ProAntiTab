@@ -527,9 +527,9 @@ public class CommandProcess {
 
             case 3:
                 if (!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer())
-                    suggestions.addAll(GroupManager.getGroupsByNameNotIncludingCommand(args[1]));
+                    suggestions.addAll(GroupManager.getGroupNames());
                 if (!backend && Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove"))
-                    suggestions.addAll(GroupManager.getGroupsByNameOnlyIncludingCommand(args[1]));
+                    suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
                     if (args[1].equals("add") && PermissionUtil.hasPermission(sender, "add"))
                         suggestions.addAll(Storage.Blacklist.getBlacklistServers());
