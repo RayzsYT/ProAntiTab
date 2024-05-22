@@ -1,0 +1,29 @@
+general:
+  global:
+    commands:
+      - help
+      - '?'
+      - about
+      - version
+      - icanhasbukkit
+      - pl
+      - plugins
+      - ver
+  servers:
+    lobby-*:
+      commands:
+        - example-command-for-all-lobbies
+    faction-1:
+      commands:
+        - example-command-for-this-specific-server
+groups:
+  examplegroup:
+    commands:
+      - example-command-for-this-group
+    servers:
+      faction-1:
+        commands:
+          - example-command-for-this-specific-server
+      lobby-*:
+        commands:
+          - example-command-for-all-lobbies
