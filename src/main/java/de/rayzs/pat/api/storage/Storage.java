@@ -217,10 +217,6 @@ public class Storage {
             return BLACKLIST.isBlocked(targetObj, command, intensive);
         }
 
-        public static boolean isNotTabable(Object targetObj, String command) {
-            return BLACKLIST.isBlocked(targetObj, command, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-        }
-
         public static boolean isInListed(String command, List<String> commandList, boolean intensive) {
             command = command.toLowerCase();
             if(command.startsWith("/")) command = command.replaceFirst("/", "");
