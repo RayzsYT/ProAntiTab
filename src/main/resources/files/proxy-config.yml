@@ -42,7 +42,7 @@ custom-protocol-ping:
 # Normally there is something like 'Purpur', or 'Spigot'.
 # With this feature, you are able to change and even animate it.
 custom-unknown-command:
-  enabled: true
+  enabled: false
   message:
     - '&cThis command does not exist!'
 
@@ -52,7 +52,7 @@ custom-unknown-command:
 cancel-blocked-commands:
   enabled: true
   message:
-    - '&cThe command %command% is blocked!'
+    - '&cThis command &8(&4%command%&8) &cis blocked!'
 
 # Here you can customize your own fake '/plugins' command.
 custom-plugins:
