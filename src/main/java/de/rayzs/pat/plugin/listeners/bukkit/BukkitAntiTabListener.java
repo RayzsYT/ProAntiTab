@@ -17,7 +17,7 @@ public class BukkitAntiTabListener implements Listener {
         if (PermissionUtil.hasBypassPermission(player)) return;
 
         if(!BukkitLoader.isLoaded()) event.getCommands().clear();
-        else event.getCommands().removeIf(command -> !Storage.Blacklist.isTabable(player, command));
+        else event.getCommands().removeIf(command -> Storage.Blacklist.isNotTabable(player, command));
     }
 
     public static void updateCommands() {

@@ -217,7 +217,7 @@ public class Storage {
             return BLACKLIST.isBlocked(targetObj, command, intensive);
         }
 
-        public static boolean isTabable(Object targetObj, String command) {
+        public static boolean isNotTabable(Object targetObj, String command) {
             return BLACKLIST.isBlocked(targetObj, command, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         }
 
