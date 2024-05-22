@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin;
 
+import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.commands.BukkitCommand;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
@@ -51,19 +52,10 @@ public class BukkitLoader extends JavaPlugin {
 
         PluginManager manager = getServer().getPluginManager();
 
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
-                if(Bukkit.getOnlinePlayers().size() >= 1 || loaded) {
-                    if(loaded && System.currentTimeMillis() - ClientCommunication.LAST_BUKKIT_SYNC >= 12000) {
-                        loaded = false;
-                    } else ClientCommunication.sendRequest();
-                }
-            }, Bukkit.getOnlinePlayers().size() >= 1 ? 10 : 40, 20 * 10);
-
-        else {
+        if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             GroupManager.initialize();
             PacketAnalyzer.injectAll();
-        }
+        } else BackendUpdater.handle();
 
         if(Reflection.getMinor() >= 16) manager.registerEvents(new BukkitAntiTabListener(), this);
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
@@ -75,6 +67,7 @@ public class BukkitLoader extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        BackendUpdater.stop();
         PacketAnalyzer.uninjectAll();
         MessageTranslator.closeAudiences();
     }
@@ -114,7 +107,7 @@ public class BukkitLoader extends JavaPlugin {
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
     }
 
-    public static void synchronizeCommandData(DataConverter.CommandsPacket packet, DataConverter.UnknownCommandPacket unknownCommandPacket) {
+    public static void synchronizeCommandData(PacketUtil.CommandsPacket packet, PacketUtil.UnknownCommandPacket unknownCommandPacket) {
         ClientCommunication.sendFeedback();
 
         if(packet.getCommands() == null || packet.getCommands().isEmpty())
@@ -136,7 +129,7 @@ public class BukkitLoader extends JavaPlugin {
         }
     }
 
-    public static void synchronizeGroupData(DataConverter.GroupsPacket packet) {
+    public static void synchronizeGroupData(PacketUtil.GroupsPacket packet) {
         GroupManager.clearAllGroups();
         packet.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getCommands()));
     }
