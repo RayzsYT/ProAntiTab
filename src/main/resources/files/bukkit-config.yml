@@ -49,7 +49,7 @@ custom-unknown-command:
 cancel-blocked-commands:
   enabled: true
   message:
-    - '&cThe command %command% is blocked!'
+    - '&cThis command &8(&4%command%&8) &cis blocked!'
 
 # Here you can customize your own fake '/plugins' command.
 custom-plugins:
