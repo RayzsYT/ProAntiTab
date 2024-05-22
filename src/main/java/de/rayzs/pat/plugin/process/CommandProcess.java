@@ -567,7 +567,7 @@ public class CommandProcess {
             ClientCommunication.syncData();
             if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
         } else {
-            if (Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
+            if (Reflection.getMinor() >= 16) BukkitAntiTabListener.updateCommands();
         }
     }
 
