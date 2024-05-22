@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.storage.config.messages;
 
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
+import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 
@@ -18,6 +19,7 @@ public class StatsSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
+        if(!Reflection.isProxyServer()) return;
         NO_SERVER = new ConfigSectionHelper<String>(this, "no-server", "&cNone!").getOrSet();
         SPLITTER = new ConfigSectionHelper<String>(this, "message.splitter", "&7, ").getOrSet();
         SERVER = new ConfigSectionHelper<String>(this, "message.server", "&f%servername% &8(%updated%)").getOrSet();
