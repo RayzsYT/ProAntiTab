@@ -9,6 +9,9 @@ general:
       - pl
       - plugins
       - ver
+      - msg
+      - tell
+      - me
     servers:
       lobby-*:
         - example-command-for-all-lobbies

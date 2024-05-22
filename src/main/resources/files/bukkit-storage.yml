@@ -8,6 +8,9 @@ general:
     - icanhasbukkit
     - tell
     - me
+    - pl
+    - plugins
+    - msg
 groups:
   examplegroup:
     commands:
@@ -16,4 +19,4 @@ groups:
   examplegroup2:
     commands:
       - tell
-      - about
+      - msg
