@@ -4,7 +4,6 @@ import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
-import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
@@ -64,7 +63,7 @@ public class CommandProcess {
                             }
 
                             int finalFound = found;
-                            Storage.ConfigSections.Messages.STATS.STATISTIC.getLines().forEach(message -> sender.sendMessage(message.replace("%server_count%", String.valueOf(ClientCommunication.SERVER_DATA_SYNC_COUNT)).replace("%last_sync_time%", TimeConverter.calcAndGetTime(ClientCommunication.LAST_DATA_UPDATE)).replace("%servers%", finalFound > 0 ? statsBuilder : Storage.ConfigSections.Messages.STATS.NO_SERVER)));
+                            Storage.ConfigSections.Messages.STATS.STATISTIC.getLines().forEach(message -> sender.sendMessage(message.replace("%groups_amount%", String.valueOf(GroupManager.getGroupNames().size())).replace("%server_count%", String.valueOf(ClientCommunication.SERVER_DATA_SYNC_COUNT)).replace("%last_sync_time%", TimeConverter.calcAndGetTime(ClientCommunication.LAST_DATA_UPDATE)).replace("%servers%", finalFound > 0 ? statsBuilder : Storage.ConfigSections.Messages.STATS.NO_SERVER)));
                             return;
 
                         case "reload":
