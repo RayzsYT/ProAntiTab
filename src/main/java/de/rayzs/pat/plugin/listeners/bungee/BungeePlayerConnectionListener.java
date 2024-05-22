@@ -21,7 +21,7 @@ public class BungeePlayerConnectionListener implements Listener {
         if(Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
                 if (player.isConnected()) {
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED);
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getName());
                 }
             }, 1, TimeUnit.SECONDS);
         }

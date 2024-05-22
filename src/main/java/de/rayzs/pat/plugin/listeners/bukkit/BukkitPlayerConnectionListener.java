@@ -30,7 +30,7 @@ public class BukkitPlayerConnectionListener implements Listener {
         if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
             Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
                 if(player.isOnline()) {
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines(), "%player%", player.getName());
                 }
             }, 20);
         }

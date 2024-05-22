@@ -45,15 +45,36 @@ public class ModernPacketHandler implements PacketHandler {
         }
 
         boolean cancelsBeforeHand = false;
+        int spaces = 0;
         if(input.startsWith("/")) {
             input = input.replace("/", "");
             String[] split = input.split(" ");
-            if(input.contains(" ")) input = split[0];
+            if(input.contains(" ")) {
+                spaces = split.length;
+                input = split[0];
+            }
 
             cancelsBeforeHand = Storage.Blacklist.isListed(input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         }
 
         Suggestions suggestions = (Suggestions) suggestionObj;
+        if((input.length() < 1 || cancelsBeforeHand) && Reflection.isWeird())
+            return false;
+
+        if(spaces > 1 && cancelsBeforeHand) {
+            suggestions.getList().clear();
+            return true;
+        }
+
+        if(spaces == 0) {
+            suggestions.getList().removeIf(suggestion -> {
+                String command = suggestion.getText();
+                return Storage.Blacklist.isBlocked(player, command);
+            });
+            return true;
+        }
+
+        /*
         if(input.length() < 1 && Reflection.isWeird() || cancelsBeforeHand && Reflection.isWeird())
             return false;
         else if(cancelsBeforeHand)
@@ -65,7 +86,7 @@ public class ModernPacketHandler implements PacketHandler {
                 String command = suggestion.getText();
                 return Storage.Blacklist.isBlocked(player, command);
             });
-        }
+        }*/
 
 
         return true;

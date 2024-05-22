@@ -26,7 +26,7 @@ public class VelocityConnectionListener {
         if(Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
             server.getScheduler().buildTask(loader, () -> {
                 if (player.isActive())
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED);
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getUsername());
             }).delay(1, TimeUnit.SECONDS).schedule();
         }
     }
