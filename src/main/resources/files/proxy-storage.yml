@@ -3,6 +3,7 @@ global:
     - help
     - '?'
     - version
+    - ver
     - icanhasbukkit
     - pl
     - plugins
