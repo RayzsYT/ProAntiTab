@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.process;
 
+import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
@@ -73,6 +74,7 @@ public class CommandProcess {
                             CustomServerBrand.initialize();
                             GroupManager.clearAllGroups();
                             GroupManager.initialize();
+                            handleReload();
 
                             if(!backend) handleChange();
                             sender.sendMessage(Storage.ConfigSections.Messages.RELOAD.DONE);
@@ -566,6 +568,13 @@ public class CommandProcess {
             if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
         } else {
             if (Reflection.getMinor() >= 18) BukkitAntiTabListener.updateCommands();
+        }
+    }
+
+    private static void handleReload() {
+        if(!Reflection.isProxyServer()) {
+            BackendUpdater.stop();
+            BackendUpdater.start();
         }
     }
 }

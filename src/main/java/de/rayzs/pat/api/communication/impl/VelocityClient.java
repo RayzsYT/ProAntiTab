@@ -9,7 +9,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.api.communication.Client;
 import de.rayzs.pat.api.communication.ClientCommunication;
-import de.rayzs.pat.utils.DataConverter;
+import de.rayzs.pat.utils.PacketUtil;
 
 public class VelocityClient implements Client {
 
@@ -24,7 +24,7 @@ public class VelocityClient implements Client {
     @Override
     public void send(Object packet) {
         for (RegisteredServer registeredServer : SERVER.getAllServers()) {
-            try { registeredServer.sendPluginMessage(IDENTIFIER, DataConverter.convertToBytes(packet));
+            try { registeredServer.sendPluginMessage(IDENTIFIER, PacketUtil.convertToBytes(packet));
             } catch (Throwable throwable) { throwable.printStackTrace(); }
         }
     }
@@ -32,8 +32,8 @@ public class VelocityClient implements Client {
     @Subscribe
     public void onQueryReceive(PluginMessageEvent event) {
         if (event.getIdentifier() != IDENTIFIER) return;
-        Object packetObj = DataConverter.buildFromBytes(event.getData());
-        if(!DataConverter.isPacket(packetObj)) return;
+        Object packetObj = PacketUtil.buildFromBytes(event.getData());
+        if(!PacketUtil.isPacket(packetObj)) return;
 
         ServerConnection server = (ServerConnection) event.getSource();
         ClientCommunication.receiveInformation(server.getServerInfo().getName(), packetObj);

@@ -7,7 +7,7 @@ import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.communication.impl.*;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.DataConverter;
+import de.rayzs.pat.utils.PacketUtil;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.group.TinyGroup;
@@ -31,12 +31,12 @@ public class ClientCommunication {
     }
 
     public static void sendPacket(ClientInfo clientInfo, Object packet) {
-        clientInfo.sendBytes(DataConverter.convertToBytes(packet));
+        clientInfo.sendBytes(PacketUtil.convertToBytes(packet));
     }
 
     public static void receiveInformation(String serverName, Object packet) {
-        if(packet instanceof DataConverter.RequestPacket) {
-            DataConverter.RequestPacket requestPacket = (DataConverter.RequestPacket) packet;
+        if(packet instanceof PacketUtil.RequestPacket) {
+            PacketUtil.RequestPacket requestPacket = (PacketUtil.RequestPacket) packet;
             if (!requestPacket.isToken(Storage.TOKEN)) return;
 
             ClientInfo client = getClientByName(serverName);
@@ -51,15 +51,15 @@ public class ClientCommunication {
             return;
         }
 
-        if(packet instanceof DataConverter.BackendDataPacket) {
-            DataConverter.BackendDataPacket backendDataPacket = (DataConverter.BackendDataPacket) packet;
+        if(packet instanceof PacketUtil.BackendDataPacket) {
+            PacketUtil.BackendDataPacket backendDataPacket = (PacketUtil.BackendDataPacket) packet;
             if (!backendDataPacket.isToken(Storage.TOKEN)) return;
             Storage.SERVER_NAME = backendDataPacket.getServerName();
             return;
         }
 
-        if(packet instanceof DataConverter.FeedbackPacket) {
-            DataConverter.FeedbackPacket feedbackPacket = (DataConverter.FeedbackPacket) packet;
+        if(packet instanceof PacketUtil.FeedbackPacket) {
+            PacketUtil.FeedbackPacket feedbackPacket = (PacketUtil.FeedbackPacket) packet;
             if (!feedbackPacket.isToken(Storage.TOKEN)) return;
             String serverId = feedbackPacket.getServerId();
 
@@ -75,18 +75,18 @@ public class ClientCommunication {
             client.syncTime();
             SERVER_DATA_SYNC_COUNT++;
 
-            DataConverter.BackendDataPacket backendDataPacket = new DataConverter.BackendDataPacket(Storage.TOKEN, serverId, serverName);
+            PacketUtil.BackendDataPacket backendDataPacket = new PacketUtil.BackendDataPacket(Storage.TOKEN, serverId, serverName);
             sendPacket(client, backendDataPacket);
             return;
         }
 
-        if(packet instanceof DataConverter.PacketBundle) {
-            DataConverter.PacketBundle packetBundle =  (DataConverter.PacketBundle) packet;
+        if(packet instanceof PacketUtil.PacketBundle) {
+            PacketUtil.PacketBundle packetBundle =  (PacketUtil.PacketBundle) packet;
             if(!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString())) return;
 
-            DataConverter.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
-            DataConverter.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
-            DataConverter.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
+            PacketUtil.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
+            PacketUtil.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
+            PacketUtil.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
 
             LAST_BUKKIT_SYNC = System.currentTimeMillis();
             BukkitLoader.synchronizeCommandData(commandsPacket, unknownCommandPacket);
@@ -113,9 +113,9 @@ public class ClientCommunication {
             if(SERVER_DATA_SYNC_COUNT <= 0) SERVER_DATA_SYNC_COUNT = 0;
         }
 
-        DataConverter.CommandsPacket commandsPacket = new DataConverter.CommandsPacket();
-        DataConverter.GroupsPacket groupsPacket;
-        DataConverter.PacketBundle bundle;
+        PacketUtil.CommandsPacket commandsPacket = new PacketUtil.CommandsPacket();
+        PacketUtil.GroupsPacket groupsPacket;
+        PacketUtil.PacketBundle bundle;
         List<String> commands = new ArrayList<>(Storage.Blacklist.getBlacklist().getCommands());
 
         if(clientInfo != null && clientInfo.getName() != null) {
@@ -129,24 +129,24 @@ public class ClientCommunication {
         List<TinyGroup> newGroupList = new ArrayList<>();
 
         groups.forEach(oldGroup -> newGroupList.add(GroupManager.convertToTinyGroup(oldGroup.getGroupName(), oldGroup.getCommands(serverName))));
-        groupsPacket = new DataConverter.GroupsPacket(newGroupList);
+        groupsPacket = new PacketUtil.GroupsPacket(newGroupList);
 
         commandsPacket.setTurnBlacklistToWhitelist(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         commandsPacket.setCommands(commands);
 
-        bundle = new DataConverter.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
-        clientInfo.sendBytes(DataConverter.convertToBytes(bundle));
+        bundle = new PacketUtil.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
+        clientInfo.sendBytes(PacketUtil.convertToBytes(bundle));
     }
 
     public static void sendRequest() {
         if(System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
             LAST_SENT_REQUEST = System.currentTimeMillis();
-            sendPacket(new DataConverter.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
+            sendPacket(new PacketUtil.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
         }
     }
 
     public static void sendFeedback() {
-        sendPacket(new DataConverter.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString()));
+        sendPacket(new PacketUtil.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString()));
     }
 
     public static Client getClient() {
