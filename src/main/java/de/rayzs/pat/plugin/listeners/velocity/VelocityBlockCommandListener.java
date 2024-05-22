@@ -36,7 +36,7 @@ public class VelocityBlockCommandListener {
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
-            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
                 org.bukkit.entity.Player target = Bukkit.getServer().getPlayer(uuid);
                 MessageTranslator.send(target, notificationMessage);
@@ -61,7 +61,7 @@ public class VelocityBlockCommandListener {
         if (PermissionUtil.hasBypassPermission(player, command)) return;
         MessageTranslator.send(player, cancelCommandMessage);
 
-        if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+        if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
         Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
             org.bukkit.entity.Player target = Bukkit.getServer().getPlayer(uuid);
             MessageTranslator.send(target, notificationMessage);
