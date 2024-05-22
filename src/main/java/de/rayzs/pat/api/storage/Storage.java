@@ -87,6 +87,7 @@ public class Storage {
 
         public static class Messages {
 
+            public static PrefixSection PREFIX = new PrefixSection();
             public static BlacklistSection BLACKLIST = new BlacklistSection();
             public static CommandFailedSection COMMAND_FAILED = new CommandFailedSection();
             public static GroupSection GROUP = new GroupSection();
