@@ -54,11 +54,11 @@ public class BukkitLoader extends JavaPlugin {
         if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
                 if(Bukkit.getOnlinePlayers().size() >= 1 || loaded) {
-                    if(System.currentTimeMillis() - ClientCommunication.LAST_BUKKIT_SYNC >= 500)
+                    if(loaded && System.currentTimeMillis() - ClientCommunication.LAST_BUKKIT_SYNC >= 12000) {
                         loaded = false;
-                    ClientCommunication.sendRequest();
+                    } else ClientCommunication.sendRequest();
                 }
-            }, Bukkit.getOnlinePlayers().size() >= 1 ? 20 : 40, 20 * 10);
+            }, Bukkit.getOnlinePlayers().size() >= 1 ? 10 : 40, 20 * 10);
 
         else {
             GroupManager.initialize();
@@ -115,17 +115,12 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public static void synchronizeCommandData(DataConverter.CommandsPacket packet, DataConverter.UnknownCommandPacket unknownCommandPacket) {
-
-        packet.getCommands().forEach(c -> System.out.println("COMMANDS: " + c));
-
         ClientCommunication.sendFeedback();
 
         if(packet.getCommands() == null || packet.getCommands().isEmpty())
             Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
         else if (!Storage.Blacklist.getBlacklist().getCommands().containsAll(packet.getCommands()) || !packet.getCommands().containsAll(Storage.Blacklist.getBlacklist().getCommands()))
             Storage.Blacklist.getBlacklist().setList(packet.getCommands());
-
-        System.out.println("--> " + packet.turnBlacklistToWhitelistEnabled());
 
         if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != packet.turnBlacklistToWhitelistEnabled())
             Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = packet.turnBlacklistToWhitelistEnabled();
@@ -138,7 +133,6 @@ public class BukkitLoader extends JavaPlugin {
         if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
         if(!loaded) {
             loaded = true;
-            Logger.info("First data has arrived successfully!");
         }
     }
 
