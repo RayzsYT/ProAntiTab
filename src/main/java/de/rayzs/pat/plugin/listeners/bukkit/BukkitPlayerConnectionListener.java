@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
+import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -18,8 +19,8 @@ public class BukkitPlayerConnectionListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !BukkitLoader.isLoaded())
-            Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), ClientCommunication::sendRequest, 5);
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+            BackendUpdater.handle();
 
         CustomServerBrand.preparePlayer(player);
         CustomServerBrand.sendBrandToPlayer(player);
