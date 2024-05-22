@@ -50,8 +50,7 @@ public class ModernPacketHandler implements PacketHandler {
             String[] split = input.split(" ");
             if(input.contains(" ")) input = split[0];
 
-            cancelsBeforeHand = !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED && Storage.Blacklist.isListed(input, true) && !PermissionUtil.hasBypassPermission(player, input)
-                    || Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED && !Storage.Blacklist.isListed(input, false) && !PermissionUtil.hasBypassPermission(player, input);
+            cancelsBeforeHand = Storage.Blacklist.isListed(input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         }
 
         Suggestions suggestions = (Suggestions) suggestionObj;
@@ -64,7 +63,6 @@ public class ModernPacketHandler implements PacketHandler {
 
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
-                System.out.println(command);
                 return Storage.Blacklist.isBlocked(player, command);
             });
         }

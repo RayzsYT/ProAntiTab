@@ -39,8 +39,7 @@ public class LegacyPacketHandler implements PacketHandler {
             input = input.replace("/", "");
             if(input.contains(" ")) input = input.split(" ")[0];
 
-            cancelsBeforeHand = Storage.Blacklist.isListed(input, true) && !PermissionUtil.hasBypassPermission(player, input)
-                    || Storage.Blacklist.isListed(input, false) && !PermissionUtil.hasBypassPermission(player, input);
+            cancelsBeforeHand = Storage.Blacklist.isListed(input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         }
 
         for (Field field : Reflection.getFields(packetObj)) {
