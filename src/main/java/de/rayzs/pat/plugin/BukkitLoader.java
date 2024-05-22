@@ -124,9 +124,7 @@ public class BukkitLoader extends JavaPlugin {
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
 
         if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
-        if(!loaded) {
-            loaded = true;
-        }
+        if(!loaded) loaded = true;
     }
 
     public static void synchronizeGroupData(PacketUtil.GroupsPacket packet) {
