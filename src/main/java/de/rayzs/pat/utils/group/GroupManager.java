@@ -10,14 +10,7 @@ public class GroupManager {
     private static final List<Group> GROUPS = new ArrayList<>();
 
     public static void initialize() {
-        if(Reflection.isProxyServer()) Storage.Files.STORAGE.getKeys("groups", true).forEach(GroupManager::registerGroup);
-        else Storage.Files.STORAGE.getKeys(true).stream().filter(key -> key.startsWith("groups.")).forEach(key -> {
-            String[] args = key.split("\\.");
-            if(args.length >= 1) {
-                String groupName = args[1];
-                GroupManager.registerGroup(groupName);
-            }
-        });
+        Storage.Files.STORAGE.getKeys("groups", false).forEach(GroupManager::registerGroup);
     }
 
     public static boolean canAccessCommand(Object targetObj, String command) {
