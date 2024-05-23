@@ -55,7 +55,7 @@ public class CommandSender {
     public String getName() {
         if(Reflection.isVelocityServer()) return sender instanceof com.velocitypowered.api.proxy.Player ? ((com.velocitypowered.api.proxy.Player) sender).getUsername() : "CONSOLE";
         else if(Reflection.isProxyServer()) return sender instanceof ProxiedPlayer ? ((ProxiedPlayer) sender).getName() : "CONSOLE";
-        return "CONSOLE";
+        return sender instanceof Player ? ((Player) sender).getName() : "CONSOLE";
     }
 
     public UUID getUniqueId() {
