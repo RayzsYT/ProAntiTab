@@ -57,7 +57,11 @@ public class BukkitServerBrand implements ServerBrand {
             TASK = -1;
         }
 
-        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) return;
+        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
+        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+            BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0) + "§r";
+            return;
+        }
 
         AtomicInteger animationState = new AtomicInteger(0);
         TASK = Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
