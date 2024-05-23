@@ -1,4 +1,4 @@
-general:
+global:
   commands:
     - help
     - '?'
