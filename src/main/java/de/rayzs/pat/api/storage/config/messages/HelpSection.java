@@ -42,6 +42,7 @@ public class HelpSection extends ConfigStorage {
                         , "&f  add/rem (command) &8<group> &7to manage the list"
                         , "&f  clear &8<group> &7to clear the list"
                         , "&7 For a specific server:"
+                        , "&f  serv list (server) &8<group>"
                         , "&f  serv add/rem (server) (command) &8<group>"
                         , "&f  serv clear (server) &8<group>"
                 ));
