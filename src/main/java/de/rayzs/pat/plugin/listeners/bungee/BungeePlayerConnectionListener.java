@@ -1,6 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
-import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.brand.impl.BungeeServerBrand;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.PermissionUtil;
@@ -31,7 +31,7 @@ public class BungeePlayerConnectionListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onServerSwitch(ServerSwitchEvent event) {
-        ProxiedPlayer player = event.getPlayer();
-        CustomServerBrand.sendBrandToPlayer(player);
+        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        BungeeServerBrand.removeFromModified(event.getPlayer());
     }
 }

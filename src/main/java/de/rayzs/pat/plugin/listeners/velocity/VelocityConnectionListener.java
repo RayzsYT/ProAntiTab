@@ -1,9 +1,11 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.rayzs.pat.api.brand.impl.VelocityServerBrand;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -29,5 +31,11 @@ public class VelocityConnectionListener {
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getUsername());
             }).delay(1, TimeUnit.SECONDS).schedule();
         }
+    }
+
+    @Subscribe
+    public void onServerSwitch(ServerConnectedEvent event) {
+        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        VelocityServerBrand.removeFromModified(event.getPlayer());
     }
 }

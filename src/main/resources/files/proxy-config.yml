@@ -75,8 +75,8 @@ custom-server-brand:
   # This is the list of the animation
   # Possible placeholders:
   # %player%        - name of the player
-  # %displayname%   - display name of the player
-  # %world%         - name of the world where the player is
+  # %server%        - name of the server where the player is currently
+  # %ping%          - ping of the player
   # and the other placeholders from PlaceholderAPI.
   brands:
     - '&f&lP&froAntiTab |'

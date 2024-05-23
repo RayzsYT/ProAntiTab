@@ -12,12 +12,16 @@ import de.rayzs.pat.api.brand.ServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.ProtocolConstants;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class VelocityServerBrand implements ServerBrand {
 
+    private static List<Player> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
     private static final ProxyServer SERVER = VelocityLoader.getServer();
     private static Class<?> pluginMessagePacketClass, minecraftConnectionClass, connectedPlayerConnectionClass;
     private static ScheduledTask TASK;
@@ -25,8 +29,12 @@ public class VelocityServerBrand implements ServerBrand {
 
     @Override
     public void initializeTask() {
-        if(TASK != null) TASK.cancel();
-        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) return;
+        if(TASK != null) {
+            TASK.cancel();
+            MODIFIED_BRAND_PLAYERS.clear();
+        }
+
+        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
 
         if(pluginMessagePacketClass == null)
             pluginMessagePacketClass = Reflection.getClass("com.velocitypowered.proxy.protocol.packet.PluginMessagePacket");
@@ -37,12 +45,20 @@ public class VelocityServerBrand implements ServerBrand {
         if(connectedPlayerConnectionClass == null)
             connectedPlayerConnectionClass = Reflection.getClass("com.velocitypowered.proxy.connection.client.ConnectedPlayer");
 
-        AtomicInteger animationState = new AtomicInteger(0);
-        TASK = SERVER.getScheduler().buildTask(VelocityLoader.getInstance(), () -> {
-            if(animationState.getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1) animationState.set(0);
-            BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get())) + "§r";
-            SERVER.getAllPlayers().forEach(this::send);
-        }).repeat(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY, TimeUnit.MILLISECONDS).schedule();
+        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+            TASK = SERVER.getScheduler().buildTask(VelocityLoader.getInstance(), () -> {
+                BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)) + "§r";
+                SERVER.getAllPlayers().stream().filter(player -> !isModified(player)).forEach(this::send);
+            }).repeat(150, TimeUnit.MILLISECONDS).schedule();
+        } else {
+            AtomicInteger animationState = new AtomicInteger(0);
+            TASK = SERVER.getScheduler().buildTask(VelocityLoader.getInstance(), () -> {
+                if (animationState.getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1)
+                    animationState.set(0);
+                BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get())) + "§r";
+                SERVER.getAllPlayers().forEach(this::send);
+            }).repeat(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY, TimeUnit.MILLISECONDS).schedule();
+        }
     }
 
 
@@ -68,8 +84,18 @@ public class VelocityServerBrand implements ServerBrand {
             Object pluginMessagePacket = pluginMessagePacketClass.getConstructor(String.class, ByteBuf.class).newInstance(brand, serverBrand.getByteBuf());
             Reflection.getMethodsByParameterAndName(minecraftConnectionObj, "write", Object.class).get(0).invoke(minecraftConnectionObj, pluginMessagePacket);
 
+            if(!MODIFIED_BRAND_PLAYERS.contains(player)) MODIFIED_BRAND_PLAYERS.add(player);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+    }
+
+    private boolean isModified(Player player) {
+        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return false;
+        return MODIFIED_BRAND_PLAYERS.contains(player);
+    }
+
+    public static void removeFromModified(Player player) {
+        MODIFIED_BRAND_PLAYERS.remove(player);
     }
 }
