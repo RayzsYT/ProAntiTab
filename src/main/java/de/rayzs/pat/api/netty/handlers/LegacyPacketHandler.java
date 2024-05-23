@@ -28,10 +28,7 @@ public class LegacyPacketHandler implements PacketHandler {
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         String input = PacketAnalyzer.getPlayerInput(player);
 
-        if(input == null) {
-            Logger.warning("Failed PacketAnalyze process! (#2)");
-            return false;
-        }
+        if(input == null) return false;
 
         boolean cancelsBeforeHand = false;
 
@@ -56,18 +53,7 @@ public class LegacyPacketHandler implements PacketHandler {
                 for (String s : tR) {
                     tempName = s.replaceFirst("/", "");
 
-                    if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-                        if(!Storage.Blacklist.isListed(tempName, true)) continue;
-                        if(PermissionUtil.hasBypassPermission(player, tempName)) continue;
-                        newResultList.add(s);
-                        continue;
-                    }
-
-                    if (tempName.contains(":")) tempName = tempName.split(":")[1];
-
-                    if (!Storage.Blacklist.isListed(tempName, false)
-                            || Storage.Blacklist.isListed(tempName, false)
-                            && PermissionUtil.hasBypassPermission(player, tempName))
+                    if (Storage.Blacklist.isBlocked(player, tempName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
                         newResultList.add(s);
                 }
 
