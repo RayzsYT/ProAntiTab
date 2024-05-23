@@ -24,6 +24,9 @@ import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Plugin(name = "ProAntiTab",
@@ -115,5 +118,11 @@ public class VelocityLoader {
 
     public static VelocityLoader getInstance() {
         return instance;
+    }
+
+    public static List<String> getServerNames() {
+        List<String> servers = new ArrayList<>();
+        server.getAllServers().forEach(server -> servers.add(server.getServerInfo().getName()));
+        return servers;
     }
 }

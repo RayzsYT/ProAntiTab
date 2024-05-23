@@ -16,6 +16,9 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class BungeeLoader extends Plugin {
@@ -114,5 +117,9 @@ public class BungeeLoader extends Plugin {
 
     public static java.util.logging.Logger getPluginLogger() {
         return logger;
+    }
+
+    public static List<String> getServerNames() {
+        return new ArrayList<>(ProxyServer.getInstance().getServers().keySet());
     }
 }
