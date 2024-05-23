@@ -313,6 +313,29 @@ public class CommandProcess {
                                     sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_CONFIRM.replace("%server%", sub));
                                 }
                                 return;
+
+                            case "ls": case "list":
+                                if (!Reflection.isProxyServer()) {
+                                    sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                                    return;
+                                }
+
+                                if(!BlacklistCreator.exist(sub)) {
+                                    sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.SERVER_DOES_NOT_EXIST.replace("%server%", sub));
+                                    return;
+                                }
+
+                                StringBuilder commandsBuilder = new StringBuilder();
+                                for (int i = 0; i < Storage.Blacklist.getBlacklist(sub).getCommands().size(); i++) {
+                                    bool = (i >= Storage.Blacklist.getBlacklist(sub).getCommands().size() - 1);
+                                    commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_SERVER_COMMAND.replace("%command%", Storage.Blacklist.getBlacklist(sub).getCommands().get(i)));
+                                    if (!bool)
+                                        commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_SERVER_SPLITTER);
+                                }
+
+                                sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.LIST_SERVER_MESSAGE.replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(Storage.Blacklist.getBlacklist(sub).getCommands().size())).replace("%commands%", commandsBuilder.toString()));
+                                return;
+
                         }
                     }
 
@@ -408,6 +431,29 @@ public class CommandProcess {
                                     CONFIRMATION.put(uuid, confirmationString);
                                     sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER_CONFIRM.replace("%group%", extra).replace("%server%", sub));
                                 }
+                                return;
+
+                            case "ls": case "list":
+                                if(!BlacklistCreator.exist(sub)) {
+                                    sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.SERVER_DOES_NOT_EXIST.replace("%server%", sub));
+                                    return;
+                                }
+
+                                group = GroupManager.getGroupByName(extra);
+                                if(!BlacklistCreator.exist(extra, sub) || group == null) {
+                                    sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.GROUP_DOES_NOT_EXIST.replace("%server%", sub));
+                                    return;
+                                }
+
+                                StringBuilder commandsBuilder = new StringBuilder();
+                                for (int i = 0; i < group.getCommands(sub).size(); i++) {
+                                    bool = (i >= group.getCommands(sub).size() - 1);
+                                    commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_COMMAND.replace("%command%", group.getCommands(sub).get(i)));
+                                    if (!bool)
+                                        commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_SPLITTER);
+                                }
+
+                                sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_MESSAGE.replace("%group%", group.getGroupName()).replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(group.getCommands(sub).size())).replace("%commands%", commandsBuilder.toString()));
                                 return;
                         }
                     }
@@ -512,7 +558,7 @@ public class CommandProcess {
                 if (!backend && Arrays.asList("ls", "list").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "list"))
                     suggestions.addAll(GroupManager.getGroupNames());
                 if (Reflection.isProxyServer() && Arrays.asList("lg", "listgroups").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "listgroups"))
-                    suggestions.addAll(ClientCommunication.getRegisteredServerNames());
+                    suggestions.addAll(Storage.Blacklist.getBlacklistServers());
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
                     if (PermissionUtil.hasPermission(sender, "add")) suggestions.add("add");
                     if (PermissionUtil.hasPermission(sender, "remove"))
@@ -538,6 +584,8 @@ public class CommandProcess {
                         suggestions.addAll(Storage.Blacklist.getBlacklistServers());
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
                         suggestions.addAll(Storage.Blacklist.getBlacklistServers());
+                    if (Arrays.asList("list", "ls").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "list"))
+                        suggestions.addAll(Storage.Blacklist.getBlacklistServers());
                 }
                 break;
 
@@ -546,6 +594,10 @@ public class CommandProcess {
                     if (Arrays.asList("remove", "rem", "rm").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove")) {
                         suggestions.addAll(Storage.Blacklist.getBlacklist(args[2]).getCommands());
                     }
+
+                    if (Arrays.asList("list", "ls").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "list"))
+                        suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));
+
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
                         suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));
                 }

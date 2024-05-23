@@ -112,6 +112,7 @@ public class Storage {
             public static NotificationSection NOTIFICATION = new NotificationSection();
             public static OnlyForProxySection NO_PROXY = new OnlyForProxySection();
             public static ReloadSection RELOAD = new ReloadSection();
+            public static ServerListSection SERV_LIST = new ServerListSection();
             public static StatsSection STATS = new StatsSection();
 
             public static void initialize() {}
