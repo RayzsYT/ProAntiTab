@@ -9,11 +9,6 @@ import java.util.List;
 
 public class PacketUtil {
 
-    /*
-        Code originally from:
-        https://stackoverflow.com/questions/2836646/java-serializable-object-to-byte-array
-     */
-
     public static byte[] convertToBytes(Object obj) {
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
         try (ObjectOutputStream outputStream = new ObjectOutputStream(arrayOutputStream)) {
@@ -31,9 +26,11 @@ public class PacketUtil {
         ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(bytes);
         try (ObjectInput input = new ObjectInputStream(arrayInputStream)) {
             return input.readObject();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
+
+        return null;
     }
 
     public static boolean isPacket(Object object) {
