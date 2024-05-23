@@ -102,6 +102,8 @@ public class MessageTranslator {
     }
 
     public static String replaceMessage(Object playerObj, String text) {
+        CommandSender commandSender = (CommandSender) playerObj;
+        if(commandSender != null) text = text.replace("%player%", commandSender.getName());
         text = text.replace("&", "§").replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX).replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
         return !placeholderSupport || playerObj == null || Reflection.isProxyServer() ? text : PlaceholderReplacer.replace(playerObj, text);
     }
