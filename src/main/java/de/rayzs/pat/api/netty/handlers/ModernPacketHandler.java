@@ -39,10 +39,7 @@ public class ModernPacketHandler implements PacketHandler {
 
         String input = PacketAnalyzer.getPlayerInput(player);
 
-        if(input == null) {
-            Logger.warning("Failed PacketAnalyze process! (#2)");
-            return false;
-        }
+        if(input == null) return false;
 
         boolean cancelsBeforeHand = false;
         int spaces = 0;
