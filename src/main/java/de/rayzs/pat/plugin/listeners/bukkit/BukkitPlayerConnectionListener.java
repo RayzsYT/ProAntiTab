@@ -1,5 +1,7 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
+import de.rayzs.pat.api.brand.impl.BukkitServerBrand;
+import de.rayzs.pat.api.brand.impl.BungeeServerBrand;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.api.storage.Storage;
@@ -40,5 +42,14 @@ public class BukkitPlayerConnectionListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PacketAnalyzer.uninject(player.getUniqueId());
+        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        BukkitServerBrand.removeFromModified(player);
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        BukkitServerBrand.removeFromModified(player);
     }
 }

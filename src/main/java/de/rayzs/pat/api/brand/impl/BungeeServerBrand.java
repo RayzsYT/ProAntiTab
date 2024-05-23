@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BungeeServerBrand implements ServerBrand {
 
-    private static List<ProxiedPlayer> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
+    private static final List<ProxiedPlayer> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
     private static final ProxyServer SERVER = BungeeLoader.getPlugin().getProxy();
     private static ScheduledTask TASK;
     private static String BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0);

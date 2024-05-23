@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class VelocityServerBrand implements ServerBrand {
 
-    private static List<Player> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
+    private static final List<Player> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
     private static final ProxyServer SERVER = VelocityLoader.getServer();
     private static Class<?> pluginMessagePacketClass, minecraftConnectionClass, connectedPlayerConnectionClass;
     private static ScheduledTask TASK;

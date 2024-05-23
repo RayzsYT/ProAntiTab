@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.proxy.Player;
@@ -35,7 +36,15 @@ public class VelocityConnectionListener {
 
     @Subscribe
     public void onServerSwitch(ServerConnectedEvent event) {
+        Player player = event.getPlayer();
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
-        VelocityServerBrand.removeFromModified(event.getPlayer());
+        VelocityServerBrand.removeFromModified(player);
+    }
+
+    @Subscribe
+    public void onDisconnect(DisconnectEvent event) {
+        Player player = event.getPlayer();
+        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        VelocityServerBrand.removeFromModified(player);
     }
 }

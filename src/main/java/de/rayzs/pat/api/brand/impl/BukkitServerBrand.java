@@ -16,11 +16,14 @@ import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BukkitServerBrand implements ServerBrand {
 
+    private static final List<Player> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
     private static final Server SERVER = Bukkit.getServer();
     private static String BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0);
     private static int TASK = -1;
@@ -55,20 +58,25 @@ public class BukkitServerBrand implements ServerBrand {
         if(TASK != -1) {
             Bukkit.getScheduler().cancelTask(TASK);
             TASK = -1;
+            MODIFIED_BRAND_PLAYERS.clear();
         }
 
         if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
-            BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0) + "§r";
-            return;
-        }
 
-        AtomicInteger animationState = new AtomicInteger(0);
-        TASK = Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
-            if(animationState.getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1) animationState.set(0);
-            BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get()) + "§r";
-            Bukkit.getOnlinePlayers().forEach(this::send);
-        }, 1, Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY);
+        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+            TASK = Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
+                BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0) + "§r";
+                Bukkit.getOnlinePlayers().forEach(this::send);
+            }, 1, Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY);
+        } else {
+            AtomicInteger animationState = new AtomicInteger(0);
+            TASK = Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
+                if (animationState.getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1)
+                    animationState.set(0);
+                BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get()) + "§r";
+                Bukkit.getOnlinePlayers().forEach(this::send);
+            }, 1, Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY);
+        }
     }
 
     @Override
@@ -81,6 +89,7 @@ public class BukkitServerBrand implements ServerBrand {
             Set<String> channels = (Set<String>) channelsField.get(player);
             channels.add(CustomServerBrand.CHANNEL_NAME);
             Reflection.closeAccess(channelsField);
+            if(!MODIFIED_BRAND_PLAYERS.contains(player)) MODIFIED_BRAND_PLAYERS.add(player);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -111,5 +120,14 @@ public class BukkitServerBrand implements ServerBrand {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+    }
+
+    private boolean isModified(Player player) {
+        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return false;
+        return MODIFIED_BRAND_PLAYERS.contains(player);
+    }
+
+    public static void removeFromModified(Player player) {
+        MODIFIED_BRAND_PLAYERS.remove(player);
     }
 }

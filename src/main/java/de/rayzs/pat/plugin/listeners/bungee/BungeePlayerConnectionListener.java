@@ -8,6 +8,7 @@ import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
+import net.md_5.bungee.api.event.ServerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -31,7 +32,15 @@ public class BungeePlayerConnectionListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onServerSwitch(ServerSwitchEvent event) {
+        ProxiedPlayer player = event.getPlayer();
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
-        BungeeServerBrand.removeFromModified(event.getPlayer());
+        BungeeServerBrand.removeFromModified(player);
+    }
+
+    @EventHandler (priority = EventPriority.LOWEST)
+    public void onServerDisconnect(ServerDisconnectEvent event) {
+        ProxiedPlayer player = event.getPlayer();
+        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        BungeeServerBrand.removeFromModified(player);
     }
 }
