@@ -70,6 +70,11 @@ custom-server-brand:
   # Set this to -1 to disable the animation.
   # Disabling the animation will only display
   # the first brand of this list.
+  # Warning:
+  # By disabling the animation, you also disable the
+  # automatic update of information.
+  # That means that placeholders won't update unless the
+  # player rejoins or switches to another server.
   repeat-delay: 150
 
   # This is the list of the animation
