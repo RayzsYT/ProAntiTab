@@ -31,12 +31,17 @@ public class LegacyPacketHandler implements PacketHandler {
         if(input == null) return false;
 
         boolean cancelsBeforeHand = false;
+        int spaces = 0;
 
         if(input.startsWith("/")) {
             input = input.replace("/", "");
-            if(input.contains(" ")) input = input.split(" ")[0];
+            if(input.contains(" ")) {
+                String[] split = input.split(" ");
+                input = split[0];
+                spaces = split.length;
+            }
 
-            cancelsBeforeHand = Storage.Blacklist.isListed(input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+            cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         }
 
         for (Field field : Reflection.getFields(packetObj)) {
@@ -49,13 +54,16 @@ public class LegacyPacketHandler implements PacketHandler {
 
             String tempName;
 
-            if(!cancelsBeforeHand)
+            if(spaces == 0) {
                 for (String s : tR) {
                     tempName = s.replaceFirst("/", "");
 
-                    if (Storage.Blacklist.isBlocked(player, tempName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
+                    if (!Storage.Blacklist.isBlocked(player, tempName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
                         newResultList.add(s);
                 }
+            } else {
+                if(!cancelsBeforeHand) newResultList.addAll(Arrays.asList(tR));
+            }
 
             field.set(packetObj, newResultList.toArray(new String[0]));
         }
