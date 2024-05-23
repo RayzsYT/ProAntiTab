@@ -37,11 +37,18 @@ public class Storage {
     }
 
     public static List<String> getServers() {
+        return getServers(false);
+    }
+
+    public static List<String> getServers(boolean withBlacklist) {
+        List<String> servers = new ArrayList<>();
         if(Reflection.isVelocityServer())
-            return VelocityLoader.getServerNames();
+            servers.addAll(VelocityLoader.getServerNames());
         else if(Reflection.isProxyServer())
-            return BungeeLoader.getServerNames();
-        return null;
+            servers.addAll(BungeeLoader.getServerNames());
+
+        if(withBlacklist) Blacklist.getBlacklistServers().stream().filter(server -> !servers.contains(server)).forEach(servers::add);
+        return servers;
     }
 
     public static boolean isServer(String originServer, Set<String> targetServers) {
