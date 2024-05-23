@@ -5,7 +5,8 @@ import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
-import de.rayzs.pat.utils.PermissionUtil;
+import de.rayzs.pat.plugin.BungeeLoader;
+import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -33,6 +34,14 @@ public class Storage {
         ConfigSections.Settings.initialize();
         ConfigSections.Messages.initialize();
         ConfigSections.SECTIONS.forEach(ConfigStorage::load);
+    }
+
+    public static List<String> getServers() {
+        if(Reflection.isVelocityServer())
+            return VelocityLoader.getServerNames();
+        else if(Reflection.isProxyServer())
+            return BungeeLoader.getServerNames();
+        return null;
     }
 
     public static boolean isServer(String originServer, Set<String> targetServers) {
