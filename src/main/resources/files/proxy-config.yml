@@ -145,6 +145,20 @@ stats:
       - '&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)'
       - '&7Sent to servers: &f%servers%'
 
+server-list:
+  server-not-found: '&cThe server %server% does not have any commands!'
+  group-does-not-exist: '&cGroup %group% does not exist for %server%!'
+  list:
+    server:
+      message: '&7Listed commands of %server% (&f%size%&7)&8: &f%commands%'
+      splitter: '&7, '
+      command: '&f%command%'
+    group:
+      message: '&7Listed commands of %group% from %server% (&f%size%&7)&8: &f%commands%'
+      splitter: '&7, '
+      command: '&f%command%'
+
+
 blacklist:
   clear: '&aList has been cleared!'
   clear-server: '&aList has been cleared for the server %server%!'

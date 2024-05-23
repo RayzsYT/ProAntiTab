@@ -25,7 +25,7 @@ public class BlacklistCreator {
 
     public static boolean exist(String server) {
         //Object obj = Storage.Blacklist.getBlacklist().getConfig().get("general." + (server != null ? "servers." + server + "." : "") + "commands");
-        Object obj = Storage.Blacklist.getBlacklist().getConfig().get("servers." + server);
+        Object obj = Storage.Blacklist.getBlacklist().getConfig().get("global.servers." + server);
         return obj != null;
     }
 

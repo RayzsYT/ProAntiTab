@@ -435,13 +435,13 @@ public class CommandProcess {
 
                             case "ls": case "list":
                                 if(!BlacklistCreator.exist(sub)) {
-                                    sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.SERVER_DOES_NOT_EXIST.replace("%server%", sub));
+                                    sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.SERVER_DOES_NOT_EXIST.replace("%group%", extra).replace("%server%", sub));
                                     return;
                                 }
 
                                 group = GroupManager.getGroupByName(extra);
                                 if(!BlacklistCreator.exist(extra, sub) || group == null) {
-                                    sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.GROUP_DOES_NOT_EXIST.replace("%server%", sub));
+                                    sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.GROUP_DOES_NOT_EXIST.replace("%group%", extra).replace("%server%", sub));
                                     return;
                                 }
 
@@ -563,6 +563,8 @@ public class CommandProcess {
                     if (PermissionUtil.hasPermission(sender, "add")) suggestions.add("add");
                     if (PermissionUtil.hasPermission(sender, "remove"))
                         suggestions.addAll(Arrays.asList("rm", "rem", "remove"));
+                    if (PermissionUtil.hasPermission(sender, "list"))
+                        suggestions.addAll(Arrays.asList("ls", "list"));
                     if (PermissionUtil.hasPermission(sender, "clear")) suggestions.add("clear");
                 }
 
@@ -584,8 +586,7 @@ public class CommandProcess {
                         suggestions.addAll(Storage.Blacklist.getBlacklistServers());
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
                         suggestions.addAll(Storage.Blacklist.getBlacklistServers());
-                    if (Arrays.asList("list", "ls").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "list"))
-                        suggestions.addAll(Storage.Blacklist.getBlacklistServers());
+                    if (Arrays.asList("list", "ls").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "list")) suggestions.addAll(Storage.Blacklist.getBlacklistServers());
                 }
                 break;
 

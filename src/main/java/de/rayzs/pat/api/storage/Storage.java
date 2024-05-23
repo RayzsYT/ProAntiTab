@@ -130,7 +130,7 @@ public class Storage {
 
             if(!Reflection.isProxyServer()) return;
 
-            BLACKLIST.getConfig().getKeys("general.servers", true).forEach(key -> {
+            BLACKLIST.getConfig().getKeys("global.servers", true).forEach(key -> {
                     GeneralBlacklist blacklist = BlacklistCreator.createGeneralBlacklist(key);
                     blacklist.load();
                     SERVER_BLACKLISTS.put(key, blacklist);
