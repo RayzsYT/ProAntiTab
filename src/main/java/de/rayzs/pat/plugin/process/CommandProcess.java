@@ -533,7 +533,7 @@ public class CommandProcess {
                     suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));
                 if (Reflection.isProxyServer() && Arrays.asList("serv", "server").contains(args[0].toLowerCase())) {
                     if (args[1].equals("add") && PermissionUtil.hasPermission(sender, "add"))
-                        suggestions.addAll(Storage.Blacklist.getBlacklistServers());
+                        suggestions.addAll(Storage.getServers(true));
                     if (Arrays.asList("remove", "rem", "rm").contains(args[1].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove"))
                         suggestions.addAll(Storage.Blacklist.getBlacklistServers());
                     if (args[1].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
