@@ -53,6 +53,7 @@ public class BukkitLoader extends JavaPlugin {
         PluginManager manager = getServer().getPluginManager();
 
         if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+            loaded = true;
             GroupManager.initialize();
             PacketAnalyzer.injectAll();
         } else BackendUpdater.handle();

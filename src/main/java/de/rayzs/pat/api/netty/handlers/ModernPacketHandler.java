@@ -2,6 +2,7 @@ package de.rayzs.pat.api.netty.handlers;
 
 import com.mojang.brigadier.suggestion.Suggestions;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.netty.*;
 import org.bukkit.entity.Player;
@@ -58,7 +59,7 @@ public class ModernPacketHandler implements PacketHandler {
         if((input.length() < 1 || cancelsBeforeHand) && Reflection.isWeird())
             return false;
 
-        if(spaces > 1 && cancelsBeforeHand) {
+        if(spaces > 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
             suggestions.getList().clear();
             return true;
         }
