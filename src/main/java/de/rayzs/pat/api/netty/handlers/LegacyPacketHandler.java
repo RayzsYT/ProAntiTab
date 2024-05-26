@@ -49,7 +49,7 @@ public class LegacyPacketHandler implements PacketHandler {
             field.setAccessible(true);
             Object result = field.get(packetObj);
 
-            if (!(result instanceof String[]) || !BukkitLoader.isLoaded()) continue;
+            if (!(result instanceof String[])) continue;
             List<String> newResultList = new ArrayList<>();
             String[] tR = (String[]) result;
 
@@ -57,6 +57,7 @@ public class LegacyPacketHandler implements PacketHandler {
 
             if(spaces == 0) {
                 for (String s : tR) {
+                    if(!BukkitLoader.isLoaded()) continue;
                     tempName = s.replaceFirst("/", "");
 
                     if (!Storage.Blacklist.isBlocked(player, tempName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
