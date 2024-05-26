@@ -52,14 +52,13 @@ public class ModernPacketHandler implements PacketHandler {
                 input = split[0];
             }
 
-            cancelsBeforeHand = Storage.Blacklist.isListed(input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+            cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         }
 
         Suggestions suggestions = (Suggestions) suggestionObj;
-        if((input.length() < 1 || cancelsBeforeHand) && Reflection.isWeird())
-            return false;
+        if((input.length() < 1 || cancelsBeforeHand) && Reflection.isWeird()) return false;
 
-        if(spaces > 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
+        if(spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
             suggestions.getList().clear();
             return true;
         }
@@ -71,21 +70,6 @@ public class ModernPacketHandler implements PacketHandler {
             });
             return true;
         }
-
-        /*
-        if(input.length() < 1 && Reflection.isWeird() || cancelsBeforeHand && Reflection.isWeird())
-            return false;
-        else if(cancelsBeforeHand)
-            suggestions.getList().clear();
-        else {
-            if(Reflection.isWeird()) return true;
-
-            suggestions.getList().removeIf(suggestion -> {
-                String command = suggestion.getText();
-                return Storage.Blacklist.isBlocked(player, command);
-            });
-        }*/
-
 
         return true;
     }

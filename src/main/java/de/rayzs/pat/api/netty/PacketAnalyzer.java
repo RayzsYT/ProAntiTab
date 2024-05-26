@@ -35,7 +35,9 @@ public class PacketAnalyzer {
                 return false;
             }
 
+            channel.pipeline().names().forEach(System.out::println);
             channel.pipeline().addBefore(PacketAnalyzer.HANDLER_NAME, PacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
+            channel.pipeline().addAfter("via-encoder", PacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
             PacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -70,6 +72,42 @@ public class PacketAnalyzer {
 
         private final Player player;
         private PacketDecoder(Player player) {
+            this.player = player;
+        }
+
+        @Override
+        public void channelRead(ChannelHandlerContext channel, Object packetObj) {
+            try {
+                if (!player.hasPermission("proantitab.bypass") && packetObj.getClass() != null) {
+                    String packetName = packetObj.getClass().getSimpleName();
+                    if (packetName.equals("PacketPlayInTabComplete")) {
+                        if(!PACKET_HANDLER.handleIncomingPacket(player, packetObj)) return;
+                    }
+                }
+
+                super.channelRead(channel, packetObj);
+            } catch (Throwable exception) { exception.printStackTrace(); }
+        }
+
+        @Override
+        public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
+            try {
+                if (!player.hasPermission("proantitab.bypass") && packetObj.getClass() != null) {
+                    String packetName = packetObj.getClass().getSimpleName();
+                    if (packetName.equals("PacketPlayOutTabComplete")) {
+                        if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;
+                    }
+                }
+
+                super.write(channel, packetObj, promise);
+            } catch (Throwable exception) { exception.printStackTrace(); }
+        }
+    }
+
+    private static class ViaPacketEncoder extends ChannelDuplexHandler {
+
+        private final Player player;
+        private ViaPacketEncoder(Player player) {
             this.player = player;
         }
 
