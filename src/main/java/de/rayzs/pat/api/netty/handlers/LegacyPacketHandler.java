@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.netty.handlers;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.netty.PacketAnalyzer;
 import de.rayzs.pat.api.netty.PacketHandler;
@@ -48,7 +49,7 @@ public class LegacyPacketHandler implements PacketHandler {
             field.setAccessible(true);
             Object result = field.get(packetObj);
 
-            if (!(result instanceof String[])) continue;
+            if (!(result instanceof String[]) || !BukkitLoader.isLoaded()) continue;
             List<String> newResultList = new ArrayList<>();
             String[] tR = (String[]) result;
 
