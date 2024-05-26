@@ -35,9 +35,7 @@ public class PacketAnalyzer {
                 return false;
             }
 
-            channel.pipeline().names().forEach(System.out::println);
             channel.pipeline().addBefore(PacketAnalyzer.HANDLER_NAME, PacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
-            channel.pipeline().addAfter("via-encoder", PacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
             PacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
