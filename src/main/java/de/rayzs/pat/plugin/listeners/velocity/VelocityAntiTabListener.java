@@ -23,7 +23,7 @@ public class VelocityAntiTabListener {
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, player.getCurrentServer().get().getServerInfo().getName()));
+        event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName()));
     }
 
     @Subscribe (order = PostOrder.LAST)
@@ -32,7 +32,7 @@ public class VelocityAntiTabListener {
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getRootNode().getChildren().removeIf(command -> Storage.Blacklist.isBlocked(player, command.getName(), player.getCurrentServer().get().getServerInfo().getName()));
+        event.getRootNode().getChildren().removeIf(command -> Storage.Blacklist.isBlocked(player, command.getName(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName()));
     }
 
     public static void updateCommands() {
