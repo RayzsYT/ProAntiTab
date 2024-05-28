@@ -239,7 +239,7 @@ public class Reflection {
     }
 
     public static Object getPlayerNetworkManager(Object playerConnection) throws Exception {
-        Optional<Field> optional = getFieldsByType(Reflection.getMinor() > 19 ? playerConnection.getClass().getSuperclass() : playerConnection.getClass(), "NetworkManager", SearchOption.ENDS).stream().findFirst();
+        Optional<Field> optional = getFieldsByType(Reflection.getMinor() == 20 && Reflection.getRelease() > 2 || Reflection.getMinor() > 20 ? playerConnection.getClass().getSuperclass() : playerConnection.getClass(), "NetworkManager", SearchOption.ENDS).stream().findFirst();
         if(!optional.isPresent()) return null;
         return optional.get().get(playerConnection);
     }
