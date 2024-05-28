@@ -96,6 +96,8 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
         Object result = get(target);
         if (result != null)
             return result;
+
+        System.out.println("Couldn't find '" + target + "'! Using default values instead.");
         set(target, object);
         save();
         return get(target);
