@@ -1,6 +1,7 @@
 package de.rayzs.pat.utils.group;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.*;
 import java.util.*;
@@ -102,8 +103,11 @@ public class GroupManager {
     public static List<Group> getGroupsByServer(String server) {
         List<Group> result = new ArrayList<>();
         GROUPS.stream().filter(group -> {
-            GroupBlacklist groupBlacklist = group.getOrCreateGroupBlacklist(server);
-            return groupBlacklist != null && !groupBlacklist.getCommands().isEmpty() && groupBlacklist.getCommands().size() >= 1;
+            if (BlacklistCreator.exist(group.getGroupName(), server)) {
+                GroupBlacklist groupBlacklist = group.getOrCreateGroupBlacklist(server);
+                return (groupBlacklist != null && !groupBlacklist.getCommands().isEmpty() && groupBlacklist.getCommands().size() >= 1);
+            }
+            return false;
         }).forEach(result::add);
         return result;
     }

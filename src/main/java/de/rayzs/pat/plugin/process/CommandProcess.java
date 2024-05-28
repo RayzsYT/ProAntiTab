@@ -488,6 +488,7 @@ public class CommandProcess {
 
                                 bool = group.containsOnServer(extra, sub);
                                 if (!bool) {
+                                    group.getOrCreateGroupBlacklist(sub, true);
                                     group.add(extra, sub);
                                     handleChange();
                                 }
@@ -506,6 +507,7 @@ public class CommandProcess {
 
                                 bool = !group.containsOnServer(extra, sub);
                                 if (!bool) {
+                                    group.getOrCreateGroupBlacklist(sub, true);
                                     group.remove(extra, sub);
                                     handleChange();
                                 }
@@ -575,7 +577,7 @@ public class CommandProcess {
                 break;
 
             case 3:
-                if (!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer())
+                if (!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add"))
                     suggestions.addAll(GroupManager.getGroupNames());
                 if (!backend && Arrays.asList("remove", "rem", "rm").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "remove"))
                     suggestions.addAll(GroupManager.getGroupNamesByServer(args[2]));

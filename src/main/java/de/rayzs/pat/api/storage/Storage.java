@@ -7,6 +7,7 @@ import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -131,9 +132,9 @@ public class Storage {
             if(!Reflection.isProxyServer()) return;
 
             BLACKLIST.getConfig().getKeys("global.servers", true).forEach(key -> {
-                    GeneralBlacklist blacklist = BlacklistCreator.createGeneralBlacklist(key);
-                    blacklist.load();
-                    SERVER_BLACKLISTS.put(key, blacklist);
+                GeneralBlacklist blacklist = BlacklistCreator.createGeneralBlacklist(key);
+                blacklist.load();
+                SERVER_BLACKLISTS.put(key, blacklist);
             });
         }
 
@@ -209,13 +210,18 @@ public class Storage {
         }
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(targetObj))) return false;
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(targetObj)))
+                return false;
 
-            boolean blocked = isBlocked(targetObj, command, intensive);
-            if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                blocked = blacklist.isBlocked(targetObj, command, intensive);
-                if(blocked) break;
+            boolean blocked = isBlocked(targetObj, command, intensive),
+                    allow = false;
+
+            for (GeneralBlacklist blacklist : getBlacklists(server)) {
+                allow = !blacklist.isBlocked(targetObj, command, intensive);
+                if(allow) break;
             }
+
+            blocked = !allow && blocked;
             return blocked;
         }
 

@@ -10,7 +10,6 @@ public class BlacklistCreator {
     }
 
     public static GeneralBlacklist createGeneralBlacklist(String server) {
-        //return new GeneralBlacklist((server != null ? "servers." + server + "." : "") + "commands");
         return new GeneralBlacklist("servers." + server + ".commands");
     }
 
@@ -18,19 +17,21 @@ public class BlacklistCreator {
         return new GroupBlacklist(group, "commands");
     }
 
-    public static GroupBlacklist createGroupBlacklist(String group, String server) {
-        //return new GroupBlacklist(group, (server != null ? ".servers." + server : "") + ".commands");
+    public static GroupBlacklist createGroupBlacklist(String group, String server, boolean ignoreExist) {
+        server = server.toLowerCase();
+        if (!exist(group, server) && !ignoreExist)
+            return null;
         return new GroupBlacklist(group, "servers." + server + ".commands");
     }
 
     public static boolean exist(String server) {
-        //Object obj = Storage.Blacklist.getBlacklist().getConfig().get("general." + (server != null ? "servers." + server + "." : "") + "commands");
+        server = server.toLowerCase();
         Object obj = Storage.Blacklist.getBlacklist().getConfig().get("global.servers." + server);
         return obj != null;
     }
 
     public static boolean exist(String group, String server) {
-        //Object obj = Storage.Blacklist.getBlacklist().getConfig().get("groups." + group + "." + (server != null ? "servers." + server + "." : "") + "commands");
+        server = server.toLowerCase();
         Object obj = Storage.Blacklist.getBlacklist().getConfig().get("groups." + group + ".servers." + server);
         return obj != null;
     }

@@ -19,6 +19,13 @@ public class PermissionUtil {
     }
 
     public static boolean hasBypassPermission(Object targetObj, String command) {
+        if (command.contains(" ")) {
+            String[] split = command.split(" ");
+            if (split.length > 0)
+                command = split[0];
+            command = command.split(" ")[0];
+        }
+
         return hasBypassPermission(targetObj)
                 || hasPermission(targetObj, "bypass." + command.toLowerCase())
                 || hasServerPermission(targetObj, "bypass." + command.toLowerCase())
@@ -26,6 +33,14 @@ public class PermissionUtil {
     }
 
     public static boolean hasBypassPermission(Object targetObj, String command, String server) {
+        server = server.toLowerCase();
+        if (command.contains(" ")) {
+            String[] split = command.split(" ");
+            if (split.length > 0)
+                command = split[0];
+            command = command.split(" ")[0];
+        }
+
         return hasBypassPermission(targetObj)
                 || hasPermission(targetObj, "bypass." + command.toLowerCase())
                 || hasServerPermission(targetObj, "bypass." + command.toLowerCase())
