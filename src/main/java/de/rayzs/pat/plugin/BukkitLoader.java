@@ -108,7 +108,7 @@ public class BukkitLoader extends JavaPlugin {
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
     }
 
-    public static void synchronizeCommandData(PacketUtil.CommandsPacket packet, PacketUtil.UnknownCommandPacket unknownCommandPacket) {
+    public static void synchronizeCommandData(CommunicationPackets.CommandsPacket packet, CommunicationPackets.UnknownCommandPacket unknownCommandPacket) {
         ClientCommunication.sendFeedback();
 
         if(packet.getCommands() == null || packet.getCommands().isEmpty())
@@ -128,7 +128,7 @@ public class BukkitLoader extends JavaPlugin {
         if(!loaded) loaded = true;
     }
 
-    public static void synchronizeGroupData(PacketUtil.GroupsPacket packet) {
+    public static void synchronizeGroupData(CommunicationPackets.GroupsPacket packet) {
         GroupManager.clearAllGroups();
         packet.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getCommands()));
     }

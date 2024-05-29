@@ -1,6 +1,6 @@
 package de.rayzs.pat.api.communication.impl;
 
-import de.rayzs.pat.utils.PacketUtil;
+import de.rayzs.pat.utils.CommunicationPackets;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -18,7 +18,7 @@ public class BukkitClient implements Client, PluginMessageListener {
 
     @Override
     public void send(Object packet) {
-        try { SERVER.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, PacketUtil.convertToBytes(packet));
+        try { SERVER.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
 
@@ -26,8 +26,8 @@ public class BukkitClient implements Client, PluginMessageListener {
     public void onPluginMessageReceived(String channel, Player player, byte[] bytes) {
         if(!channel.equals(CHANNEL_NAME)) return;
         try {
-            Object packetObj = PacketUtil.buildFromBytes(bytes);
-            if(!PacketUtil.isPacket(packetObj)) return;
+            Object packetObj = CommunicationPackets.buildFromBytes(bytes);
+            if(!CommunicationPackets.isPacket(packetObj)) return;
 
             Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> ClientCommunication.receiveInformation("proxy", packetObj));
         } catch (Throwable throwable) { throwable.printStackTrace(); }
