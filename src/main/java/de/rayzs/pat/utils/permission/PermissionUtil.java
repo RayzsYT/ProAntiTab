@@ -27,10 +27,12 @@ public class PermissionUtil {
         if(!permissionMap.hasPermissionState("proantitab.*"))
             permissionMap.setState(permission, sender.hasPermission("proantitab.*"));
 
+        if(permissionMap.isPermitted("proantitab.*")) return true;
+
         if(!permissionMap.hasPermissionState("proantitab." + permission))
             permissionMap.setState(permission, sender.hasPermission("proantitab." + permission));
 
-        return permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
+        return permissionMap.isPermitted("proantitab." + permission);
     }
 
     public static boolean hasBypassPermission(Object targetObj) {
