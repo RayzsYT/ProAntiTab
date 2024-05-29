@@ -95,6 +95,19 @@ public class PacketUtil {
         }
     }
 
+    public static class ForcePermissionResetPacket implements Serializable {
+
+        private final String proxyToken;
+
+        public ForcePermissionResetPacket(String proxyToken) {
+            this.proxyToken = proxyToken;
+        }
+
+        public boolean isToken(String token) {
+            return proxyToken.equals(token);
+        }
+    }
+
     public static class PacketBundle implements CommunicationPacket, Serializable {
 
         private final CommandsPacket commandsPacket;
