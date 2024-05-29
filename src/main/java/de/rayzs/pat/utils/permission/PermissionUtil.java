@@ -4,7 +4,12 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandSender;
 import de.rayzs.pat.utils.group.GroupManager;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 public class PermissionUtil {
+
+    private static final HashMap<UUID, PermissionMap> MAP = new HashMap<>();
 
     public static boolean hasPermission(Object targetObj, String permission) {
         CommandSender sender;
@@ -12,7 +17,16 @@ public class PermissionUtil {
         if(targetObj instanceof CommandSender) sender = (CommandSender) targetObj;
         else sender = new CommandSender(targetObj);
 
-        return sender.hasPermission("proantitab.*") || sender.hasPermission("proantitab." + permission);
+        PermissionMap permissionMap = MAP.getOrDefault(sender.getUniqueId(), new PermissionMap(sender.getUniqueId()));
+        MAP.putIfAbsent(sender.getUniqueId(), permissionMap);
+
+        if(!permissionMap.hasPermissionState("proantitab.*"))
+            permissionMap.setStateIfEmpty(permission, sender.hasPermission("proantitab.*"));
+
+        if(!permissionMap.hasPermissionState("proantitab." + permission))
+            permissionMap.setStateIfEmpty(permission, sender.hasPermission("proantitab." + permission));
+
+        return permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
     }
 
     public static boolean hasBypassPermission(Object targetObj) {
