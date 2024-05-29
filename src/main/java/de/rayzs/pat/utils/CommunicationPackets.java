@@ -7,7 +7,7 @@ import de.rayzs.pat.utils.group.TinyGroup;
 import java.io.*;
 import java.util.List;
 
-public class PacketUtil {
+public class CommunicationPackets {
 
     public static byte[] convertToBytes(Object obj) {
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
