@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.luckperms;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.luckperms.api.model.user.User;
@@ -16,8 +17,8 @@ public class LuckPermsAdapter {
         LuckPerms provider = LuckPermsProvider.get();
         EventBus eventBus = provider.getEventBus();
 
-        eventBus.subscribe(provider, NodeAddEvent.class, LuckPermsAdapter::onNodeAdd);
-        eventBus.subscribe(provider, NodeRemoveEvent.class, LuckPermsAdapter::onNodeRemove);
+        eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeAddEvent.class, LuckPermsAdapter::onNodeAdd);
+        eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeRemoveEvent.class, LuckPermsAdapter::onNodeRemove);
     }
 
     private static void onNodeAdd(NodeAddEvent event) {
