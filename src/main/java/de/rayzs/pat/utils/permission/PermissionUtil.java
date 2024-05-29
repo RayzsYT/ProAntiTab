@@ -11,6 +11,10 @@ public class PermissionUtil {
 
     private static final HashMap<UUID, PermissionMap> MAP = new HashMap<>();
 
+    public static void resetPermissions() {
+        MAP.forEach((key, value) -> value.clear());
+    }
+
     public static boolean hasPermission(Object targetObj, String permission) {
         CommandSender sender;
 
@@ -21,10 +25,10 @@ public class PermissionUtil {
         MAP.putIfAbsent(sender.getUniqueId(), permissionMap);
 
         if(!permissionMap.hasPermissionState("proantitab.*"))
-            permissionMap.setStateIfEmpty(permission, sender.hasPermission("proantitab.*"));
+            permissionMap.setState(permission, sender.hasPermission("proantitab.*"));
 
         if(!permissionMap.hasPermissionState("proantitab." + permission))
-            permissionMap.setStateIfEmpty(permission, sender.hasPermission("proantitab." + permission));
+            permissionMap.setState(permission, sender.hasPermission("proantitab." + permission));
 
         return permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
     }
