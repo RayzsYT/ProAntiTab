@@ -13,6 +13,7 @@ import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.luckperms.LuckPermsAdapter;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
@@ -63,6 +64,10 @@ public class BukkitLoader extends JavaPlugin {
         manager.registerEvents(new BukkitBlockCommandListener(), this);
 
         registerCommand("proantitab", "pat");
+
+        if(getServer().getPluginManager().getPlugin("LuckPerms") != null)
+            LuckPermsAdapter.initialize();
+
         startUpdaterTask();
     }
 
