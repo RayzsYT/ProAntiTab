@@ -12,7 +12,7 @@ import net.luckperms.api.*;
 public class LuckPermsAdapter {
 
     public static void initialize() {
-        Logger.info("You're using LuckPerms? Hope you don't mind if I hook myself into it. ^^");
+        Logger.info("§aSuccessfully hooked into LuckPerms for easier usage.");
 
         LuckPerms provider = LuckPermsProvider.get();
         EventBus eventBus = provider.getEventBus();
