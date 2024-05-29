@@ -28,5 +28,9 @@ public class PermissionMap {
         return permissionMap.containsKey(permission);
     }
 
+    public UUID getUUID() {
+        return uuid;
+    }
+
     enum PermissionState { PERMITTED, DENIED, EMPTY }
 }
