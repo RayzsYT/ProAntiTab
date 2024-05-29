@@ -85,7 +85,7 @@ public class VelocityLoader {
             ClientCommunication.syncData();
         }).delay(2, TimeUnit.SECONDS).schedule();
 
-        if(server.getPluginManager().getPlugin("LuckPerms").isPresent())
+        if(server.getPluginManager().getPlugin("luckperms").isPresent())
             LuckPermsAdapter.initialize();
     }
 
