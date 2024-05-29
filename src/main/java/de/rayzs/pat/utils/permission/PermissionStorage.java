@@ -1,4 +1,4 @@
-package de.rayzs.pat.utils;
+package de.rayzs.pat.utils.permission;
 
 import java.util.*;
 
