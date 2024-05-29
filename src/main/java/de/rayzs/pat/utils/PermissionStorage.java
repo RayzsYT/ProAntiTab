@@ -11,6 +11,14 @@ public class PermissionStorage {
         this.uuid = uuid;
     }
 
+    public void remove(String permission) {
+        permissionMap.remove(permission);
+    }
+
+    public void clear() {
+        permissionMap.clear();
+    }
+
     public PermissionState getPermissionState(String permission) {
         if(!hasPermissionState(permission)) return PermissionState.EMPTY;
         return permissionMap.get(permission) ? PermissionState.PERMITTED : PermissionState.DENIED;
