@@ -3,6 +3,8 @@ package de.rayzs.pat.utils.permission;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandSender;
+import de.rayzs.pat.utils.luckperms.LuckPermsAdapter;
+
 import java.util.*;
 
 public class PermissionUtil {
@@ -13,32 +15,56 @@ public class PermissionUtil {
         MAP.forEach((key, value) -> value.clear());
     }
 
+    public static void reloadPermissions() {
+        MAP.forEach((key, value) -> {
+            value.clear();
+            setPlayerPermissions(key);
+        });
+    }
+
+    public static void setPlayerPermissions(UUID uuid) {
+        if(Storage.USE_LUCKPERMS) LuckPermsAdapter.setPermissions(uuid);
+    }
+
     public static void resetPermissions(UUID uuid) {
         if(!MAP.containsKey(uuid)) return;
         MAP.get(uuid).clear();
     }
 
+    public static void setPermission(UUID uuid, String permission, boolean permitted) {
+        PermissionMap permissionMap;
+        if(!MAP.containsKey(uuid)) return;
+        permissionMap = MAP.get(uuid);
+        MAP.putIfAbsent(uuid, permissionMap);
+        permissionMap.setState(permission, permitted);
+    }
+
     public static boolean hasPermission(Object targetObj, String permission) {
         CommandSender sender;
         PermissionMap permissionMap;
+        UUID uuid;
 
         if(targetObj instanceof CommandSender) sender = (CommandSender) targetObj;
         else sender = new CommandSender(targetObj);
+        if(sender.isConsole()) return true;
+        uuid = sender.getUniqueId();
 
-        if(!MAP.containsKey(sender.getUniqueId())) MAP.put(sender.getUniqueId(), new PermissionMap(sender.getUniqueId()));
+        if(!MAP.containsKey(uuid)) {
+            MAP.put(uuid, new PermissionMap(sender.getUniqueId()));
+            return false;
+        }
 
-        permissionMap = MAP.get(sender.getUniqueId());
-        MAP.putIfAbsent(sender.getUniqueId(), permissionMap);
+        permissionMap = MAP.get(uuid);
 
-        if(!permissionMap.hasPermissionState("proantitab.*"))
-            permissionMap.setState("proantitab.*", sender.hasPermission("proantitab.*"));
+        if(!Storage.USE_LUCKPERMS) {
+            if (permissionMap.hasPermissionState("proantitab.*"))
+                permissionMap.setState("proantitab.*", sender.hasPermission("proantitab.*"));
 
-        if(permissionMap.isPermitted("proantitab.*")) return true;
+            if (permissionMap.hasPermissionState("proantitab." + permission))
+                permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
+        }
 
-        if(!permissionMap.hasPermissionState("proantitab." + permission))
-            permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
-
-        return permissionMap.isPermitted("proantitab." + permission);
+        return permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
     }
 
     public static boolean hasBypassPermission(Object targetObj) {

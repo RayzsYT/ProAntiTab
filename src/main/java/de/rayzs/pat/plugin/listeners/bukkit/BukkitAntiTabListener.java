@@ -26,11 +26,13 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     public static void handleTabCompletion(List<String> commands) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            List<String> dummy = new ArrayList<>(commands);
-            PlayerCommandSendEvent event = new PlayerCommandSendEvent(player, dummy);
-            Bukkit.getPluginManager().callEvent(event);
-            player.updateCommands();
-        }
+        Bukkit.getOnlinePlayers().forEach(player -> handleTabCompletion(player, commands));
+    }
+
+    public static void handleTabCompletion(Player player, List<String> commands) {
+        List<String> dummy = new ArrayList<>(commands);
+        PlayerCommandSendEvent event = new PlayerCommandSendEvent(player, dummy);
+        Bukkit.getPluginManager().callEvent(event);
+        player.updateCommands();
     }
 }

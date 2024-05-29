@@ -26,6 +26,8 @@ public class VelocityConnectionListener {
     @Subscribe
     public void onServerPreConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
+        PermissionUtil.setPlayerPermissions(player.getUniqueId());
+
         if(Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
             server.getScheduler().buildTask(loader, () -> {
                 if (player.isActive())

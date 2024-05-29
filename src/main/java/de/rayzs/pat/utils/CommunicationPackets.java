@@ -1,6 +1,7 @@
 package de.rayzs.pat.utils;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.group.TinyGroup;
 
@@ -16,9 +17,7 @@ public class CommunicationPackets {
             outputStream.writeObject(obj);
             outputStream.flush();
             return arrayOutputStream.toByteArray();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
+        } catch (Exception ignored) { }
 
         return null;
     }
@@ -26,10 +25,10 @@ public class CommunicationPackets {
     public static Object buildFromBytes(byte[] bytes) {
         ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(bytes);
         try (ObjectInput input = new ObjectInputStream(arrayInputStream)) {
-            return input.readObject();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
+            Object object = input.readObject();
+            if (object.getClass() == null) return null;
+            return object;
+        } catch (Throwable ignored) { }
 
         return null;
     }

@@ -632,7 +632,7 @@ public class CommandProcess {
         if(!Reflection.isProxyServer()) {
             BackendUpdater.stop();
             BackendUpdater.start();
-            PermissionUtil.resetPermissions();
+            PermissionUtil.reloadPermissions();
             return;
         }
 

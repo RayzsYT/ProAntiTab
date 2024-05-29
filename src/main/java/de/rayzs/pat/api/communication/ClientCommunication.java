@@ -57,8 +57,8 @@ public class ClientCommunication {
             CommunicationPackets.ForcePermissionResetPacket permissionResetPacket = (CommunicationPackets.ForcePermissionResetPacket) packet;
             if(!permissionResetPacket.isToken(Storage.TOKEN)) return;
 
-            if(permissionResetPacket.hasTarget()) PermissionUtil.resetPermissions(permissionResetPacket.getTargetUUID());
-            else PermissionUtil.resetPermissions();
+            if(permissionResetPacket.hasTarget()) PermissionUtil.setPlayerPermissions(permissionResetPacket.getTargetUUID());
+            else PermissionUtil.reloadPermissions();
             return;
         }
 

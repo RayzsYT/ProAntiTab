@@ -21,6 +21,8 @@ public class BungeePlayerConnectionListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPostLogin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
+        PermissionUtil.setPlayerPermissions(player.getUniqueId());
+
         if(Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
                 if (player.isConnected()) {

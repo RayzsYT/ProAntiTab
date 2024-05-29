@@ -22,6 +22,7 @@ public class BukkitPlayerConnectionListener implements Listener {
         if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             BackendUpdater.handle();
 
+        PermissionUtil.setPlayerPermissions(player.getUniqueId());
         CustomServerBrand.preparePlayer(player);
         CustomServerBrand.sendBrandToPlayer(player);
 
