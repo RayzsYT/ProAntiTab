@@ -61,7 +61,7 @@ public class CommandSender {
     public UUID getUniqueId() {
         if(Reflection.isVelocityServer()) return sender instanceof com.velocitypowered.api.proxy.Player ? ((com.velocitypowered.api.proxy.Player) sender).getUniqueId() : CONSOLE_UUID;
         else if(Reflection.isProxyServer()) return  sender instanceof ProxiedPlayer ? ((ProxiedPlayer) sender).getUniqueId() : CONSOLE_UUID;
-        else if(sender instanceof Player) ((Player) sender).getUniqueId();
+        else if(sender instanceof Player) return ((Player) sender).getUniqueId();
         return CONSOLE_UUID;
     }
 }
