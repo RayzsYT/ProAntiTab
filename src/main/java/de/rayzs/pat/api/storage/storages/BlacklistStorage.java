@@ -1,7 +1,7 @@
 package de.rayzs.pat.api.storage.storages;
 
 import de.rayzs.pat.api.storage.*;
-import de.rayzs.pat.utils.PermissionUtil;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 
 import java.io.Serializable;
 import java.util.*;

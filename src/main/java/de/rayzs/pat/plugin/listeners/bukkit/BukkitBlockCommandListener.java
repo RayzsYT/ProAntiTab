@@ -2,8 +2,8 @@
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

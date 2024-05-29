@@ -2,7 +2,7 @@ package de.rayzs.pat.plugin.listeners.bungee;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.PermissionUtil;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.*;

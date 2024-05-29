@@ -10,7 +10,7 @@ import de.rayzs.pat.api.brand.impl.VelocityServerBrand;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.utils.PermissionUtil;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import java.util.concurrent.TimeUnit;
 
 public class VelocityConnectionListener {

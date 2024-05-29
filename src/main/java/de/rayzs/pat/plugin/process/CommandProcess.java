@@ -12,6 +12,7 @@ import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
