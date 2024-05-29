@@ -57,9 +57,6 @@ public class BungeeLoader extends Plugin {
         manager.registerListener(this, new BungeeBlockCommandListener());
         manager.registerListener(this, new BungeePingListener());
 
-        if(manager.getPlugin("LuckPerms") != null)
-            LuckPermsAdapter.initialize();
-
         try {
             Class.forName("io.github.waterfallmc.waterfall.QueryResult");
             manager.registerListener(this, new WaterfallAntiTabListener());
@@ -75,6 +72,9 @@ public class BungeeLoader extends Plugin {
             ClientCommunication.syncData();
             ClientCommunication.syncData();
         }, 5, TimeUnit.SECONDS);
+
+        if(manager.getPlugin("LuckPerms") != null)
+            LuckPermsAdapter.initialize();
     }
 
     @Override

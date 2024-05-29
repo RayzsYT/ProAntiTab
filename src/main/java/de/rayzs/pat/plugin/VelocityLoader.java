@@ -79,14 +79,14 @@ public class VelocityLoader {
         server.getEventManager().register(this, new VelocityConnectionListener(server, this));
         server.getEventManager().register(this, new VelocityPingListener(server));
 
-        if(server.getPluginManager().getPlugin("LuckPerms").isPresent())
-            LuckPermsAdapter.initialize();
-
         startUpdaterTask();
         server.getScheduler().buildTask(this, () -> {
             ClientCommunication.syncData();
             ClientCommunication.syncData();
         }).delay(2, TimeUnit.SECONDS).schedule();
+
+        if(server.getPluginManager().getPlugin("LuckPerms").isPresent())
+            LuckPermsAdapter.initialize();
     }
 
     public void startUpdaterTask() {
