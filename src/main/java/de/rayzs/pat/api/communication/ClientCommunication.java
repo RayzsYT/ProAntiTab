@@ -57,7 +57,8 @@ public class ClientCommunication {
             CommunicationPackets.ForcePermissionResetPacket permissionResetPacket = (CommunicationPackets.ForcePermissionResetPacket) packet;
             if(!permissionResetPacket.isToken(Storage.TOKEN)) return;
 
-            PermissionUtil.resetPermissions();
+            if(permissionResetPacket.hasTarget()) PermissionUtil.resetPermissions(permissionResetPacket.getTargetUUID());
+            else PermissionUtil.resetPermissions();
             return;
         }
 
@@ -158,6 +159,11 @@ public class ClientCommunication {
     public static void sendPermissionReset() {
         if(Reflection.isProxyServer())
             sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN));
+    }
+
+    public static void sendFeedback(UUID targetUUID) {
+        if(Reflection.isProxyServer())
+            sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN, targetUUID));
     }
 
     public static void sendFeedback() {

@@ -6,6 +6,7 @@ import de.rayzs.pat.utils.group.TinyGroup;
 
 import java.io.*;
 import java.util.List;
+import java.util.UUID;
 
 public class CommunicationPackets {
 
@@ -98,9 +99,23 @@ public class CommunicationPackets {
     public static class ForcePermissionResetPacket implements Serializable {
 
         private final String proxyToken;
+        private UUID targetUUID = null;
 
         public ForcePermissionResetPacket(String proxyToken) {
             this.proxyToken = proxyToken;
+        }
+
+        public ForcePermissionResetPacket(String proxyToken, UUID targetUUID) {
+            this.proxyToken = proxyToken;
+            this.targetUUID = targetUUID;
+        }
+
+        public UUID getTargetUUID() {
+            return targetUUID;
+        }
+
+        public boolean hasTarget() {
+            return targetUUID != null;
         }
 
         public boolean isToken(String token) {
