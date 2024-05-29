@@ -13,6 +13,7 @@ import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +49,15 @@ public class ClientCommunication {
             if (!client.compareId(requestPacket.getServerId())) client.setId(requestPacket.getServerId());
 
             syncData(client.getId());
+            return;
+        }
+
+        if(packet instanceof CommunicationPackets.ForcePermissionResetPacket) {
+            if(Reflection.isProxyServer()) return;
+            CommunicationPackets.ForcePermissionResetPacket permissionResetPacket = (CommunicationPackets.ForcePermissionResetPacket) packet;
+            if(!permissionResetPacket.isToken(Storage.TOKEN)) return;
+
+            PermissionUtil.resetPermissions();
             return;
         }
 
@@ -143,6 +153,11 @@ public class ClientCommunication {
             LAST_SENT_REQUEST = System.currentTimeMillis();
             sendPacket(new CommunicationPackets.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
         }
+    }
+
+    public static void sendPermissionReset() {
+        if(Reflection.isProxyServer())
+            sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN));
     }
 
     public static void sendFeedback() {
