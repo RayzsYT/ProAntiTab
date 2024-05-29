@@ -19,6 +19,18 @@ public class PermissionMap {
         permissionMap.clear();
     }
 
+    public void setState(String permission, boolean permitted) {
+        permissionMap.put(permission, permitted);
+    }
+
+    public void setStateIfEmpty(String permission, boolean permitted) {
+        permissionMap.putIfAbsent(permission, permitted);
+    }
+
+    public boolean isPermitted(String permission) {
+        return getPermissionState(permission) == PermissionState.PERMITTED;
+    }
+
     public PermissionState getPermissionState(String permission) {
         if(!hasPermissionState(permission)) return PermissionState.EMPTY;
         return permissionMap.get(permission) ? PermissionState.PERMITTED : PermissionState.DENIED;
