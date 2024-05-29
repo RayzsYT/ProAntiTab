@@ -20,20 +20,23 @@ public class PermissionUtil {
 
     public static boolean hasPermission(Object targetObj, String permission) {
         CommandSender sender;
+        PermissionMap permissionMap;
 
         if(targetObj instanceof CommandSender) sender = (CommandSender) targetObj;
         else sender = new CommandSender(targetObj);
 
-        PermissionMap permissionMap = MAP.getOrDefault(sender.getUniqueId(), new PermissionMap(sender.getUniqueId()));
+        if(!MAP.containsKey(sender.getUniqueId())) MAP.put(sender.getUniqueId(), new PermissionMap(sender.getUniqueId()));
+
+        permissionMap = MAP.get(sender.getUniqueId());
         MAP.putIfAbsent(sender.getUniqueId(), permissionMap);
 
         if(!permissionMap.hasPermissionState("proantitab.*"))
-            permissionMap.setState(permission, sender.hasPermission("proantitab.*"));
+            permissionMap.setState("proantitab.*", sender.hasPermission("proantitab.*"));
 
         if(permissionMap.isPermitted("proantitab.*")) return true;
 
         if(!permissionMap.hasPermissionState("proantitab." + permission))
-            permissionMap.setState(permission, sender.hasPermission("proantitab." + permission));
+            permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
 
         return permissionMap.isPermitted("proantitab." + permission);
     }
