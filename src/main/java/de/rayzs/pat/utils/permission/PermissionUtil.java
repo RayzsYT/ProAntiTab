@@ -1,11 +1,9 @@
 package de.rayzs.pat.utils.permission;
 
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandSender;
-import de.rayzs.pat.utils.group.GroupManager;
-
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class PermissionUtil {
 
@@ -13,6 +11,11 @@ public class PermissionUtil {
 
     public static void resetPermissions() {
         MAP.forEach((key, value) -> value.clear());
+    }
+
+    public static void resetPermissions(UUID uuid) {
+        if(!MAP.containsKey(uuid)) return;
+        MAP.get(uuid).clear();
     }
 
     public static boolean hasPermission(Object targetObj, String permission) {
