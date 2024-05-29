@@ -632,6 +632,10 @@ public class CommandProcess {
         if(!Reflection.isProxyServer()) {
             BackendUpdater.stop();
             BackendUpdater.start();
+            PermissionUtil.resetPermissions();
+            return;
         }
+
+        ClientCommunication.sendPermissionReset();
     }
 }
