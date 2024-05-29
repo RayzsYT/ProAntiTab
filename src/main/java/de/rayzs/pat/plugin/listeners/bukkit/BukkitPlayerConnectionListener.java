@@ -40,6 +40,7 @@ public class BukkitPlayerConnectionListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PacketAnalyzer.uninject(player.getUniqueId());
+        PermissionUtil.resetPermissions(player.getUniqueId());
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
         BukkitServerBrand.removeFromModified(player);
     }

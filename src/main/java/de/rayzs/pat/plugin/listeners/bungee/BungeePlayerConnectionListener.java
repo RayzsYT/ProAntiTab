@@ -40,6 +40,7 @@ public class BungeePlayerConnectionListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerDisconnectEvent(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
+        PermissionUtil.resetPermissions(player.getUniqueId());
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
         BungeeServerBrand.removeFromModified(player);
     }

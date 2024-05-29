@@ -44,6 +44,7 @@ public class VelocityConnectionListener {
     @Subscribe
     public void onDisconnect(DisconnectEvent event) {
         Player player = event.getPlayer();
+        PermissionUtil.resetPermissions(player.getUniqueId());
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
         VelocityServerBrand.removeFromModified(player);
     }
