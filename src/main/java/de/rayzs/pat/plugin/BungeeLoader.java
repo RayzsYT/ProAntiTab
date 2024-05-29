@@ -73,6 +73,8 @@ public class BungeeLoader extends Plugin {
             ClientCommunication.syncData();
         }, 5, TimeUnit.SECONDS);
 
+        Storage.PLUGIN_OBJECT = this;
+
         if(manager.getPlugin("LuckPerms") != null)
             LuckPermsAdapter.initialize();
     }

@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.luckperms;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.event.EventBus;
@@ -10,6 +11,8 @@ import net.luckperms.api.*;
 public class LuckPermsAdapter {
 
     public static void initialize() {
+        Logger.info("You're using LuckPerms? Hope you don't mind if I hook myself into it. ^^");
+
         LuckPerms provider = LuckPermsProvider.get();
         EventBus eventBus = provider.getEventBus();
 

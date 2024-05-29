@@ -66,6 +66,8 @@ public class BukkitLoader extends JavaPlugin {
         registerCommand("proantitab", "pat");
         startUpdaterTask();
 
+        Storage.PLUGIN_OBJECT = this;
+
         if(getServer().getPluginManager().getPlugin("LuckPerms") != null)
             LuckPermsAdapter.initialize();
     }

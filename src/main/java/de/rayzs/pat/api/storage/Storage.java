@@ -20,6 +20,7 @@ public class Storage {
 
     public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
+    public static Object PLUGIN_OBJECT;
 
     public static void loadAll(boolean loadBlacklist) {
         loadConfig();
