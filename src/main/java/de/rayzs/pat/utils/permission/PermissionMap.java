@@ -2,12 +2,12 @@ package de.rayzs.pat.utils.permission;
 
 import java.util.*;
 
-public class PermissionStorage {
+public class PermissionMap {
 
     private final UUID uuid;
     private final HashMap<String, Boolean> permissionMap = new HashMap<>();
 
-    public PermissionStorage(UUID uuid) {
+    public PermissionMap(UUID uuid) {
         this.uuid = uuid;
     }
 
