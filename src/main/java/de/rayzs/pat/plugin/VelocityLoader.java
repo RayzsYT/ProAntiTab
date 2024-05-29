@@ -20,6 +20,7 @@ import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.ClientCommunication;
+import de.rayzs.pat.utils.luckperms.LuckPermsAdapter;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.configuration.Configurator;
@@ -77,6 +78,9 @@ public class VelocityLoader {
         server.getEventManager().register(this, new VelocityAntiTabListener(server));
         server.getEventManager().register(this, new VelocityConnectionListener(server, this));
         server.getEventManager().register(this, new VelocityPingListener(server));
+
+        if(server.getPluginManager().getPlugin("LuckPerms").isPresent())
+            LuckPermsAdapter.initialize();
 
         startUpdaterTask();
         server.getScheduler().buildTask(this, () -> {

@@ -11,6 +11,7 @@ import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.luckperms.LuckPermsAdapter;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -55,6 +56,9 @@ public class BungeeLoader extends Plugin {
         manager.registerListener(this, new BungeeAntiTabListener());
         manager.registerListener(this, new BungeeBlockCommandListener());
         manager.registerListener(this, new BungeePingListener());
+
+        if(manager.getPlugin("LuckPerms") != null)
+            LuckPermsAdapter.initialize();
 
         try {
             Class.forName("io.github.waterfallmc.waterfall.QueryResult");
