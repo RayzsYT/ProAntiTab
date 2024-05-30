@@ -54,6 +54,7 @@ public class Reflection {
     public static boolean isVelocityServer() {
         return velocity;
     }
+    public static boolean isPaper() { return paper; }
 
     public static Class<?> getClass(String clazzPath) {
         Class<?> clazz = null;

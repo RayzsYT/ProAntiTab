@@ -6,6 +6,7 @@ import de.rayzs.pat.plugin.commands.BukkitCommand;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitBlockCommandListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitPlayerConnectionListener;
+import de.rayzs.pat.plugin.listeners.bukkit.PaperAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.api.netty.PacketAnalyzer;
@@ -59,7 +60,11 @@ public class BukkitLoader extends JavaPlugin {
             PacketAnalyzer.injectAll();
         } else BackendUpdater.handle();
 
-        if(Reflection.getMinor() >= 16) manager.registerEvents(new BukkitAntiTabListener(), this);
+        if(Reflection.getMinor() >= 16) {
+            manager.registerEvents(new BukkitAntiTabListener(), this);
+            if(Reflection.isPaper()) manager.registerEvents(new PaperAntiTabListener(), this);
+        }
+
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
 
@@ -130,7 +135,9 @@ public class BukkitLoader extends JavaPlugin {
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
 
-        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
+        if(Reflection.getMinor() >= 16)
+            BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
+
         if(!loaded) loaded = true;
     }
 
