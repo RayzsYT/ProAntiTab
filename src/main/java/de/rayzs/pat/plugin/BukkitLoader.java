@@ -62,7 +62,6 @@ public class BukkitLoader extends JavaPlugin {
 
         if(Reflection.getMinor() >= 16) {
             manager.registerEvents(new BukkitAntiTabListener(), this);
-            if(Reflection.isPaper()) manager.registerEvents(new PaperAntiTabListener(), this);
         }
 
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
