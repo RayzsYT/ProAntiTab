@@ -30,7 +30,11 @@ public class VelocityAntiTabListener {
         Player player = event.getPlayer();
         if(PermissionUtil.hasBypassPermission(player) || event.getRootNode().getChildren().isEmpty()) return;
 
-        event.getRootNode().getChildren().removeIf(command -> Storage.Blacklist.isBlocked(player, command.getName(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName()));
+        event.getRootNode().getChildren().removeIf(command -> {
+            if(command == null || command.getName() == null) return true;
+            String commandName = command.getName();
+            return Storage.Blacklist.isBlocked(player, commandName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName());
+        });
     }
 
     public static void updateCommands() {
