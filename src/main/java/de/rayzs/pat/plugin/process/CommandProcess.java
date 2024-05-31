@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.process;
 
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.communication.client.ClientInfo;
+import de.rayzs.pat.api.netty.PacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -621,10 +622,20 @@ public class CommandProcess {
 
     private static void handleChange() {
         if(Reflection.isProxyServer()) {
+
             ClientCommunication.syncData();
-            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+
+            if(Reflection.isVelocityServer())
+                VelocityAntiTabListener.updateCommands();
+
+            ClientCommunication.sendPermissionReset();
         } else {
-            if (Reflection.getMinor() >= 16) BukkitAntiTabListener.updateCommands();
+
+            if (Reflection.getMinor() >= 16) {
+                PermissionUtil.reloadPermissions();
+                BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
+            }
+
         }
     }
 
@@ -632,10 +643,6 @@ public class CommandProcess {
         if(!Reflection.isProxyServer()) {
             BackendUpdater.stop();
             BackendUpdater.start();
-            PermissionUtil.reloadPermissions();
-            return;
         }
-
-        ClientCommunication.sendPermissionReset();
     }
 }

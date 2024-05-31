@@ -28,7 +28,8 @@ public class VelocityAntiTabListener {
     @Subscribe (order = PostOrder.LAST)
     public void onPlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
         Player player = event.getPlayer();
-        if(PermissionUtil.hasBypassPermission(player) || event.getRootNode().getChildren().isEmpty()) return;
+        if(PermissionUtil.hasBypassPermission(player) || event.getRootNode().getChildren().isEmpty() || !player.getCurrentServer().isPresent())
+            return;
 
         event.getRootNode().getChildren().removeIf(command -> {
             if(command == null || command.getName() == null) return true;

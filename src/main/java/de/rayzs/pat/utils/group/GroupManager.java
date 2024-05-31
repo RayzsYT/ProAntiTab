@@ -15,13 +15,24 @@ public class GroupManager {
     }
 
     public static boolean canAccessCommand(Object targetObj, String command) {
-        return GROUPS.stream().filter(group -> group.contains(command) && group.hasPermission(targetObj)
-        ).findFirst().orElse(null) != null;
+        command = Storage.Blacklist.getBlacklist().convertCommand(command, true, false);
+
+        for (Group group : GROUPS)
+            if(group.contains(command))
+                if(group.hasPermission(targetObj)) return true;
+
+        return false;
     }
 
     public static boolean canAccessCommand(Object targetObj, String command, String server) {
-        return GROUPS.stream().filter(group -> group.contains(command) && group.hasPermission(targetObj)
-        ).findFirst().orElse(null) != null;
+        command = Storage.Blacklist.getBlacklist().convertCommand(command, true, false);
+        server = server.toLowerCase();
+
+        for (Group group : GROUPS)
+            if(group.contains(command, server))
+                if(group.hasPermission(targetObj)) return true;
+
+        return false;
     }
 
     public static void setGroup(String groupName, List<String> commands) {

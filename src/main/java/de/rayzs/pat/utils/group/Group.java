@@ -67,7 +67,7 @@ public class Group implements Serializable {
     }
 
     public boolean hasPermission(Object targetObj) {
-        return (PermissionUtil.hasPermission(targetObj, "group." + this.groupName) || PermissionUtil.hasServerPermission(targetObj, "group." + this.groupName));
+        return PermissionUtil.hasPermission(targetObj, "group." + this.groupName);
     }
 
     public boolean contains(String command) {
@@ -75,12 +75,10 @@ public class Group implements Serializable {
     }
 
     public boolean contains(String command, String server) {
-        server = server.toLowerCase();
         return (this.generalGroupBlacklist.isListed(command) || getOrCreateGroupBlacklist(server).isListed(command));
     }
 
     public boolean containsOnServer(String command, String server) {
-        server = server.toLowerCase();
         GroupBlacklist serverGroupBlacklist = getOrCreateGroupBlacklist(server);
         return (serverGroupBlacklist != null && serverGroupBlacklist.isListed(command));
     }

@@ -20,7 +20,7 @@ import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.ClientCommunication;
-import de.rayzs.pat.utils.luckperms.LuckPermsAdapter;
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.configuration.Configurator;

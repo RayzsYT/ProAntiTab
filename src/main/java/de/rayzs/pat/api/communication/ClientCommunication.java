@@ -100,6 +100,8 @@ public class ClientCommunication {
             CommunicationPackets.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
 
             LAST_BUKKIT_SYNC = System.currentTimeMillis();
+            Storage.VELOCITY_SYNC = packetBundle.isVelocity();
+
             BukkitLoader.synchronizeCommandData(commandsPacket, unknownCommandPacket);
             BukkitLoader.synchronizeGroupData(groupsPacket);
         }

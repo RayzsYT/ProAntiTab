@@ -3,7 +3,7 @@ package de.rayzs.pat.utils.permission;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandSender;
-import de.rayzs.pat.utils.luckperms.LuckPermsAdapter;
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 
 import java.util.*;
 
@@ -16,10 +16,13 @@ public class PermissionUtil {
     }
 
     public static void reloadPermissions() {
-        MAP.forEach((key, value) -> {
-            value.clear();
-            setPlayerPermissions(key);
-        });
+        MAP.keySet().forEach(PermissionUtil::reloadPermissions);
+    }
+
+    public static void reloadPermissions(UUID uuid) {
+        if(!MAP.containsKey(uuid)) return;
+        MAP.get(uuid).clear();
+        setPlayerPermissions(uuid);
     }
 
     public static void setPlayerPermissions(UUID uuid) {
@@ -33,9 +36,10 @@ public class PermissionUtil {
 
     public static void setPermission(UUID uuid, String permission, boolean permitted) {
         PermissionMap permissionMap;
-        if(!MAP.containsKey(uuid)) return;
-        permissionMap = MAP.get(uuid);
-        MAP.putIfAbsent(uuid, permissionMap);
+        if(!MAP.containsKey(uuid)) {
+            permissionMap = new PermissionMap(uuid);
+            MAP.put(uuid, permissionMap);
+        } else permissionMap = MAP.get(uuid);
         permissionMap.setState(permission, permitted);
     }
 
@@ -57,6 +61,9 @@ public class PermissionUtil {
         permissionMap = MAP.get(uuid);
 
         if(!Storage.USE_LUCKPERMS) {
+            if (permissionMap.hasPermissionState("*"))
+                permissionMap.setState("*", sender.hasPermission("*"));
+
             if (permissionMap.hasPermissionState("proantitab.*"))
                 permissionMap.setState("proantitab.*", sender.hasPermission("proantitab.*"));
 
@@ -64,7 +71,7 @@ public class PermissionUtil {
                 permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
         }
 
-        return permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
+        return permissionMap.isPermitted("*") || permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
     }
 
     public static boolean hasBypassPermission(Object targetObj) {
@@ -72,16 +79,10 @@ public class PermissionUtil {
     }
 
     public static boolean hasBypassPermission(Object targetObj, String command) {
-        if (command.contains(" ")) {
-            String[] split = command.split(" ");
-            if (split.length > 0)
-                command = split[0];
-            command = command.split(" ")[0];
-        }
+        command = Storage.Blacklist.convertCommand(command, false, true);
 
         return hasBypassPermission(targetObj)
                 || hasPermission(targetObj, "bypass." + command.toLowerCase())
-                || hasServerPermission(targetObj, "bypass." + command.toLowerCase())
                 || GroupManager.canAccessCommand(targetObj, command);
     }
 
@@ -96,31 +97,7 @@ public class PermissionUtil {
 
         return hasBypassPermission(targetObj)
                 || hasPermission(targetObj, "bypass." + command.toLowerCase())
-                || hasServerPermission(targetObj, "bypass." + command.toLowerCase())
                 || GroupManager.canAccessCommand(targetObj, command, server);
-    }
-
-    public static boolean hasServerPermission(Object targetObj, String permission) {
-        StringBuilder builder = new StringBuilder();
-        CommandSender sender = new CommandSender(targetObj);
-        String targetServerName = sender.getServerName();
-        boolean allowed = false, numeric = false;
-        if(targetServerName == null) return false;
-
-        if(!Character.isDigit(targetServerName.charAt(0)))
-            for (char c : targetServerName.toCharArray()) {
-                if (Character.isDigit(c)) {
-                    numeric = true;
-                    break;
-                }
-
-                builder.append(c);
-            }
-
-        if(numeric) allowed = hasPermission(targetObj, permission + "." + builder + ".*");
-        if(!allowed) allowed = hasPermission(targetObj, permission + "." + targetServerName);
-
-        return allowed;
     }
 
     public static boolean hasPermissionWithResponse(Object targetObj, String command) {

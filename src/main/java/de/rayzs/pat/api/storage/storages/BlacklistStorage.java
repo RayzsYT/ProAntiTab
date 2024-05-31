@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.storage.storages;
 
 import de.rayzs.pat.api.storage.*;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 
 import java.io.Serializable;
@@ -18,8 +19,14 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
         return isListed(command, false);
     }
 
-    public boolean isListed(String command, boolean intensive) {
-        command = command.toLowerCase();
+    public boolean isConverted(String command, boolean intensive) {
+        return !command.contains(" ") && (intensive && !command.contains(":"));
+    }
+
+    public String convertCommand(String command, boolean intensive, boolean lowerCase) {
+        if(isConverted(command, intensive)) return command;
+        if(lowerCase) command = command.toLowerCase();
+
         if(command.startsWith("/")) command = command.replaceFirst("/", "");
 
         String[] split;
@@ -31,9 +38,17 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
 
         if(intensive && command.contains(":")) {
             split = command.split(":");
-            if(split.length > 0)
+            if(split.length > 0) {
+
                 command = command.replaceFirst(split[0] + ":", "");
+            }
         }
+
+        return command;
+    }
+
+    public boolean isListed(String command, boolean intensive) {
+        if(!isConverted(command, intensive)) command = convertCommand(command, intensive, true);
 
         for (String commands : commands)
             if(commands.equals(command)) return true;
@@ -50,6 +65,13 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
             return !isListed(command, intensive) && !PermissionUtil.hasBypassPermission(targetObj, command);
         else
             return isListed(command, intensive) && !PermissionUtil.hasBypassPermission(targetObj, command);
+    }
+
+    public boolean isBlocked(String command, boolean intensive) {
+        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+            return !isListed(command, intensive);
+        else
+            return isListed(command, intensive);
     }
 
     public void setList(List<String> commands) {

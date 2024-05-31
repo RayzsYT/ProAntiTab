@@ -8,6 +8,7 @@ import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -21,7 +22,7 @@ public class Storage {
     public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
     public static Object PLUGIN_OBJECT;
-    public static boolean USE_LUCKPERMS = false;
+    public static boolean USE_LUCKPERMS = false, USE_VIAVERSION = false, VELOCITY_SYNC = false;
 
     public static void loadAll(boolean loadBlacklist) {
         loadConfig();
@@ -185,8 +186,7 @@ public class Storage {
         }
 
         public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj))) return true;
-            return false;
+            return GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj));
         }
 
         public static boolean isListed(Object playerObj, String command, boolean intensive, String server) {
@@ -243,22 +243,21 @@ public class Storage {
             return BLACKLIST.isBlocked(targetObj, command, intensive);
         }
 
+        public static boolean isBlocked(String command, boolean intensive) {
+            return BLACKLIST.isBlocked(command, intensive);
+        }
+
+        public static boolean isConverted(String command, boolean intensive) {
+            return BLACKLIST.isConverted(command, intensive);
+        }
+
+        public static String convertCommand(String command, boolean intensive, boolean lowercase) {
+            return BLACKLIST.convertCommand(command, intensive, lowercase);
+        }
+
         public static boolean isInListed(String command, List<String> commandList, boolean intensive) {
-            command = command.toLowerCase();
-            if(command.startsWith("/")) command = command.replaceFirst("/", "");
-
-            String[] split;
-            if(command.contains(" ")) {
-                split = command.split(" ");
-                if(split.length > 0) command = split[0];
-                command = command.split(" ")[0];
-            }
-
-            if(intensive && command.contains(":")) {
-                split = command.split(":");
-                if(split.length > 0)
-                    command = command.replaceFirst(split[0] + ":", "");
-            }
+            command = StringUtils.replaceFirst(command, "/", "");
+            command = convertCommand(command, intensive, false);
 
             for (String commands : commandList)
                 if(commands.equals(command)) return true;

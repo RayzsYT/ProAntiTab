@@ -11,10 +11,12 @@ import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.api.netty.PacketAnalyzer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.ClientCommunication;
+import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.luckperms.LuckPermsAdapter;
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.*;
@@ -59,9 +61,8 @@ public class BukkitLoader extends JavaPlugin {
             PacketAnalyzer.injectAll();
         } else BackendUpdater.handle();
 
-        if(Reflection.getMinor() >= 16) {
+        if(Reflection.getMinor() >= 16)
             manager.registerEvents(new BukkitAntiTabListener(), this);
-        }
 
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
@@ -71,8 +72,14 @@ public class BukkitLoader extends JavaPlugin {
 
         Storage.PLUGIN_OBJECT = this;
 
-        if(getServer().getPluginManager().getPlugin("LuckPerms") != null)
+        if(getServer().getPluginManager().getPlugin("LuckPerms") != null) {
             LuckPermsAdapter.initialize();
+            Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
+        }
+
+        if(getServer().getPluginManager().getPlugin("ViaVersion") != null) {
+            ViaVersionAdapter.initialize();
+        }
     }
 
     @Override
@@ -133,8 +140,9 @@ public class BukkitLoader extends JavaPlugin {
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
 
-        if(Reflection.getMinor() >= 16)
+        if(Reflection.getMinor() >= 16) {
             BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
+        }
 
         if(!loaded) loaded = true;
     }
