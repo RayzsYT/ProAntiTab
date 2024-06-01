@@ -8,7 +8,7 @@ import de.rayzs.pat.plugin.listeners.bukkit.BukkitBlockCommandListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitPlayerConnectionListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.bStats;
-import de.rayzs.pat.api.netty.PacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.PacketAnalyzer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.ClientCommunication;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;

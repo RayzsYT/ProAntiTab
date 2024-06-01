@@ -2,7 +2,6 @@ package de.rayzs.pat.plugin.process;
 
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.communication.client.ClientInfo;
-import de.rayzs.pat.api.netty.PacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.plugin.BukkitLoader;
