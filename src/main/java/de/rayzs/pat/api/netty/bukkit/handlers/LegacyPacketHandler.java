@@ -1,10 +1,10 @@
-package de.rayzs.pat.api.netty.handlers;
+package de.rayzs.pat.api.netty.bukkit.handlers;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.api.netty.PacketAnalyzer;
-import de.rayzs.pat.api.netty.PacketHandler;
+import de.rayzs.pat.api.netty.bukkit.PacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.PacketHandler;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import de.rayzs.pat.utils.*;

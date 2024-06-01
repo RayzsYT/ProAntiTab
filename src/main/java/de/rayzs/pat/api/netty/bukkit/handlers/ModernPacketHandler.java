@@ -1,10 +1,11 @@
-package de.rayzs.pat.api.netty.handlers;
+package de.rayzs.pat.api.netty.bukkit.handlers;
 
 import com.mojang.brigadier.suggestion.Suggestions;
+import de.rayzs.pat.api.netty.bukkit.PacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.PacketHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.api.netty.*;
 import org.bukkit.entity.Player;
 import java.lang.reflect.*;
 import de.rayzs.pat.utils.*;

@@ -1,4 +1,4 @@
-package de.rayzs.pat.api.netty;
+package de.rayzs.pat.api.netty.bukkit;
 
 import org.bukkit.entity.Player;
 

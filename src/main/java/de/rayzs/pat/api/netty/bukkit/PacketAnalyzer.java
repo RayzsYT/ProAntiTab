@@ -1,7 +1,7 @@
-package de.rayzs.pat.api.netty;
+package de.rayzs.pat.api.netty.bukkit;
 
-import de.rayzs.pat.api.netty.handlers.LegacyPacketHandler;
-import de.rayzs.pat.api.netty.handlers.ModernPacketHandler;
+import de.rayzs.pat.api.netty.bukkit.handlers.LegacyPacketHandler;
+import de.rayzs.pat.api.netty.bukkit.handlers.ModernPacketHandler;
 import de.rayzs.pat.utils.Reflection;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
