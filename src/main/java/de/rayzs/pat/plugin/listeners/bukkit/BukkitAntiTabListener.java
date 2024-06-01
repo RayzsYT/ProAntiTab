@@ -44,13 +44,11 @@ public class BukkitAntiTabListener implements Listener {
 
         if (PermissionUtil.hasBypassPermission(player)) return;
 
-        if(Storage.VELOCITY_SYNC) {
-            if(!Storage.USE_VIAVERSION)
-                if(Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754)
-                    event.getCommands().clear();
+        if(Storage.USE_VIAVERSION)
+            if(Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754)
+                event.getCommands().clear();
 
-            return;
-        }
+        if(Storage.VELOCITY_SYNC) return;
 
         List<String> commands = new LinkedList<>(COMMANDS);
         if (!(Storage.USE_LUCKPERMS && !LuckPermsAdapter.hasAnyPermissions(uuid))) {
@@ -66,26 +64,22 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     public static void updateCommands(Player player) {
-        if(Storage.VELOCITY_SYNC) return;
+        if(notUpdatablePlayer(player.getUniqueId())) return;
         if(Reflection.getMinor() >= 16) player.updateCommands();
     }
 
     public static void updateCommands() {
-        if(Storage.VELOCITY_SYNC) return;
         if(Reflection.getMinor() >= 16) Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::updateCommands);
     }
 
     public static void handleTabCompletion(List<String> commands) {
-        if(Storage.VELOCITY_SYNC) return;
-
-        long start = System.currentTimeMillis();
         COMMANDS = null;
         Bukkit.getOnlinePlayers().forEach(player -> handleTabCompletion(player, commands));
-        Logger.info("Took " + (System.currentTimeMillis() - start) + "ms to sync commands with players.");
     }
 
     public static void handleTabCompletion(UUID uuid, List<String> commands) {
-        if(Storage.VELOCITY_SYNC) return;
+        if(notUpdatablePlayer(uuid)) return;
+
         Player player = Bukkit.getPlayer(uuid);
         if(player == null) return;
         handleTabCompletion(player, commands);
@@ -93,10 +87,19 @@ public class BukkitAntiTabListener implements Listener {
 
 
     public static void handleTabCompletion(Player player, List<String> commands) {
-        if(Storage.VELOCITY_SYNC) return;
+        if(notUpdatablePlayer(player.getUniqueId())) return;
+
         List<String> dummy = new ArrayList<>(commands);
         PlayerCommandSendEvent event = new PlayerCommandSendEvent(player, dummy);
         Bukkit.getPluginManager().callEvent(event);
         updateCommands(player);
     }
+
+    private static boolean notUpdatablePlayer(UUID uuid) {
+        if(Storage.USE_VIAVERSION)
+            return Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754;
+
+        return false;
+    }
+
 }
