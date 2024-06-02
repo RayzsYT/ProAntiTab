@@ -15,6 +15,7 @@ import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
