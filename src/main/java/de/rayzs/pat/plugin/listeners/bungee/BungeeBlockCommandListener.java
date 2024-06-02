@@ -47,7 +47,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(Storage.Blacklist.isListed(command, true, player.getServer().getInfo().getName())) return;
+            if(Storage.Blacklist.isListed(player, command, true, player.getServer().getInfo().getName())) return;
             if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getServer().getInfo().getName())) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
             MessageTranslator.send(player, cancelCommandMessage);
