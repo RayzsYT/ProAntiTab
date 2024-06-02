@@ -43,7 +43,7 @@ public class LegacyPacketHandler implements PacketHandler {
             }
 
             cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-        }
+        } else return true;
 
         for (Field field : Reflection.getFields(packetObj)) {
             field.setAccessible(true);
@@ -58,6 +58,11 @@ public class LegacyPacketHandler implements PacketHandler {
             if(spaces == 0) {
                 for (String s : tR) {
                     if(!BukkitLoader.isLoaded()) continue;
+                    if(!s.startsWith("/")) {
+                        newResultList.add(s);
+                        continue;
+                    }
+
                     tempName = s.replaceFirst("/", "");
 
                     if (!Storage.Blacklist.isBlocked(player, tempName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
