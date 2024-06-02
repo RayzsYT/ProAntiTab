@@ -22,7 +22,9 @@ public class BukkitAntiTabListener implements Listener {
         UUID uuid = player.getUniqueId();
 
         if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !BukkitLoader.isLoaded()) {
-            event.getCommands().clear();
+            if(Storage.USE_VIAVERSION)
+                if(Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754)
+                    event.getCommands().clear();
             return;
         }
 
