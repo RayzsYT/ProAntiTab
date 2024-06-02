@@ -60,19 +60,19 @@ public class LuckPermsAdapter {
 
     private static void onNoteMutate(NodeMutateEvent event) {
         if (!event.isUser()) return;
+
         boolean relevant = false;
         for(Node node : event.getDataAfter()) {
-            if (node.getType() != NodeType.INHERITANCE
+            if (node.getType() != NodeType.INHERITANCE && node.getType() != NodeType.PERMISSION
                     || !(event.getTarget() instanceof User)
-                    || !node.getKey().startsWith("proantitab.")
-                    || !node.getKey().equals("*"))
+                    || !node.getKey().startsWith("proantitab.") && !node.getKey().equals("*")) {
                 continue;
+            }
             relevant = true;
             break;
         }
 
         if(!relevant) return;
-
         User user = (User) event.getTarget();
         PermissionUtil.reloadPermissions(user.getUniqueId());
     }
