@@ -36,7 +36,7 @@ public class Group implements Serializable {
     }
 
     public void add(String command, String server) {
-        GroupBlacklist serverGroupBlacklist = BlacklistCreator.createGroupBlacklist(this.groupName, server, true);
+        GroupBlacklist serverGroupBlacklist = getOrCreateGroupBlacklist(server, true);
         serverGroupBlacklist.load();
         serverGroupBlacklist.add(command).save();
     }
@@ -46,7 +46,7 @@ public class Group implements Serializable {
     }
 
     public void remove(String command, String server) {
-        GroupBlacklist serverGroupBlacklist = BlacklistCreator.createGroupBlacklist(this.groupName, server, true);
+        GroupBlacklist serverGroupBlacklist = getOrCreateGroupBlacklist(server, true);
         serverGroupBlacklist.load();
         serverGroupBlacklist.remove(command).save();
     }
@@ -56,7 +56,7 @@ public class Group implements Serializable {
     }
 
     public void clear(String server) {
-        GroupBlacklist serverGroupBlacklist = BlacklistCreator.createGroupBlacklist(this.groupName, server, true);
+        GroupBlacklist serverGroupBlacklist = getOrCreateGroupBlacklist(server, true);
         serverGroupBlacklist.clear().save();
         serverGroupBlacklist.load();
         Storage.Files.STORAGE.reload();
@@ -90,7 +90,7 @@ public class Group implements Serializable {
     public GroupBlacklist getOrCreateGroupBlacklist(String server, boolean ignoreExist) {
         GroupBlacklist groupBlacklist;
         server = server.toLowerCase();
-        if (this.groupServerBlacklist.containsKey(server))
+        if (this.groupServerBlacklist.containsKey(server) && this.groupServerBlacklist.get(server) != null)
             groupBlacklist = this.groupServerBlacklist.get(server);
         else {
             groupBlacklist = BlacklistCreator.createGroupBlacklist(this.groupName, server, ignoreExist);
