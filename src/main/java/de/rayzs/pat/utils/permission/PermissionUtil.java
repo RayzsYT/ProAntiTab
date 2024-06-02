@@ -21,6 +21,7 @@ public class PermissionUtil {
 
     public static void reloadPermissions(UUID uuid) {
         if(!MAP.containsKey(uuid)) return;
+
         MAP.get(uuid).clear();
         setPlayerPermissions(uuid);
     }
