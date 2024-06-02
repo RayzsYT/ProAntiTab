@@ -84,21 +84,36 @@ public class Group implements Serializable {
     }
 
     public GroupBlacklist getOrCreateGroupBlacklist(String server) {
-        return getOrCreateGroupBlacklist(server, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+        return getOrCreateGroupBlacklist(server, false);
     }
 
     public GroupBlacklist getOrCreateGroupBlacklist(String server, boolean ignoreExist) {
         GroupBlacklist groupBlacklist;
         server = server.toLowerCase();
-        if (this.groupServerBlacklist.containsKey(server)) {
+        if (this.groupServerBlacklist.containsKey(server))
             groupBlacklist = this.groupServerBlacklist.get(server);
-        } else {
+        else {
             groupBlacklist = BlacklistCreator.createGroupBlacklist(this.groupName, server, ignoreExist);
             this.groupServerBlacklist.put(server, groupBlacklist);
         }
         if (groupBlacklist != null)
             groupBlacklist.load();
         return groupBlacklist;
+    }
+
+    public List<GroupBlacklist> getAllServerGroupBlacklist(String server) {
+        List<GroupBlacklist> groupBlacklists = new ArrayList<>();
+        GroupBlacklist groupBlacklist;
+
+        for (String key : groupServerBlacklist.keySet()) {
+             if(!Storage.isServer(key, server)) continue;
+             groupBlacklist = groupServerBlacklist.get(key);
+
+             if(groupBlacklist == null) continue;
+             groupBlacklists.add(groupBlacklist);
+        }
+
+        return groupBlacklists;
     }
 
     public List<String> getCommands() {
@@ -111,6 +126,17 @@ public class Group implements Serializable {
         GroupBlacklist groupBlacklist = getOrCreateGroupBlacklist(server);
         if (groupBlacklist != null)
             commands.addAll(groupBlacklist.getCommands());
+
+        return commands;
+    }
+
+    public List<String> getAllCommands(String server) {
+        server = server.toLowerCase();
+        List<String> commands = new ArrayList<>(this.generalGroupBlacklist.getCommands());
+        GroupBlacklist groupBlacklist = getOrCreateGroupBlacklist(server);
+        if (groupBlacklist != null)
+            commands.addAll(groupBlacklist.getCommands());
+
         return commands;
     }
 
