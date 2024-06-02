@@ -9,7 +9,7 @@ import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.ClientCommunication;
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -52,9 +52,9 @@ public class CommandProcess {
 
                             int found = 0;
                             StringBuilder statsBuilder = new StringBuilder();
-                            for (int i = 0; i < ClientCommunication.CLIENTS.size(); i++) {
-                                bool = (i >= ClientCommunication.CLIENTS.size() - 1);
-                                ClientInfo client = ClientCommunication.CLIENTS.get(i);
+                            for (int i = 0; i < Communicator.CLIENTS.size(); i++) {
+                                bool = (i >= Communicator.CLIENTS.size() - 1);
+                                ClientInfo client = Communicator.CLIENTS.get(i);
                                 if(!client.hasSentFeedback()) continue;
                                 found++;
 
@@ -64,7 +64,7 @@ public class CommandProcess {
                             }
 
                             int finalFound = found;
-                            Storage.ConfigSections.Messages.STATS.STATISTIC.getLines().forEach(message -> sender.sendMessage(message.replace("%groups_amount%", String.valueOf(GroupManager.getGroupNames().size())).replace("%server_count%", String.valueOf(ClientCommunication.SERVER_DATA_SYNC_COUNT)).replace("%last_sync_time%", TimeConverter.calcAndGetTime(ClientCommunication.LAST_DATA_UPDATE)).replace("%servers%", finalFound > 0 ? statsBuilder : Storage.ConfigSections.Messages.STATS.NO_SERVER)));
+                            Storage.ConfigSections.Messages.STATS.STATISTIC.getLines().forEach(message -> sender.sendMessage(message.replace("%groups_amount%", String.valueOf(GroupManager.getGroupNames().size())).replace("%server_count%", String.valueOf(Communicator.SERVER_DATA_SYNC_COUNT)).replace("%last_sync_time%", TimeConverter.calcAndGetTime(Communicator.LAST_DATA_UPDATE)).replace("%servers%", finalFound > 0 ? statsBuilder : Storage.ConfigSections.Messages.STATS.NO_SERVER)));
                             return;
 
                         case "reload":
@@ -449,12 +449,12 @@ public class CommandProcess {
                                 StringBuilder commandsBuilder = new StringBuilder();
                                 for (int i = 0; i < group.getCommands(sub).size(); i++) {
                                     bool = (i >= group.getCommands(sub).size() - 1);
-                                    commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_COMMAND.replace("%command%", group.getCommands(sub).get(i)));
+                                    commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_COMMAND.replace("%command%", group.getAllCommands(sub).get(i)));
                                     if (!bool)
                                         commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_SPLITTER);
                                 }
 
-                                sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_MESSAGE.replace("%group%", group.getGroupName()).replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(group.getCommands(sub).size())).replace("%commands%", commandsBuilder.toString()));
+                                sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_MESSAGE.replace("%group%", group.getGroupName()).replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(group.getAllCommands(sub).size())).replace("%commands%", commandsBuilder.toString()));
                                 return;
                         }
                     }
@@ -622,12 +622,12 @@ public class CommandProcess {
     private static void handleChange() {
         if(Reflection.isProxyServer()) {
 
-            ClientCommunication.syncData();
+            Communicator.syncData();
 
             if(Reflection.isVelocityServer())
                 VelocityAntiTabListener.updateCommands();
 
-            ClientCommunication.sendPermissionReset();
+            Communicator.sendPermissionReset();
         } else {
 
             if (Reflection.getMinor() >= 16) {
