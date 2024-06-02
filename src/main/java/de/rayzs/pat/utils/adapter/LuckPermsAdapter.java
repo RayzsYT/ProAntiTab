@@ -79,6 +79,8 @@ public class LuckPermsAdapter {
         if(!relevant) return;
 
         User user = (User) event.getTarget();
-        PermissionUtil.reloadPermissions(user.getUniqueId());
+
+        if(Reflection.isProxyServer()) PermissionUtil.reloadPermissions(user.getUniqueId());
+        else BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
     }
 }
