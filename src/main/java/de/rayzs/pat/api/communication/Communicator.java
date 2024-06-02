@@ -18,7 +18,7 @@ import de.rayzs.pat.utils.permission.PermissionUtil;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class ClientCommunication {
+public class Communicator {
 
     private static final Client CLIENT = Reflection.isVelocityServer() ? new VelocityClient() : Reflection.isProxyServer() ? new BungeeClient() : new BukkitClient();
     private static final UUID SERVER_ID = UUID.randomUUID();
