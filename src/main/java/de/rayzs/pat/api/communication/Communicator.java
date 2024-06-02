@@ -4,6 +4,7 @@ import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.communication.client.impl.BungeeClientInfo;
 import de.rayzs.pat.api.communication.client.impl.VelocityClientInfo;
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.communication.impl.*;
 import de.rayzs.pat.api.storage.Storage;
@@ -137,13 +138,20 @@ public class Communicator {
         }
 
         String serverName = clientInfo.getName();
-        List<Group> groups = GroupManager.getGroupsByServer(serverName);
-        GroupManager.getGroups().stream().filter(group -> !groups.contains(group)).forEach(groups::add);
-        List<TinyGroup> newGroupList = new ArrayList<>();
+        List<TinyGroup> groups = new ArrayList<>();
 
-        groups.forEach(oldGroup -> newGroupList.add(GroupManager.convertToTinyGroup(oldGroup.getGroupName(), oldGroup.getCommands(serverName))));
-        groupsPacket = new CommunicationPackets.GroupsPacket(newGroupList);
+        TinyGroup tinyGroup;
+        for (Group group : GroupManager.getGroups()) {
+            if(groups.stream().anyMatch(cTG -> cTG.getGroupName().equals(group.getGroupName()))) continue;
 
+            tinyGroup = new TinyGroup(group.getGroupName(), group.getAllCommands(serverName));
+            for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(serverName))
+                tinyGroup.addAll(groupBlacklist.getCommands());
+
+            groups.add(tinyGroup);
+        }
+
+        groupsPacket = new CommunicationPackets.GroupsPacket(groups);
         commandsPacket.setTurnBlacklistToWhitelist(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         commandsPacket.setCommands(commands);
 
