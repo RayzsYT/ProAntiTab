@@ -2,7 +2,6 @@ package de.rayzs.pat.plugin.listeners.bukkit;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.permission.PermissionUtil;
