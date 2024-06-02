@@ -71,20 +71,20 @@ public class Group implements Serializable {
     }
 
     public boolean contains(String command) {
-        return this.generalGroupBlacklist.isListed(command);
+        return this.generalGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
     }
 
     public boolean contains(String command, String server) {
-        return (this.generalGroupBlacklist.isListed(command) || getOrCreateGroupBlacklist(server).isListed(command));
+        return (this.generalGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) || getOrCreateGroupBlacklist(server).isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED));
     }
 
     public boolean containsOnServer(String command, String server) {
         GroupBlacklist serverGroupBlacklist = getOrCreateGroupBlacklist(server);
-        return (serverGroupBlacklist != null && serverGroupBlacklist.isListed(command));
+        return (serverGroupBlacklist != null && serverGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED));
     }
 
     public GroupBlacklist getOrCreateGroupBlacklist(String server) {
-        return getOrCreateGroupBlacklist(server, false);
+        return getOrCreateGroupBlacklist(server, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
     }
 
     public GroupBlacklist getOrCreateGroupBlacklist(String server, boolean ignoreExist) {

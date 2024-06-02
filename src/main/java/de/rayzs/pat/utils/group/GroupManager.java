@@ -15,7 +15,7 @@ public class GroupManager {
     }
 
     public static boolean canAccessCommand(Object targetObj, String command) {
-        command = Storage.Blacklist.getBlacklist().convertCommand(command, true, false);
+        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false);
 
         for (Group group : GROUPS)
             if(group.contains(command))

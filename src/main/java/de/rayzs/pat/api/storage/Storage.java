@@ -170,7 +170,7 @@ public class Storage {
         public static boolean isListed(String command, String server) {
             boolean blocked = isBlocked(command, server);
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                blocked = blacklist.isBlocked(command, server);
+                blocked = blacklist.isBlocked(command, server, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
                 if(blocked) break;
             }
             return blocked;
@@ -201,11 +201,11 @@ public class Storage {
         }
 
         public static boolean isBlocked(Object playerObj, String command, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), false) && group.hasPermission(playerObj))) return false;
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) && group.hasPermission(playerObj))) return false;
 
             boolean blocked = isBlocked(playerObj, command);
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                blocked = blacklist.isBlocked(playerObj, command);
+                blocked = blacklist.isBlocked(playerObj, command, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
                 if(blocked) break;
             }
             return blocked;
