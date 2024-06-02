@@ -2,6 +2,7 @@ package de.rayzs.pat.api.storage;
 
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
@@ -10,6 +11,7 @@ import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 
 import java.util.*;
@@ -185,7 +187,13 @@ public class Storage {
         }
 
         public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, String server) {
-            return GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(playerObj));
+            for (Group group : GroupManager.getGroups()) {
+                for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(server)) {
+                    if(groupBlacklist.isListed(command, intensive) && group.hasPermission(playerObj)) return true;
+                }
+            }
+
+            return false;
         }
 
         public static boolean isListed(Object playerObj, String command, boolean intensive, String server) {
