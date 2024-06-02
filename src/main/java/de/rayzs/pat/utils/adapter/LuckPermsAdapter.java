@@ -5,6 +5,7 @@ import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import net.luckperms.api.event.sync.PreNetworkSyncEvent;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.event.EventBus;
 import net.luckperms.api.event.node.*;
@@ -24,6 +25,9 @@ public class LuckPermsAdapter {
         EventBus eventBus = PROVIDER.getEventBus();
 
         eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeMutateEvent.class, LuckPermsAdapter::onNoteMutate);
+
+        if(!Reflection.isProxyServer())
+            eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitAntiTabListener.luckpermsNetworkSync());
     }
 
 
@@ -73,6 +77,7 @@ public class LuckPermsAdapter {
         }
 
         if(!relevant) return;
+
         User user = (User) event.getTarget();
         PermissionUtil.reloadPermissions(user.getUniqueId());
     }
