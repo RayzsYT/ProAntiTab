@@ -84,6 +84,9 @@ public class BukkitAntiTabListener implements Listener {
         handleTabCompletion(player, commands);
     }
 
+    public static void luckpermsNetworkSync() {
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), PermissionUtil::reloadPermissions, 40);
+    }
 
     public static void handleTabCompletion(Player player, List<String> commands) {
         if(notUpdatablePlayer(player.getUniqueId())) return;
