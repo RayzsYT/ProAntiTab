@@ -7,7 +7,6 @@ import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.plugin.VelocityLoader;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
@@ -186,11 +185,11 @@ public class Storage {
         }
 
         public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, String server) {
-            return GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj));
+            return GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(playerObj));
         }
 
         public static boolean isListed(Object playerObj, String command, boolean intensive, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(playerObj))) return false;
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(playerObj))) return false;
 
             boolean blocked = isListed(command, intensive);
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
@@ -200,19 +199,20 @@ public class Storage {
             return blocked;
         }
 
-        public static boolean isBlocked(Object playerObj, String command, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) && group.hasPermission(playerObj))) return false;
+        public static boolean isBlocked(Object targetObj, String command, String server) {
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) && group.hasPermission(targetObj)))
+                return false;
 
-            boolean blocked = isBlocked(playerObj, command);
+            boolean blocked = isBlocked(targetObj, command);
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                blocked = blacklist.isBlocked(playerObj, command, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+                blocked = blacklist.isBlocked(targetObj, command, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
                 if(blocked) break;
             }
             return blocked;
         }
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getCommands(server), intensive) && group.hasPermission(targetObj)))
+            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(targetObj)))
                 return false;
 
             boolean blocked = isBlocked(targetObj, command, intensive),
