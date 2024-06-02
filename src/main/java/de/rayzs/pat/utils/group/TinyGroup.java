@@ -13,6 +13,15 @@ public class TinyGroup implements Serializable {
         this.commands = commands;
     }
 
+    public void add(String command) {
+        if(this.commands.contains(command)) return;
+        this.commands.add(command);
+    }
+
+    public void addAll(List<String> commands) {
+        commands.forEach(this::add);
+    }
+
     public String getGroupName() {
         return groupName;
     }
