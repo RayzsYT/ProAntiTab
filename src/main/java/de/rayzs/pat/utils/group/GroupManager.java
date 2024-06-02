@@ -12,6 +12,12 @@ public class GroupManager {
 
     public static void initialize() {
         Storage.Files.STORAGE.getKeys("groups", false).forEach(GroupManager::registerGroup);
+        if(!Reflection.isProxyServer()) return;
+        getGroups().forEach(group -> {
+            Storage.Files.STORAGE.getKeys("groups." + group.getGroupName() + ".servers", false).forEach(key -> {
+                group.getOrCreateGroupBlacklist(key, true);
+            });
+        });
     }
 
     public static boolean canAccessCommand(Object targetObj, String command) {
@@ -25,7 +31,7 @@ public class GroupManager {
     }
 
     public static boolean canAccessCommand(Object targetObj, String command, String server) {
-        command = Storage.Blacklist.getBlacklist().convertCommand(command, true, false);
+        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false);
         server = server.toLowerCase();
 
         for (Group group : GROUPS)
