@@ -150,9 +150,6 @@ public class BukkitLoader extends JavaPlugin {
 
     public static void synchronizeGroupData(CommunicationPackets.GroupsPacket packet) {
         GroupManager.clearAllGroups();
-        for (TinyGroup g : packet.getGroups()) {
-            System.out.println(g.getGroupName() + ": " + Arrays.toString(g.getCommands().toArray()));
-        }
         packet.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getCommands()));
     }
 
