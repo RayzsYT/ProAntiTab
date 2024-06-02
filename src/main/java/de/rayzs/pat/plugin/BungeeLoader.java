@@ -8,7 +8,7 @@ import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.ClientCommunication;
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
@@ -69,8 +69,8 @@ public class BungeeLoader extends Plugin {
 
         startUpdaterTask();
         ProxyServer.getInstance().getScheduler().schedule(this, () -> {
-            ClientCommunication.syncData();
-            ClientCommunication.syncData();
+            Communicator.syncData();
+            Communicator.syncData();
         }, 5, TimeUnit.SECONDS);
 
         Storage.PLUGIN_OBJECT = this;

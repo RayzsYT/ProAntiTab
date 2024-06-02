@@ -21,7 +21,7 @@ public class BackendUpdater {
         if(TASK != -1) return;
 
         TASK = Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
-            if(shouldRun()) ClientCommunication.sendRequest();
+            if(shouldRun()) Communicator.sendRequest();
             else stop();
         }, 5, 20);
     }

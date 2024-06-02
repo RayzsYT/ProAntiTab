@@ -29,7 +29,7 @@ public class BukkitClient implements Client, PluginMessageListener {
             Object packetObj = CommunicationPackets.buildFromBytes(bytes);
             if(!CommunicationPackets.isPacket(packetObj)) return;
 
-            Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> ClientCommunication.receiveInformation("proxy", packetObj));
+            Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> Communicator.receiveInformation("proxy", packetObj));
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
 }

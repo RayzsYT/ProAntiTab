@@ -8,7 +8,7 @@ import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.api.communication.Client;
-import de.rayzs.pat.api.communication.ClientCommunication;
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.CommunicationPackets;
 
 public class VelocityClient implements Client {
@@ -36,7 +36,7 @@ public class VelocityClient implements Client {
         if(!CommunicationPackets.isPacket(packetObj)) return;
 
         ServerConnection server = (ServerConnection) event.getSource();
-        ClientCommunication.receiveInformation(server.getServerInfo().getName(), packetObj);
+        Communicator.receiveInformation(server.getServerInfo().getName(), packetObj);
     }
 
     public static MinecraftChannelIdentifier getIdentifier() {

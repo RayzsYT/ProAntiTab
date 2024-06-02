@@ -19,7 +19,7 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.ClientCommunication;
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
@@ -81,8 +81,8 @@ public class VelocityLoader {
 
         startUpdaterTask();
         server.getScheduler().buildTask(this, () -> {
-            ClientCommunication.syncData();
-            ClientCommunication.syncData();
+            Communicator.syncData();
+            Communicator.syncData();
         }).delay(2, TimeUnit.SECONDS).schedule();
 
         Storage.PLUGIN_OBJECT = this;

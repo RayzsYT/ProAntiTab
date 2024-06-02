@@ -10,7 +10,7 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.api.netty.bukkit.PacketAnalyzer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.ClientCommunication;
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -126,7 +126,7 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public static void synchronizeCommandData(CommunicationPackets.CommandsPacket packet, CommunicationPackets.UnknownCommandPacket unknownCommandPacket) {
-        ClientCommunication.sendFeedback();
+        Communicator.sendFeedback();
 
         if(packet.getCommands() == null || packet.getCommands().isEmpty())
             Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
@@ -150,6 +150,9 @@ public class BukkitLoader extends JavaPlugin {
 
     public static void synchronizeGroupData(CommunicationPackets.GroupsPacket packet) {
         GroupManager.clearAllGroups();
+        for (TinyGroup g : packet.getGroups()) {
+            System.out.println(g.getGroupName() + ": " + Arrays.toString(g.getCommands().toArray()));
+        }
         packet.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getCommands()));
     }
 
