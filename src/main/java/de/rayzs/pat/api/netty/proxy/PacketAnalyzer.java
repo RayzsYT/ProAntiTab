@@ -16,7 +16,7 @@ public class PacketAnalyzer {
     public static final ConcurrentHashMap<UUID, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
 
     private static final String PIPELINE_NAME = "pat-packethandler", HANDLER_NAME = "packet_handler";
-    private static final PacketHandler PACKET_HANDLER = Reflection.getMinor() >= 16 ? new BungeePacketHandler() : new VelocityPacketHandler();
+    private static final PacketHandler PACKET_HANDLER = Reflection.isVelocityServer() ? new VelocityPacketHandler() : new BungeePacketHandler();
     private static final HashMap<UUID, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
     public static void uninjectAll() {
