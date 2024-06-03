@@ -30,6 +30,11 @@
         </repository>
 
         <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+
+        <repository>
             <id>velocity</id>
             <url>https://repo.velocitypowered.com/snapshots/</url>
         </repository>
@@ -79,6 +84,13 @@
             <version>1.20-R0.3-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-protocol</artifactId>
+            <version>1.16-R0.4</version>
+        </dependency>
+
 
         <dependency>
             <groupId>com.mojang</groupId>
