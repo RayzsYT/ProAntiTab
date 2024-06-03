@@ -75,7 +75,7 @@ public class BungeeLoader extends Plugin {
 
         Storage.PLUGIN_OBJECT = this;
 
-        if(manager.getPlugin("LuckPerms") != null)
+        if (manager.getPlugin("LuckPerms") != null)
             LuckPermsAdapter.initialize();
     }
 
