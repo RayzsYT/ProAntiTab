@@ -7,9 +7,8 @@ import com.mojang.brigadier.tree.CommandNode;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import io.netty.channel.*;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.md_5.bungee.api.ProxyServer;
@@ -18,7 +17,6 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Commands;
 import net.md_5.bungee.protocol.packet.TabCompleteResponse;
-
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +27,7 @@ public class BungeePacketAnalyzer {
 
     private static final String PIPELINE_NAME = "pat-bungee-packethandler", HANDLER_NAME = "packet-decoder";
     private static final HashMap<ProxiedPlayer, Boolean> PLAYER_MODIFIED = new HashMap<>();
+    private static final HashMap<ProxiedPlayer, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
     private static final com.mojang.brigadier.Command DUMMY_COMMAND = (context) -> 0;
 
@@ -107,6 +106,16 @@ public class BungeePacketAnalyzer {
         }
     }
 
+    public static String getPlayerInput(ProxiedPlayer player) {
+        String input = PLAYER_INPUT_CACHE.get(player);
+        PLAYER_INPUT_CACHE.remove(player);
+        return input;
+    }
+
+    public static void insertPlayerInput(ProxiedPlayer player, String text) {
+        PLAYER_INPUT_CACHE.put(player, text);
+    }
+
     private static void modifyCommands(ProxiedPlayer player, Commands commands, List<String> list) {
         list.clear();
 
@@ -144,8 +153,6 @@ public class BungeePacketAnalyzer {
                 return;
             }
 
-            System.out.println(wrapper.packet.getClass());
-
             if (wrapper.packet instanceof Commands) {
                 if(isPlayerModified(player)) return;
                 setPlayerModification(player, true);
@@ -158,12 +165,32 @@ public class BungeePacketAnalyzer {
                 TabCompleteResponse response = (TabCompleteResponse) wrapper.packet;
 
                 if(player.getPendingConnection().getVersion() < 754) {
-                    ClientInfo clientInfo = Communicator.getClientByName(player.getServer().getInfo().getName());
-                    if(clientInfo == null || !clientInfo.hasVersion()) return;
+                    if(!PermissionUtil.hasBypassPermission(player)) {
 
-                    if(clientInfo.getRelease() == 16 && clientInfo.getMinor() == 5 || clientInfo.getMinor() > 16) {
-                        Storage.Blacklist.getAllBlacklists(player.getServer().getInfo().getName()).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !response.getCommands().contains("/" + command)).forEach(command -> response.getCommands().add("/" + command)));
-                        player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
+                        ClientInfo clientInfo = Communicator.getClientByName(player.getServer().getInfo().getName());
+                        if (clientInfo == null || !clientInfo.hasVersion() || !PLAYER_INPUT_CACHE.containsKey(player))
+                            return;
+
+                        if (clientInfo.getRelease() == 16 && clientInfo.getMinor() == 5 || clientInfo.getMinor() > 16) {
+                            String cursor = getPlayerInput(player);
+                            int spaces = 0;
+
+                            if(cursor.contains(" ")) {
+                                String[] split = cursor.split(" ");
+                                if(split.length > 0) spaces = split.length;
+                            }
+
+                            if(cursor.startsWith("/") && spaces == 0) {
+                                if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+                                    List<String> suggestions = new ArrayList<>(response.getCommands());
+                                    Storage.Blacklist.getAllBlacklists(player.getServer().getInfo().getName()).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !suggestions.contains("/" + command)).forEach(command -> suggestions.add("/" + command)));
+                                    suggestions.stream().filter(suggestion -> suggestion.startsWith(cursor) && response.getCommands().contains(suggestion)).forEach(command -> response.getCommands().add(command));
+                                }
+                                else response.getCommands().removeIf(command -> Storage.Blacklist.isBlocked(player, command, true));
+
+                                player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
+                            }
+                        }
                     }
                 }
             }
