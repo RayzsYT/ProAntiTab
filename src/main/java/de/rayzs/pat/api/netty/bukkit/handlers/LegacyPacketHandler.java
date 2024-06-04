@@ -3,14 +3,14 @@ package de.rayzs.pat.api.netty.bukkit.handlers;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.api.netty.bukkit.PacketAnalyzer;
-import de.rayzs.pat.api.netty.bukkit.PacketHandler;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketHandler;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 
-public class LegacyPacketHandler implements PacketHandler {
+public class LegacyPacketHandler implements BukkitPacketHandler {
 
     @Override
     public boolean handleIncomingPacket(Player player, Object packetObj) throws Exception {
@@ -21,13 +21,13 @@ public class LegacyPacketHandler implements PacketHandler {
         }
 
         String text = (String) stringField.get(packetObj);
-        PacketAnalyzer.insertPlayerInput(player, text);
+        BukkitPacketAnalyzer.insertPlayerInput(player, text);
         return true;
     }
 
     @Override
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
-        String input = PacketAnalyzer.getPlayerInput(player);
+        String input = BukkitPacketAnalyzer.getPlayerInput(player);
 
         if(input == null) return false;
 

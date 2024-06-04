@@ -10,21 +10,21 @@ import org.bukkit.entity.Player;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PacketAnalyzer {
+public class BukkitPacketAnalyzer {
 
     public static final ConcurrentHashMap<UUID, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
 
     private static final String PIPELINE_NAME = "pat-packethandler", HANDLER_NAME = "packet_handler";
-    private static final PacketHandler PACKET_HANDLER = Reflection.getMinor() >= 16 ? new ModernPacketHandler() : new LegacyPacketHandler();
+    private static final BukkitPacketHandler PACKET_HANDLER = Reflection.getMinor() >= 16 ? new ModernPacketHandler() : new LegacyPacketHandler();
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
     public static void injectAll() {
-        Bukkit.getOnlinePlayers().forEach(PacketAnalyzer::inject);
+        Bukkit.getOnlinePlayers().forEach(BukkitPacketAnalyzer::inject);
     }
 
     public static void uninjectAll() {
-        PacketAnalyzer.INJECTED_PLAYERS.keySet().forEach(PacketAnalyzer::uninject);
-        PacketAnalyzer.INJECTED_PLAYERS.clear();
+        BukkitPacketAnalyzer.INJECTED_PLAYERS.keySet().forEach(BukkitPacketAnalyzer::uninject);
+        BukkitPacketAnalyzer.INJECTED_PLAYERS.clear();
     }
 
     public static boolean inject(Player player) {
@@ -35,8 +35,8 @@ public class PacketAnalyzer {
                 return false;
             }
 
-            channel.pipeline().addBefore(PacketAnalyzer.HANDLER_NAME, PacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
-            PacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
+            channel.pipeline().addBefore(BukkitPacketAnalyzer.HANDLER_NAME, BukkitPacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
+            BukkitPacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return false;
@@ -44,13 +44,13 @@ public class PacketAnalyzer {
     }
 
     public static void uninject(UUID uuid) {
-        if(PacketAnalyzer.INJECTED_PLAYERS.containsKey(uuid)) {
-            Channel channel = PacketAnalyzer.INJECTED_PLAYERS.get(uuid);
+        if(BukkitPacketAnalyzer.INJECTED_PLAYERS.containsKey(uuid)) {
+            Channel channel = BukkitPacketAnalyzer.INJECTED_PLAYERS.get(uuid);
             if(channel != null) {
-                PacketAnalyzer.INJECTED_PLAYERS.remove(uuid);
+                BukkitPacketAnalyzer.INJECTED_PLAYERS.remove(uuid);
                 channel.eventLoop().submit(() -> {
                     ChannelPipeline pipeline = channel.pipeline();
-                    if (pipeline.names().contains(PacketAnalyzer.PIPELINE_NAME)) pipeline.remove(PacketAnalyzer.PIPELINE_NAME);
+                    if (pipeline.names().contains(BukkitPacketAnalyzer.PIPELINE_NAME)) pipeline.remove(BukkitPacketAnalyzer.PIPELINE_NAME);
                 });
             }
         }

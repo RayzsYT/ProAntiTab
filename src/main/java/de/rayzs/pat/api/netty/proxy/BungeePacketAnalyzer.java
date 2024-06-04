@@ -1,4 +1,4 @@
-package de.rayzs.pat.api.netty.bungee;
+package de.rayzs.pat.api.netty.proxy;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PacketAnalyzer {
+public class BungeePacketAnalyzer {
 
     public static final ConcurrentHashMap<ProxiedPlayer, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
 
@@ -29,9 +29,17 @@ public class PacketAnalyzer {
 
     private static Class<?> channelWrapperClass, serverConnectionClass;
 
+    public static void removePlayerModifies() {
+        ProxyServer.getInstance().getPlayers().forEach(player -> setPlayerModification(player, false));
+    }
+
+    public static void injectAll() {
+        ProxyServer.getInstance().getPlayers().forEach(BungeePacketAnalyzer::inject);
+    }
+
     public static void uninjectAll() {
-        PacketAnalyzer.INJECTED_PLAYERS.keySet().forEach(PacketAnalyzer::uninject);
-        PacketAnalyzer.INJECTED_PLAYERS.clear();
+        BungeePacketAnalyzer.INJECTED_PLAYERS.keySet().forEach(BungeePacketAnalyzer::uninject);
+        BungeePacketAnalyzer.INJECTED_PLAYERS.clear();
     }
 
     public static boolean inject(ProxiedPlayer player) {
@@ -43,7 +51,7 @@ public class PacketAnalyzer {
             serverConnectionClass = Reflection.getClass("net.md_5.bungee.ServerConnection");
 
         Object channelWrapperObj;
-        Field channelField = null;
+        Field channelField;
         Channel channel;
 
         try {
@@ -57,11 +65,13 @@ public class PacketAnalyzer {
             }
 
             channelField.setAccessible(false);
-            if(channel.pipeline().names().contains(PacketAnalyzer.HANDLER_NAME))
+
+            setPlayerModification(player, false);
+            if(channel.pipeline().names().contains(BungeePacketAnalyzer.PIPELINE_NAME))
                 uninject(player);
 
-            channel.pipeline().addBefore(PacketAnalyzer.HANDLER_NAME, PacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
-            PacketAnalyzer.INJECTED_PLAYERS.put(player, channel);
+            channel.pipeline().addAfter(BungeePacketAnalyzer.HANDLER_NAME, BungeePacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
+            BungeePacketAnalyzer.INJECTED_PLAYERS.put(player, channel);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return false;
@@ -80,13 +90,13 @@ public class PacketAnalyzer {
     public static void uninject(ProxiedPlayer player) {
         PLAYER_MODIFIED.remove(player);
 
-        if(PacketAnalyzer.INJECTED_PLAYERS.containsKey(player)) {
-            Channel channel = PacketAnalyzer.INJECTED_PLAYERS.get(player);
+        if(BungeePacketAnalyzer.INJECTED_PLAYERS.containsKey(player)) {
+            Channel channel = BungeePacketAnalyzer.INJECTED_PLAYERS.get(player);
             if(channel != null) {
-                PacketAnalyzer.INJECTED_PLAYERS.remove(player);
+                BungeePacketAnalyzer.INJECTED_PLAYERS.remove(player);
                 channel.eventLoop().submit(() -> {
                     ChannelPipeline pipeline = channel.pipeline();
-                    if (pipeline.names().contains(PacketAnalyzer.PIPELINE_NAME)) pipeline.remove(PacketAnalyzer.PIPELINE_NAME);
+                    if (pipeline.names().contains(BungeePacketAnalyzer.PIPELINE_NAME)) pipeline.remove(BungeePacketAnalyzer.PIPELINE_NAME);
                 });
             }
         }

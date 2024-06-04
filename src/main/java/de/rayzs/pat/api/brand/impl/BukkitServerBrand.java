@@ -2,7 +2,7 @@ package de.rayzs.pat.api.brand.impl;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.api.netty.bukkit.PacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.api.brand.CustomServerBrand;
@@ -110,7 +110,7 @@ public class BukkitServerBrand implements ServerBrand {
         }
 
         try {
-            Channel channel = PacketAnalyzer.INJECTED_PLAYERS.get(player.getUniqueId());
+            Channel channel = BukkitPacketAnalyzer.INJECTED_PLAYERS.get(player.getUniqueId());
             if(channel == null) return;
 
             Object brandPayloadObj = brandPayloadClass.getDeclaredConstructor(String.class).newInstance(MessageTranslator.replaceMessage(player, customBrand)),

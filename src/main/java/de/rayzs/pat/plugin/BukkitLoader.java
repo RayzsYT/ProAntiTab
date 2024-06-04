@@ -8,14 +8,13 @@ import de.rayzs.pat.plugin.listeners.bukkit.BukkitBlockCommandListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitPlayerConnectionListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.bStats;
-import de.rayzs.pat.api.netty.bukkit.PacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
-import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
@@ -59,7 +58,7 @@ public class BukkitLoader extends JavaPlugin {
         if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             loaded = true;
             GroupManager.initialize();
-            PacketAnalyzer.injectAll();
+            BukkitPacketAnalyzer.injectAll();
         } else BackendUpdater.handle();
 
         if(Reflection.getMinor() >= 16)
@@ -86,7 +85,7 @@ public class BukkitLoader extends JavaPlugin {
     @Override
     public void onDisable() {
         BackendUpdater.stop();
-        PacketAnalyzer.uninjectAll();
+        BukkitPacketAnalyzer.uninjectAll();
         MessageTranslator.closeAudiences();
     }
 

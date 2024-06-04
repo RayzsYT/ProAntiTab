@@ -4,7 +4,7 @@ import de.rayzs.pat.api.brand.impl.BukkitServerBrand;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.api.netty.bukkit.PacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -26,7 +26,7 @@ public class BukkitPlayerConnectionListener implements Listener {
         CustomServerBrand.preparePlayer(player);
         CustomServerBrand.sendBrandToPlayer(player);
 
-        if(!PacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
+        if(!BukkitPacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
 
         if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
             Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
@@ -40,7 +40,7 @@ public class BukkitPlayerConnectionListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        PacketAnalyzer.uninject(player.getUniqueId());
+        BukkitPacketAnalyzer.uninject(player.getUniqueId());
         PermissionUtil.resetPermissions(player.getUniqueId());
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
         BukkitServerBrand.removeFromModified(player);

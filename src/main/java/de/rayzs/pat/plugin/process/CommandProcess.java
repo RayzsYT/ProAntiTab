@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.process;
 
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.communication.client.ClientInfo;
+import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -624,8 +625,11 @@ public class CommandProcess {
 
             Communicator.syncData();
 
-            if(Reflection.isVelocityServer())
+            if(Reflection.isVelocityServer()) {
                 VelocityAntiTabListener.updateCommands();
+            } else {
+                BungeePacketAnalyzer.removePlayerModifies();
+            }
 
             Communicator.sendPermissionReset();
         } else {

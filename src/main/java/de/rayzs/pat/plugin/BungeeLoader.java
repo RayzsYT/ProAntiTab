@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin;
 
+import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.commands.BungeeCommand;
 import de.rayzs.pat.plugin.listeners.bungee.*;
@@ -76,10 +77,12 @@ public class BungeeLoader extends Plugin {
 
         if (manager.getPlugin("LuckPerms") != null)
             LuckPermsAdapter.initialize();
+        BungeePacketAnalyzer.injectAll();
     }
 
     @Override
     public void onDisable() {
+        BungeePacketAnalyzer.uninjectAll();
         MessageTranslator.closeAudiences();
     }
 
