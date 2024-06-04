@@ -1,7 +1,11 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import com.google.common.collect.Multimap;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.context.CommandContextBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -27,7 +31,9 @@ import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
+import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import net.md_5.bungee.protocol.DefinedPacket;
@@ -35,8 +41,12 @@ import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Commands;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -104,6 +114,15 @@ public class BungeePlayerConnectionListener implements Listener {
             }
         }
 
+        try {
+            System.out.println("Trying inject into commandMultimap");
+            Multimap<Plugin, Command> commandMultimap = (Multimap<Plugin, Command>) Reflection.getFieldByName(ProxyServer.getInstance().getPluginManager().getClass(), "commandsByPlugin").get(ProxyServer.getInstance().getPluginManager());
+            Map<Plugin, Collection<Command>> map = commandMultimap.asMap();
+            System.out.println("Maybe successful? " + map.size());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
         ChannelPipeline pipeline = channel.pipeline();
 
             pipeline.addBefore("inbound-boss", "pat-test", new ChannelDuplexHandler() {
@@ -119,9 +138,31 @@ public class BungeePlayerConnectionListener implements Listener {
                                         if (packet instanceof Commands) {
                                             Commands response = (Commands) packet;
                                             System.out.println("COMMANS PACKET");
+
+                                            com.mojang.brigadier.Command DUMMY_COMMAND = (context) ->
+                                            {
+                                                return 0;
+                                            };
+
                                             ProxyServer.getInstance().getScheduler().runAsync(BungeeLoader.getPlugin(), () -> {
-                                                RootCommandNode rootCommandNode = new RootCommandNode();
-                                                player.getPendingConnection().unsafe().sendPacket(new Commands(rootCommandNode));
+
+                                                Commands commands = new Commands(new RootCommandNode());
+
+                                                for ( Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands() )
+                                                {
+                                                    if ( !ProxyServer.getInstance().getDisabledCommands().contains( command.getKey() ) && commands.getRoot().getChild( command.getKey() ) == null && command.getValue().hasPermission( player ) )
+                                                    {
+                                                        if(!command.getKey().equals("server")) continue;
+                                                        CommandNode dummy = LiteralArgumentBuilder.literal( command.getKey() ).executes( DUMMY_COMMAND )
+                                                                .then( RequiredArgumentBuilder.argument( "args", StringArgumentType.greedyString() )
+                                                                        .suggests( Commands.SuggestionRegistry.ASK_SERVER ).executes( DUMMY_COMMAND ) )
+                                                                .build();
+
+                                                        commands.getRoot().addChild( dummy );
+                                                    }
+                                                }
+
+                                                player.getPendingConnection().unsafe().sendPacket(commands);
                                                 player.sendMessage("Send packet");
                                             });
                                         }
