@@ -71,6 +71,13 @@ public class BungeePlayerConnectionListener implements Listener {
         BungeeServerBrand.removeFromModified(player);
     }
 
+
+    /* EXPERIMENTAL CODE:
+        Don't worry... it won't look like it when it's actually done. ;3
+        The actual code is gonna be on this path later on:
+        => de.rayzs.pat.api.netty.proxy
+     */
+
     @EventHandler
     public void onServerConnected(ServerConnectedEvent event) {
         ProxiedPlayer player = event.getPlayer();
