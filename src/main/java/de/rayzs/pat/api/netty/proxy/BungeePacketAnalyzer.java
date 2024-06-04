@@ -4,8 +4,12 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
+import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
 import io.netty.channel.*;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.md_5.bungee.api.ProxyServer;
@@ -13,6 +17,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Commands;
+import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -102,16 +107,20 @@ public class BungeePacketAnalyzer {
         }
     }
 
-    private static void modifyCommands(ProxiedPlayer player, Commands commands) {
+    private static void modifyCommands(ProxiedPlayer player, Commands commands, List<String> list) {
+        list.clear();
+
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
             if (!ProxyServer.getInstance().getDisabledCommands().contains(command.getKey()) && commands.getRoot().getChild(command.getKey()) == null && command.getValue().hasPermission(player)) {
                 if (Storage.Blacklist.isBlocked(player, command.getKey(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
                     continue;
 
+                list.add(command.getKey());
+
                 CommandNode dummy = LiteralArgumentBuilder.literal(command.getKey())
                         .executes(DUMMY_COMMAND)
                         .then(RequiredArgumentBuilder.argument("args", StringArgumentType.greedyString())
-                        .suggests(Commands.SuggestionRegistry.ASK_SERVER).executes(DUMMY_COMMAND))
+                                .suggests(Commands.SuggestionRegistry.ASK_SERVER).executes(DUMMY_COMMAND))
                         .build();
 
                 commands.getRoot().addChild(dummy);
@@ -122,28 +131,41 @@ public class BungeePacketAnalyzer {
     private static class PacketDecoder extends MessageToMessageDecoder<PacketWrapper> {
 
         private final ProxiedPlayer player;
+        private final List<String> commands = new ArrayList<>();
 
         private PacketDecoder(ProxiedPlayer player) {
             this.player = player;
         }
 
         @Override
-        protected void decode(ChannelHandlerContext channelHandlerContext, PacketWrapper wrapper, List<Object> list) throws Exception {
+        protected void decode(ChannelHandlerContext channelHandlerContext, PacketWrapper wrapper, List<Object> list) {
             if (wrapper.packet == null) {
                 list.add(wrapper);
                 return;
             }
 
+            System.out.println(wrapper.packet.getClass());
+
             if (wrapper.packet instanceof Commands) {
                 if(isPlayerModified(player)) return;
-
                 setPlayerModification(player, true);
 
                 Commands response = (Commands) wrapper.packet;
-                modifyCommands(player, response);
-
+                modifyCommands(player, response, commands);
                 player.getPendingConnection().unsafe().sendPacket(response);
                 return;
+            } else if (wrapper.packet instanceof TabCompleteResponse) {
+                TabCompleteResponse response = (TabCompleteResponse) wrapper.packet;
+
+                if(player.getPendingConnection().getVersion() < 754) {
+                    ClientInfo clientInfo = Communicator.getClientByName(player.getServer().getInfo().getName());
+                    if(clientInfo == null || !clientInfo.hasVersion()) return;
+
+                    if(clientInfo.getRelease() == 16 && clientInfo.getMinor() == 5 || clientInfo.getMinor() > 16) {
+                        Storage.Blacklist.getAllBlacklists(player.getServer().getInfo().getName()).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !response.getCommands().contains("/" + command)).forEach(command -> response.getCommands().add("/" + command)));
+                        player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
+                    }
+                }
             }
 
             list.add(wrapper);

@@ -162,6 +162,12 @@ public class Storage {
             return SERVER_BLACKLISTS.getOrDefault(server, blacklist);
         }
 
+        public static List<GeneralBlacklist> getAllBlacklists(String server) {
+            List<GeneralBlacklist> blacklists = getBlacklists(server);
+            blacklists.add(Storage.Blacklist.getBlacklist());
+            return blacklists;
+        }
+
         public static List<GeneralBlacklist> getBlacklists(String server) {
             List<GeneralBlacklist> blacklists = new ArrayList<>();
             SERVER_BLACKLISTS.entrySet().stream().filter(entry -> entry.getKey().endsWith("*") ? isServer(entry.getKey(), server) : entry.getKey().equals(server)).forEach(entry -> blacklists.add(entry.getValue()));

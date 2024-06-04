@@ -63,10 +63,21 @@ public class CommunicationPackets {
 
     public static class FeedbackPacket implements CommunicationPacket, Serializable {
         private final String proxyToken, serverId;
+        private final int minor, release;
 
-        public FeedbackPacket(String proxyToken, String serverId) {
+        public FeedbackPacket(String proxyToken, String serverId, int minor, int release) {
             this.proxyToken = proxyToken;
             this.serverId = serverId;
+            this.minor = minor;
+            this.release = release;
+        }
+
+        public int getMinor() {
+            return minor;
+        }
+
+        public int getRelease() {
+            return release;
         }
 
         public String getServerId() {
