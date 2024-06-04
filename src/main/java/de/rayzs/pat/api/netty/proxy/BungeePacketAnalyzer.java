@@ -135,22 +135,14 @@ public class BungeePacketAnalyzer {
             }
 
             if (wrapper.packet instanceof Commands) {
-                if(isPlayerModified(player)) {
-                    System.out.println("Cancelled because already set!");
-                    return;
-                }
+                if(isPlayerModified(player)) return;
 
                 setPlayerModification(player, true);
 
                 Commands response = (Commands) wrapper.packet;
-                System.out.println("Received packet");
-
                 modifyCommands(player, response);
-                System.out.println("Manipulating packet");
 
                 player.getPendingConnection().unsafe().sendPacket(response);
-                player.sendMessage("Send packet");
-
                 return;
             }
 
