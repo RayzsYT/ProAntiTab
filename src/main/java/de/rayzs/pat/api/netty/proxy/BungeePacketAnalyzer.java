@@ -30,6 +30,7 @@ public class BungeePacketAnalyzer {
     private static final HashMap<ProxiedPlayer, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
     private static final com.mojang.brigadier.Command DUMMY_COMMAND = (context) -> 0;
+    private static final List<String> PLUGIN_COMMANDS = new ArrayList<>();
 
     private static Class<?> channelWrapperClass, serverConnectionClass;
 
@@ -44,6 +45,11 @@ public class BungeePacketAnalyzer {
     public static void uninjectAll() {
         BungeePacketAnalyzer.INJECTED_PLAYERS.keySet().forEach(BungeePacketAnalyzer::uninject);
         BungeePacketAnalyzer.INJECTED_PLAYERS.clear();
+    }
+
+    public static void setPluginCommands() {
+        if(!PLUGIN_COMMANDS.isEmpty()) return;
+        ProxyServer.getInstance().getPluginManager().getCommands().stream().filter(entry -> !PLUGIN_COMMANDS.contains(entry.getKey())).forEach(entry -> PLUGIN_COMMANDS.add(entry.getKey()));
     }
 
     public static boolean inject(ProxiedPlayer player) {
@@ -172,22 +178,31 @@ public class BungeePacketAnalyzer {
                             return;
 
                         if (clientInfo.getRelease() == 16 && clientInfo.getMinor() == 5 || clientInfo.getMinor() > 16) {
-                            String cursor = getPlayerInput(player);
+                            String playerInput = getPlayerInput(player);
                             int spaces = 0;
 
-                            if(cursor.contains(" ")) {
-                                String[] split = cursor.split(" ");
-                                if(split.length > 0) spaces = split.length;
+                            if(playerInput.contains(" ")) {
+                                String[] split = playerInput.split(" ");
+                                if(split.length > 0) {
+                                    playerInput = split[0];
+                                    spaces = split.length;
+                                }
                             }
 
+                            final String cursor = playerInput;
                             if(cursor.startsWith("/") && spaces == 0) {
                                 if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-                                    List<String> suggestions = new ArrayList<>(response.getCommands());
-                                    Storage.Blacklist.getAllBlacklists(player.getServer().getInfo().getName()).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !suggestions.contains("/" + command)).forEach(command -> suggestions.add("/" + command)));
-                                    suggestions.stream().filter(suggestion -> suggestion.startsWith(cursor) && response.getCommands().contains(suggestion)).forEach(command -> response.getCommands().add(command));
-                                }
-                                else response.getCommands().removeIf(command -> Storage.Blacklist.isBlocked(player, command, true));
+                                    setPluginCommands();
 
+                                    List<String> suggestions = new ArrayList<>(response.getCommands());
+                                    Storage.Blacklist.getAllBlacklists(player.getServer().getInfo().getName()).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !suggestions.contains("/" + command)).forEach(command -> {
+                                        if(BungeePacketAnalyzer.PLUGIN_COMMANDS.contains(command))
+                                            suggestions.add("/" + command);
+                                    }));
+                                    suggestions.stream().filter(suggestion -> suggestion.startsWith(cursor) && !response.getCommands().contains(suggestion)).forEach(command -> response.getCommands().add(command));
+                                } else response.getCommands().removeIf(command -> Storage.Blacklist.isBlocked(player, command, true));
+
+                                if(response.getCommands().isEmpty()) return;
                                 player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
                             }
                         }

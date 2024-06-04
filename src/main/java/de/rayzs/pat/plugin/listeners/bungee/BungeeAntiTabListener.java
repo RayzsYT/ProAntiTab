@@ -2,12 +2,15 @@ package de.rayzs.pat.plugin.listeners.bungee;
 
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.TabCompleteEvent;
 import net.md_5.bungee.api.event.TabCompleteResponseEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.*;
+import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 
 public class BungeeAntiTabListener implements Listener {
 
