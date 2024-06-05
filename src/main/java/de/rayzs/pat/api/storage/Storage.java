@@ -226,15 +226,24 @@ public class Storage {
         }
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server) {
+            return isBlocked(targetObj, command, intensive, server, false);
+        }
+
+        public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server, boolean focusOnBlock) {
             if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(targetObj)))
                 return false;
 
             boolean blocked = isBlocked(targetObj, command, intensive),
                     allow = false;
 
+            if(focusOnBlock && blocked) return true;
             for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                allow = !blacklist.isBlocked(targetObj, command, intensive);
-                if(allow) break;
+                if(!focusOnBlock) {
+                    allow = !blacklist.isBlocked(targetObj, command, intensive);
+                    if (allow) break;
+                } else {
+                    if(blacklist.isBlocked(targetObj, command, intensive)) return true;
+                }
             }
 
             blocked = !allow && blocked;
