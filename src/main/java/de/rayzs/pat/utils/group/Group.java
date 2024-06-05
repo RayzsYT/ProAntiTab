@@ -75,7 +75,8 @@ public class Group implements Serializable {
     }
 
     public boolean contains(String command, String server) {
-        return (this.generalGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) || getOrCreateGroupBlacklist(server).isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED));
+        GroupBlacklist groupBlacklist = getOrCreateGroupBlacklist(server);
+        return (this.generalGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) || groupBlacklist != null && getOrCreateGroupBlacklist(server).isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED));
     }
 
     public boolean containsOnServer(String command, String server) {
