@@ -51,7 +51,7 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
     public void save() {
         try { ConfigurationProvider.getProvider(YamlConfiguration.class).save(configuration, file);
         } catch (Exception exception) {
-            Logger.info("Could not save configuration file! [file=" + fileName + ", message=" + exception.getMessage() + "]");
+            Logger.warning("Could not save configuration file! [file=" + fileName + ", message=" + exception.getMessage() + "]");
         }
     }
 
@@ -97,7 +97,6 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        System.out.println("Couldn't find '" + target + "'! Using default values instead.");
         set(target, object);
         save();
         return get(target);
