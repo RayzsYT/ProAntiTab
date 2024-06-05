@@ -26,7 +26,7 @@ public class BungeePacketAnalyzer {
 
     public static final ConcurrentHashMap<ProxiedPlayer, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
 
-    private static final String PIPELINE_NAME = "pat-bungee-packethandler", HANDLER_NAME = "packet-decoder";
+    private static final String PIPELINE_NAME = "pat-bungee-handler", HANDLER_NAME = "packet-decoder";
     private static final HashMap<ProxiedPlayer, Boolean> PLAYER_MODIFIED = new HashMap<>();
     private static final HashMap<ProxiedPlayer, String> PLAYER_INPUT_CACHE = new HashMap<>();
 

@@ -14,7 +14,7 @@ public class BukkitPacketAnalyzer {
 
     public static final ConcurrentHashMap<UUID, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
 
-    private static final String PIPELINE_NAME = "pat-packethandler", HANDLER_NAME = "packet_handler";
+    private static final String PIPELINE_NAME = "pat-bukkit-handler", HANDLER_NAME = "packet_handler";
     private static final BukkitPacketHandler PACKET_HANDLER = Reflection.getMinor() >= 16 ? new ModernPacketHandler() : new LegacyPacketHandler();
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
