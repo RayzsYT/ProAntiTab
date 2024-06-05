@@ -60,6 +60,12 @@
             <url>https://repo.viaversion.com</url>
         </repository>
 
+        <repository>
+            <id>william278-velocity</id>
+            <name>William278</name>
+            <url>https://repo.william278.net/velocity</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -162,6 +168,20 @@
             <version>3.1.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.velocitypowered</groupId>
+            <artifactId>velocity-proxy</artifactId>
+            <version>3.3.0-SNAPSHOT</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.velocitypowered</groupId>
+                    <artifactId>velocity-proxy-log4j2-plugin</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 
         <dependency>
             <groupId>org.sonatype.sisu</groupId>
