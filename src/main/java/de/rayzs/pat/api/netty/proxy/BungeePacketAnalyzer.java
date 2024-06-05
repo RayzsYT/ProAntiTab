@@ -175,7 +175,7 @@ public class BungeePacketAnalyzer {
                     if(!PermissionUtil.hasBypassPermission(player)) {
 
                         ClientInfo clientInfo = Communicator.getClientByName(player.getServer().getInfo().getName());
-                        if (clientInfo == null || !clientInfo.hasVersion() || !PLAYER_INPUT_CACHE.containsKey(player))
+                        if (clientInfo == null || !PLAYER_INPUT_CACHE.containsKey(player))
                             return;
 
                         boolean cancelsBeforeHand = false;
