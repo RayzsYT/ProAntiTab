@@ -178,8 +178,8 @@ public class BungeePacketAnalyzer {
                         if (clientInfo == null || !clientInfo.hasVersion() || !PLAYER_INPUT_CACHE.containsKey(player))
                             return;
 
-                        boolean cancelsBeforeHand;
-                        String playerInput = getPlayerInput(player);
+                        boolean cancelsBeforeHand = false;
+                        String playerInput = getPlayerInput(player), server = player.getServer().getInfo().getName();
                         int spaces = 0;
 
                         if(playerInput.contains(" ")) {
@@ -190,23 +190,37 @@ public class BungeePacketAnalyzer {
                             }
                         }
 
-                        cancelsBeforeHand = Storage.Blacklist.isBlocked(player, StringUtils.replaceFirst(playerInput, "/", ""), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+                        if(!playerInput.equals("/"))
+                            cancelsBeforeHand = Storage.Blacklist.isBlocked(player, StringUtils.replaceFirst(playerInput, "/", ""), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server);
 
                         final String cursor = playerInput;
                         if(cursor.startsWith("/")) {
-
                             if(spaces == 0) {
+                                List<String> suggestions = new ArrayList<>(response.getCommands());
+
                                 if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
                                     setPluginCommands();
 
-                                    List<String> suggestions = new ArrayList<>(response.getCommands());
-                                    Storage.Blacklist.getAllBlacklists(player.getServer().getInfo().getName()).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !suggestions.contains("/" + command)).forEach(command -> {
+                                    Storage.Blacklist.getAllBlacklists(server).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !suggestions.contains("/" + command)).forEach(command -> {
                                         if (BungeePacketAnalyzer.PLUGIN_COMMANDS.contains(command))
                                             suggestions.add("/" + command);
                                     }));
+
+                                    BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command -> !suggestions.contains(command)).forEach(command -> {
+                                        if(command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
+                                        if(PermissionUtil.hasBypassPermission(player, command, server)) {
+                                            suggestions.add("/" + command);
+                                        }
+                                    });
+
                                     suggestions.stream().filter(suggestion -> suggestion.startsWith(cursor) && !response.getCommands().contains(suggestion)).forEach(command -> response.getCommands().add(command));
-                                } else
-                                    response.getCommands().removeIf(command -> Storage.Blacklist.isBlocked(player, command, true));
+
+                                } else {
+                                    BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command -> !suggestions.contains(command)).forEach(suggestions::add);
+                                    suggestions.removeIf(command -> Storage.Blacklist.isBlocked(player, command, true, server, true));
+                                    response.getCommands().clear();
+                                    suggestions.forEach(command -> response.getCommands().add(command));
+                                }
 
                                 if (response.getCommands().isEmpty()) return;
                             } else {
