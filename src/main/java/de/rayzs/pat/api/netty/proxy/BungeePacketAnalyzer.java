@@ -26,7 +26,7 @@ public class BungeePacketAnalyzer {
 
     public static final ConcurrentHashMap<ProxiedPlayer, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
 
-    private static final String PIPELINE_NAME = "pat-bungee-handler", HANDLER_NAME = "packet-decoder";
+    private static final String HANDLER_NAME = "pat-bungee-handler", PIPELINE_NAME = "packet-decoder";
     private static final HashMap<ProxiedPlayer, Boolean> PLAYER_MODIFIED = new HashMap<>();
     private static final HashMap<ProxiedPlayer, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
@@ -78,10 +78,10 @@ public class BungeePacketAnalyzer {
             channelField.setAccessible(false);
 
             setPlayerModification(player, false);
-            if(channel.pipeline().names().contains(BungeePacketAnalyzer.PIPELINE_NAME))
+            if(channel.pipeline().names().contains(BungeePacketAnalyzer.HANDLER_NAME))
                 uninject(player);
 
-            channel.pipeline().addAfter(BungeePacketAnalyzer.HANDLER_NAME, BungeePacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
+            channel.pipeline().addAfter(BungeePacketAnalyzer.PIPELINE_NAME, BungeePacketAnalyzer.HANDLER_NAME, new PacketDecoder(player));
             BungeePacketAnalyzer.INJECTED_PLAYERS.put(player, channel);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -107,7 +107,7 @@ public class BungeePacketAnalyzer {
                 BungeePacketAnalyzer.INJECTED_PLAYERS.remove(player);
                 channel.eventLoop().submit(() -> {
                     ChannelPipeline pipeline = channel.pipeline();
-                    if (pipeline.names().contains(BungeePacketAnalyzer.PIPELINE_NAME)) pipeline.remove(BungeePacketAnalyzer.PIPELINE_NAME);
+                    if (pipeline.names().contains(BungeePacketAnalyzer.HANDLER_NAME)) pipeline.remove(BungeePacketAnalyzer.HANDLER_NAME);
                 });
             }
         }

@@ -14,7 +14,7 @@ public class BukkitPacketAnalyzer {
 
     public static final ConcurrentHashMap<UUID, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
 
-    private static final String PIPELINE_NAME = "pat-bukkit-handler", HANDLER_NAME = "packet_handler";
+    private static final String HANDLER_NAME = "pat-bukkit-handler", PIPELINE_NAME = "packet_handler";
     private static final BukkitPacketHandler PACKET_HANDLER = Reflection.getMinor() >= 16 ? new ModernPacketHandler() : new LegacyPacketHandler();
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
@@ -35,7 +35,7 @@ public class BukkitPacketAnalyzer {
                 return false;
             }
 
-            channel.pipeline().addBefore(BukkitPacketAnalyzer.HANDLER_NAME, BukkitPacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
+            channel.pipeline().addBefore(BukkitPacketAnalyzer.PIPELINE_NAME, BukkitPacketAnalyzer.HANDLER_NAME, new PacketDecoder(player));
             BukkitPacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -50,7 +50,7 @@ public class BukkitPacketAnalyzer {
                 BukkitPacketAnalyzer.INJECTED_PLAYERS.remove(uuid);
                 channel.eventLoop().submit(() -> {
                     ChannelPipeline pipeline = channel.pipeline();
-                    if (pipeline.names().contains(BukkitPacketAnalyzer.PIPELINE_NAME)) pipeline.remove(BukkitPacketAnalyzer.PIPELINE_NAME);
+                    if (pipeline.names().contains(BukkitPacketAnalyzer.HANDLER_NAME)) pipeline.remove(BukkitPacketAnalyzer.HANDLER_NAME);
                 });
             }
         }
