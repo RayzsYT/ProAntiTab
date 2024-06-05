@@ -8,6 +8,7 @@ import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import io.netty.channel.*;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -119,7 +120,7 @@ public class BungeePacketAnalyzer {
     }
 
     public static void insertPlayerInput(ProxiedPlayer player, String text) {
-        PLAYER_INPUT_CACHE.put(player, text);
+        PLAYER_INPUT_CACHE.put(player, text.toLowerCase());
     }
 
     private static void modifyCommands(ProxiedPlayer player, Commands commands, List<String> list) {
@@ -177,34 +178,42 @@ public class BungeePacketAnalyzer {
                         if (clientInfo == null || !clientInfo.hasVersion() || !PLAYER_INPUT_CACHE.containsKey(player))
                             return;
 
-                        if (clientInfo.getRelease() == 16 && clientInfo.getMinor() == 5 || clientInfo.getMinor() > 16) {
-                            String playerInput = getPlayerInput(player);
-                            int spaces = 0;
+                        boolean cancelsBeforeHand;
+                        String playerInput = getPlayerInput(player);
+                        int spaces = 0;
 
-                            if(playerInput.contains(" ")) {
-                                String[] split = playerInput.split(" ");
-                                if(split.length > 0) {
-                                    playerInput = split[0];
-                                    spaces = split.length;
-                                }
+                        if(playerInput.contains(" ")) {
+                            String[] split = playerInput.split(" ");
+                            if(split.length > 0) {
+                                playerInput = split[0];
+                                spaces = split.length;
                             }
+                        }
 
-                            final String cursor = playerInput;
-                            if(cursor.startsWith("/") && spaces == 0) {
-                                if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+                        cancelsBeforeHand = Storage.Blacklist.isBlocked(player, StringUtils.replaceFirst(playerInput, "/", ""), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+
+                        final String cursor = playerInput;
+                        if(cursor.startsWith("/")) {
+
+                            if(spaces == 0) {
+                                if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
                                     setPluginCommands();
 
                                     List<String> suggestions = new ArrayList<>(response.getCommands());
                                     Storage.Blacklist.getAllBlacklists(player.getServer().getInfo().getName()).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !suggestions.contains("/" + command)).forEach(command -> {
-                                        if(BungeePacketAnalyzer.PLUGIN_COMMANDS.contains(command))
+                                        if (BungeePacketAnalyzer.PLUGIN_COMMANDS.contains(command))
                                             suggestions.add("/" + command);
                                     }));
                                     suggestions.stream().filter(suggestion -> suggestion.startsWith(cursor) && !response.getCommands().contains(suggestion)).forEach(command -> response.getCommands().add(command));
-                                } else response.getCommands().removeIf(command -> Storage.Blacklist.isBlocked(player, command, true));
+                                } else
+                                    response.getCommands().removeIf(command -> Storage.Blacklist.isBlocked(player, command, true));
 
-                                if(response.getCommands().isEmpty()) return;
-                                player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
+                                if (response.getCommands().isEmpty()) return;
+                            } else {
+                                if(cancelsBeforeHand) return;
                             }
+
+                            player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
                         }
                     }
                 }
