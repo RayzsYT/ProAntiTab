@@ -78,9 +78,8 @@ public class Communicator {
             ClientInfo client = getClientByName(serverName);
             if (client == null) {
                 client = Reflection.isVelocityServer() ? new VelocityClientInfo(feedbackPacket.getServerId(), serverName) : new BungeeClientInfo(feedbackPacket.getServerId(), serverName);
-                client.setVersion(feedbackPacket.getMinor(), feedbackPacket.getRelease());
                 CLIENTS.add(client);
-            } else client.setVersion(feedbackPacket.getMinor(), feedbackPacket.getRelease());
+            }
 
             if (!client.compareId(feedbackPacket.getServerId())) client.setId(feedbackPacket.getServerId());
             if (client.hasSentFeedback()) return;
@@ -178,7 +177,7 @@ public class Communicator {
     }
 
     public static void sendFeedback() {
-        sendPacket(new CommunicationPackets.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString(), Reflection.getMinor(), Reflection.getRelease()));
+        sendPacket(new CommunicationPackets.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString()));
     }
 
     public static Client getClient() {
