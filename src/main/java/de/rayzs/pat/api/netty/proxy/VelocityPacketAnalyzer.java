@@ -56,10 +56,6 @@ public class VelocityPacketAnalyzer {
             Object connectedPlayerObj = connectedPlayerConnectionClass.cast(player),
                     minecraftConnectionObj = Reflection.getMethodsByName(connectedPlayerConnectionClass, "getConnection").get(0).invoke(connectedPlayerObj);
 
-            for (Field field : Reflection.getFields(minecraftConnectionObj)) {
-                System.out.println(field.getName() + " | " + field.getType().getName());
-            }
-
             channel = (Channel) Reflection.getMethodsByName(minecraftConnectionClass, "getChannel").get(0).invoke(minecraftConnectionObj);
 
             if(channel == null) {
