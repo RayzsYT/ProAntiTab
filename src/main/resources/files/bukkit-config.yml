@@ -33,7 +33,7 @@ handle-through-proxy:
 # This is a very necessary feature if you have way too many commands to block and instead decide
 # to whitelist specific commands.
 # Enabling this will disable ALL commands except for those that are in the (group-)list.
-turn-blacklist-to-whitelist: false
+turn-blacklist-to-whitelist: true
 
 # This feature allows you to customize your server brand you see when you press F3.
 # Normally there is something like 'Purpur', or 'Spigot'.

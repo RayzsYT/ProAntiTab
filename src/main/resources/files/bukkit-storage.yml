@@ -1,20 +1,9 @@
 global:
   commands:
-    - help
-    - '?'
-    - about
-    - ver
-    - version
-    - icanhasbukkit
-    - tell
-    - me
     - pl
     - plugins
-    - msg
 groups:
   examplegroup:
     commands:
-      - example-command-for-this-group-to-bypass
-      - second-example-command-for-this-group-to-bypass
       - tell
       - msg

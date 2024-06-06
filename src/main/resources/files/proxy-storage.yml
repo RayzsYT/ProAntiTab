@@ -1,16 +1,7 @@
 global:
   commands:
-    - help
-    - '?'
-    - version
-    - ver
-    - icanhasbukkit
     - pl
     - plugins
-    - me
-    - about
-    - tell
-    - msg
   servers:
     lobby-*:
       commands:

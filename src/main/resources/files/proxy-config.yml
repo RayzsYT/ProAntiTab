@@ -22,7 +22,7 @@ updater:
 # This is a very necessary feature if you have way too many commands to block and instead decide
 # to whitelist specific commands.
 # Enabling this will disable ALL commands except for those that are in the (group-)list.
-turn-blacklist-to-whitelist: false
+turn-blacklist-to-whitelist: true
 
 # Change the protocol for the version name when the server is being pinged
 custom-protocol-ping:
