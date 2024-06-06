@@ -170,7 +170,8 @@ public class VelocityPacketAnalyzer {
                             response.getOffers().removeIf(offer -> {
                                 String command = offer.getText();
                                 if (command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
-                                return offer.getText().startsWith("/") && Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+
+                                return Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
                             });
                         } else {
                             if (cancelsBeforeHand) return;
