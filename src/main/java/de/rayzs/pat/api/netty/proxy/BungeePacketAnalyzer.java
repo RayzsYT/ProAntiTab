@@ -217,7 +217,10 @@ public class BungeePacketAnalyzer {
 
                                 } else {
                                     BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command -> !suggestions.contains(command)).forEach(suggestions::add);
-                                    suggestions.removeIf(command -> Storage.Blacklist.isBlocked(player, command, true, server, true));
+                                    suggestions.removeIf(command -> {
+                                        if(command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
+                                        return Storage.Blacklist.isBlocked(player, command, true, server, true);
+                                    });
                                     response.getCommands().clear();
                                     suggestions.forEach(command -> response.getCommands().add(command));
                                 }
