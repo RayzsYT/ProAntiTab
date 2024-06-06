@@ -6,6 +6,7 @@ import com.velocitypowered.proxy.protocol.packet.*;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import io.netty.channel.*;
 
@@ -67,7 +68,7 @@ public class VelocityPacketAnalyzer {
             if(channel.pipeline().names().contains(VelocityPacketAnalyzer.PIPELINE_NAME))
                 uninject(player);
 
-            channel.pipeline().addAfter(VelocityPacketAnalyzer.HANDLER_NAME, VelocityPacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
+            channel.pipeline().addBefore(VelocityPacketAnalyzer.HANDLER_NAME, VelocityPacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
             VelocityPacketAnalyzer.INJECTED_PLAYERS.put(player, channel);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -118,6 +119,23 @@ public class VelocityPacketAnalyzer {
         }
 
         @Override
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            if (!(msg instanceof MinecraftPacket)) {
+                super.channelRead(ctx, msg);
+                return;
+            }
+
+            MinecraftPacket packet = (MinecraftPacket) msg;
+
+            if(packet instanceof TabCompleteRequestPacket) {
+                TabCompleteRequestPacket request = (TabCompleteRequestPacket) msg;
+                insertPlayerInput(player, request.getCommand());
+            }
+
+            super.channelRead(ctx, msg);
+        }
+
+        @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             if (!(msg instanceof MinecraftPacket)) {
                 super.write(ctx, msg, promise);
@@ -129,7 +147,35 @@ public class VelocityPacketAnalyzer {
             if(packet instanceof TabCompleteResponsePacket) {
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
-                    response.getOffers().removeIf(offer -> offer.getText().startsWith("/") && Storage.Blacklist.isBlocked(player, offer.getText(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName()));
+
+                    boolean cancelsBeforeHand = false;
+                    String playerInput = getPlayerInput(player), server = player.getCurrentServer().get().getServerInfo().getName();
+                    int spaces = 0;
+
+                    if(playerInput.contains(" ")) {
+                        String[] split = playerInput.split(" ");
+                        if(split.length > 0) {
+                            playerInput = split[0];
+                            spaces = split.length;
+                        }
+                    }
+
+                    if(!playerInput.equals("/"))
+                        cancelsBeforeHand = Storage.Blacklist.isBlocked(player, StringUtils.replaceFirst(playerInput, "/", ""), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server);
+
+                    final String cursor = playerInput;
+
+                    if(cursor.startsWith("/")) {
+                        if (spaces == 0) {
+                            response.getOffers().removeIf(offer -> {
+                                String command = offer.getText();
+                                if (command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
+                                return offer.getText().startsWith("/") && Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+                            });
+                        } else {
+                            if (cancelsBeforeHand) return;
+                        }
+                    }
                 }
             } else if(packet instanceof AvailableCommandsPacket) {
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
@@ -138,7 +184,7 @@ public class VelocityPacketAnalyzer {
                         commands.getRootNode().getChildren().removeIf(command -> {
                             if(command == null || command.getName() == null) return true;
                             String commandName = command.getName();
-                            return Storage.Blacklist.isBlocked(player, commandName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName());
+                            return Storage.Blacklist.isBlocked(player, commandName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
                         });
                     }
                 }
