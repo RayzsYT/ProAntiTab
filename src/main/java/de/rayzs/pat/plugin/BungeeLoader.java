@@ -60,12 +60,7 @@ public class BungeeLoader extends Plugin {
         try {
             Class.forName("io.github.waterfallmc.waterfall.QueryResult");
             manager.registerListener(this, new WaterfallAntiTabListener());
-        } catch (ClassNotFoundException ignored) {
-            ProxyServer.getInstance().getScheduler().schedule(this, () -> {
-                logger.warning("We advice you to use WaterFall instead for a better experience!");
-                logger.warning("It's also required to really block every Bungeecord command with ProAntiTab!");
-            }, 2, TimeUnit.SECONDS);
-        }
+        } catch (ClassNotFoundException ignored) { }
 
         startUpdaterTask();
         ProxyServer.getInstance().getScheduler().schedule(this, () -> {
