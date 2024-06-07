@@ -23,6 +23,7 @@ public class BungeeBlockCommandListener implements Listener {
         if(!(connection instanceof ProxiedPlayer) || !event.getMessage().startsWith("/")) return;
 
         ProxiedPlayer player = (ProxiedPlayer) connection;
+
         String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", "").toLowerCase();
 
         if(rawCommand.equals("/")) return;
