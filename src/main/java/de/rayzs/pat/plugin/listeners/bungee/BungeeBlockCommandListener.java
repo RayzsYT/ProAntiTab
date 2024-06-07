@@ -15,7 +15,7 @@ import java.util.List;
 
 public class BungeeBlockCommandListener implements Listener {
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onChat(ChatEvent event) {
         if(event.isCancelled()) return;
 
@@ -32,6 +32,7 @@ public class BungeeBlockCommandListener implements Listener {
 
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
@@ -39,7 +40,6 @@ public class BungeeBlockCommandListener implements Listener {
                 Player target = Bukkit.getServer().getPlayer(uuid);
                 MessageTranslator.send(target, notificationMessage);
             });
-            event.setCancelled(true);
             return;
         }
 
@@ -50,13 +50,14 @@ public class BungeeBlockCommandListener implements Listener {
             if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getServer().getInfo().getName())) return;
             if(Storage.Blacklist.isListed(player, command, true, player.getServer().getInfo().getName())) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
-            MessageTranslator.send(player, cancelCommandMessage);
             event.setCancelled(true);
+            MessageTranslator.send(player, cancelCommandMessage);
             return;
         }
 
         if (!Storage.Blacklist.isBlocked(player, command, player.getServer().getInfo().getName())) return;
         if (PermissionUtil.hasBypassPermission(player, command)) return;
+        event.setCancelled(true);
         MessageTranslator.send(player, cancelCommandMessage);
 
         if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
@@ -64,7 +65,5 @@ public class BungeeBlockCommandListener implements Listener {
             Player target = Bukkit.getServer().getPlayer(uuid);
             MessageTranslator.send(target, notificationMessage);
         });
-
-        event.setCancelled(true);
     }
 }
