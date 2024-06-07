@@ -19,10 +19,11 @@ updater:
     - '&8[&4ProAntiTab&8] &cGet the newest version here:'
     - '&8[&4ProAntiTab&8] &ehttps://www.rayzs.de/products/proantitab/page'
 
-# This part is VERY important if you are using a Bungeecord/Velocity server!
-# Enabling this allows the Bungeecord/Velocity server to communicate with the Spigot server and exchange information.
-# This is very important to block tab-completions and unwanted suggestions.
-# Please follow the instructions on the documentation page to understand how to set it up.
+# Enabling this allows you to sync all available feature data with your proxy.
+# Basically it takes you off the work to configure a single feature on all backend servers.
+# Some of them are just getting overwritten as well but there's no big difference between them.
+# Those features are marked with the following comment: '>> HTP'
+# Please follow the instructions on the documentation page to understand how to properly set it up.
 # https://www.spigotmc.org/resources/113172/field?field=documentation
 # Go to the section "How to setup" (It's the first section actually)
 # and open the spoiler that matches your server scenario.
@@ -30,19 +31,23 @@ handle-through-proxy:
   enabled: false
   token: insert-token-of-proxy-here
 
+#>> HTP
 # This is a very necessary feature if you have way too many commands to block and instead decide
 # to whitelist specific commands.
 # Enabling this will disable ALL commands except for those that are in the (group-)list.
 turn-blacklist-to-whitelist: true
 
-# This feature allows you to customize your server brand you see when you press F3.
-# Normally there is something like 'Purpur', or 'Spigot'.
-# With this feature, you are able to change and even animate it.
+#>> HTP (Sync)
+# This feature allows you to create your own 'Unknown command.' message.
+# It is very helpful considering the fact you might have to set the same message
+# for if a command is blocked or really doesn't exist. ^^
+# Good to hide real and not-real commands from your players.
 custom-unknown-command:
   enabled: false
   message:
     - '&cThis command does not exist!'
 
+#>> HTP (Overwritten)
 # This setting decides if a listed command should be cancelled from execution or not.
 # As you can see it's enabled by default, which is also why every command that is listed
 # is being blocked entirely.
@@ -51,12 +56,14 @@ cancel-blocked-commands:
   message:
     - '%prefix% &cThis command &8(&4%command%&8) &cis blocked!'
 
+#>> HTP (Overwritten)
 # Here you can customize your own fake '/plugins' command.
 custom-plugins:
   enabled: true
   message:
     - '&fPlugins (0):'
 
+#>> HTP (Overwritten)
 # This feature allows you to customize your server brand you see when you press F3.
 # Normally there is something like 'Purpur', or 'Spigot'.
 # With this feature, you are able to change and even animate it.
