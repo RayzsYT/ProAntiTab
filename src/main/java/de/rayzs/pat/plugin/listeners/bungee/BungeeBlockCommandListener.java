@@ -15,7 +15,7 @@ import java.util.List;
 
 public class BungeeBlockCommandListener implements Listener {
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler (priority = EventPriority.HIGHEST)
     public void onChat(ChatEvent event) {
         if(event.isCancelled()) return;
 

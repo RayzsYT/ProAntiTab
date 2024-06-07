@@ -21,7 +21,7 @@ public class VelocityBlockCommandListener {
     }
 
     @Subscribe
-    public void onPlayerChat(CommandExecuteEvent event) {
+    public void onCommandExecute(CommandExecuteEvent event) {
         if(!event.getResult().isAllowed()) return;
         CommandSource commandSource = event.getCommandSource();
 
