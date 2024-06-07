@@ -26,13 +26,14 @@ import java.util.List;
             String targetCommand = rawCommand.contains(" ") ? rawCommand.split(" ")[0] : rawCommand;
             HelpTopic helpTopic = Bukkit.getHelpMap().getHelpTopic(targetCommand);
             if(helpTopic == null) {
-                MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE);
                 event.setCancelled(true);
+                MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE);
                 return;
             }
         }
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
@@ -40,7 +41,7 @@ import java.util.List;
                 Player target = Bukkit.getServer().getPlayer(uuid);
                 MessageTranslator.send(target, notificationMessage);
             });
-            event.setCancelled(true);
+
             return;
         }
 
@@ -50,13 +51,14 @@ import java.util.List;
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.isListed(command, true)) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
-            MessageTranslator.send(player, cancelCommandMessage);
             event.setCancelled(true);
+            MessageTranslator.send(player, cancelCommandMessage);
             return;
         }
 
         if (!Storage.Blacklist.isBlocked(player, command)) return;
         if (PermissionUtil.hasBypassPermission(player, command)) return;
+        event.setCancelled(true);
         MessageTranslator.send(player, cancelCommandMessage);
 
         if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
@@ -64,6 +66,5 @@ import java.util.List;
             Player target = Bukkit.getServer().getPlayer(uuid);
             MessageTranslator.send(target, notificationMessage);
         });
-        event.setCancelled(true);
     }
 }

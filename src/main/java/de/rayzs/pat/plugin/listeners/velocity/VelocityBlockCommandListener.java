@@ -33,6 +33,7 @@ public class VelocityBlockCommandListener {
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
@@ -40,7 +41,6 @@ public class VelocityBlockCommandListener {
                 org.bukkit.entity.Player target = Bukkit.getServer().getPlayer(uuid);
                 MessageTranslator.send(target, notificationMessage);
             });
-            event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
 
@@ -51,13 +51,14 @@ public class VelocityBlockCommandListener {
             if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getCurrentServer().get().getServerInfo().getName())) return;
             if(Storage.Blacklist.isListed(player, command, true, player.getCurrentServer().get().getServerInfo().getName())) return;
             if(PermissionUtil.hasBypassPermission(player, command)) return;
-            MessageTranslator.send(player, cancelCommandMessage);
             event.setResult(CommandExecuteEvent.CommandResult.denied());
+            MessageTranslator.send(player, cancelCommandMessage);
             return;
         }
 
         if (!Storage.Blacklist.isBlocked(player, command, player.getCurrentServer().get().getServerInfo().getName())) return;
         if (PermissionUtil.hasBypassPermission(player, command)) return;
+        event.setResult(CommandExecuteEvent.CommandResult.denied());
         MessageTranslator.send(player, cancelCommandMessage);
 
         if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
@@ -65,7 +66,5 @@ public class VelocityBlockCommandListener {
             org.bukkit.entity.Player target = Bukkit.getServer().getPlayer(uuid);
             MessageTranslator.send(target, notificationMessage);
         });
-
-        event.setResult(CommandExecuteEvent.CommandResult.denied());
     }
 }
