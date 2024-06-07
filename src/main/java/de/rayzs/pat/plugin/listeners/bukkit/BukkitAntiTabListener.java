@@ -18,15 +18,10 @@ public class BukkitAntiTabListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
+
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
-
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !BukkitLoader.isLoaded()) {
-            if(Storage.USE_VIAVERSION)
-                if(Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754)
-                    event.getCommands().clear();
-            return;
-        }
 
         if(event.getCommands().size() == 0) return;
 
@@ -48,8 +43,6 @@ public class BukkitAntiTabListener implements Listener {
         if(Storage.USE_VIAVERSION)
             if(Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754)
                 event.getCommands().clear();
-
-        if(Storage.VELOCITY_SYNC) return;
 
         List<String> commands = new LinkedList<>(COMMANDS);
         if (!(Storage.USE_LUCKPERMS && !LuckPermsAdapter.hasAnyPermissions(uuid))) {
@@ -74,6 +67,7 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     public static void handleTabCompletion(List<String> commands) {
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
         COMMANDS = null;
         Bukkit.getOnlinePlayers().forEach(player -> handleTabCompletion(player, commands));
     }
@@ -95,6 +89,7 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     public static void handleTabCompletion(Player player, List<String> commands) {
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
         if(notUpdatablePlayer(player.getUniqueId())) return;
 
         List<String> dummy = new ArrayList<>(commands);

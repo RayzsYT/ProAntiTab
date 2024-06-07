@@ -128,7 +128,6 @@ public class CommunicationPackets {
         private final GroupsPacket groupsPacket;
         private final UnknownCommandPacket unknownCommandPacket;
         private final String proxyToken, serverId;
-        private boolean velocity = false;
 
         public PacketBundle(String proxyToken, String serverId, CommandsPacket commandsPacket, GroupsPacket groupsPacket) {
             this.proxyToken = proxyToken;
@@ -136,10 +135,7 @@ public class CommunicationPackets {
             this.commandsPacket = commandsPacket;
             this.groupsPacket = groupsPacket;
             this.unknownCommandPacket = new UnknownCommandPacket();
-            this.velocity = Reflection.isVelocityServer();
         }
-
-        public boolean isVelocity() { return velocity; }
 
         public boolean isToken(String token) {
             return proxyToken.equals(token);

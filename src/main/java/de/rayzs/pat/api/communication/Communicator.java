@@ -96,15 +96,8 @@ public class Communicator {
             CommunicationPackets.PacketBundle packetBundle =  (CommunicationPackets.PacketBundle) packet;
             if(!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString())) return;
 
-            CommunicationPackets.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
-            CommunicationPackets.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
-            CommunicationPackets.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
-
             LAST_BUKKIT_SYNC = System.currentTimeMillis();
-            Storage.VELOCITY_SYNC = packetBundle.isVelocity();
-
-            BukkitLoader.synchronizeCommandData(commandsPacket, unknownCommandPacket);
-            BukkitLoader.synchronizeGroupData(groupsPacket);
+            BukkitLoader.synchronize(packetBundle);
         }
     }
 

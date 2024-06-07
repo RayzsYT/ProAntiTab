@@ -2,6 +2,7 @@ package de.rayzs.pat.api.netty.bukkit;
 
 import de.rayzs.pat.api.netty.bukkit.handlers.LegacyPacketHandler;
 import de.rayzs.pat.api.netty.bukkit.handlers.ModernPacketHandler;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.Reflection;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
@@ -28,6 +29,8 @@ public class BukkitPacketAnalyzer {
     }
 
     public static boolean inject(Player player) {
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return true;
+
         try {
             Channel channel = Reflection.getPlayerChannel(player);
             if(channel == null) {
@@ -44,6 +47,8 @@ public class BukkitPacketAnalyzer {
     }
 
     public static void uninject(UUID uuid) {
+        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
+
         if(BukkitPacketAnalyzer.INJECTED_PLAYERS.containsKey(uuid)) {
             Channel channel = BukkitPacketAnalyzer.INJECTED_PLAYERS.get(uuid);
             if(channel != null) {
