@@ -36,7 +36,7 @@ public class MessageTranslator {
         colors.put('o', "<i>");
         colors.put('l', "<b>");
 
-        support =  Reflection.getMinor() >= 17
+        support =  Reflection.getMinor() >= 18
                 || Reflection.isProxyServer();
 
         if(support)
