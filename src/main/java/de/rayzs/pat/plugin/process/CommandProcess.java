@@ -625,11 +625,8 @@ public class CommandProcess {
 
             Communicator.syncData();
 
-            if(Reflection.isVelocityServer()) {
+            if(Reflection.isVelocityServer())
                 VelocityAntiTabListener.updateCommands();
-            } else {
-                BungeePacketAnalyzer.removePlayerModifies();
-            }
 
             Communicator.sendPermissionReset();
         } else {

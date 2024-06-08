@@ -35,10 +35,6 @@ public class BungeePacketAnalyzer {
 
     private static Class<?> channelWrapperClass, serverConnectionClass;
 
-    public static void removePlayerModifies() {
-        ProxyServer.getInstance().getPlayers().forEach(player -> setPlayerModification(player, false));
-    }
-
     public static void injectAll() {
         ProxyServer.getInstance().getPlayers().forEach(BungeePacketAnalyzer::inject);
     }
@@ -77,7 +73,6 @@ public class BungeePacketAnalyzer {
 
             channelField.setAccessible(false);
 
-            setPlayerModification(player, false);
             if(channel.pipeline().names().contains(BungeePacketAnalyzer.HANDLER_NAME))
                 uninject(player);
 
@@ -87,15 +82,6 @@ public class BungeePacketAnalyzer {
             throwable.printStackTrace();
             return false;
         } return true;
-    }
-
-    public static boolean isPlayerModified(ProxiedPlayer player) {
-        PLAYER_MODIFIED.putIfAbsent(player, false);
-        return PLAYER_MODIFIED.get(player);
-    }
-
-    public static void setPlayerModification(ProxiedPlayer player, boolean modified) {
-        PLAYER_MODIFIED.put(player, modified);
     }
 
     public static void uninject(ProxiedPlayer player) {
@@ -161,9 +147,6 @@ public class BungeePacketAnalyzer {
             }
 
             if (wrapper.packet instanceof Commands) {
-                if(isPlayerModified(player)) return;
-                setPlayerModification(player, true);
-
                 Commands response = (Commands) wrapper.packet;
                 modifyCommands(player, response, commands);
             } else if (wrapper.packet instanceof TabCompleteResponse) {
