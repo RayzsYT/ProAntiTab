@@ -57,10 +57,8 @@ public class BungeeLoader extends Plugin {
         manager.registerListener(this, new BungeeBlockCommandListener());
         manager.registerListener(this, new BungeePingListener());
 
-        try {
-            Class.forName("io.github.waterfallmc.waterfall.QueryResult");
+        if(Reflection.isPaper())
             manager.registerListener(this, new WaterfallAntiTabListener());
-        } catch (ClassNotFoundException ignored) { }
 
         startUpdaterTask();
         ProxyServer.getInstance().getScheduler().schedule(this, () -> {

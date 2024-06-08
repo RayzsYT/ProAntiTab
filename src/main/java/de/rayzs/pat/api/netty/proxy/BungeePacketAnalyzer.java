@@ -115,8 +115,15 @@ public class BungeePacketAnalyzer {
         boolean blocked, turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
             if (!ProxyServer.getInstance().getDisabledCommands().contains(command.getKey()) && commands.getRoot().getChild(command.getKey()) == null && command.getValue().hasPermission(player)) {
-                blocked = Storage.Blacklist.isBlocked(player, command.getKey(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-                if(turn && blocked || !turn && !blocked) continue;
+                blocked = Storage.Blacklist.isBlocked(player, command.getKey(), !turn);
+                if(!blocked && turn) {
+                    for (String alias : command.getValue().getAliases()) {
+                        if(blocked) break;
+                        blocked = Storage.Blacklist.isBlocked(player, alias, !turn);
+                    }
+                }
+
+                if(blocked) continue;
 
                 list.add(command.getKey());
                 CommandNode dummy = LiteralArgumentBuilder.literal(command.getKey())
@@ -149,6 +156,9 @@ public class BungeePacketAnalyzer {
             if (wrapper.packet instanceof Commands) {
                 Commands response = (Commands) wrapper.packet;
                 modifyCommands(player, response, commands);
+                player.unsafe().sendPacket(response);
+                return;
+
             } else if (wrapper.packet instanceof TabCompleteResponse) {
                 TabCompleteResponse response = (TabCompleteResponse) wrapper.packet;
 

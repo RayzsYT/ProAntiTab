@@ -155,7 +155,7 @@ public class BukkitLoader extends JavaPlugin {
             return;
         }
 
-        BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
+        BukkitAntiTabListener.handleTabCompletion(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? Storage.Blacklist.getBlacklist().getCommands() : getNotBlockedCommands());
     }
 
     public static List<String> getNotBlockedCommands() {

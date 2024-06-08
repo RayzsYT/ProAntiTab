@@ -28,7 +28,14 @@ public class Reflection {
         try {
             Class.forName("com.destroystokyo.paper.Metrics");
             paper = true;
-        } catch (Throwable throwable) { paper = false; }
+        } catch (Throwable throwable) {
+            try {
+                Class.forName("io.github.waterfallmc.waterfall.QueryResult");
+                paper = true;
+            } catch (Throwable throwable1) {
+                paper = false;
+            }
+        }
 
         if(proxy) {
             try {
