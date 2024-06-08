@@ -12,18 +12,17 @@ updater:
   enabled: true
   period: 10000
   updated:
-    - '&8[&2ProAntiTab&8] &aYou are using the newest version! ^^'
+    - '&8[&2PAT &7| &2Bukkit&8] &aYou are using the newest version! ^^'
   outdated:
-    - '&8[&4ProAntiTab&8] &cThere is a new version available! (%newest_version%)'
-    - '&8[&4ProAntiTab&8] &cYou are still using the %current_version%.'
-    - '&8[&4ProAntiTab&8] &cGet the newest version here:'
-    - '&8[&4ProAntiTab&8] &ehttps://www.rayzs.de/products/proantitab/page'
+    - '&8[&4PAT &7| &4Bukkit&8] &cThere is a new version available! (%newest_version%)'
+    - '&8[&4PAT &7| &4Bukkit&8] &cYou are still using the %current_version%.'
+    - '&8[&4PAT &7| &4Bukkit&8] &cGet the newest version here:'
+    - '&8[&4PAT &7| &4Bukkit&8] &ehttps://www.rayzs.de/products/proantitab/page'
 
-# Enabling this allows you to sync all available feature data with your proxy.
-# Basically it takes you off the work to configure a single feature on all backend servers.
-# Some of them are just getting overwritten as well but there's no big difference between them.
-# Those features are marked with the following comment: '>> HTP'
-# Please follow the instructions on the documentation page to understand how to properly set it up.
+# This part is VERY important if you are using a Bungeecord/Velocity server!
+# Enabling this allows the Bungeecord/Velocity server to communicate with the Spigot server and exchange information.
+# This is very important to block tab-completions and unwanted suggestions.
+# Please follow the instructions on the documentation page to understand how to set it up.
 # https://www.spigotmc.org/resources/113172/field?field=documentation
 # Go to the section "How to setup" (It's the first section actually)
 # and open the spoiler that matches your server scenario.
@@ -128,7 +127,7 @@ reload:
   done: '&aSuccessfully reloaded all configuration files!'
 
 help:
-  - '&7Available commands are: &f/%label%&7...'
+  - '&7Available commands are: &f/%label%&7... &8[&fBUKKIT&8]'
   - '§7Format: &8<optional> (required)'
   - '&f  reload &7to reload the plugin'
   - '&f  notify &7to get alerted'

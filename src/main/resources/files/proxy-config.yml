@@ -12,12 +12,12 @@ updater:
   enabled: true
   period: 10000
   updated:
-    - '&8[&2ProAntiTab&8] &aYou are using the newest version! ^^'
+    - '&8[&2PAT &7| &2Proxy&8] &aYou are using the newest version! ^^'
   outdated:
-    - '&8[&4ProAntiTab&8] &cThere is a new version available! (%newest_version%)'
-    - '&8[&4ProAntiTab&8] &cYou are still using the %current_version%.'
-    - '&8[&4ProAntiTab&8] &cGet the newest version here:'
-    - '&8[&4ProAntiTab&8] &ehttps://www.rayzs.de/products/proantitab/page'
+    - '&8[&4PAT &7| &4Proxy&8] &cThere is a new version available! (%newest_version%)'
+    - '&8[&4PAT &7| &4Proxy&8] &cYou are still using the %current_version%.'
+    - '&8[&4PAT &7| &4Proxy&8] &cGet the newest version here:'
+    - '&8[&4PAT &7| &4Proxy&8] &ehttps://www.rayzs.de/products/proantitab/page'
 
 # This is a very necessary feature if you have way too many commands to block and instead decide
 # to whitelist specific commands.
@@ -132,7 +132,7 @@ reload:
   done: '&aSuccessfully reloaded all configuration files!'
 
 help:
-  - '&7Available commands are: &f/%label%&7...'
+  - '&7Available commands are: &f/%label%&7... &8[&fPROXY&8]'
   - '§7Format: &8<optional> (required)'
   - '&f  reload &7to reload the plugin'
   - '&f  notify &7to get alerted'
