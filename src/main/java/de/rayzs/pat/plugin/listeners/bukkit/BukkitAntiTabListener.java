@@ -23,6 +23,11 @@ public class BukkitAntiTabListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
+        if(!BukkitLoader.isLoaded()) {
+            event.getCommands().clear();
+            return;
+        }
+
         if(event.getCommands().size() == 0) return;
 
         if(COMMANDS == null) {
