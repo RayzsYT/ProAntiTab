@@ -18,11 +18,14 @@ import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.utils.*;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 public class BukkitLoader extends JavaPlugin {
@@ -30,6 +33,7 @@ public class BukkitLoader extends JavaPlugin {
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
     private static boolean loaded = false, checkUpdate = false;
+    private static Map<String, Command> commandsMap = null;
     private int updaterTaskId;
 
     @Override
@@ -78,6 +82,20 @@ public class BukkitLoader extends JavaPlugin {
         if(getServer().getPluginManager().getPlugin("ViaVersion") != null) {
             ViaVersionAdapter.initialize();
         }
+
+        try {
+            if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
+                Field commandMapField = SimplePluginManager.class.getDeclaredField("commandMap");
+                commandMapField.setAccessible(true);
+                SimpleCommandMap simpleCommandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getPluginManager());
+                Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
+                knownCommandsField.setAccessible(true);
+                commandsMap = (Map<String, Command>)knownCommandsField.get(simpleCommandMap);
+            }
+        }catch (Throwable ignored) { }
+
+        if(commandsMap == null)
+            Logger.warning("Failed injection task! Skript commands won't be detected with that.");
     }
 
     @Override
@@ -156,6 +174,16 @@ public class BukkitLoader extends JavaPlugin {
         }
 
         BukkitAntiTabListener.handleTabCompletion(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? Storage.Blacklist.getBlacklist().getCommands() : getNotBlockedCommands());
+    }
+
+    public static boolean doesCommandExist(String command) {
+        if(commandsMap == null) return false;
+        if(command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
+
+        for (String currentCommand : commandsMap.keySet())
+            if (currentCommand.equals(command)) return true;
+
+        return false;
     }
 
     public static List<String> getNotBlockedCommands() {
