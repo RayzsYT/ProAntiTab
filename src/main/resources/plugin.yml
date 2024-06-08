@@ -12,6 +12,7 @@ softdepend:
   - ViaVersion
   - ViaBackwards
   - ViaRewind
+  - Skript
 
 commands:
   proantitab:
