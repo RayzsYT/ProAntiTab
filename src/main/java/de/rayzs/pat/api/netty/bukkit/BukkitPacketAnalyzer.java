@@ -4,6 +4,7 @@ import de.rayzs.pat.api.netty.bukkit.handlers.LegacyPacketHandler;
 import de.rayzs.pat.api.netty.bukkit.handlers.ModernPacketHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -81,7 +82,7 @@ public class BukkitPacketAnalyzer {
         @Override
         public void channelRead(ChannelHandlerContext channel, Object packetObj) {
             try {
-                if (!player.hasPermission("proantitab.bypass") && packetObj.getClass() != null) {
+                if (!PermissionUtil.hasBypassPermission(player, "proantitab.bypass") && packetObj.getClass() != null) {
                     String packetName = packetObj.getClass().getSimpleName();
                     if (packetName.equals("PacketPlayInTabComplete")) {
                         if(!PACKET_HANDLER.handleIncomingPacket(player, packetObj)) return;
@@ -95,7 +96,7 @@ public class BukkitPacketAnalyzer {
         @Override
         public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
             try {
-                if (!player.hasPermission("proantitab.bypass") && packetObj.getClass() != null) {
+                if (!PermissionUtil.hasBypassPermission(player, "proantitab.bypass") && packetObj.getClass() != null) {
                     String packetName = packetObj.getClass().getSimpleName();
                     if (packetName.equals("PacketPlayOutTabComplete")) {
                         if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;

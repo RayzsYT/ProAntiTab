@@ -74,7 +74,7 @@ public class PermissionUtil {
         }
 
         if(sender.isOperator())
-            if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+            if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
                 return true;
 
         return permissionMap.isPermitted("*") || permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);

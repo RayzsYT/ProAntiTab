@@ -31,7 +31,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
 
         if(input == null) return false;
 
-        boolean cancelsBeforeHand = false;
+        boolean cancelsBeforeHand;
         int spaces = 0;
 
         if(input.startsWith("/")) {
