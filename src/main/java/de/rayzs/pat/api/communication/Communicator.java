@@ -96,6 +96,7 @@ public class Communicator {
             CommunicationPackets.PacketBundle packetBundle =  (CommunicationPackets.PacketBundle) packet;
             if(!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString())) return;
 
+            Storage.USE_VELOCITY = packetBundle.isVelocity();
             LAST_BUKKIT_SYNC = System.currentTimeMillis();
             BukkitLoader.synchronize(packetBundle);
         }

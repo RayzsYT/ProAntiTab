@@ -126,13 +126,13 @@ public class BungeePacketAnalyzer {
     private static void modifyCommands(ProxiedPlayer player, Commands commands, List<String> list) {
         list.clear();
 
+        boolean blocked, turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
             if (!ProxyServer.getInstance().getDisabledCommands().contains(command.getKey()) && commands.getRoot().getChild(command.getKey()) == null && command.getValue().hasPermission(player)) {
-                if (Storage.Blacklist.isBlocked(player, command.getKey(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
-                    continue;
+                blocked = Storage.Blacklist.isBlocked(player, command.getKey(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+                if(turn && blocked || !turn && !blocked) continue;
 
                 list.add(command.getKey());
-
                 CommandNode dummy = LiteralArgumentBuilder.literal(command.getKey())
                         .executes(DUMMY_COMMAND)
                         .then(RequiredArgumentBuilder.argument("args", StringArgumentType.greedyString())
@@ -166,8 +166,6 @@ public class BungeePacketAnalyzer {
 
                 Commands response = (Commands) wrapper.packet;
                 modifyCommands(player, response, commands);
-                player.getPendingConnection().unsafe().sendPacket(response);
-                return;
             } else if (wrapper.packet instanceof TabCompleteResponse) {
                 TabCompleteResponse response = (TabCompleteResponse) wrapper.packet;
 

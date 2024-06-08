@@ -17,6 +17,6 @@ public class WaterfallAntiTabListener implements Listener {
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        event.getCommands().entrySet().removeIf(entry -> Storage.Blacklist.isBlocked(player, entry.getKey(), player.getServer().getInfo().getName()));
+        event.getCommands().entrySet().removeIf(command -> Storage.Blacklist.isBlocked(player, command.getKey(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName()));
     }
 }

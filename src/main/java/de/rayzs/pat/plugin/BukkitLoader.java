@@ -59,13 +59,11 @@ public class BukkitLoader extends JavaPlugin {
             loaded = true;
             GroupManager.initialize();
             BukkitPacketAnalyzer.injectAll();
-            if(Reflection.getMinor() >= 16)
-                manager.registerEvents(new BukkitAntiTabListener(), this);
-
         } else BackendUpdater.handle();
 
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
+        if(Reflection.getMinor() >= 16) manager.registerEvents(new BukkitAntiTabListener(), this);
 
         registerCommand("proantitab", "pat");
         startUpdaterTask();
@@ -126,15 +124,38 @@ public class BukkitLoader extends JavaPlugin {
 
     public static void synchronize(CommunicationPackets.PacketBundle packetBundle) {
         Communicator.sendFeedback();
-
         CommunicationPackets.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
 
+        if(!Storage.USE_VELOCITY) {
+            CommunicationPackets.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
+            CommunicationPackets.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
+
+            if (commandsPacket.getCommands() == null || commandsPacket.getCommands().isEmpty())
+                Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
+            else if (!Storage.Blacklist.getBlacklist().getCommands().containsAll(commandsPacket.getCommands()) || !commandsPacket.getCommands().containsAll(Storage.Blacklist.getBlacklist().getCommands()))
+                Storage.Blacklist.getBlacklist().setList(commandsPacket.getCommands());
+
+            if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != commandsPacket.turnBlacklistToWhitelistEnabled())
+                Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = commandsPacket.turnBlacklistToWhitelistEnabled();
+
+            GroupManager.clearAllGroups();
+            groupsPacket.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getCommands()));
+        }
+
+        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
         if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
             Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = unknownCommandPacket.isEnabled();
-        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
 
-        if(Reflection.getMinor() >= 16) BukkitAntiTabListener.updateCommands();
         if(!loaded) loaded = true;
+
+        if(Reflection.getMinor() < 16) return;
+
+        if(Storage.USE_VELOCITY) {
+            BukkitAntiTabListener.updateCommands();
+            return;
+        }
+
+        BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
     }
 
     public static List<String> getNotBlockedCommands() {

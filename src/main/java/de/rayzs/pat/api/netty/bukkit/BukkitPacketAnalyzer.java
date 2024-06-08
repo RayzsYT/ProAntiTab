@@ -29,7 +29,7 @@ public class BukkitPacketAnalyzer {
     }
 
     public static boolean inject(Player player) {
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return true;
+        if(Storage.USE_VELOCITY) return true;
 
         try {
             Channel channel = Reflection.getPlayerChannel(player);
@@ -47,7 +47,7 @@ public class BukkitPacketAnalyzer {
     }
 
     public static void uninject(UUID uuid) {
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
+        if(Storage.USE_VELOCITY) return;
 
         if(BukkitPacketAnalyzer.INJECTED_PLAYERS.containsKey(uuid)) {
             Channel channel = BukkitPacketAnalyzer.INJECTED_PLAYERS.get(uuid);
