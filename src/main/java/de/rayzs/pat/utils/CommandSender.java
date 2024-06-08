@@ -40,6 +40,19 @@ public class CommandSender {
                 || ((Player) sender).isOp());
     }
 
+    public boolean isOperator() {
+        if(isConsole()) return true;
+
+        if(!Reflection.isProxyServer()) {
+            if(sender instanceof Player) {
+                Player player = (Player) sender;
+                return player.isOp();
+            }
+        }
+
+        return false;
+    }
+
     public void sendMessage(String text) {
         if(MessageTranslator.isSupported()) MessageTranslator.send(sender, text);
         else if(sender instanceof Player) ((Player) sender).sendMessage(text);
