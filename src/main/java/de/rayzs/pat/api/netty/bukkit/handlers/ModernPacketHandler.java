@@ -47,10 +47,10 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         int spaces = 0;
         if(input.startsWith("/")) {
             input = input.replace("/", "");
-            String[] split = input.split(" ");
             if(input.contains(" ")) {
+                String[] split = input.split(" ");
                 spaces = split.length;
-                input = split[0];
+                if(spaces > 0) input = split[0];
             }
 
             cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);

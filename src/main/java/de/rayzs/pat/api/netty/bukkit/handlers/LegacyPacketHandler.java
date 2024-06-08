@@ -38,8 +38,8 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
             input = input.replace("/", "");
             if(input.contains(" ")) {
                 String[] split = input.split(" ");
-                input = split[0];
                 spaces = split.length;
+                if(spaces > 0) input = split[0];
             }
 
             cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);

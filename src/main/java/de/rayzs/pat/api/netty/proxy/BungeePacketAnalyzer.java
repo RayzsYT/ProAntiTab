@@ -175,10 +175,8 @@ public class BungeePacketAnalyzer {
 
                         if(playerInput.contains(" ")) {
                             String[] split = playerInput.split(" ");
-                            if(split.length > 0) {
-                                playerInput = split[0];
-                                spaces = split.length;
-                            }
+                            spaces = split.length;
+                            if(spaces > 0) playerInput = split[0];
                         }
 
                         if(!playerInput.equals("/"))
