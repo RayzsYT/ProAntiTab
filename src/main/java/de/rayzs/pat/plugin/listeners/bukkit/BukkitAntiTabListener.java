@@ -18,10 +18,10 @@ public class BukkitAntiTabListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
-        if(Storage.USE_VELOCITY) return;
-
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
+
+        if(Storage.USE_VELOCITY || player.isOp()) return;
 
         if(!BukkitLoader.isLoaded()) {
             event.getCommands().clear();
