@@ -6,6 +6,7 @@ import de.rayzs.pat.utils.CommandSender;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PermissionUtil {
 
@@ -72,7 +73,11 @@ public class PermissionUtil {
                 permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
         }
 
-        return sender.isOperator() || permissionMap.isPermitted("*") || permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
+        if(sender.isOperator())
+            if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+                return true;
+
+        return permissionMap.isPermitted("*") || permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
     }
 
     public static boolean hasBypassPermission(Object targetObj) {
