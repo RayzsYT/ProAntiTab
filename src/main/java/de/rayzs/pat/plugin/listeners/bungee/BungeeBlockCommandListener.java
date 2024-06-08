@@ -26,6 +26,14 @@ public class BungeeBlockCommandListener implements Listener {
 
         String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", "").toLowerCase();
 
+        if(command.contains(" ")) {
+            String[] split = command.split(" ");
+            if(split.length > 0) command = split[0];
+        }
+
+        if(command.contains("\n"))
+            command = command.replace("\n", "\\n");
+
         if(rawCommand.equals("/")) return;
         ServerInfo serverInfo = player.getServer().getInfo();
         String serverName = serverInfo != null ? serverInfo.getName() : "unknown";

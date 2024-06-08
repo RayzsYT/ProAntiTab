@@ -26,14 +26,22 @@ public class BukkitBlockCommandListener implements Listener {
         Player player = event.getPlayer();
         World world = player.getWorld();
         String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", ""), worldName = world.getName();
+
+        if(command.contains(" ")) {
+            String[] split = command.split(" ");
+            if(split.length > 0) command = split[0];
+        }
+
+        if(command.contains("\n"))
+            command = command.replace("\n", "\\n");
+
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%world%", worldName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED) {
-            String targetCommand = rawCommand.contains(" ") ? rawCommand.split(" ")[0] : rawCommand;
-            HelpTopic helpTopic = Bukkit.getHelpMap().getHelpTopic(targetCommand);
+            HelpTopic helpTopic = Bukkit.getHelpMap().getHelpTopic(command);
 
             if(helpTopic == null && !event.isCancelled()) {
-                if(!BukkitLoader.doesCommandExist(targetCommand)) {
+                if(!BukkitLoader.doesCommandExist(command)) {
                     event.setCancelled(true);
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE);
                     return;

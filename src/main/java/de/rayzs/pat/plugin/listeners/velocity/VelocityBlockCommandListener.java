@@ -30,6 +30,15 @@ public class VelocityBlockCommandListener {
         Player player = (Player) commandSource;
         String command = event.getCommand(),
                 serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown";
+
+        if(command.contains(" ")) {
+            String[] split = command.split(" ");
+            if(split.length > 0) command = split[0];
+        }
+
+        if(command.contains("\n"))
+            command = command.replace("\n", "\\n");
+
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
