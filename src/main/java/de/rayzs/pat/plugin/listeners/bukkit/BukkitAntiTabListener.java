@@ -21,7 +21,7 @@ public class BukkitAntiTabListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        if(Storage.USE_VELOCITY || player.isOp()) return;
+        if(Storage.USE_VELOCITY || !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && player.isOp()) return;
 
         if(!BukkitLoader.isLoaded()) {
             event.getCommands().clear();
