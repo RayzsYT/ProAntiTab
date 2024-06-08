@@ -1,19 +1,25 @@
- package de.rayzs.pat.plugin.listeners.bukkit;
+package de.rayzs.pat.plugin.listeners.bukkit;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.help.HelpTopic;
+import org.bukkit.plugin.SimplePluginManager;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
- public class BukkitBlockCommandListener implements Listener {
+public class BukkitBlockCommandListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
@@ -25,12 +31,17 @@ import java.util.List;
         if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED) {
             String targetCommand = rawCommand.contains(" ") ? rawCommand.split(" ")[0] : rawCommand;
             HelpTopic helpTopic = Bukkit.getHelpMap().getHelpTopic(targetCommand);
-            if(helpTopic == null) {
-                event.setCancelled(true);
-                MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE);
-                return;
+
+            if(helpTopic == null && !event.isCancelled()) {
+                if(!BukkitLoader.doesCommandExist(targetCommand)) {
+                    event.setCancelled(true);
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE);
+                    return;
+                }
             }
         }
+
+        if(player.isOp()) return;
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
             event.setCancelled(true);
