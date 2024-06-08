@@ -33,15 +33,12 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
         if(command.contains(" ")) {
             split = command.split(" ");
             if(split.length > 0) command = split[0];
-            command = command.split(" ")[0];
         }
 
         if(intensive && command.contains(":")) {
             split = command.split(":");
-            if(split.length > 0) {
-
+            if(split.length > 0)
                 command = command.replaceFirst(split[0] + ":", "");
-            }
         }
 
         return command;
