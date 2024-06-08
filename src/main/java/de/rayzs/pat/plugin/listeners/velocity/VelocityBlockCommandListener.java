@@ -6,6 +6,7 @@ import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
@@ -31,13 +32,9 @@ public class VelocityBlockCommandListener {
         String command = event.getCommand(),
                 serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown";
 
-        if(command.contains(" ")) {
-            String[] split = command.split(" ");
-            if(split.length > 0) command = split[0];
-        }
-
-        if(command.contains("\n"))
-            command = command.replace("\n", "\\n");
+        command = StringUtils.replaceFirst(command, "/", "");
+        command = StringUtils.getFirstArg(command);
+        command = StringUtils.replace(command, "\\", "<", ">", "&");
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 

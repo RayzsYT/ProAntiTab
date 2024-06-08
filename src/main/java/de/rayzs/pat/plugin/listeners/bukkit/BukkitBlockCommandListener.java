@@ -3,6 +3,7 @@ package de.rayzs.pat.plugin.listeners.bukkit;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
@@ -25,15 +26,11 @@ public class BukkitBlockCommandListener implements Listener {
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
-        String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", ""), worldName = world.getName();
+        String rawCommand = event.getMessage(), command = rawCommand, worldName = world.getName();
 
-        if(command.contains(" ")) {
-            String[] split = command.split(" ");
-            if(split.length > 0) command = split[0];
-        }
-
-        if(command.contains("\n"))
-            command = command.replace("\n", "\\n");
+        command = StringUtils.replaceFirst(command, "/", "");
+        command = StringUtils.getFirstArg(command);
+        command = StringUtils.replace(command, "\\", "<", ">", "&");
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%world%", worldName);
 
@@ -63,7 +60,7 @@ public class BukkitBlockCommandListener implements Listener {
         }
 
         if(!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || rawCommand.equals("/")) return;
-        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
+        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", command);
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.isListed(command, true)) return;

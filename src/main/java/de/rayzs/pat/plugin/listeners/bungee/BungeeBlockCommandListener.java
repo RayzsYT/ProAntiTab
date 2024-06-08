@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.listeners.bungee;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -24,15 +25,11 @@ public class BungeeBlockCommandListener implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) connection;
 
-        String rawCommand = event.getMessage(), command = rawCommand.replaceFirst("/", "").toLowerCase();
+        String rawCommand = event.getMessage(), command = rawCommand.toLowerCase();
 
-        if(command.contains(" ")) {
-            String[] split = command.split(" ");
-            if(split.length > 0) command = split[0];
-        }
-
-        if(command.contains("\n"))
-            command = command.replace("\n", "\\n");
+        command = StringUtils.replaceFirst(command, "/", "");
+        command = StringUtils.getFirstArg(command);
+        command = StringUtils.replace(command, "\\", "<", ">", "&");
 
         if(rawCommand.equals("/")) return;
         ServerInfo serverInfo = player.getServer().getInfo();
@@ -54,7 +51,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         if(!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return;
 
-        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
+        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", command);
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getServer().getInfo().getName())) return;
             if(Storage.Blacklist.isListed(player, command, true, player.getServer().getInfo().getName())) return;
