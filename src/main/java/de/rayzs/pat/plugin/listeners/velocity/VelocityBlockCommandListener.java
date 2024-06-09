@@ -34,7 +34,7 @@ public class VelocityBlockCommandListener {
 
         command = StringUtils.replaceFirst(command, "/", "");
         command = StringUtils.getFirstArg(command);
-        command = StringUtils.replace(command, "", "\\", "<", ">", "&");
+        command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
