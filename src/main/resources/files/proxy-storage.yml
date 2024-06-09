@@ -17,7 +17,7 @@ groups:
     servers:
       lobby-*:
         commands:
-          - example-command-to-bypass-in-this-group-for-this-server
+          - example-command-to-bypass-in-this-group-for-all-lobby-servers
       factions-1:
         commands:
-          - example-command-to-bypass-in-this-group-for-this-server
+          - example-command-to-bypass-in-this-group-for-this-specific-server
