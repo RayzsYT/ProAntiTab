@@ -29,7 +29,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         command = StringUtils.replaceFirst(command, "/", "");
         command = StringUtils.getFirstArg(command);
-        command = StringUtils.replace(command, "\\", "<", ">", "&");
+        command = StringUtils.replace(command, "", "\\", "<", ">", "&");
 
         if(rawCommand.equals("/")) return;
         ServerInfo serverInfo = player.getServer().getInfo();

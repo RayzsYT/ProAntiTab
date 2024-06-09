@@ -30,7 +30,7 @@ public class BukkitBlockCommandListener implements Listener {
 
         command = StringUtils.replaceFirst(command, "/", "");
         command = StringUtils.getFirstArg(command);
-        command = StringUtils.replace(command, "\\", "<", ">", "&");
+        command = StringUtils.replace(command, "", "\\", "<", ">", "&");
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%world%", worldName);
 
