@@ -42,8 +42,11 @@ custom-protocol-ping:
 # It is very helpful considering the fact you might have to set the same message
 # for if a command is blocked or really doesn't exist. ^^
 # Good to hide real and not-real commands from your players.
-# (!) Warning: THIS FEATURE ONLY WORKS IF PAT IS INSTALLED ON THE BACKEND-SERVERS AS WELL!
-# (!) Check first section for this (How to setup?): https://www.spigotmc.org/resources/113172/field?field=documentation
+# (!) Warning: This feature only works if PAT is installed on the backend server as well.
+# (!) The following page shows you how to setup PAT on the backend servers as well:
+# (!) https://www.spigotmc.org/resources/113172/field?field=documentation
+# (!) At the first section ("How to setup") are spoilers with different server scenarios.
+# (!) Open the spoiler that matches your server scenario and follow the instructed steps in there.
 custom-unknown-command:
   enabled: false
   message:
