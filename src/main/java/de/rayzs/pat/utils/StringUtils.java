@@ -22,7 +22,7 @@ public class StringUtils {
         return input;
     }
 
-    public static String replace(String input, String replacement, String... triggers) {
+    public static String replaceTriggers(String input, String replacement, String... triggers) {
         for (String trigger : triggers) {
             if(!input.contains(trigger)) continue;
             input = input.replace(trigger, replacement);
