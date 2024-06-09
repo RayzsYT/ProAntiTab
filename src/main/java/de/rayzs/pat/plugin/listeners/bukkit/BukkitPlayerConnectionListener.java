@@ -28,7 +28,7 @@ public class BukkitPlayerConnectionListener implements Listener {
 
         if(!BukkitPacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
 
-        if(Storage.OUTDATED && (PermissionUtil.hasPermission(player, "update"))) {
+        if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "update")) {
             Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
                 if(player.isOnline()) {
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
