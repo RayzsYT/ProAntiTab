@@ -28,7 +28,7 @@ public class CommandProcess {
 
         UUID uuid = sender.getUniqueId();
         int length = args.length;
-        String task, sub, extra, subExtra, confirmationString;
+        String task, sub, extra, subExtra, confirmationString, stringList;
         Group group;
         boolean bool, backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
 
@@ -132,14 +132,14 @@ public class CommandProcess {
                                 return;
                             }
 
-                            StringBuilder blacklistedCommandBuilder = new StringBuilder();
-                            for (int i = 0; i < Storage.Blacklist.getBlacklist().getCommands().size(); i++) {
-                                bool = (i >= Storage.Blacklist.getBlacklist().getCommands().size() - 1);
-                                blacklistedCommandBuilder.append(Storage.ConfigSections.Messages.BLACKLIST.LIST_COMMAND.replace("%command%", Storage.Blacklist.getBlacklist().getCommands().get(i)));
-                                if (!bool)
-                                    blacklistedCommandBuilder.append(Storage.ConfigSections.Messages.BLACKLIST.LIST_SPLITTER);
-                            }
-                            sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.LIST_MESSAGE.replace("%size%", String.valueOf(Storage.Blacklist.getBlacklist().getCommands().size())).replace("%commands%", blacklistedCommandBuilder.toString()));
+                            stringList = StringUtils.buildStringList(
+                                    Storage.Blacklist.getBlacklist().getCommands(),
+                                    Storage.ConfigSections.Messages.BLACKLIST.LIST_SPLITTER,
+                                    Storage.ConfigSections.Messages.BLACKLIST.LIST_COMMAND,
+                                    "%command%"
+                            );
+
+                            sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.LIST_MESSAGE.replace("%size%", String.valueOf(Storage.Blacklist.getBlacklist().getCommands().size())).replace("%commands%", stringList));
                             return;
 
                         case "listgroups":
@@ -152,14 +152,13 @@ public class CommandProcess {
                                 return;
                             }
 
-                            StringBuilder groupsBuilder = new StringBuilder();
-                            for (int i = 0; i < GroupManager.getGroupNames().size(); i++) {
-                                bool = (i >= GroupManager.getGroupNames().size() - 1);
-                                groupsBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_GROUPS.replace("%group%", GroupManager.getGroupNames().get(i)));
-                                if (!bool)
-                                    groupsBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SPLITTER);
-                            }
-                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_MESSAGE.replace("%size%", String.valueOf(GroupManager.getGroupNames().size())).replace("%groups%", groupsBuilder.toString()));
+                            stringList = StringUtils.buildStringList(
+                                    GroupManager.getGroupNames(),
+                                    Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SPLITTER,
+                                    Storage.ConfigSections.Messages.GROUP.LIST_GROUP_GROUPS,
+                                    "%group%");
+
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_MESSAGE.replace("%size%", String.valueOf(GroupManager.getGroupNames().size())).replace("%groups%", stringList));
                             return;
                     }
 
@@ -183,14 +182,12 @@ public class CommandProcess {
                                 return;
                             }
 
-                            StringBuilder blacklistedCommandBuilder = new StringBuilder();
-                            for (int i = 0; i < group.getCommands().size(); i++) {
-                                bool = (i >= group.getCommands().size() - 1);
-                                blacklistedCommandBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_COMMAND.replace("%command%", group.getCommands().get(i)));
-                                if (!bool)
-                                    blacklistedCommandBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_SPLITTER);
-                            }
-                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_MESSAGE.replace("%size%", String.valueOf(group.getCommands().size())).replace("%commands%", blacklistedCommandBuilder.toString()).replace("%group%", group.getGroupName()));
+                            stringList = StringUtils.buildStringList(
+                                    group.getCommands(),
+                                    Storage.ConfigSections.Messages.GROUP.LIST_SPLITTER,
+                                    Storage.ConfigSections.Messages.GROUP.LIST_COMMAND,
+                                    "%command%");
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_MESSAGE.replace("%size%", String.valueOf(group.getCommands().size())).replace("%commands%", stringList).replace("%group%", group.getGroupName()));
                             return;
 
                         case "listgroups":
@@ -203,15 +200,14 @@ public class CommandProcess {
                                 return;
                             }
 
-                            StringBuilder groupsBuilder = new StringBuilder();
-                            for (int i = 0; i < GroupManager.getGroupNamesByServer(sub.toLowerCase()).size(); i++) {
-                                bool = (i >= GroupManager.getGroupNamesByServer(sub.toLowerCase()).size() - 1);
-                                groupsBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_GROUPS.replace("%group%",GroupManager.getGroupNamesByServer(sub.toLowerCase()).get(i)));
-                                if (!bool)
-                                    groupsBuilder.append(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_SPLITTER);
-                            }
+                            stringList = StringUtils.buildStringList(
+                                    GroupManager.getGroupNamesByServer(sub.toLowerCase()),
+                                    Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_SPLITTER,
+                                    Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_GROUPS,
+                                    "%group%"
+                            );
 
-                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_MESSAGE.replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(GroupManager.getGroupNamesByServer(sub.toLowerCase()).size())).replace("%groups%", groupsBuilder.toString()));
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_SERVER_MESSAGE.replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(GroupManager.getGroupNamesByServer(sub.toLowerCase()).size())).replace("%groups%", stringList));
                             return;
 
                         case "creategroup":
@@ -327,15 +323,14 @@ public class CommandProcess {
                                     return;
                                 }
 
-                                StringBuilder commandsBuilder = new StringBuilder();
-                                for (int i = 0; i < Storage.Blacklist.getBlacklist(sub).getCommands().size(); i++) {
-                                    bool = (i >= Storage.Blacklist.getBlacklist(sub).getCommands().size() - 1);
-                                    commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_SERVER_COMMAND.replace("%command%", Storage.Blacklist.getBlacklist(sub).getCommands().get(i)));
-                                    if (!bool)
-                                        commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_SERVER_SPLITTER);
-                                }
+                                stringList = StringUtils.buildStringList(
+                                        Storage.Blacklist.getBlacklist(sub).getCommands(),
+                                        Storage.ConfigSections.Messages.SERV_LIST.LIST_SERVER_SPLITTER,
+                                        Storage.ConfigSections.Messages.SERV_LIST.LIST_SERVER_COMMAND,
+                                        "%command%"
+                                );
 
-                                sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.LIST_SERVER_MESSAGE.replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(Storage.Blacklist.getBlacklist(sub).getCommands().size())).replace("%commands%", commandsBuilder.toString()));
+                                sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.LIST_SERVER_MESSAGE.replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(Storage.Blacklist.getBlacklist(sub).getCommands().size())).replace("%commands%", stringList));
                                 return;
 
                         }
@@ -447,15 +442,14 @@ public class CommandProcess {
                                     return;
                                 }
 
-                                StringBuilder commandsBuilder = new StringBuilder();
-                                for (int i = 0; i < group.getCommands(sub).size(); i++) {
-                                    bool = (i >= group.getCommands(sub).size() - 1);
-                                    commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_COMMAND.replace("%command%", group.getAllCommands(sub).get(i)));
-                                    if (!bool)
-                                        commandsBuilder.append(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_SPLITTER);
-                                }
+                                stringList = StringUtils.buildStringList(
+                                        group.getCommands(sub),
+                                        Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_SPLITTER,
+                                        Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_COMMAND,
+                                        "%command%"
+                                );
 
-                                sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_MESSAGE.replace("%group%", group.getGroupName()).replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(group.getAllCommands(sub).size())).replace("%commands%", commandsBuilder.toString()));
+                                sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.LIST_GROUP_MESSAGE.replace("%group%", group.getGroupName()).replace("%server%", sub.toLowerCase()).replace("%size%", String.valueOf(group.getAllCommands(sub).size())).replace("%commands%", stringList));
                                 return;
                         }
                     }
