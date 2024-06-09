@@ -19,13 +19,15 @@ updater:
     - '&8[&4PAT &7| &4Bukkit&8] &cGet the newest version here:'
     - '&8[&4PAT &7| &4Bukkit&8] &ehttps://www.rayzs.de/products/proantitab/page'
 
-# This part is VERY important if you are using a Bungeecord/Velocity server!
-# Enabling this allows the Bungeecord/Velocity server to communicate with the Spigot server and exchange information.
-# This is very important to block tab-completions and unwanted suggestions.
-# Please follow the instructions on the documentation page to understand how to set it up.
-# https://www.spigotmc.org/resources/113172/field?field=documentation
-# Go to the section "How to setup" (It's the first section actually)
-# and open the spoiler that matches your server scenario.
+# (!) Warning: If you have a Bungeecord/Velocity server, please enable this option!
+# (!) How to use it properly can be seen on the following page:
+# (!) https://www.spigotmc.org/resources/113172/field?field=documentation
+# (!) At the first section ("How to setup") are spoilers with different server scenarios.
+# (!) Open the spoiler that matches your server scenario and follow the instructed steps in there.
+# Enabling this allows the Bungeecord/Velocity and backend servers to communicate with each other.
+# Information that are being communicated with are for example settings of certain features, but also important
+# data about groups, commands and much more, that are very important for the tab-completion & suggestions!
+# Affected features that are being synced with, or overwritten by the proxy, are marked as ">> HTP".
 handle-through-proxy:
   enabled: false
   token: insert-token-of-proxy-here
