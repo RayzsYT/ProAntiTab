@@ -1,4 +1,4 @@
-package de.rayzs.pat.utils.adapter;
+package de.rayzs.pat.utils.hooks;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -7,9 +7,9 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.*;
 
-public class PlaceholderAdapter extends PlaceholderExpansion {
+public class PlaceholderHook extends PlaceholderExpansion {
 
-    public PlaceholderAdapter() {
+    public PlaceholderHook() {
         Storage.ConfigSections.Placeholders.initialize();
     }
 
