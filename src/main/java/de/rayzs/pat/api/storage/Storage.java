@@ -4,6 +4,9 @@ import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.blacklist.impl.*;
 import de.rayzs.pat.api.storage.placeholders.commands.general.*;
 import de.rayzs.pat.api.storage.placeholders.commands.group.*;
+import de.rayzs.pat.api.storage.placeholders.general.GeneralCurrentVersionPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.general.GeneralNewestVersionPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.general.GeneralUserPlaceholder;
 import de.rayzs.pat.api.storage.placeholders.groups.*;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.config.messages.*;
@@ -14,6 +17,7 @@ import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.group.*;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -131,21 +135,28 @@ public class Storage {
 
         public static class Placeholders {
 
+            public static GeneralUserPlaceholder USER = new GeneralUserPlaceholder();
+            public static GeneralCurrentVersionPlaceholder CURRENT_VERSION = new GeneralCurrentVersionPlaceholder();
+            public static GeneralNewestVersionPlaceholder NEWEST_VERSION = new GeneralNewestVersionPlaceholder();
+
             public static ListGroupsPlaceholder LIST_GROUP = new ListGroupsPlaceholder();
             public static ListGroupsReversedPlaceholder LIST_GROUP_REVERSED = new ListGroupsReversedPlaceholder();
             public static ListGroupsSortedPlaceholder LIST_GROUP_SORTED = new ListGroupsSortedPlaceholder();
+            public static ListSizeGroupsPlaceholder LIST_SIZE_GROUPS = new ListSizeGroupsPlaceholder();
 
             public static ListGroupCommandsPlaceholder LIST_GROUP_COMMANDS = new ListGroupCommandsPlaceholder();
             public static ListGroupReversedCommandsPlaceholder LIST_GROUP_REVERSED_COMMANDS = new ListGroupReversedCommandsPlaceholder();
             public static ListGroupSortedCommandsPlaceholder LIST_GROUP_SORTED_COMMANDS = new ListGroupSortedCommandsPlaceholder();
+            public static ListGroupSizeCommandsPlaceholder LIST_GROUP_SIZE_GROUP = new ListGroupSizeCommandsPlaceholder();
 
             public static ListCommandsPlaceholder LIST_COMMANDS = new ListCommandsPlaceholder();
             public static ListReversedCommandsPlaceholder LIST_REVERSED_COMMANDS = new ListReversedCommandsPlaceholder();
             public static ListSortedCommandsPlaceholder LIST_SORTED_COMMANDS = new ListSortedCommandsPlaceholder();
+            public static ListSizeCommandsPlaceholder LIST_SIZE_COMMANDS = new ListSizeCommandsPlaceholder();
 
             public static void initialize() {}
 
-            public static String findAndReplace(String request) {
+            public static String findAndReplace(Player player, String request) {
                 String result = null, param = "";
 
                 if(USE_PLACEHOLDERAPI)
@@ -155,7 +166,7 @@ public class Storage {
                         if(storage.getRequest().endsWith("group_") && request.contains("group_"))
                             param = request.split("group_")[1];
 
-                        result = storage.onRequest(param);
+                        result = storage.onRequest(player, param);
                         if(result == null) continue;
                         else result = result.replace("\\n", "\n");
 

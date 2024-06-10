@@ -44,9 +44,7 @@ public class ConnectionBuilder {
             StringBuilder builder = new StringBuilder("\\");
             while (scanner.hasNextLine()) builder.append(" ").append(scanner.next());
             response = builder.toString().replace("\\ ", "");
-        } catch (Exception exception) {
-            Logger.warning("§cFailed to built connection to website! [" + exception.getMessage() + "]");
-        }
+        } catch (Exception ignored) { }
         return this;
     }
 

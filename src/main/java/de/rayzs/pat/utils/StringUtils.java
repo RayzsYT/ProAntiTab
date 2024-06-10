@@ -1,12 +1,6 @@
 package de.rayzs.pat.utils;
 
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.group.GroupManager;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StringUtils {
 
@@ -79,6 +73,19 @@ public class StringUtils {
             end = i >= list.size() - 1;
             builder.append(format.replace(placeholder, list.get(i)));
             if (!end && splitter != null) builder.append(splitter);
+        }
+
+        return builder.toString();
+    }
+
+    public static String buildStringList(List<String> list) {
+        StringBuilder builder = new StringBuilder();
+        boolean end;
+
+        for (int i = 0; i < list.size(); i++) {
+            end = i >= list.size() - 1;
+            builder.append(list.get(i).replace("&", "§"));
+            if (!end) builder.append("\n");
         }
 
         return builder.toString();

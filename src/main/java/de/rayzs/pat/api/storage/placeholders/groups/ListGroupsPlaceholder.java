@@ -4,6 +4,7 @@ import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.group.*;
+import org.bukkit.entity.Player;
 
 public class ListGroupsPlaceholder extends PlaceholderStorage {
 
@@ -12,7 +13,7 @@ public class ListGroupsPlaceholder extends PlaceholderStorage {
     public String COMMAND, SPLITTER;
 
     @Override
-    public String onRequest(String param) {
+    public String onRequest(Player player, String param) {
         Group group = GroupManager.getGroupByName(param);
         if(group == null) return null;
 

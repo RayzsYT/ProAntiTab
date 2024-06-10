@@ -6,6 +6,7 @@ import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
+import org.bukkit.entity.Player;
 
 public class ListGroupSortedCommandsPlaceholder extends PlaceholderStorage {
 
@@ -14,7 +15,7 @@ public class ListGroupSortedCommandsPlaceholder extends PlaceholderStorage {
     public String COMMAND, SPLITTER;
 
     @Override
-    public String onRequest(String param) {
+    public String onRequest(Player player, String param) {
         Group group = GroupManager.getGroupByName(param);
         if(group == null) return null;
 

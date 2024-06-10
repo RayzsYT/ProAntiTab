@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.configuration.helper;
 
+import de.rayzs.pat.api.storage.StorageTemplate;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
@@ -10,13 +11,7 @@ public class ConfigSectionHelper<T> {
     private final String path;
     private final Object obj;
 
-    public ConfigSectionHelper(ConfigStorage config, String path, Object obj) {
-        this.configuration = config.getConfig();
-        this.path = config.getNavigatePath() + (path != null ? "." + path : ""); ;
-        this.obj = obj;
-    }
-
-    public ConfigSectionHelper(PlaceholderStorage config, String path, Object obj) {
+    public ConfigSectionHelper(StorageTemplate config, String path, Object obj) {
         this.configuration = config.getConfig();
         this.path = config.getNavigatePath() + (path != null ? "." + path : ""); ;
         this.obj = obj;

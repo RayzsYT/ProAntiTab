@@ -42,6 +42,6 @@ public class PlaceholderHook extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String request) {
-        return Storage.ConfigSections.Placeholders.findAndReplace(request.toLowerCase());
+        return Storage.ConfigSections.Placeholders.findAndReplace(player, request.toLowerCase());
     }
 }

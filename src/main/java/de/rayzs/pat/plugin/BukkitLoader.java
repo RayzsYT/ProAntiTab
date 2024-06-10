@@ -122,17 +122,26 @@ public class BukkitLoader extends JavaPlugin {
         updaterTaskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
+
+            if(result == null) result = "internet";
             Storage.NEWER_VERSION = result;
 
             if (!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
                 Bukkit.getScheduler().cancelTask(updaterTaskId);
-                if (result.equals("unknown")) {
-                    Logger.warning("Failed reaching web host! (firewall enabled? website down?)");
-                } else if (result.equals("exception")) {
-                    Logger.warning("Failed creating web instance! (outdated java version?)");
-                } else {
-                    Storage.OUTDATED = true;
-                    Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
+                switch (result) {
+                    case "internet":
+                        Logger.warning("Failed to build connection to website! (No internet?)");
+                        break;
+                    case "unknown":
+                        Logger.warning("Failed to build connection to website! (Firewall enabled or website down?)");
+                        break;
+                    case "exception":
+                        Logger.warning("Failed to build connection to website! (Outdated java version?)");
+                        break;
+                    default:
+                        Storage.OUTDATED = true;
+                        Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
+                        break;
                 }
             } else {
                 if(!checkUpdate) {

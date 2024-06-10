@@ -2,6 +2,7 @@ package de.rayzs.pat.api.storage.storages;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.StorageTemplate;
+import org.bukkit.entity.Player;
 
 public abstract class PlaceholderStorage extends StorageTemplate {
 
@@ -23,5 +24,5 @@ public abstract class PlaceholderStorage extends StorageTemplate {
         return request;
     }
 
-    public abstract String onRequest(String param);
+    public abstract String onRequest(Player player, String param);
 }

@@ -4,6 +4,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
+import org.bukkit.entity.Player;
 
 public class ListCommandsPlaceholder extends PlaceholderStorage {
 
@@ -12,7 +13,7 @@ public class ListCommandsPlaceholder extends PlaceholderStorage {
     public String COMMAND, SPLITTER;
 
     @Override
-    public String onRequest(String param) {
+    public String onRequest(Player player, String param) {
         return StringUtils.buildStringList(
                 Storage.Blacklist.getBlacklist().getCommands(),
                 SPLITTER,
