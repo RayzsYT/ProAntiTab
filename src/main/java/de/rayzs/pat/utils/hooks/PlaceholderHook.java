@@ -3,7 +3,6 @@ package de.rayzs.pat.utils.hooks;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.StringUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.*;
