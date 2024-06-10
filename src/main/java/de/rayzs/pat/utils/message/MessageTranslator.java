@@ -4,7 +4,6 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
-import de.rayzs.pat.utils.message.replacer.impl.BukkitPlaceholderReplacer;
 import de.rayzs.pat.utils.message.translators.*;
 import java.util.*;
 
@@ -66,11 +65,13 @@ public class MessageTranslator {
     }
 
     public static void send(Object target, MultipleMessagesHelper texts) {
-        texts.getLines().forEach(text -> send(target, text));
+        String stringList = StringUtils.buildStringList(texts.getLines());
+        send(target, stringList);
     }
 
     public static void send(Object target, MultipleMessagesHelper texts, String... replacements) {
-        texts.getLines().forEach(text -> send(target, text, replacements));
+        String stringList = StringUtils.buildStringList(texts.getLines());
+        send(target, stringList, replacements);
     }
 
     public static void send(Object target, List<String> texts) {
@@ -88,14 +89,23 @@ public class MessageTranslator {
         text = replaceMessageString(text, replacements);
         if(translator == null) {
             CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
-            if(!PlaceholderReplacer.process(sender, text, sender::sendMessage))
-                sender.sendMessage(text);
+
+            if(!Reflection.isProxyServer())
+                sender.sendMessage(PlaceholderReplacer.replace(sender, text));
+            else {
+                if(!PlaceholderReplacer.process(sender, text, sender::sendMessage))
+                    sender.sendMessage(text);
+            }
 
             return;
         }
 
-        if(!PlaceholderReplacer.process(target, text, result -> translator.send(target, result)))
-            translator.send(target, text);
+        if(!Reflection.isProxyServer())
+            translator.send(target, PlaceholderReplacer.replace(target, text));
+        else {
+            if(!PlaceholderReplacer.process(target, text, result -> translator.send(target, result)))
+                translator.send(target, text);
+        }
     }
 
     public static String replaceMessage(String text) {
