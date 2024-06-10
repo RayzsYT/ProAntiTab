@@ -148,7 +148,7 @@ public class Storage {
             public static String findAndReplace(String request) {
                 String result = null, param = "";
 
-                if(!USE_PLACEHOLDERAPI)
+                if(USE_PLACEHOLDERAPI)
                     for (PlaceholderStorage storage : PLACEHOLDERS) {
                         if(!storage.getRequest().startsWith(request)) continue;
 
@@ -157,6 +157,7 @@ public class Storage {
 
                         result = storage.onRequest(param);
                         if(result == null) continue;
+                        else result = result.replace("\\n", "\n");
 
                         break;
                     }
