@@ -14,11 +14,6 @@ public class PlaceholderHook extends PlaceholderExpansion {
     }
 
     @Override
-    public boolean register() {
-        return super.register();
-    }
-
-    @Override
     public boolean persist() {
         return super.persist();
     }
