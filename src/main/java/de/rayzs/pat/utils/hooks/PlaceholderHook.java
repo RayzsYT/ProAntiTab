@@ -2,6 +2,7 @@ package de.rayzs.pat.utils.hooks;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -12,16 +13,12 @@ public class PlaceholderHook extends PlaceholderExpansion {
     public PlaceholderHook() {
         Storage.USE_PLACEHOLDERAPI = true;
         Storage.ConfigSections.Placeholders.initialize();
+        Logger.info("Successfully hooked into PlaceholderAPI! You can now use all available placeholders of PAT.");
     }
 
     @Override
     public boolean persist() {
         return super.persist();
-    }
-
-    @Override
-    public boolean register() {
-        return super.register();
     }
 
     @Override
