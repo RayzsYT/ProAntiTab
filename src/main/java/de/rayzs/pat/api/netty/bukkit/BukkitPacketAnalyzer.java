@@ -39,6 +39,9 @@ public class BukkitPacketAnalyzer {
                 return false;
             }
 
+            if(channel.pipeline().names().contains(BukkitPacketAnalyzer.HANDLER_NAME))
+                uninject(channel);
+
             channel.pipeline().addBefore(BukkitPacketAnalyzer.PIPELINE_NAME, BukkitPacketAnalyzer.HANDLER_NAME, new PacketDecoder(player));
             BukkitPacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
         } catch (Throwable throwable) {
@@ -52,13 +55,18 @@ public class BukkitPacketAnalyzer {
 
         if(BukkitPacketAnalyzer.INJECTED_PLAYERS.containsKey(uuid)) {
             Channel channel = BukkitPacketAnalyzer.INJECTED_PLAYERS.get(uuid);
-            if(channel != null) {
-                BukkitPacketAnalyzer.INJECTED_PLAYERS.remove(uuid);
-                channel.eventLoop().submit(() -> {
-                    ChannelPipeline pipeline = channel.pipeline();
-                    if (pipeline.names().contains(BukkitPacketAnalyzer.HANDLER_NAME)) pipeline.remove(BukkitPacketAnalyzer.HANDLER_NAME);
-                });
-            }
+            uninject(channel);
+        }
+    }
+
+    public static void uninject(Channel channel) {
+        if(Storage.USE_VELOCITY) return;
+
+        if(channel != null) {
+            channel.eventLoop().submit(() -> {
+                ChannelPipeline pipeline = channel.pipeline();
+                if (pipeline.names().contains(BukkitPacketAnalyzer.HANDLER_NAME)) pipeline.remove(BukkitPacketAnalyzer.HANDLER_NAME);
+            });
         }
     }
 
