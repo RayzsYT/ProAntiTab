@@ -27,15 +27,22 @@ public class ProxyPlaceholderReplacer {
                     uuid = ((com.velocitypowered.api.proxy.Player) playerObj).getUniqueId();
 
             } else if(Reflection.isProxyServer()) {
-                if (playerObj instanceof net.md_5.bungee.api.connection.ProxiedPlayer)
+                System.out.println("Checking through proxy");
+                if (playerObj instanceof net.md_5.bungee.api.connection.ProxiedPlayer) {
+                    System.out.println("Is ProxiedPlayer");
                     uuid = ((net.md_5.bungee.api.connection.ProxiedPlayer) playerObj).getUniqueId();
-
+                } else System.out.println("No proxied player ;C -> " + playerObj);
             } else {
                 if(playerObj instanceof org.bukkit.entity.Player)
                     uuid = ((org.bukkit.entity.Player) playerObj).getUniqueId();
             }
 
-        if(uuid == null) return false;
+        if(uuid == null) {
+            System.out.println("Ignore translation: " + text);
+            return false;
+        }
+
+        System.out.println("Translated: " + text);
         PLACEHOLDER_API.formatPlaceholders(text, uuid).thenAccept(consumer);
 
         return true;
