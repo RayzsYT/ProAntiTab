@@ -8,13 +8,14 @@ import java.util.function.Consumer;
 
 public class ProxyPlaceholderReplacer {
 
-    private static final PlaceholderAPI PLACEHOLDER_API;
+    private final PlaceholderAPI placeholderAPI;
 
-    static {
-        PLACEHOLDER_API = PlaceholderAPI.createInstance();
+    public ProxyPlaceholderReplacer() {
+        placeholderAPI = PlaceholderAPI.createInstance();
+        placeholderAPI.setRequestTimeout(1500);
     }
 
-    public static boolean process(Object playerObj, String text, Consumer<String> consumer) {
+    public boolean process(Object playerObj, String text, Consumer<String> consumer) {
         UUID uuid = null;
 
         if(playerObj != null)
@@ -27,23 +28,16 @@ public class ProxyPlaceholderReplacer {
                     uuid = ((com.velocitypowered.api.proxy.Player) playerObj).getUniqueId();
 
             } else if(Reflection.isProxyServer()) {
-                System.out.println("Checking through proxy");
-                if (playerObj instanceof net.md_5.bungee.api.connection.ProxiedPlayer) {
-                    System.out.println("Is ProxiedPlayer");
+                if (playerObj instanceof net.md_5.bungee.api.connection.ProxiedPlayer)
                     uuid = ((net.md_5.bungee.api.connection.ProxiedPlayer) playerObj).getUniqueId();
-                } else System.out.println("No proxied player ;C -> " + playerObj);
+
             } else {
                 if(playerObj instanceof org.bukkit.entity.Player)
                     uuid = ((org.bukkit.entity.Player) playerObj).getUniqueId();
             }
 
-        if(uuid == null) {
-            System.out.println("Ignore translation: " + text);
-            return false;
-        }
-
-        System.out.println("Translated: " + text);
-        PLACEHOLDER_API.formatPlaceholders(text, uuid).thenAccept(consumer);
+        if(uuid == null) return false;
+        placeholderAPI.formatPlaceholders(text, uuid).thenAccept(consumer);
 
         return true;
     }

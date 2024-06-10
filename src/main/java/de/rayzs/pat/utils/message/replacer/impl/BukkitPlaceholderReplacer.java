@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 public class BukkitPlaceholderReplacer {
 
-    public static String process(Object playerObj, String text) {
+    public String process(Object playerObj, String text) {
         Player player = null;
 
         if(playerObj != null)
