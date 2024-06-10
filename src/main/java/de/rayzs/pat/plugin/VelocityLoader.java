@@ -92,7 +92,10 @@ public class VelocityLoader {
         if(server.getPluginManager().getPlugin("luckperms").isPresent())
             LuckPermsAdapter.initialize();
 
-        Storage.USE_PAPIPROXYBRIDGE = server.getPluginManager().getPlugin("papiproxybridge").isPresent();
+        if(server.getPluginManager().getPlugin("papiproxybridge").isPresent()) {
+            Storage.USE_PAPIPROXYBRIDGE = true;
+            Logger.info("Successfully hooked into PAPIProxyBridge!");
+        }
     }
 
     public void startUpdaterTask() {

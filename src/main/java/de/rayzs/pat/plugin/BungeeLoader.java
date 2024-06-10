@@ -72,7 +72,10 @@ public class BungeeLoader extends Plugin {
         if (manager.getPlugin("LuckPerms") != null)
             LuckPermsAdapter.initialize();
 
-        Storage.USE_PAPIPROXYBRIDGE = manager.getPlugin("PAPIProxyBridge") != null;
+        if(manager.getPlugin("PAPIProxyBridge") != null) {
+            Storage.USE_PAPIPROXYBRIDGE = true;
+            Logger.info("Successfully hooked into PAPIProxyBridge!");
+        }
 
         BungeePacketAnalyzer.injectAll();
     }

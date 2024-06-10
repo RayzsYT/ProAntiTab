@@ -74,12 +74,14 @@ public class MessageTranslator {
     }
 
     public static void send(Object target, List<String> texts) {
-        texts.forEach(text -> send(target, text));
+        String stringList = StringUtils.buildStringList(texts);
+        send(target, stringList);
     }
 
     public static void send(Object target, List<String> texts, String... replacements) {
         texts = replaceMessageList(texts, replacements);
-        texts.forEach(text -> send(target, text));
+        String stringList = StringUtils.buildStringList(texts);
+        send(target, stringList);
     }
 
     public static void send(Object target, String text, String... replacements) {
