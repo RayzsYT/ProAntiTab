@@ -20,7 +20,7 @@
 #   list_sorted_groups = Get all groups in alphabetic order. (A-Z)
 #   list_reversed_groups = Get all groups in reversed alphabetic order. (Z-A)
 
-# Placeholders to list all commands in a group:
+# Placeholders to list all commands from a group:
 #   list_commands_group_xxx = Get all commands of a group.
 #   list_sorted_commands_group_xxx = Get all commands of a group in alphabetic order. (A-Z)
 #   list_reversed_commands_group_xxx = Get all commands of a group in reversed alphabetic order. (Z-A)
