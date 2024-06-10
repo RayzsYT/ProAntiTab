@@ -41,10 +41,8 @@ public class PlaceholderHook extends PlaceholderExpansion {
         String result = null;
         request = request.toLowerCase();
 
-        if(request.startsWith("pat_")) {
-            request = StringUtils.replaceFirst(request,"pat_", "");
+        if(request.startsWith("pat_"))
             result = Storage.ConfigSections.Placeholders.findAndReplace(request);
-        }
 
         return result != null ? result : super.onPlaceholderRequest(player, request);
     }
