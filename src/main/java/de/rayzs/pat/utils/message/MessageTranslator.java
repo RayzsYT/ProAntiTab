@@ -88,6 +88,7 @@ public class MessageTranslator {
             CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
             if(!PlaceholderReplacer.process(sender, text, sender::sendMessage))
                 sender.sendMessage(text);
+
             return;
         }
 

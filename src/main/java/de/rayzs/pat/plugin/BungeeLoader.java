@@ -33,6 +33,7 @@ public class BungeeLoader extends Plugin {
     public void onLoad() {
         Configurator.createResourcedFile(getDataFolder(), "files\\proxy-config.yml", "config.yml", false);
         Configurator.createResourcedFile(getDataFolder(), "files\\proxy-storage.yml", "storage.yml", false);
+        Configurator.createResourcedFile(getDataFolder(), "files\\placeholders.yml", "placeholders.yml", false);
     }
 
     @Override

@@ -62,6 +62,7 @@ public class VelocityLoader {
 
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-config.yml", "config.yml", false);
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-storage.yml", "storage.yml", false);
+        Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\placeholders.yml", "placeholders.yml", false);
 
         Reflection.initialize(server);
         Storage.CURRENT_VERSION = pluginContainer.getDescription().getVersion().get();
