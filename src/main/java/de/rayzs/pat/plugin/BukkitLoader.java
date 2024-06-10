@@ -83,8 +83,9 @@ public class BukkitLoader extends JavaPlugin {
         if(getServer().getPluginManager().getPlugin("ViaVersion") != null)
             ViaVersionAdapter.initialize();
 
-        if(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
+        if(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceholderHook().register();
+        }
 
 
         try {

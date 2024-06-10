@@ -24,7 +24,7 @@ public class Storage {
     public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
     public static Object PLUGIN_OBJECT;
-    public static boolean USE_LUCKPERMS = false, USE_VIAVERSION = false, USE_VELOCITY = false;
+    public static boolean USE_LUCKPERMS = false, USE_PLACEHOLDERAPI = false, USE_VIAVERSION = false, USE_VELOCITY = false;
 
     public static void loadAll(boolean loadBlacklist) {
         loadConfig();
@@ -40,7 +40,9 @@ public class Storage {
         ConfigSections.Settings.initialize();
         ConfigSections.Messages.initialize();
         ConfigSections.SECTIONS.forEach(ConfigStorage::load);
-        ConfigSections.PLACEHOLDERS.forEach(PlaceholderStorage::load);
+
+        if(USE_PLACEHOLDERAPI)
+            ConfigSections.PLACEHOLDERS.forEach(PlaceholderStorage::load);
     }
 
     public static List<String> getServers() {
@@ -146,17 +148,18 @@ public class Storage {
             public static String findAndReplace(String request) {
                 String result, param = "";
 
-                for (PlaceholderStorage storage : PLACEHOLDERS) {
-                    if(!storage.getRequest().startsWith(request)) continue;
+                if(!USE_PLACEHOLDERAPI)
+                    for (PlaceholderStorage storage : PLACEHOLDERS) {
+                        if(!storage.getRequest().startsWith(request)) continue;
 
-                    if(storage.getRequest().endsWith("group_") && request.contains("group_"))
-                        param = request.split("group_")[1];
+                        if(storage.getRequest().endsWith("group_") && request.contains("group_"))
+                            param = request.split("group_")[1];
 
-                    result = storage.onRequest(param);
-                    if(result == null) continue;
+                        result = storage.onRequest(param);
+                        if(result == null) continue;
 
-                    break;
-                }
+                        break;
+                    }
 
                 return request;
             }

@@ -10,12 +10,18 @@ import org.jetbrains.annotations.*;
 public class PlaceholderHook extends PlaceholderExpansion {
 
     public PlaceholderHook() {
+        Storage.USE_PLACEHOLDERAPI = true;
         Storage.ConfigSections.Placeholders.initialize();
     }
 
     @Override
     public boolean persist() {
         return super.persist();
+    }
+
+    @Override
+    public boolean register() {
+        return super.register();
     }
 
     @Override
