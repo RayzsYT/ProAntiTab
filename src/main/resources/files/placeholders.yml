@@ -11,61 +11,61 @@
 # Here's a small overview of all placeholders:
 
 # Placeholders to list all commands:
-#   %list_commands% = Get all listed commands.
-#   %list_sorted_commands% = Get all listed commands in alphabetic order. (A-Z)
-#   %list_reversed_groups% = Get all listed commands in reversed alphabetic order. (Z-A)
+#   %pat_list_commands% = Get all listed commands.
+#   %pat_list_sorted_commands% = Get all listed commands in alphabetic order. (A-Z)
+#   %pat_list_reversed_groups% = Get all listed commands in reversed alphabetic order. (Z-A)
 
 # Placeholders to list all groups:
-#   %list_groups% = Get all groups
-#   %list_sorted_groups% = Get all groups in alphabetic order. (A-Z)
-#   %list_reversed_groups% = Get all groups in reversed alphabetic order. (Z-A)
+#   %pat_list_groups% = Get all groups
+#   %pat_list_sorted_groups% = Get all groups in alphabetic order. (A-Z)
+#   %pat_list_reversed_groups% = Get all groups in reversed alphabetic order. (Z-A)
 
 # Placeholders to list all commands from a group: (replace 'xxx' with the group-name)
-#   %list_commands_group_xxx% = Get all commands of a group.
-#   %list_sorted_commands_group_xxx% = Get all commands of a group in alphabetic order. (A-Z)
-#   %list_reversed_commands_group_xxx% = Get all commands of a group in reversed alphabetic order. (Z-A)
+#   %pat_list_commands_group_xxx% = Get all commands of a group.
+#   %pat_list_sorted_commands_group_xxx% = Get all commands of a group in alphabetic order. (A-Z)
+#   %pat_list_reversed_commands_group_xxx% = Get all commands of a group in reversed alphabetic order. (Z-A)
 
 # Get all groups.
-list_groups:
+pat_list_groups:
   splitter: '&7-> '
   group: '&f%group%\n'
 
 # Get all groups in alphabetic order. (A-Z)
-list_sorted_groups:
+pat_list_sorted_groups:
   splitter: '&7-> '
   group: '&f%group%\n'
 
 # Get all groups in reversed alphabetic order. (Z-A)
-list_reversed_groups:
+pat_list_reversed_groups:
   splitter: '&7-> '
   group: '&f%group%\n'
 
 # Get all commands of a group.
-list_commands_group_:
+pat_list_commands_group_:
   splitter: '&7-> '
   command: '&f%command%\n'
 
 # Get all commands of a group in alphabetic order. (A-Z)
-list_sorted_commands_group_:
+pat_list_sorted_commands_group_:
   splitter: '&7-> '
   command: '&f%command%\n'
 
 # Get all commands of a group in reversed alphabetic order. (Z-A)
-list_reversed_commands_group_:
+pat_list_reversed_commands_group_:
   splitter: '&7-> '
   command: '&f%command%\n'
 
 # Get all listed commands.
-list_commands:
+pat_list_commands:
   splitter: '&7-> '
   command: '&f%command%\n'
 
 # Get all listed commands in alphabetic order. (A-Z)
-list_sorted_commands:
+pat_list_sorted_commands:
   splitter: '&7-> '
   command: '&f%command%\n'
 
 # Get all listed commands in reversed alphabetic order. (Z-A)
-list_reversed_commands:
+pat_list_reversed_commands:
   splitter: '&7-> '
   command: '&f%command%\n'
