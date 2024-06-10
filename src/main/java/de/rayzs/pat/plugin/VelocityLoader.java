@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 id = "proantitab",
 version = "1.7.4",
 authors = "Rayzs_YT",
-description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.",
+description = "Hide more then just plugins. Hide almost everything!",
 dependencies = {
         @Dependency(id = "luckperms", optional = true),
         @Dependency(id = "papiproxybridge", optional = true)
