@@ -1,0 +1,71 @@
+#      ____             ___          __  _ ______      __
+#     / __ \_________  /   |  ____  / /_(_)_  __/___ _/ /_
+#    / /_/ / ___/ __ \/ /| | / __ \/ __/ / / / / __ `/ __ \
+#   / ____/ /  / /_/ / ___ |/ / / / /_/ / / / / /_/ / /_/ /
+#  /_/   /_/   \____/_/  |_/_/ /_/\__/_/ /_/  \__,_/_.___/
+#  placeholders.yml (PlaceholderAPI Hook)
+
+# This here are all placeholders PAT can provide you with.
+# Here you can change those placeholders to your liking.
+# The names of the usable placeholders are the heading of the sections.
+# Here's a small overview of all placeholders:
+
+# Placeholders to list all commands:
+#   list_commands = Get all listed commands.
+#   list_sorted_commands = Get all listed commands in alphabetic order. (A-Z)
+#   list_reversed_groups = Get all listed commands in reversed alphabetic order. (Z-A)
+
+# Placeholders to list all groups:
+#   list_groups = Get all groups
+#   list_sorted_groups = Get all groups in alphabetic order. (A-Z)
+#   list_reversed_groups = Get all groups in reversed alphabetic order. (Z-A)
+
+# Placeholders to list all commands in a group:
+#   list_commands_group_xxx = Get all commands of a group.
+#   list_sorted_commands_group_xxx = Get all commands of a group in alphabetic order. (A-Z)
+#   list_reversed_commands_group_xxx = Get all commands of a group in reversed alphabetic order. (Z-A)
+
+# Get all groups.
+list_groups:
+  splitter: '&7-> '
+  group: '&f%group%\n'
+
+# Get all groups in alphabetic order. (A-Z)
+list_sorted_groups:
+  splitter: '&7-> '
+  group: '&f%group%\n'
+
+# Get all groups in reversed alphabetic order. (Z-A)
+list_reversed_groups:
+  splitter: '&7-> '
+  group: '&f%group%\n'
+
+# Get all commands of a group.
+list_commands_group_:
+  splitter: '&7-> '
+  command: '&f%command%\n'
+
+# Get all commands of a group in alphabetic order. (A-Z)
+list_sorted_commands_group_:
+  splitter: '&7-> '
+  command: '&f%command%\n'
+
+# Get all commands of a group in reversed alphabetic order. (Z-A)
+list_reversed_commands_group_:
+  splitter: '&7-> '
+  command: '&f%command%\n'
+
+# Get all listed commands.
+list_commands:
+  splitter: '&7-> '
+  command: '&f%command%\n'
+
+# Get all listed commands in alphabetic order. (A-Z)
+list_sorted_commands:
+  splitter: '&7-> '
+  command: '&f%command%\n'
+
+# Get all listed commands in reversed alphabetic order. (Z-A)
+list_reversed_commands:
+  splitter: '&7-> '
+  command: '&f%command%\n'
