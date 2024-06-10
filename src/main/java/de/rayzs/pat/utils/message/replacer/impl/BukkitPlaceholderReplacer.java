@@ -16,6 +16,7 @@ public class BukkitPlaceholderReplacer {
             } else if(playerObj instanceof Player)
                 player = (Player) playerObj;
 
+
         return PlaceholderAPI.setPlaceholders(player, text);
     }
 }

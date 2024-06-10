@@ -86,40 +86,37 @@ public class MessageTranslator {
     }
 
     public static void send(Object target, String text, String... replacements) {
-        text = replaceMessageString(text, replacements);
+        text = replaceMessageString(target, text, replacements);
         if(translator == null) {
             CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
 
-            if(!Reflection.isProxyServer())
-                sender.sendMessage(PlaceholderReplacer.replace(sender, text));
-            else {
-                if(!PlaceholderReplacer.process(sender, text, sender::sendMessage))
-                    sender.sendMessage(text);
-            }
+            if(!PlaceholderReplacer.process(sender, text, sender::sendMessage))
+                sender.sendMessage(text);
 
             return;
         }
 
-        if(!Reflection.isProxyServer())
-            translator.send(target, PlaceholderReplacer.replace(target, text));
-        else {
-            if(!PlaceholderReplacer.process(target, text, result -> translator.send(target, result)))
-                translator.send(target, text);
-        }
+        if(PlaceholderReplacer.process(target, text, result -> translator.send(target, result))) return;
+
+        translator.send(target, text);
     }
 
     public static String replaceMessage(String text) {
         return replaceMessage(null, text);
     }
 
-    public static String replaceMessage(Object playerObj, String text) {
-        CommandSender sender = playerObj instanceof CommandSender ? (CommandSender) playerObj : new CommandSender(playerObj);
+    public static String replaceMessage(Object targetObj, String text) {
+        CommandSender sender = targetObj instanceof CommandSender ? (CommandSender) targetObj : new CommandSender(targetObj);
         text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "").replace("&", "§").replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX).replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
-        return PlaceholderReplacer.replace(playerObj, text);
+        return PlaceholderReplacer.replace(targetObj, text);
     }
 
     public static String replaceMessageString(String rawText, String... replacements) {
         return replaceMessage(StringUtils.replace(rawText, replacements));
+    }
+
+    public static String replaceMessageString(Object targetObj, String rawText, String... replacements) {
+        return replaceMessage(targetObj, StringUtils.replace(rawText, replacements));
     }
 
     public static List<String> replaceMessageList(MultipleMessagesHelper rawText, String... replacements) {
