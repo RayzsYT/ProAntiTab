@@ -12,7 +12,6 @@ public class MessageTranslator {
     private static final HashMap<Character, String> colors = new HashMap<>();
     private static boolean support;
     private static Translator translator = null;
-    private static boolean placeholderSupport = false;
 
     public static void initialize() {
         colors.put('1', "<dark_blue>");
@@ -43,10 +42,6 @@ public class MessageTranslator {
             translator = Reflection.isVelocityServer() ? new VelocityMessageTranslator()
                     : Reflection.isProxyServer() ? new BungeeMessageTranslator()
                     : new BukkitMessageTranslator();
-    }
-
-    public static void enablePlaceholderSupport() {
-        placeholderSupport = true;
     }
 
     public static String translateLegacy(String text) {
@@ -104,7 +99,7 @@ public class MessageTranslator {
     public static String replaceMessage(Object playerObj, String text) {
         CommandSender sender = playerObj instanceof CommandSender ? (CommandSender) playerObj : new CommandSender(playerObj);
         text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "").replace("&", "§").replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX).replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
-        return !placeholderSupport || playerObj == null || Reflection.isProxyServer() ? text : PlaceholderReplacer.replace(playerObj, text);
+        return !Storage.USE_PLACEHOLDERAPI || playerObj == null || Reflection.isProxyServer() ? text : PlaceholderReplacer.replace(playerObj, text);
     }
 
     public static String replaceMessageString(String rawText, String... replacements) {
