@@ -11,19 +11,19 @@
 # Here's a small overview of all placeholders:
 
 # Placeholders to list all commands:
-#   list_commands = Get all listed commands.
-#   list_sorted_commands = Get all listed commands in alphabetic order. (A-Z)
-#   list_reversed_groups = Get all listed commands in reversed alphabetic order. (Z-A)
+#   %list_commands% = Get all listed commands.
+#   %list_sorted_commands% = Get all listed commands in alphabetic order. (A-Z)
+#   %list_reversed_groups% = Get all listed commands in reversed alphabetic order. (Z-A)
 
 # Placeholders to list all groups:
-#   list_groups = Get all groups
-#   list_sorted_groups = Get all groups in alphabetic order. (A-Z)
-#   list_reversed_groups = Get all groups in reversed alphabetic order. (Z-A)
+#   %list_groups% = Get all groups
+#   %list_sorted_groups% = Get all groups in alphabetic order. (A-Z)
+#   %list_reversed_groups% = Get all groups in reversed alphabetic order. (Z-A)
 
 # Placeholders to list all commands from a group:
-#   list_commands_group_xxx = Get all commands of a group.
-#   list_sorted_commands_group_xxx = Get all commands of a group in alphabetic order. (A-Z)
-#   list_reversed_commands_group_xxx = Get all commands of a group in reversed alphabetic order. (Z-A)
+#   %list_commands_group_xxx% = Get all commands of a group.
+#   %list_sorted_commands_group_xxx% = Get all commands of a group in alphabetic order. (A-Z)
+#   %list_reversed_commands_group_xxx% = Get all commands of a group in reversed alphabetic order. (Z-A)
 
 # Get all groups.
 list_groups:
