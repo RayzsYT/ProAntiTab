@@ -54,7 +54,9 @@ public class BukkitLoader extends JavaPlugin {
 
         Storage.loadAll(true);
 
-        if(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) MessageTranslator.enablePlaceholderSupport();
+        if(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
+            new PlaceholderHook().register();
+        ;
         MessageTranslator.initialize();
         CustomServerBrand.initialize();
         bStats.initialize(this);
@@ -83,9 +85,6 @@ public class BukkitLoader extends JavaPlugin {
 
         if(getServer().getPluginManager().getPlugin("ViaVersion") != null)
             ViaVersionAdapter.initialize();
-
-        if(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
-            new PlaceholderHook().register();
 
         try {
             if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
