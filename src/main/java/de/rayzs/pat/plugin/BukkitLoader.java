@@ -11,7 +11,7 @@ import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.Communicator;
-import de.rayzs.pat.utils.adapter.PlaceholderAdapter;
+import de.rayzs.pat.utils.hooks.PlaceholderHook;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -84,7 +84,7 @@ public class BukkitLoader extends JavaPlugin {
             ViaVersionAdapter.initialize();
 
         if(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
-            new PlaceholderAdapter().register();
+            new PlaceholderHook().register();
 
 
         try {
