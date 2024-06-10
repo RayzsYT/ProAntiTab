@@ -1,18 +1,19 @@
 package de.rayzs.pat.api.storage;
 
-import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
-import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.api.storage.blacklist.impl.*;
+import de.rayzs.pat.api.storage.placeholders.commands.general.*;
+import de.rayzs.pat.api.storage.placeholders.commands.group.*;
+import de.rayzs.pat.api.storage.placeholders.groups.*;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
-import de.rayzs.pat.plugin.BungeeLoader;
-import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
+import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.group.Group;
-import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.group.*;
 
 import java.util.*;
 
@@ -39,6 +40,7 @@ public class Storage {
         ConfigSections.Settings.initialize();
         ConfigSections.Messages.initialize();
         ConfigSections.SECTIONS.forEach(ConfigStorage::load);
+        ConfigSections.PLACEHOLDERS.forEach(PlaceholderStorage::load);
     }
 
     public static List<String> getServers() {
@@ -83,6 +85,7 @@ public class Storage {
         public static final ConfigurationBuilder
                 CONFIGURATION = Configurator.get("config"),
                 STORAGE = Configurator.get("storage"),
+                PLACEHOLDERS = Configurator.get("placeholders"),
                 TOKEN = Configurator.get("token");
 
         public static void initialize() {}
@@ -91,6 +94,7 @@ public class Storage {
     public static class ConfigSections {
 
         public static List<ConfigStorage> SECTIONS = new ArrayList<>();
+        public static List<PlaceholderStorage> PLACEHOLDERS = new ArrayList<>();
 
         public static class Settings {
 
@@ -121,6 +125,41 @@ public class Storage {
             public static StatsSection STATS = new StatsSection();
 
             public static void initialize() {}
+        }
+
+        public static class Placeholders {
+
+            public static ListGroupsPlaceholder LIST_GROUP = new ListGroupsPlaceholder();
+            public static ListGroupsReversedPlaceholder LIST_GROUP_REVERSED = new ListGroupsReversedPlaceholder();
+            public static ListGroupsSortedPlaceholder LIST_GROUP_SORTED = new ListGroupsSortedPlaceholder();
+
+            public static ListGroupCommandsPlaceholder LIST_GROUP_COMMANDS = new ListGroupCommandsPlaceholder();
+            public static ListGroupReversedCommandsPlaceholder LIST_GROUP_REVERSED_COMMANDS = new ListGroupReversedCommandsPlaceholder();
+            public static ListGroupSortedCommandsPlaceholder LIST_GROUP_SORTED_COMMANDS = new ListGroupSortedCommandsPlaceholder();
+
+            public static ListCommandsPlaceholder LIST_COMMANDS = new ListCommandsPlaceholder();
+            public static ListReversedCommandsPlaceholder LIST_REVERSED_COMMANDS = new ListReversedCommandsPlaceholder();
+            public static ListSortedCommandsPlaceholder LIST_SORTED_COMMANDS = new ListSortedCommandsPlaceholder();
+
+            public static void initialize() {}
+
+            public static String findAndReplace(String request) {
+                String result, param = "";
+
+                for (PlaceholderStorage storage : PLACEHOLDERS) {
+                    if(!storage.getRequest().startsWith(request)) continue;
+
+                    if(storage.getRequest().endsWith("group_") && request.contains("group_"))
+                        param = request.split("group_")[1];
+
+                    result = storage.onRequest(param);
+                    if(result == null) continue;
+
+                    break;
+                }
+
+                return request;
+            }
         }
     }
 

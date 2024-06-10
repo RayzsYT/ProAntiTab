@@ -11,6 +11,7 @@ import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.utils.adapter.PlaceholderAdapter;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -79,9 +80,12 @@ public class BukkitLoader extends JavaPlugin {
             Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
         }
 
-        if(getServer().getPluginManager().getPlugin("ViaVersion") != null) {
+        if(getServer().getPluginManager().getPlugin("ViaVersion") != null)
             ViaVersionAdapter.initialize();
-        }
+
+        if(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
+            new PlaceholderAdapter().register();
+
 
         try {
             if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
