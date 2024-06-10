@@ -7,7 +7,7 @@ import de.rayzs.pat.utils.group.*;
 
 public class ListGroupsSortedPlaceholder extends PlaceholderStorage {
 
-    public ListGroupsSortedPlaceholder() { super("list_sorted_groups"); }
+    public ListGroupsSortedPlaceholder() { super("pat_list_sorted_groups"); }
 
     public String COMMAND, SPLITTER;
 
