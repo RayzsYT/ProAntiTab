@@ -85,7 +85,7 @@ public class BukkitLoader extends JavaPlugin {
             ViaVersionAdapter.initialize();
 
         if(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
-            new PlaceholderHook().register();
+            new PlaceholderHook();
 
         try {
             if (Bukkit.getPluginManager() instanceof SimplePluginManager) {

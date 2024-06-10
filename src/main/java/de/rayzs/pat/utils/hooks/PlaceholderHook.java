@@ -23,7 +23,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "proantitab";
+        return "pat";
     }
 
     @Override
@@ -38,12 +38,6 @@ public class PlaceholderHook extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String request) {
-        String result = null;
-        request = request.toLowerCase();
-
-        if(request.startsWith("pat_"))
-            result = Storage.ConfigSections.Placeholders.findAndReplace(request);
-
-        return result != null ? result : super.onPlaceholderRequest(player, request);
+        return Storage.ConfigSections.Placeholders.findAndReplace(request.toLowerCase());
     }
 }

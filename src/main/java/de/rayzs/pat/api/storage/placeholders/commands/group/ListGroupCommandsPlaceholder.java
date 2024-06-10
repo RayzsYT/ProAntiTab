@@ -9,7 +9,7 @@ import de.rayzs.pat.utils.group.GroupManager;
 
 public class ListGroupCommandsPlaceholder extends PlaceholderStorage {
 
-    public ListGroupCommandsPlaceholder() { super("pat_list_commands_group_"); }
+    public ListGroupCommandsPlaceholder() { super("list_commands_group_"); }
 
     public String COMMAND, SPLITTER;
 

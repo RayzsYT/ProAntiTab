@@ -7,7 +7,7 @@ import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class ListSortedCommandsPlaceholder extends PlaceholderStorage {
 
-    public ListSortedCommandsPlaceholder() { super("pat_list_sorted_commands"); }
+    public ListSortedCommandsPlaceholder() { super("list_sorted_commands"); }
 
     public String COMMAND, SPLITTER;
 

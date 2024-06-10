@@ -7,7 +7,7 @@ import de.rayzs.pat.utils.group.*;
 
 public class ListGroupsReversedPlaceholder extends PlaceholderStorage {
 
-    public ListGroupsReversedPlaceholder() { super("pat_list_reversed_groups"); }
+    public ListGroupsReversedPlaceholder() { super("list_reversed_groups"); }
 
     public String COMMAND, SPLITTER;
 

@@ -7,7 +7,7 @@ import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class ListReversedCommandsPlaceholder extends PlaceholderStorage {
 
-    public ListReversedCommandsPlaceholder() { super("pat_list_reversed_commands"); }
+    public ListReversedCommandsPlaceholder() { super("list_reversed_commands"); }
 
     public String COMMAND, SPLITTER;
 
