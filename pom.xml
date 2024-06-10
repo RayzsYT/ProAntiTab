@@ -66,6 +66,12 @@
             <url>https://repo.william278.net/velocity</url>
         </repository>
 
+        <repository>
+            <id>william278-papiproxybridge</id>
+            <name>William278</name>
+            <url>https://repo.william278.net/papiproxybridge</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -159,6 +165,13 @@
             <groupId>io.github.waterfallmc</groupId>
             <artifactId>waterfall-api</artifactId>
             <version>1.20-R0.3-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.william278</groupId>
+            <artifactId>papiproxybridge</artifactId>
+            <version>1.4</version>
             <scope>provided</scope>
         </dependency>
 

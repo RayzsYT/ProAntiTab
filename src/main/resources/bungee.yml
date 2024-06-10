@@ -7,3 +7,4 @@ main: de.rayzs.pat.plugin.BungeeLoader
 
 softDepends:
   - LuckPerms
+  - PAPIProxyBridge

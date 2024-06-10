@@ -1,21 +1,18 @@
 package de.rayzs.pat.utils.message.replacer;
 
-import de.rayzs.pat.utils.CommandSender;
-import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.entity.Player;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.message.replacer.impl.*;
+import java.util.function.Consumer;
 
 public class PlaceholderReplacer {
 
     public static String replace(Object playerObj, String text) {
-        Player player = null;
+        if(!Storage.USE_PLACEHOLDERAPI) return text;
+        return BukkitPlaceholderReplacer.process(playerObj, text);
+    }
 
-        if(playerObj != null)
-            if(playerObj instanceof CommandSender) {
-                CommandSender sender = (CommandSender) playerObj;
-                player = sender.isPlayer() ? (Player) sender.getSenderObject() : null;
-            } else if(playerObj instanceof Player)
-                player = (Player) playerObj;
-
-        return PlaceholderAPI.setPlaceholders(player, text);
+    public static boolean process(Object playerObj, String text, Consumer<String> consumer) {
+        if(!Storage.USE_PAPIPROXYBRIDGE) return false;
+        return ProxyPlaceholderReplacer.process(playerObj, text, consumer);
     }
 }

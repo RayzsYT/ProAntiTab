@@ -4,6 +4,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
+import de.rayzs.pat.utils.message.replacer.impl.BukkitPlaceholderReplacer;
 import de.rayzs.pat.utils.message.translators.*;
 import java.util.*;
 
@@ -85,11 +86,13 @@ public class MessageTranslator {
         text = replaceMessageString(text, replacements);
         if(translator == null) {
             CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
-            sender.sendMessage(text);
+            if(!PlaceholderReplacer.process(sender, text, sender::sendMessage))
+                sender.sendMessage(text);
             return;
         }
 
-        translator.send(target, text);
+        if(!PlaceholderReplacer.process(target, text, result -> translator.send(target, result)))
+            translator.send(target, text);
     }
 
     public static String replaceMessage(String text) {
@@ -99,7 +102,7 @@ public class MessageTranslator {
     public static String replaceMessage(Object playerObj, String text) {
         CommandSender sender = playerObj instanceof CommandSender ? (CommandSender) playerObj : new CommandSender(playerObj);
         text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "").replace("&", "§").replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX).replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
-        return !Storage.USE_PLACEHOLDERAPI ? text : PlaceholderReplacer.replace(playerObj, text);
+        return PlaceholderReplacer.replace(playerObj, text);
     }
 
     public static String replaceMessageString(String rawText, String... replacements) {

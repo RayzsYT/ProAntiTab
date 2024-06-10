@@ -36,7 +36,8 @@ version = "1.7.3",
 authors = "Rayzs_YT",
 description = "A simple structured AntiTab plugin to prevent specific commands from being executed and auto-tab-completed.",
 dependencies = {
-        @Dependency(id = "luckperms", optional = true)
+        @Dependency(id = "luckperms", optional = true),
+        @Dependency(id = "papiproxybridge", optional = true)
 })
 public class VelocityLoader {
 
@@ -89,6 +90,8 @@ public class VelocityLoader {
 
         if(server.getPluginManager().getPlugin("luckperms").isPresent())
             LuckPermsAdapter.initialize();
+
+        Storage.USE_PAPIPROXYBRIDGE = server.getPluginManager().getPlugin("papiproxybridge").isPresent();
     }
 
     public void startUpdaterTask() {
