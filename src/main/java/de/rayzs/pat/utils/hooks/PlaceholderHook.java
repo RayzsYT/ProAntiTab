@@ -13,7 +13,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
     public PlaceholderHook() {
         Storage.USE_PLACEHOLDERAPI = true;
         Storage.ConfigSections.Placeholders.initialize();
-        Logger.info("Successfully hooked into PlaceholderAPI! You can now use all available placeholders of PAT.");
+        Logger.info("Successfully hooked into PlaceholderAPI!");
     }
 
     @Override
