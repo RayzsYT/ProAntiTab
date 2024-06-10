@@ -56,7 +56,7 @@ public class BukkitLoader extends JavaPlugin {
 
         if(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
             new PlaceholderHook().register();
-        ;
+
         MessageTranslator.initialize();
         CustomServerBrand.initialize();
         bStats.initialize(this);
