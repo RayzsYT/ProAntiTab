@@ -146,7 +146,7 @@ public class Storage {
             public static void initialize() {}
 
             public static String findAndReplace(String request) {
-                String result, param = "";
+                String result = null, param = "";
 
                 if(!USE_PLACEHOLDERAPI)
                     for (PlaceholderStorage storage : PLACEHOLDERS) {
@@ -161,7 +161,7 @@ public class Storage {
                         break;
                     }
 
-                return request;
+                return result;
             }
         }
     }

@@ -16,13 +16,18 @@ public class PlaceholderHook extends PlaceholderExpansion {
     }
 
     @Override
-    public boolean persist() {
-        return super.persist();
+    public @NotNull String getIdentifier() {
+        return "pat";
     }
 
     @Override
-    public @NotNull String getIdentifier() {
-        return "pat";
+    public boolean persist() {
+        return true;
+    }
+
+    @Override
+    public boolean canRegister() {
+        return true;
     }
 
     @Override

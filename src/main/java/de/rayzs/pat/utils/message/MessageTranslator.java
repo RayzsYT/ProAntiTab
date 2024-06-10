@@ -99,7 +99,7 @@ public class MessageTranslator {
     public static String replaceMessage(Object playerObj, String text) {
         CommandSender sender = playerObj instanceof CommandSender ? (CommandSender) playerObj : new CommandSender(playerObj);
         text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "").replace("&", "§").replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX).replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
-        return !Storage.USE_PLACEHOLDERAPI || playerObj == null || Reflection.isProxyServer() ? text : PlaceholderReplacer.replace(playerObj, text);
+        return !Storage.USE_PLACEHOLDERAPI ? text : PlaceholderReplacer.replace(playerObj, text);
     }
 
     public static String replaceMessageString(String rawText, String... replacements) {
