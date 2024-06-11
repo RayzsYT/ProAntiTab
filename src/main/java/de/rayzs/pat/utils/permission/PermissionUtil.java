@@ -86,7 +86,6 @@ public class PermissionUtil {
 
     public static boolean hasBypassPermission(Object targetObj, String command, boolean slash) {
         command = Storage.Blacklist.convertCommand(command, false, true, slash);
-        System.out.println("--> proantitab.bypass." + command);
 
         return hasBypassPermission(targetObj)
                 || hasPermission(targetObj, "bypass." + command.toLowerCase())
