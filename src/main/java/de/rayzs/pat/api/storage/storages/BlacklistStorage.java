@@ -24,10 +24,15 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public String convertCommand(String command, boolean intensive, boolean lowerCase) {
+        return convertCommand(command, intensive, lowerCase, true);
+    }
+
+    public String convertCommand(String command, boolean intensive, boolean lowerCase, boolean slash) {
         if(isConverted(command, intensive)) return command;
         if(lowerCase) command = command.toLowerCase();
 
-        if(command.startsWith("/")) command = command.replaceFirst("/", "");
+        if(slash)
+            if(command.startsWith("/")) command = command.replaceFirst("/", "");
 
         String[] split;
         if(command.contains(" ")) {

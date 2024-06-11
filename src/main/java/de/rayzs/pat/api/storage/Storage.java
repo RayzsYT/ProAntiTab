@@ -336,6 +336,10 @@ public class Storage {
             return BLACKLIST.convertCommand(command, intensive, lowercase);
         }
 
+        public static String convertCommand(String command, boolean intensive, boolean lowercase, boolean slash) {
+            return BLACKLIST.convertCommand(command, intensive, lowercase, slash);
+        }
+
         public static boolean isInListed(String command, List<String> commandList, boolean intensive) {
             command = StringUtils.replaceFirst(command, "/", "");
             command = convertCommand(command, intensive, false);

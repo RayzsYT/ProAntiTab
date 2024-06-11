@@ -55,14 +55,14 @@ public class BungeeBlockCommandListener implements Listener {
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getServer().getInfo().getName())) return;
             if(Storage.Blacklist.isListed(player, command, true, player.getServer().getInfo().getName())) return;
-            if(PermissionUtil.hasBypassPermission(player, command)) return;
+            if(PermissionUtil.hasBypassPermission(player, command, false)) return;
             event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);
             return;
         }
 
         if (!Storage.Blacklist.isBlocked(player, command, player.getServer().getInfo().getName())) return;
-        if (PermissionUtil.hasBypassPermission(player, command)) return;
+        if (PermissionUtil.hasBypassPermission(player, command, false)) return;
         event.setCancelled(true);
         MessageTranslator.send(player, cancelCommandMessage);
 
