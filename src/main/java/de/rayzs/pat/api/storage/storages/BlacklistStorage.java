@@ -53,6 +53,16 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
         return false;
     }
 
+    public boolean isListed(String command, boolean intensive, boolean convert) {
+        if(convert)
+            if(!isConverted(command, intensive)) command = convertCommand(command, intensive, true);
+
+        for (String commands : commands)
+            if(commands.equals(command)) return true;
+
+        return false;
+    }
+
     public boolean isBlocked(Object targetObj, String command) {
         return isBlocked(targetObj, command, false);
     }
@@ -64,11 +74,25 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
             return isListed(command, intensive) && !PermissionUtil.hasBypassPermission(targetObj, command);
     }
 
+    public boolean isBlocked(Object targetObj, String command, boolean intensive, boolean convert) {
+        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+            return !isListed(command, intensive, convert) && !PermissionUtil.hasBypassPermission(targetObj, command);
+        else
+            return isListed(command, intensive, convert) && !PermissionUtil.hasBypassPermission(targetObj, command);
+    }
+
     public boolean isBlocked(String command, boolean intensive) {
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return !isListed(command, intensive);
         else
             return isListed(command, intensive);
+    }
+
+    public boolean isBlocked(String command, boolean intensive, boolean convert) {
+        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+            return !isListed(command, intensive, convert);
+        else
+            return isListed(command, intensive, convert);
     }
 
     public void setList(List<String> commands) {

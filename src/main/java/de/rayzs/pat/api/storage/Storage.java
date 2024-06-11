@@ -324,6 +324,10 @@ public class Storage {
             return BLACKLIST.isBlocked(command, intensive);
         }
 
+        public static boolean isBlocked(String command, boolean intensive, boolean convert) {
+            return BLACKLIST.isBlocked(command, intensive, convert);
+        }
+
         public static boolean isConverted(String command, boolean intensive) {
             return BLACKLIST.isConverted(command, intensive);
         }

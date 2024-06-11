@@ -38,7 +38,7 @@ public class BukkitAntiTabListener implements Listener {
             for (String command : allCommands) {
                 if(COMMANDS.contains(command)) continue;
 
-                if (Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
+                if (Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))
                     continue;
 
                 COMMANDS.add(command);
