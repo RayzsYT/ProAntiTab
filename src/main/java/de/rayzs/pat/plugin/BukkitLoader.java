@@ -49,6 +49,8 @@ public class BukkitLoader extends JavaPlugin {
         plugin = this;
         logger = getLogger();
 
+        loadCommandMap();
+
         Reflection.initialize(getServer());
         Storage.CURRENT_VERSION = getDescription().getVersion();
 
@@ -85,20 +87,6 @@ public class BukkitLoader extends JavaPlugin {
 
         if(getServer().getPluginManager().getPlugin("ViaVersion") != null)
             ViaVersionAdapter.initialize();
-
-        try {
-            if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
-                Field commandMapField = SimplePluginManager.class.getDeclaredField("commandMap");
-                commandMapField.setAccessible(true);
-                SimpleCommandMap simpleCommandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getPluginManager());
-                Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
-                knownCommandsField.setAccessible(true);
-                commandsMap = (Map<String, Command>)knownCommandsField.get(simpleCommandMap);
-            }
-        }catch (Throwable ignored) { }
-
-        if(commandsMap == null)
-            Logger.warning("Failed injection task! Skript commands won't be detected with that.");
     }
 
     @Override
@@ -188,14 +176,30 @@ public class BukkitLoader extends JavaPlugin {
         BukkitAntiTabListener.handleTabCompletion(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? Storage.Blacklist.getBlacklist().getCommands() : getNotBlockedCommands());
     }
 
-    public static boolean doesCommandExist(String command) {
+    public static boolean doesCommandExist(String command, boolean replace) {
         if(commandsMap == null) return false;
-        if(command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
+        if(command.startsWith("/") && replace) command = StringUtils.replaceFirst(command, "/", "");
 
         for (String currentCommand : commandsMap.keySet())
             if (currentCommand.equals(command)) return true;
 
         return false;
+    }
+
+    private void loadCommandMap() {
+        try {
+            if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
+                Field commandMapField = SimplePluginManager.class.getDeclaredField("commandMap");
+                commandMapField.setAccessible(true);
+                SimpleCommandMap simpleCommandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getPluginManager());
+                Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
+                knownCommandsField.setAccessible(true);
+                commandsMap = (Map<String, Command>)knownCommandsField.get(simpleCommandMap);
+            }
+        }catch (Throwable ignored) { }
+
+        if(commandsMap == null)
+            Logger.warning("Failed injection task! Skript commands won't be detected with that.");
     }
 
     public static List<String> getNotBlockedCommands() {
@@ -204,6 +208,11 @@ public class BukkitLoader extends JavaPlugin {
                 .filter(topic -> !topic.getName().contains(":") && topic.getName().startsWith("/") && !Storage.Blacklist.getBlacklist().isListed(topic.getName().replaceFirst("/", "")))
                 .forEach(topic -> commands.add(topic.getName().replaceFirst("/", "")));
         return commands;
+    }
+
+    public static List<String> getAllCommands() {
+        if(commandsMap == null) return getNotBlockedCommands();
+        return Arrays.asList(commandsMap.keySet().toArray(new String[] { }));
     }
 
     public static Plugin getPlugin() {

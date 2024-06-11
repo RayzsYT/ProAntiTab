@@ -38,7 +38,7 @@ public class BukkitBlockCommandListener implements Listener {
             HelpTopic helpTopic = Bukkit.getHelpMap().getHelpTopic(command);
 
             if(helpTopic == null && !event.isCancelled()) {
-                if(!BukkitLoader.doesCommandExist(command)) {
+                if(!BukkitLoader.doesCommandExist(command, false)) {
                     event.setCancelled(true);
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE);
                     return;
