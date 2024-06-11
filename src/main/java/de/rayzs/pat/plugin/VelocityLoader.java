@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "1.7.4",
+version = "1.7.5",
 authors = "Rayzs_YT",
 description = "Hide more then just plugins. Hide almost everything!",
 dependencies = {
