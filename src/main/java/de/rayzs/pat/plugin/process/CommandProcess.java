@@ -627,7 +627,7 @@ public class CommandProcess {
 
             if (Reflection.getMinor() >= 16) {
                 PermissionUtil.reloadPermissions();
-                BukkitAntiTabListener.handleTabCompletion(Storage.Blacklist.getBlacklist().getCommands());
+                BukkitAntiTabListener.handleTabCompletion();
             }
 
         }

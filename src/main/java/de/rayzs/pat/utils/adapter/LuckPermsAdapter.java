@@ -59,7 +59,7 @@ public class LuckPermsAdapter {
                 }
         );
 
-        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(uuid, Storage.Blacklist.getBlacklist().getCommands());
+        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(uuid);
     }
 
     private static void onNoteMutate(NodeMutateEvent event) {
