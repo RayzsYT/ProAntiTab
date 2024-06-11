@@ -211,7 +211,10 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public static List<String> getAllCommands() {
-        if(commandsMap == null) return getNotBlockedCommands();
+        if(commandsMap == null) {
+            return getNotBlockedCommands();
+        }
+
         return Arrays.asList(commandsMap.keySet().toArray(new String[] { }));
     }
 

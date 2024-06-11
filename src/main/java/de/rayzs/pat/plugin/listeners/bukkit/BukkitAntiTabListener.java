@@ -14,7 +14,7 @@ import java.util.*;
 
 public class BukkitAntiTabListener implements Listener {
 
-    private static List<String> COMMANDS = null;
+    private static List<String> COMMANDS = null, ALL_COMMANDS = null;
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
@@ -29,11 +29,13 @@ public class BukkitAntiTabListener implements Listener {
         }
 
         if(event.getCommands().size() == 0) return;
+        List<String> allCommands = getCommands();
 
-        if(COMMANDS == null) {
+        if(COMMANDS == null || ALL_COMMANDS == null || !Arrays.equals(allCommands.toArray(), ALL_COMMANDS.toArray())) {
             COMMANDS = new LinkedList<>();
+            ALL_COMMANDS = new ArrayList<>(allCommands);
 
-            for (String command : event.getCommands()) {
+            for (String command : allCommands) {
                 if(COMMANDS.contains(command)) continue;
 
                 if (Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
@@ -53,7 +55,9 @@ public class BukkitAntiTabListener implements Listener {
         if (!(Storage.USE_LUCKPERMS && !LuckPermsAdapter.hasAnyPermissions(uuid))) {
             for (String command : event.getCommands()) {
                 if (COMMANDS.contains(command)) continue;
-                if (!PermissionUtil.hasBypassPermission(player, command)) continue;
+                if (!PermissionUtil.hasBypassPermission(player, command))
+                    continue;
+
                 commands.add(command);
             }
         }
@@ -75,6 +79,28 @@ public class BukkitAntiTabListener implements Listener {
         if(Storage.USE_VELOCITY) return;
         COMMANDS = null;
         Bukkit.getOnlinePlayers().forEach(player -> handleTabCompletion(player, commands));
+    }
+
+    public static void handleTabCompletion() {
+        COMMANDS = null;
+        Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::handleTabCompletion);
+    }
+
+    public static void handleTabCompletion(Player player) {
+        handleTabCompletion(player, getCommands());
+    }
+
+    public static List<String> getCommands() {
+        return Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED
+                ? Storage.Blacklist.getBlacklist().getCommands() : BukkitLoader.getAllCommands();
+    }
+
+    public static void handleTabCompletion(UUID uuid) {
+        if(notUpdatablePlayer(uuid)) return;
+
+        Player player = Bukkit.getPlayer(uuid);
+        if(player == null) return;
+        handleTabCompletion(player);
     }
 
     public static void handleTabCompletion(UUID uuid, List<String> commands) {
