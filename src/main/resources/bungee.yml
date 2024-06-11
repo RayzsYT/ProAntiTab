@@ -2,7 +2,7 @@ name: ProAntiTab
 description: Hide more then just plugins. Hide almost everything!
 
 author: Rayzs_YT
-version: 1.7.5
+version: 1.7.5-dev
 main: de.rayzs.pat.plugin.BungeeLoader
 
 softDepends:
