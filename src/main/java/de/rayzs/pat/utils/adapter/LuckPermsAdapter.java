@@ -1,6 +1,7 @@
 package de.rayzs.pat.utils.adapter;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
@@ -27,7 +28,8 @@ public class LuckPermsAdapter {
         eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeMutateEvent.class, LuckPermsAdapter::onNoteMutate);
 
         if(!Reflection.isProxyServer())
-            eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitAntiTabListener.luckpermsNetworkSync());
+             if(BukkitLoader.useSuggestions())
+                eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitAntiTabListener.luckpermsNetworkSync());
     }
 
 
