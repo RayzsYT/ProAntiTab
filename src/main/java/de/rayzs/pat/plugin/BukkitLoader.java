@@ -33,7 +33,7 @@ public class BukkitLoader extends JavaPlugin {
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
-    private static boolean loaded = false, checkUpdate = false;
+    private static boolean loaded = false, checkUpdate = false, suggestions;
     private static Map<String, Command> commandsMap = null;
     private int updaterTaskId;
 
@@ -73,7 +73,10 @@ public class BukkitLoader extends JavaPlugin {
 
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
-        if(Reflection.getMinor() >= 16) manager.registerEvents(new BukkitAntiTabListener(), this);
+        if(Reflection.getMinor() >= 16) {
+            suggestions = true;
+            manager.registerEvents(new BukkitAntiTabListener(), this);
+        } else suggestions = false;
 
         registerCommand("proantitab", "pat");
         startUpdaterTask();
@@ -178,12 +181,24 @@ public class BukkitLoader extends JavaPlugin {
 
     public static boolean doesCommandExist(String command, boolean replace) {
         if(commandsMap == null) return false;
-        if(command.startsWith("/") && replace) command = StringUtils.replaceFirst(command, "/", "");
+        if(replace) if(command.startsWith("/"))
+                command = StringUtils.replaceFirst(command, "/", "");
 
-        for (String currentCommand : commandsMap.keySet())
-            if (currentCommand.equals(command)) return true;
+        boolean detected = false;
 
-        return false;
+        Command commandObj;
+        for (String currentCommand : commandsMap.keySet()) {
+            if(detected) break;
+
+            detected = currentCommand.equals(command);
+            if(!detected) {
+                commandObj = commandsMap.get(currentCommand);
+                if(commandObj == null) continue;
+                detected = commandsMap.get(currentCommand).getAliases().contains(command);
+            }
+        }
+
+        return detected;
     }
 
     private void loadCommandMap() {
@@ -199,7 +214,7 @@ public class BukkitLoader extends JavaPlugin {
         }catch (Throwable ignored) { }
 
         if(commandsMap == null)
-            Logger.warning("Failed injection task! Skript commands won't be detected with that.");
+            Logger.warning("Failed to get server commands!");
     }
 
     public static List<String> getNotBlockedCommands() {
@@ -216,6 +231,11 @@ public class BukkitLoader extends JavaPlugin {
         }
 
         return Arrays.asList(commandsMap.keySet().toArray(new String[] { }));
+    }
+
+
+    public static boolean useSuggestions() {
+        return suggestions;
     }
 
     public static Plugin getPlugin() {
