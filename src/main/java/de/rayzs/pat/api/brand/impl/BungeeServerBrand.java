@@ -35,8 +35,8 @@ public class BungeeServerBrand implements ServerBrand {
         if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
 
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+            BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)) + "§r";
             TASK = SERVER.getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
-                BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)) + "§r";
                 SERVER.getPlayers().stream().filter(player -> !isModified(player)).forEach(this::send);
             }, 1, 150, TimeUnit.MILLISECONDS);
         } else {

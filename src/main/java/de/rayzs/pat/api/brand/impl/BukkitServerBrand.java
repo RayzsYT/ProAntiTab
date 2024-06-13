@@ -64,8 +64,8 @@ public class BukkitServerBrand implements ServerBrand {
         if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
 
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+            BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0) + "§r";
             TASK = Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
-                BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0) + "§r";
                 Bukkit.getOnlinePlayers().forEach(this::send);
             }, 1, Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY);
         } else {

@@ -13,6 +13,7 @@ import de.rayzs.pat.utils.message.MessageTranslator;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.ProtocolConstants;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class VelocityServerBrand implements ServerBrand {
     private static final List<Player> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
     private static final ProxyServer SERVER = VelocityLoader.getServer();
     private static Class<?> pluginMessagePacketClass, minecraftConnectionClass, connectedPlayerConnectionClass;
+    private static Method connectionMethod;
     private static ScheduledTask TASK;
     private static String BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0);
 
@@ -45,9 +47,13 @@ public class VelocityServerBrand implements ServerBrand {
         if(connectedPlayerConnectionClass == null)
             connectedPlayerConnectionClass = Reflection.getClass("com.velocitypowered.proxy.connection.client.ConnectedPlayer");
 
+        if(connectionMethod == null)
+            connectionMethod = Reflection.getMethodByName(connectedPlayerConnectionClass, "getConnection");
+
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+            BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)) + "§r";
+
             TASK = SERVER.getScheduler().buildTask(VelocityLoader.getInstance(), () -> {
-                BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)) + "§r";
                 SERVER.getAllPlayers().stream().filter(player -> !isModified(player)).forEach(this::send);
             }).repeat(150, TimeUnit.MILLISECONDS).schedule();
         } else {
@@ -72,7 +78,7 @@ public class VelocityServerBrand implements ServerBrand {
         try {
             Player player = (Player) playerObj;
             Object connectedPlayerObj = connectedPlayerConnectionClass.cast(player),
-                    minecraftConnectionObj = Reflection.getMethodsByName(connectedPlayerObj, "getConnection").get(0).invoke(connectedPlayerObj);
+                    minecraftConnectionObj = connectionMethod.invoke(connectedPlayerObj);
 
             String serverName = "", playerName = player.getUsername(), customBrand;
             Optional<ServerConnection> serverConnection = player.getCurrentServer();
