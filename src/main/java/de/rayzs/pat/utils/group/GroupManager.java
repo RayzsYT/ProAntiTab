@@ -3,12 +3,13 @@ package de.rayzs.pat.utils.group;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 
 public class GroupManager {
 
-    private static final List<Group> GROUPS = new ArrayList<>();
+    private static final List<Group> GROUPS = new LinkedList<>();
 
     public static void initialize() {
         Storage.Files.STORAGE.getKeys("groups", false).forEach(GroupManager::registerGroup);
@@ -23,10 +24,13 @@ public class GroupManager {
     public static boolean canAccessCommand(Object targetObj, String command) {
         command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false);
 
-        for (Group group : GROUPS)
-            if(group.contains(command))
-                if(group.hasPermission(targetObj)) return true;
+        final List<Group> finalList = new ArrayList<>(GROUPS);
+        for (Group group : finalList) {
+            if(group == null) continue;
 
+            if (group.contains(command))
+                if (group.hasPermission(targetObj)) return true;
+        }
         return false;
     }
 
@@ -34,10 +38,13 @@ public class GroupManager {
         command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false);
         server = server.toLowerCase();
 
-        for (Group group : GROUPS)
-            if(group.contains(command, server))
-                if(group.hasPermission(targetObj)) return true;
+        final List<Group> finalList = new ArrayList<>(GROUPS);
+        for (Group group : finalList) {
+            if(group == null) continue;
 
+            if (group.contains(command, server))
+                if (group.hasPermission(targetObj)) return true;
+        }
         return false;
     }
 
