@@ -104,12 +104,13 @@ public class BukkitPacketAnalyzer {
         @Override
         public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
             try {
-                if (!PermissionUtil.hasBypassPermission(player, "proantitab.bypass") && packetObj.getClass() != null) {
-                    String packetName = packetObj.getClass().getSimpleName();
-                    if (packetName.equals("PacketPlayOutTabComplete")) {
-                        if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;
+                if(packetObj.getClass() != null)
+                    if (!PermissionUtil.hasBypassPermission(player, "proantitab.bypass")) {
+                        String packetName = packetObj.getClass().getSimpleName();
+                        if (packetName.equals("PacketPlayOutTabComplete")) {
+                            if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;
+                        }
                     }
-                }
 
                 super.write(channel, packetObj, promise);
             } catch (Throwable exception) { exception.printStackTrace(); }
