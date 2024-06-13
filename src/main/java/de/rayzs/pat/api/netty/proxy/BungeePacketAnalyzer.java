@@ -112,27 +112,32 @@ public class BungeePacketAnalyzer {
     private static void modifyCommands(ProxiedPlayer player, Commands commands, List<String> list) {
         list.clear();
 
-        boolean blocked, turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
             if (!ProxyServer.getInstance().getDisabledCommands().contains(command.getKey()) && commands.getRoot().getChild(command.getKey()) == null && command.getValue().hasPermission(player)) {
-                blocked = Storage.Blacklist.isBlocked(player, command.getKey(), !turn);
-                if(!blocked && turn) {
-                    for (String alias : command.getValue().getAliases()) {
-                        if(blocked) break;
-                        blocked = Storage.Blacklist.isBlocked(player, alias, !turn);
+
+                List<String> commandsToCheck =
+                        new ArrayList<>(Arrays.asList(command.getValue().getAliases()));
+                if(!commandsToCheck.contains(command.getValue().getName()))
+                    commandsToCheck.add(command.getValue().getName());
+                if(!commandsToCheck.contains(command.getKey()))
+                    commandsToCheck.add(command.getKey());
+
+                commandsToCheck.removeAll(list);
+
+                for (String commandName : commandsToCheck) {
+                    if (!list.contains(commandName)) {
+                        if (!Storage.Blacklist.isBlocked(player, commandName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName())) {
+                            list.add(commandName);
+                            CommandNode dummy = LiteralArgumentBuilder.literal(commandName)
+                                    .executes(DUMMY_COMMAND)
+                                    .then(RequiredArgumentBuilder.argument("args", StringArgumentType.greedyString())
+                                            .suggests(Commands.SuggestionRegistry.ASK_SERVER).executes(DUMMY_COMMAND))
+                                    .build();
+
+                            commands.getRoot().addChild(dummy);
+                        }
                     }
                 }
-
-                if(blocked) continue;
-
-                list.add(command.getKey());
-                CommandNode dummy = LiteralArgumentBuilder.literal(command.getKey())
-                        .executes(DUMMY_COMMAND)
-                        .then(RequiredArgumentBuilder.argument("args", StringArgumentType.greedyString())
-                                .suggests(Commands.SuggestionRegistry.ASK_SERVER).executes(DUMMY_COMMAND))
-                        .build();
-
-                commands.getRoot().addChild(dummy);
             }
         }
     }
