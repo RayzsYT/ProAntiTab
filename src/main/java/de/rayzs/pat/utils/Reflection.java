@@ -148,6 +148,20 @@ public class Reflection {
         return result;
     }
 
+    public static Method getMethodByName(Object obj, String name) {
+        Method method = null;
+        try { method = obj.getClass().getDeclaredMethod(name);
+        } catch (Exception ignored) { }
+        return method;
+    }
+
+    public static Method getMethodByName(Class<?> clazz, String name) {
+        Method method = null;
+        try { method = clazz.getDeclaredMethod(name);
+        } catch (Exception ignored) { }
+        return method;
+    }
+
     public static List<Method> getMethodsByParameterAndName(Object obj, String name, Class<?>... parameterTypes) {
         return getMethodsByParameterAndName(obj.getClass(), name, parameterTypes);
     }
