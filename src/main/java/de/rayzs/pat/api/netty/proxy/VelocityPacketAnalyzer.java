@@ -9,8 +9,6 @@ import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import io.netty.channel.*;
-
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,16 +17,9 @@ public class VelocityPacketAnalyzer {
     public static final ConcurrentHashMap<Player, Channel> INJECTED_PLAYERS = new ConcurrentHashMap<>();
 
     private static final String PIPELINE_NAME = "pat-velocity-handler", HANDLER_NAME = "handler";
-    private static final HashMap<Player, Boolean> PLAYER_MODIFIED = new HashMap<>();
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
-    private static final List<String> PLUGIN_COMMANDS = new ArrayList<>();
-
     private static Class<?> minecraftConnectionClass, connectedPlayerConnectionClass;
-
-    public static void removePlayerModifies() {
-        VelocityLoader.getServer().getAllPlayers().forEach(player -> setPlayerModification(player, false));
-    }
 
     public static void injectAll() {
         VelocityLoader.getServer().getAllPlayers().forEach(VelocityPacketAnalyzer::inject);
@@ -60,11 +51,10 @@ public class VelocityPacketAnalyzer {
             channel = (Channel) Reflection.getMethodsByName(minecraftConnectionClass, "getChannel").get(0).invoke(minecraftConnectionObj);
 
             if(channel == null) {
-                System.err.println("Failed to inject " + player.getUsername() + "! Channel is null.");
+                System.out.println("Failed to inject " + player.getUsername() + "! Channel is null.");
                 return false;
             }
 
-            setPlayerModification(player, false);
             if(channel.pipeline().names().contains(VelocityPacketAnalyzer.PIPELINE_NAME))
                 uninject(player);
 
@@ -76,18 +66,7 @@ public class VelocityPacketAnalyzer {
         } return true;
     }
 
-    public static boolean isPlayerModified(Player player) {
-        PLAYER_MODIFIED.putIfAbsent(player, false);
-        return PLAYER_MODIFIED.get(player);
-    }
-
-    public static void setPlayerModification(Player player, boolean modified) {
-        PLAYER_MODIFIED.put(player, modified);
-    }
-
     public static void uninject(Player player) {
-        PLAYER_MODIFIED.remove(player);
-
         if(VelocityPacketAnalyzer.INJECTED_PLAYERS.containsKey(player)) {
             Channel channel = VelocityPacketAnalyzer.INJECTED_PLAYERS.get(player);
             if(channel != null) {

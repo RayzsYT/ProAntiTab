@@ -40,7 +40,6 @@ public class VelocityConnectionListener {
     @Subscribe
     public void onServerSwitch(ServerConnectedEvent event) {
         Player player = event.getPlayer();
-        VelocityPacketAnalyzer.setPlayerModification(player, false);
 
         if(!VelocityPacketAnalyzer.isInjected(player))
             VelocityPacketAnalyzer.inject(player);
