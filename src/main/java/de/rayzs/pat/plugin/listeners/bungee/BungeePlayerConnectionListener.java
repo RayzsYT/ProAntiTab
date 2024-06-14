@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.brand.impl.BungeeServerBrand;
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
@@ -38,7 +39,7 @@ public class BungeePlayerConnectionListener implements Listener {
 
         BungeePacketAnalyzer.inject(player);
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
-        BungeeServerBrand.removeFromModified(player);
+        CustomServerBrand.sendBrandToPlayer(player);
     }
 
     @EventHandler (priority = EventPriority.LOWEST)
@@ -47,6 +48,6 @@ public class BungeePlayerConnectionListener implements Listener {
         PermissionUtil.resetPermissions(player.getUniqueId());
         BungeePacketAnalyzer.uninject(player);
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
-        BungeeServerBrand.removeFromModified(player);
+        CustomServerBrand.sendBrandToPlayer(player);
     }
 }

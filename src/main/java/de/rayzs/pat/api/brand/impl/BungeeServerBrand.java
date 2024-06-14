@@ -10,15 +10,11 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.protocol.ProtocolConstants;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BungeeServerBrand implements ServerBrand {
 
-    private static final List<ProxiedPlayer> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
     private static final ProxyServer SERVER = BungeeLoader.getPlugin().getProxy();
     private static ScheduledTask TASK;
     private static String BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0);
@@ -27,18 +23,13 @@ public class BungeeServerBrand implements ServerBrand {
 
     @Override
     public void initializeTask() {
-        if(TASK != null) {
-            TASK.cancel();
-            MODIFIED_BRAND_PLAYERS.clear();
-        }
+        if(TASK != null) TASK.cancel();
 
         if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
 
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
             BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)) + "§r";
-            TASK = SERVER.getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
-                SERVER.getPlayers().stream().filter(player -> !isModified(player)).forEach(this::send);
-            }, 1, 150, TimeUnit.MILLISECONDS);
+            SERVER.getPlayers().forEach(this::send);
         } else {
             AtomicInteger animationState = new AtomicInteger(0);
             TASK = SERVER.getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
@@ -66,16 +57,5 @@ public class BungeeServerBrand implements ServerBrand {
         PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(customBrand);
         String brand = player.getPendingConnection().getVersion() >= ProtocolConstants.MINECRAFT_1_13 ? "minecraft:brand" : "MC|Brand";
         player.sendData(brand, serverBrand.getBytes());
-
-        if(!MODIFIED_BRAND_PLAYERS.contains(player)) MODIFIED_BRAND_PLAYERS.add(player);
-    }
-
-    private boolean isModified(ProxiedPlayer player) {
-        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return false;
-        return MODIFIED_BRAND_PLAYERS.contains(player);
-    }
-
-    public static void removeFromModified(ProxiedPlayer player) {
-        MODIFIED_BRAND_PLAYERS.remove(player);
     }
 }

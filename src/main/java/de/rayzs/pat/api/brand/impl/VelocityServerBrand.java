@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class VelocityServerBrand implements ServerBrand {
 
-    private static final List<Player> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
     private static final ProxyServer SERVER = VelocityLoader.getServer();
     private static Class<?> pluginMessagePacketClass, minecraftConnectionClass, connectedPlayerConnectionClass;
     private static Method connectionMethod;
@@ -31,10 +30,7 @@ public class VelocityServerBrand implements ServerBrand {
 
     @Override
     public void initializeTask() {
-        if(TASK != null) {
-            TASK.cancel();
-            MODIFIED_BRAND_PLAYERS.clear();
-        }
+        if(TASK != null) TASK.cancel();
 
         if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
 
@@ -52,10 +48,7 @@ public class VelocityServerBrand implements ServerBrand {
 
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
             BRAND = MessageTranslator.replaceMessage(Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)) + "§r";
-
-            TASK = SERVER.getScheduler().buildTask(VelocityLoader.getInstance(), () -> {
-                SERVER.getAllPlayers().stream().filter(player -> !isModified(player)).forEach(this::send);
-            }).repeat(150, TimeUnit.MILLISECONDS).schedule();
+            SERVER.getAllPlayers().forEach(this::send);
         } else {
             AtomicInteger animationState = new AtomicInteger(0);
             TASK = SERVER.getScheduler().buildTask(VelocityLoader.getInstance(), () -> {
@@ -89,19 +82,8 @@ public class VelocityServerBrand implements ServerBrand {
             String brand = player.getProtocolVersion().getProtocol() >= ProtocolConstants.MINECRAFT_1_13 ? "minecraft:brand" : "MC|Brand";
             Object pluginMessagePacket = pluginMessagePacketClass.getConstructor(String.class, ByteBuf.class).newInstance(brand, serverBrand.getByteBuf());
             Reflection.getMethodsByParameterAndName(minecraftConnectionObj, "write", Object.class).get(0).invoke(minecraftConnectionObj, pluginMessagePacket);
-
-            if(!MODIFIED_BRAND_PLAYERS.contains(player)) MODIFIED_BRAND_PLAYERS.add(player);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-    }
-
-    private boolean isModified(Player player) {
-        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return false;
-        return MODIFIED_BRAND_PLAYERS.contains(player);
-    }
-
-    public static void removeFromModified(Player player) {
-        MODIFIED_BRAND_PLAYERS.remove(player);
     }
 }
