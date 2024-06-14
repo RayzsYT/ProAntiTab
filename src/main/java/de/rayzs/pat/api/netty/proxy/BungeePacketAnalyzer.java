@@ -123,6 +123,7 @@ public class BungeePacketAnalyzer {
                     commandsToCheck.add(command.getKey());
 
                 commandsToCheck.removeAll(list);
+                commandsToCheck.removeIf(commandName -> commandName.startsWith("/"));
 
                 for (String commandName : commandsToCheck) {
                     if (!list.contains(commandName)) {

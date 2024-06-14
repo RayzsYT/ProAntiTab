@@ -15,7 +15,7 @@ import java.util.List;
 
 public class BukkitBlockCommandListener implements Listener {
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();

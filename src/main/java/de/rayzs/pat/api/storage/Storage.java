@@ -256,6 +256,16 @@ public class Storage {
             return false;
         }
 
+        public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, String server, boolean convert) {
+            for (Group group : GroupManager.getGroups()) {
+                for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(server)) {
+                    if(groupBlacklist.isListed(command, intensive, convert) && group.hasPermission(playerObj)) return true;
+                }
+            }
+
+            return false;
+        }
+
         public static boolean isListed(Object playerObj, String command, boolean intensive, String server) {
             if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(playerObj))) return false;
 
@@ -310,6 +320,10 @@ public class Storage {
 
         public static boolean isListed(String command, boolean intensive) {
             return BLACKLIST.isListed(command, intensive);
+        }
+
+        public static boolean isListed(String command, boolean intensive, boolean convert) {
+            return BLACKLIST.isListed(command, intensive, convert);
         }
 
         public static boolean isBlocked(Object targetObj, String command) {

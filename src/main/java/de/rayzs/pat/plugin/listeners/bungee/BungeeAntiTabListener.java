@@ -12,6 +12,8 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.*;
 import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 
+import java.util.Arrays;
+
 public class BungeeAntiTabListener implements Listener {
 
     @EventHandler
@@ -20,9 +22,8 @@ public class BungeeAntiTabListener implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
         if(PermissionUtil.hasBypassPermission(player)) return;
-
-        BungeePacketAnalyzer.insertPlayerInput(player, event.getCursor());
-        event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName()));
+        if(Storage.Blacklist.isBlocked(player, event.getCursor(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName()))
+            event.getSuggestions().clear();
     }
 
     @EventHandler
