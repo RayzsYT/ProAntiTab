@@ -6,6 +6,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -26,7 +27,7 @@ public class BukkitMessageTranslator implements Translator {
     @Override
     public void send(Object target, String text) {
         Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
-        audience.sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+        audience.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
     }
 
     @Override

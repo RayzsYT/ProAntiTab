@@ -4,6 +4,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.*;
 import de.rayzs.pat.utils.message.*;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class VelocityMessageTranslator implements Translator {
 
@@ -17,11 +18,11 @@ public class VelocityMessageTranslator implements Translator {
     @Override
     public void send(Object target, String text) {
         if(target instanceof Player)
-            ((Player) target).sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+            ((Player) target).sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
         else if(target instanceof CommandSource)
-            ((CommandSource) target).sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+            ((CommandSource) target).sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
         else if(target instanceof ConsoleCommandSource)
-            ((ConsoleCommandSource) target).sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+            ((ConsoleCommandSource) target).sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
     }
 
     @Override
