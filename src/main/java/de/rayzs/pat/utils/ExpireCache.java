@@ -23,6 +23,12 @@ public class ExpireCache<T, K> {
         return true;
     }
 
+    public boolean remove(T t) {
+        if(contains(t)) return false;
+        cache.invalidate(t);
+        return true;
+    }
+
     public K putAndGet(T t, K k) {
         put(t, k);
         return k;
