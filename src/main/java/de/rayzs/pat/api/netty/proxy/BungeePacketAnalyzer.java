@@ -85,7 +85,8 @@ public class BungeePacketAnalyzer {
     }
 
     public static void uninject(ProxiedPlayer player) {
-        PLAYER_MODIFIED.remove(player);
+        BungeePacketAnalyzer.PLAYER_INPUT_CACHE.remove(player);
+        BungeePacketAnalyzer.PLAYER_MODIFIED.remove(player);
 
         if(BungeePacketAnalyzer.INJECTED_PLAYERS.containsKey(player)) {
             Channel channel = BungeePacketAnalyzer.INJECTED_PLAYERS.get(player);

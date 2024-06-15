@@ -67,6 +67,8 @@ public class VelocityPacketAnalyzer {
     }
 
     public static void uninject(Player player) {
+        VelocityPacketAnalyzer.PLAYER_INPUT_CACHE.remove(player);
+
         if(VelocityPacketAnalyzer.INJECTED_PLAYERS.containsKey(player)) {
             Channel channel = VelocityPacketAnalyzer.INJECTED_PLAYERS.get(player);
             if(channel != null) {
