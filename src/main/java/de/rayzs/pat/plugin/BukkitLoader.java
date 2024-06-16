@@ -33,7 +33,7 @@ public class BukkitLoader extends JavaPlugin {
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
-    private static boolean loaded = false, checkUpdate = false, suggestions;
+    private static boolean loaded = false, checkUpdate = false, suggestions = false;
     private static Map<String, Command> commandsMap = null;
     private int updaterTaskId;
 
@@ -76,7 +76,7 @@ public class BukkitLoader extends JavaPlugin {
         if(Reflection.getMinor() >= 16) {
             suggestions = true;
             manager.registerEvents(new BukkitAntiTabListener(), this);
-        } else suggestions = false;
+        }
 
         registerCommand("proantitab", "pat");
         startUpdaterTask();
