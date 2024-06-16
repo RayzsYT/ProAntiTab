@@ -7,6 +7,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.api.brand.CustomServerBrand;
@@ -619,8 +620,8 @@ public class CommandProcess {
 
             Communicator.syncData();
 
-            if(Reflection.isVelocityServer())
-                VelocityAntiTabListener.updateCommands();
+            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+            else WaterfallAntiTabListener.updateCommands();
 
             Communicator.sendPermissionReset();
         } else {
