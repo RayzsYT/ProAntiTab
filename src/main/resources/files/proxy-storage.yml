@@ -2,6 +2,8 @@ global:
   commands:
     - pl
     - plugins
+  ignored-servers:
+    - auth-*
   servers:
     lobby-*:
       commands:
