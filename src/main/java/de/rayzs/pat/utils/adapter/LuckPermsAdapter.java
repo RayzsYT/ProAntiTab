@@ -3,6 +3,8 @@ package de.rayzs.pat.utils.adapter;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
+import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -27,9 +29,13 @@ public class LuckPermsAdapter {
 
         eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeMutateEvent.class, LuckPermsAdapter::onNoteMutate);
 
-        if(!Reflection.isProxyServer())
-             if(BukkitLoader.useSuggestions())
+        if(!Reflection.isProxyServer()) {
+            if (BukkitLoader.useSuggestions())
                 eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitAntiTabListener.luckpermsNetworkSync());
+        } else {
+            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+            else WaterfallAntiTabListener.updateCommands();
+        }
     }
 
 
@@ -61,7 +67,13 @@ public class LuckPermsAdapter {
                 }
         );
 
-        if(Reflection.getMinor() >= 18) BukkitAntiTabListener.handleTabCompletion(uuid);
+        if(Reflection.isProxyServer()) {
+            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+            else if(Reflection.isPaper()) WaterfallAntiTabListener.updateCommands();
+            return;
+        }
+
+        if(Reflection.getMinor() >= 16) BukkitAntiTabListener.handleTabCompletion(uuid);
     }
 
     private static void onNoteMutate(NodeMutateEvent event) {

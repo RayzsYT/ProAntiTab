@@ -124,15 +124,24 @@ public class GroupManager {
         return result;
     }
 
+    public static List<Group> getGroupsByCommandAndServer(String command, String server) {
+        List<Group> result = new ArrayList<>();
+        GROUPS.stream().filter(group -> group.getAllServerGroupBlacklist(server).stream().anyMatch(groupBlacklist -> groupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))).forEach(result::add);
+        return result;
+    }
+
     public static List<Group> getGroupsByServer(String server) {
         List<Group> result = new ArrayList<>();
+
         GROUPS.stream().filter(group -> {
             if (BlacklistCreator.exist(group.getGroupName(), server)) {
                 GroupBlacklist groupBlacklist = group.getOrCreateGroupBlacklist(server);
                 return (groupBlacklist != null && !groupBlacklist.getCommands().isEmpty() && groupBlacklist.getCommands().size() >= 1);
             }
+
             return false;
         }).forEach(result::add);
+
         return result;
     }
 

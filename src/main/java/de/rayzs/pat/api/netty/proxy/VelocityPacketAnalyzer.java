@@ -5,6 +5,7 @@ import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.*;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -18,6 +19,7 @@ public class VelocityPacketAnalyzer {
 
     private static final String PIPELINE_NAME = "pat-velocity-handler", HANDLER_NAME = "handler";
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
+    private static HashMap<String, CommandsCache> COMMANDS_CACHE_MAP = new HashMap<>();
 
     private static Class<?> minecraftConnectionClass, connectedPlayerConnectionClass;
 
@@ -157,16 +159,26 @@ public class VelocityPacketAnalyzer {
                         }
                     }
                 }
+
             } else if(packet instanceof AvailableCommandsPacket) {
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     AvailableCommandsPacket commands = (AvailableCommandsPacket) packet;
-                    if(!commands.getRootNode().getChildren().isEmpty()) {
-                        commands.getRootNode().getChildren().removeIf(command -> {
-                            if(command == null || command.getName() == null) return true;
-                            String commandName = command.getName();
-                            return Storage.Blacklist.isBlocked(player, commandName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-                        });
-                    }
+                    if(commands.getRootNode().getChildren().isEmpty() || !player.getCurrentServer().isPresent()) return;
+
+                    String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
+
+                    if(!COMMANDS_CACHE_MAP.containsKey(serverName))
+                        COMMANDS_CACHE_MAP.put(serverName, new CommandsCache().reverse());
+                    CommandsCache commandsCache = COMMANDS_CACHE_MAP.get(serverName);
+
+                    List<String> commandsAsString = new ArrayList<>();
+                    commands.getRootNode().getChildren().stream().filter(command -> command != null && command.getName() != null).forEach(command -> commandsAsString.add(command.getName()));
+                    commandsCache.handleCommands(commandsAsString);
+
+                    if(PermissionUtil.hasBypassPermission(player)) return;
+
+                    final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
+                    commands.getRootNode().getChildren().removeIf(command -> command == null || command.getName() == null || playerCommands.contains(command.getName()));
                 }
             }
 

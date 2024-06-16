@@ -11,12 +11,14 @@ import de.rayzs.pat.api.storage.placeholders.groups.*;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
+import de.rayzs.pat.api.storage.storages.IgnoredServersStorage;
 import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
 import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.group.*;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -182,18 +184,23 @@ public class Storage {
 
         private static HashMap<String, GeneralBlacklist> SERVER_BLACKLISTS = new HashMap<>();
         private static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
+        private static final IgnoredServersStorage IGNORED_SERVERS = new GeneralIgnoredServers();
 
         public static void loadAll() {
             SERVER_BLACKLISTS.clear();
             BLACKLIST.load();
 
             if(!Reflection.isProxyServer()) return;
-
+            IGNORED_SERVERS.load();
             BLACKLIST.getConfig().getKeys("global.servers", true).forEach(key -> {
                 GeneralBlacklist blacklist = BlacklistCreator.createGeneralBlacklist(key);
                 blacklist.load();
                 SERVER_BLACKLISTS.put(key, blacklist);
             });
+        }
+
+        public static boolean isOnIgnoredServer(String server) {
+            return IGNORED_SERVERS.isListed(server);
         }
 
         public static List<String> getBlacklistServers() {
@@ -218,6 +225,10 @@ public class Storage {
 
         public static List<GeneralBlacklist> getAllBlacklists(String server) {
             List<GeneralBlacklist> blacklists = getBlacklists(server);
+
+            if(Reflection.isProxyServer())
+                if (isOnIgnoredServer(server)) return blacklists;
+
             blacklists.add(Storage.Blacklist.getBlacklist());
             return blacklists;
         }
@@ -229,7 +240,14 @@ public class Storage {
         }
 
         public static boolean isListed(String command, String server) {
-            boolean blocked = isBlocked(command, server);
+            boolean blocked;
+            if(Reflection.isProxyServer()) {
+                blocked = isBlocked(command, server);
+                if(isOnIgnoredServer(server)) blocked = !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+            }
+            else
+                blocked = isBlocked(command, server);
+
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
                 blocked = blacklist.isBlocked(command, server, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
                 if(blocked) break;
@@ -238,7 +256,14 @@ public class Storage {
         }
 
         public static boolean isListed(String command, boolean intensive, String server) {
-            boolean blocked = isListed(command, intensive);
+            boolean blocked;
+            if(Reflection.isProxyServer()) {
+                blocked = isListed(command, intensive);
+                if(isOnIgnoredServer(server)) blocked = !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+            }
+            else
+                blocked = isListed(command, intensive);
+
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
                 blocked = blacklist.isListed(command, intensive);
                 if(blocked) break;
@@ -246,10 +271,21 @@ public class Storage {
             return blocked;
         }
 
+        public static boolean doesGroupBypass(String command, boolean intensive, String server) {
+            for (Group group : GroupManager.getGroups()) {
+                for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(server)) {
+                    if(groupBlacklist.isListed(command, intensive)) return true;
+                }
+            }
+
+            return false;
+        }
+
         public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, String server) {
             for (Group group : GroupManager.getGroups()) {
                 for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(server)) {
-                    if(groupBlacklist.isListed(command, intensive) && group.hasPermission(playerObj)) return true;
+                    if(groupBlacklist.isListed(command, intensive))
+                        if(group.hasPermission(playerObj)) return true;
                 }
             }
 
@@ -259,7 +295,8 @@ public class Storage {
         public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, String server, boolean convert) {
             for (Group group : GroupManager.getGroups()) {
                 for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(server)) {
-                    if(groupBlacklist.isListed(command, intensive, convert) && group.hasPermission(playerObj)) return true;
+                    if(groupBlacklist.isListed(command, intensive, convert))
+                        if(group.hasPermission(playerObj)) return true;
                 }
             }
 
@@ -269,7 +306,17 @@ public class Storage {
         public static boolean isListed(Object playerObj, String command, boolean intensive, String server) {
             if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(playerObj))) return false;
 
-            boolean blocked = isListed(command, intensive);
+
+            boolean /*blocked;
+            if(Reflection.isProxyServer()) {
+                blocked = isListed(command, intensive);
+                System.out.println("2.1> " + command + ": " + blocked);
+                if(isOnIgnoredServer(server)) blocked = !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+                System.out.println("2.2> " + command + ": " + blocked);
+            }
+            else*/
+                 blocked = isListed(command, intensive);
+
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
                 blocked = blacklist.isListed(command, intensive);
                 if(blocked) break;
@@ -281,7 +328,14 @@ public class Storage {
             if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) && group.hasPermission(targetObj)))
                 return false;
 
-            boolean blocked = isBlocked(targetObj, command);
+            boolean /*blocked;
+            if(Reflection.isProxyServer()) {
+                blocked = isBlocked(targetObj, command);
+                if(isOnIgnoredServer(server)) blocked = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+            }
+            else
+                */blocked = isBlocked(targetObj, command);
+
             if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
                 blocked = blacklist.isBlocked(targetObj, command, !ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
                 if(blocked) break;
@@ -294,11 +348,18 @@ public class Storage {
         }
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server, boolean focusOnBlock) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(targetObj)))
+            if(GroupManager.getGroupsByCommandAndServer(command, server).stream().anyMatch(group -> group.hasPermission(targetObj)))
                 return false;
 
-            boolean blocked = isBlocked(targetObj, command, intensive),
+            boolean blocked,
                     allow = false;
+
+            blocked = isBlocked(targetObj, command, intensive);
+            /*if(Reflection.isProxyServer()) {
+                System.out.println("1.1> " + command + ": " + blocked);
+                if(isOnIgnoredServer(server)) blocked = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+                System.out.println("1.2> " + command + ": " + blocked);
+            }*/
 
             if(focusOnBlock && blocked) return true;
             for (GeneralBlacklist blacklist : getBlacklists(server)) {

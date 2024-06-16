@@ -111,6 +111,8 @@ public class BungeePacketAnalyzer {
     }
 
     private static void modifyCommands(ProxiedPlayer player, Commands commands, List<String> list) {
+        final String serverName = player.getServer().getInfo().getName();
+        final boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
         list.clear();
 
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
@@ -128,7 +130,7 @@ public class BungeePacketAnalyzer {
 
                 for (String commandName : commandsToCheck) {
                     if (!list.contains(commandName)) {
-                        if (!Storage.Blacklist.isBlocked(player, commandName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName())) {
+                        if (!Storage.Blacklist.isBlocked(player, commandName, !turn, serverName)) {
                             list.add(commandName);
                             CommandNode dummy = LiteralArgumentBuilder.literal(commandName)
                                     .executes(DUMMY_COMMAND)

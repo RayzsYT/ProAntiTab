@@ -124,14 +124,19 @@ public class Communicator {
         CommunicationPackets.CommandsPacket commandsPacket = new CommunicationPackets.CommandsPacket();
         CommunicationPackets.GroupsPacket groupsPacket;
         CommunicationPackets.PacketBundle bundle;
-        List<String> commands = new ArrayList<>(Storage.Blacklist.getBlacklist().getCommands());
+        List<String> commands = new ArrayList<>();
+        String tempServerName = "";
 
         if(clientInfo != null && clientInfo.getName() != null) {
+            tempServerName = clientInfo.getName();
+            //if(!Storage.Blacklist.isOnIgnoredServer(tempServerName))
+                commands.addAll(Storage.Blacklist.getBlacklist().getCommands());
+
             List<GeneralBlacklist> serverBlacklists = Storage.Blacklist.getBlacklists(clientInfo.getName());
             serverBlacklists.stream().filter(serverBlacklist -> serverBlacklist != null && serverBlacklist.getCommands() != null).forEach(serverBlacklist -> commands.addAll(serverBlacklist.getCommands()));
         }
 
-        String serverName = clientInfo.getName();
+        final String serverName = tempServerName;
         List<TinyGroup> groups = new ArrayList<>();
 
         TinyGroup tinyGroup;
@@ -148,6 +153,8 @@ public class Communicator {
         groupsPacket = new CommunicationPackets.GroupsPacket(groups);
         commandsPacket.setTurnBlacklistToWhitelist(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         commandsPacket.setCommands(commands);
+
+        //System.out.println("-> " + commands);
 
         bundle = new CommunicationPackets.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
         clientInfo.sendBytes(CommunicationPackets.convertToBytes(bundle));

@@ -20,9 +20,9 @@ public class VelocityMessageTranslator implements Translator {
         if(target instanceof Player)
             ((Player) target).sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
         else if(target instanceof CommandSource)
-            ((CommandSource) target).sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
+            ((ConsoleCommandSource) target).sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
         else if(target instanceof ConsoleCommandSource)
-            ((ConsoleCommandSource) target).sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
+            ((ConsoleCommandSource) target).sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
     }
 
     @Override
