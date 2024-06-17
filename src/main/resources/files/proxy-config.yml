@@ -36,6 +36,9 @@ custom-protocol-ping:
   # It's the current amount of players increased by this number.
   # For example: 5/20 becomes 6/20
   extend-online-count: 1
+  # true: Use new calculated online-count (%online_extended%) as max-players count.
+  # false: Use the default max-players count.
+  use-as-maxplayers: false
 
   # The displayed protocol message
   # Available placeholders:

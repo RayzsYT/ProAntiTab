@@ -22,6 +22,9 @@ public class BungeePingListener implements Listener {
         ServerPing.Protocol newProtocol = new ServerPing.Protocol(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PROTOCOL.replace("%online_extended%", String.valueOf(onlineExtend)).replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max)), !Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ALWAYS_SHOW ? serverPing.getVersion().getProtocol() : 0);
         serverPing.setVersion(newProtocol);
 
+        if(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_EXTEND_AS_MAX_COUNT)
+            serverPing.getPlayers().setMax(onlineExtend);
+
         event.setResponse(serverPing);
     }
 }
