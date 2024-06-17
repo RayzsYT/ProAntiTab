@@ -71,9 +71,9 @@ public class Storage {
         return isServer(originServer, list);
     }
 
-    public static boolean isServer(String originServer, List<String> targetServers) {
-        for (String targetServer : targetServers)
-            if(isServer(originServer, targetServer))
+    public static boolean isServer(String targetServers, List<String> servers) {
+        for (String originServer : servers)
+            if(isServer(originServer, targetServers))
                 return true;
         return false;
     }
@@ -358,7 +358,7 @@ public class Storage {
 
             boolean turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
                     blocked = false,
-                    blockedGlobal = isBlockedGloballyOnServer(isBlocked(targetObj, command, intensive), server, turn),
+                    blockedGlobal = isBlockedGloballyOnServer(BLACKLIST.isBlockedIgnorePermission(command, intensive), server, turn),
                     blockedServer = false;
 
             if(focusOnBlock && blockedGlobal) return true;
@@ -372,7 +372,7 @@ public class Storage {
             }
 
             boolean bypass = PermissionUtil.hasBypassPermission(targetObj, command);
-            if(!bypass) blocked = blockedServer || blockedGlobal;
+            if(!bypass) blocked = turn ? blockedGlobal && blockedServer : blockedServer || blockedGlobal;
 
             return blocked;
         }
