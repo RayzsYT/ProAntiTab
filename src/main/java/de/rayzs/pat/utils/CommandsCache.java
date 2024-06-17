@@ -46,12 +46,13 @@ public class CommandsCache {
         if(filteredCommands == null)
             return useList ? playerCommands : new LinkedList<>(unfilteredCommands);
 
-        if(useList) playerCommands = new LinkedList<>(filteredCommands);
+        if(useList && !Storage.Blacklist.isOnIgnoredServer(serverName)) playerCommands = new LinkedList<>(filteredCommands);
 
         boolean permitted;
         if (!(Storage.USE_LUCKPERMS && !LuckPermsAdapter.hasAnyPermissions(uuid))) {
             for (String command : unfilteredCommands) {
-                if (filteredCommands.contains(command)) continue;
+                if (playerCommands.contains(command)) continue;
+
                 permitted = Reflection.isProxyServer() && serverName != null
                         ? !Storage.Blacklist.isBlocked(targetObj, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, serverName)
                         : PermissionUtil.hasBypassPermission(targetObj, command);
