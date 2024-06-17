@@ -40,7 +40,7 @@ turn-blacklist-to-whitelist: true
 
 # Change the protocol for the version name when the server is being pinged
 # (!) Warning: It's required to use Paper or Purpur to use this feature!
-# (!) Warning: For following server version: 1.12.2 - latest
+# (!) Supported server versions: 1.12.2 - latest
 custom-protocol-ping:
   enabled: true
 
