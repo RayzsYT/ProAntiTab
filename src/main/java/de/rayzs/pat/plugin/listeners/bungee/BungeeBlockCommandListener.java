@@ -31,6 +31,8 @@ public class BungeeBlockCommandListener implements Listener {
         command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
+        if(PermissionUtil.hasBypassPermission(player, command)) return;
+
         if(rawCommand.equals("/")) return;
         ServerInfo serverInfo = player.getServer().getInfo();
         String serverName = serverInfo != null ? serverInfo.getName() : "unknown";
@@ -52,17 +54,29 @@ public class BungeeBlockCommandListener implements Listener {
         if(!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return;
 
         List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", command);
+
+        boolean listed, serverListed, ignored;
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getServer().getInfo().getName())) return;
-            if(Storage.Blacklist.isListed(player, command, true, player.getServer().getInfo().getName())) return;
-            if(PermissionUtil.hasBypassPermission(player, command, false)) return;
+
+            if(Storage.Blacklist.doesGroupBypass(player, command, true, serverName)) return;
+
+            listed = Storage.Blacklist.isListed(command, true);
+            serverListed = Storage.Blacklist.isListed(player, command, true, listed, serverName);
+            ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
+            if(ignored ? !listed && serverListed : serverListed) return;
+
             event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);
             return;
         }
 
-        if (!Storage.Blacklist.isBlocked(player, command, player.getServer().getInfo().getName())) return;
-        if (PermissionUtil.hasBypassPermission(player, command, false)) return;
+        if(Storage.Blacklist.doesGroupBypass(player, command, true, serverName)) return;
+
+        listed = Storage.Blacklist.isListed(command, true);
+        serverListed = Storage.Blacklist.isListed(player, command, true, listed, serverName);
+        ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
+
+        if(!listed && !serverListed || listed && serverListed && ignored) return;
         event.setCancelled(true);
         MessageTranslator.send(player, cancelCommandMessage);
 

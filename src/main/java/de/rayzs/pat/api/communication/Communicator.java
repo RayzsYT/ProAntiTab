@@ -129,7 +129,7 @@ public class Communicator {
 
         if(clientInfo != null && clientInfo.getName() != null) {
             tempServerName = clientInfo.getName();
-            //if(!Storage.Blacklist.isOnIgnoredServer(tempServerName))
+            if(!Storage.Blacklist.isOnIgnoredServer(tempServerName))
                 commands.addAll(Storage.Blacklist.getBlacklist().getCommands());
 
             List<GeneralBlacklist> serverBlacklists = Storage.Blacklist.getBlacklists(clientInfo.getName());

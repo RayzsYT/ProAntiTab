@@ -79,6 +79,13 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
             return isListed(command, intensive) && !PermissionUtil.hasBypassPermission(targetObj, command);
     }
 
+    public boolean isBlockedIgnorePermission(String command, boolean intensive) {
+        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+            return !isListed(command, intensive);
+        else
+            return isListed(command, intensive);
+    }
+
     public boolean isBlocked(Object targetObj, String command, boolean intensive, boolean convert) {
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return !isListed(command, intensive, convert) && !PermissionUtil.hasBypassPermission(targetObj, command);

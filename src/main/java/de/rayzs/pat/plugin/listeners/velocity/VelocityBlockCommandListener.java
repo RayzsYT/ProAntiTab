@@ -36,9 +36,11 @@ public class VelocityBlockCommandListener {
         command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
+        if(PermissionUtil.hasBypassPermission(player, command)) return;
+
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
-        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command)) {
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
@@ -53,17 +55,29 @@ public class VelocityBlockCommandListener {
         if(!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return;
         List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
+        boolean listed, serverListed, ignored;
+
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getCurrentServer().get().getServerInfo().getName())) return;
-            if(Storage.Blacklist.isListed(player, command, true, player.getCurrentServer().get().getServerInfo().getName())) return;
-            if(PermissionUtil.hasBypassPermission(player, command, false)) return;
+
+            listed = Storage.Blacklist.isListed(command, true);
+            serverListed = Storage.Blacklist.isListed(player, command, true, listed, serverName);
+            ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
+            if(ignored ? !listed && serverListed : serverListed) return;
+
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, cancelCommandMessage);
             return;
         }
 
-        if (!Storage.Blacklist.isBlocked(player, command, player.getCurrentServer().get().getServerInfo().getName())) return;
-        if (PermissionUtil.hasBypassPermission(player, command, false)) return;
+        if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getCurrentServer().get().getServerInfo().getName())) return;
+
+        listed = Storage.Blacklist.isListed(command, true);
+        serverListed = Storage.Blacklist.isListed(player, command, true, listed, serverName);
+        ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
+
+        if(!listed && !serverListed || listed && serverListed && ignored) return;
+
         event.setResult(CommandExecuteEvent.CommandResult.denied());
         MessageTranslator.send(player, cancelCommandMessage);
 
