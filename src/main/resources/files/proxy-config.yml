@@ -32,10 +32,16 @@ custom-protocol-ping:
   # Enabling this will always display the protocol and replace it with the normal player count.
   always-show: false
 
+  # This number here determines the outcome for the %online_extended% placeholder.
+  # It's the current amount of players increased by this number.
+  # For example: 5/20 becomes 6/20
+  extend-online-count: 1
+
   # The displayed protocol message
   # Available placeholders:
-  # %online%    - current online player count
-  # %max%       - max player count
+  # %online%            - current online player count
+  # %online_extended%   - manipulated online player count
+  # %max%               - max player count
   protocol: '&f&lProAntiTab &7(&a%online%&7/&c%max%&7)'
 
 # This feature allows you to create your own 'Unknown command.' message.

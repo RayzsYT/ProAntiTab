@@ -8,6 +8,7 @@ public class CustomProtocolPingSection extends ConfigStorage {
 
     public boolean ENABLED, ALWAYS_SHOW, HIDE_PLAYERS;
     public String PROTOCOL;
+    public int EXTEND_COUNT;
 
     public CustomProtocolPingSection() {
         super("custom-protocol-ping");
@@ -24,6 +25,7 @@ public class CustomProtocolPingSection extends ConfigStorage {
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
         ALWAYS_SHOW = new ConfigSectionHelper<Boolean>(this, "always-show", Reflection.isProxyServer() || Reflection.isPaper()).getOrSet();
         PROTOCOL = new ConfigSectionHelper<String>(this, "protocol", "&f&lProAntiTab &7(&a%online%&7/&c%max%&7)").getOrSet();
+        EXTEND_COUNT = new ConfigSectionHelper<Integer>(this, "extend-online-count", 1).getOrSet();
         if(Reflection.isProxyServer()) return;
         HIDE_PLAYERS = new ConfigSectionHelper<Boolean>(this, "hide-players", true).getOrSet();
     }
