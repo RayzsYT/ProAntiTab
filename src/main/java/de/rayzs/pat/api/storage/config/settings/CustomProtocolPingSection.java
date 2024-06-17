@@ -16,10 +16,15 @@ public class CustomProtocolPingSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
-        ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", Reflection.isProxyServer() || Reflection.isPaper()).getOrSet();
+        if(!Reflection.isProxyServer()) {
+            if(!Reflection.isPaper() || Reflection.getMinor() < 12)
+            return;
+        }
+
+        ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
         ALWAYS_SHOW = new ConfigSectionHelper<Boolean>(this, "always-show", Reflection.isProxyServer() || Reflection.isPaper()).getOrSet();
         PROTOCOL = new ConfigSectionHelper<String>(this, "protocol", "&f&lProAntiTab &7(&a%online%&7/&c%max%&7)").getOrSet();
-        if(!Reflection.isProxyServer()) return;
+        if(Reflection.isProxyServer()) return;
         HIDE_PLAYERS = new ConfigSectionHelper<Boolean>(this, "hide-players", true).getOrSet();
     }
 }
