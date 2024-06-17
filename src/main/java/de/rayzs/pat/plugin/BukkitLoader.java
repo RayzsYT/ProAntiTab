@@ -79,7 +79,7 @@ public class BukkitLoader extends JavaPlugin {
             manager.registerEvents(new BukkitAntiTabListener(), this);
         }
 
-        if(Reflection.isPaper() && Reflection.getMinor() >= 12) 
+        if(Reflection.isPaper() && Reflection.getMinor() >= 12)
             manager.registerEvents(new PaperServerListPing(), this);
 
         registerCommand("proantitab", "pat");
