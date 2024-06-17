@@ -6,7 +6,7 @@ import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class CustomProtocolPingSection extends ConfigStorage {
 
-    public boolean ENABLED, ALWAYS_SHOW;
+    public boolean ENABLED, ALWAYS_SHOW, HIDE_PLAYERS;
     public String PROTOCOL;
 
     public CustomProtocolPingSection() {
@@ -16,9 +16,10 @@ public class CustomProtocolPingSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
-        if(!Reflection.isProxyServer()) return;
-        ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
-        ALWAYS_SHOW = new ConfigSectionHelper<Boolean>(this, "always-show", true).getOrSet();
+        ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", Reflection.isProxyServer() || Reflection.isPaper()).getOrSet();
+        ALWAYS_SHOW = new ConfigSectionHelper<Boolean>(this, "always-show", Reflection.isProxyServer() || Reflection.isPaper()).getOrSet();
         PROTOCOL = new ConfigSectionHelper<String>(this, "protocol", "&f&lProAntiTab &7(&a%online%&7/&c%max%&7)").getOrSet();
+        if(!Reflection.isProxyServer()) return;
+        HIDE_PLAYERS = new ConfigSectionHelper<Boolean>(this, "hide-players", true).getOrSet();
     }
 }

@@ -38,6 +38,26 @@ handle-through-proxy:
 # Enabling this will disable ALL commands except for those that are in the (group-)list.
 turn-blacklist-to-whitelist: true
 
+# Change the protocol for the version name when the server is being pinged
+# (!) Warning: It's required to use Paper or Purpur to use this feature!
+# (!) Warning: For following server version: 1.12.2 - latest
+custom-protocol-ping:
+  enabled: true
+
+  # Normally it would only display when someone pings the server with the wrong version.
+  # Enabling this will always display the protocol and replace it with the normal player count.
+  always-show: true
+
+  # Enabling this option hides the list of players on your server,
+  # when you hover over the player count.
+  hide-players: true
+
+  # The displayed protocol message
+  # Available placeholders:
+  # %online%    - current online player count
+  # %max%       - max player count
+  protocol: '&f&lProAntiTab &7(&a%online%&7/&c%max%&7)'
+
 #>> HTP (Sync)
 # This feature allows you to create your own 'Unknown command.' message.
 # It is very helpful considering the fact you might have to set the same message
