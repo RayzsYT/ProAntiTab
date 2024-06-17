@@ -59,8 +59,9 @@ custom-protocol-ping:
 
   # The displayed protocol message
   # Available placeholders:
-  # %online%    - current online player count
-  # %max%       - max player count
+  # %online%            - current online player count
+  # %online_extended%   - manipulated online player count
+  # %max%               - max player count
   protocol: '&f&lProAntiTab &7(&a%online%&7/&c%max%&7)'
 
 #>> HTP (Sync)

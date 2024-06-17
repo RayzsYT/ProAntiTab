@@ -15,9 +15,11 @@ public class BungeePingListener implements Listener {
         if(!Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ENABLED) return;
 
         ProxyServer proxyServer = BungeeLoader.getPlugin().getProxy();
-        int online = proxyServer.getOnlineCount(), max = proxyServer.getConfigurationAdapter().getListeners().iterator().next().getMaxPlayers();
+        int online = proxyServer.getOnlineCount(),
+                onlineExtend = online + Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.EXTEND_COUNT,
+                max = proxyServer.getConfigurationAdapter().getListeners().iterator().next().getMaxPlayers();
         ServerPing serverPing = event.getResponse();
-        ServerPing.Protocol newProtocol = new ServerPing.Protocol(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PROTOCOL.replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max)), !Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ALWAYS_SHOW ? serverPing.getVersion().getProtocol() : 0);
+        ServerPing.Protocol newProtocol = new ServerPing.Protocol(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PROTOCOL.replace("%online_extended%", String.valueOf(onlineExtend)).replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max)), !Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ALWAYS_SHOW ? serverPing.getVersion().getProtocol() : 0);
         serverPing.setVersion(newProtocol);
 
         event.setResponse(serverPing);

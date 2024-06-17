@@ -12,8 +12,10 @@ public class PaperServerListPing implements Listener {
         if(!Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ENABLED) return;
         if(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ALWAYS_SHOW) event.setProtocolVersion(0);
 
-        int online = Bukkit.getOnlinePlayers().size(), max = Bukkit.getMaxPlayers();
-        String versionName = Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PROTOCOL.replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max));
+        int online = Bukkit.getOnlinePlayers().size(),
+                onlineExtend = online + Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.EXTEND_COUNT,
+                max = Bukkit.getMaxPlayers();
+        String versionName = Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PROTOCOL.replace("%online_extended%", String.valueOf(onlineExtend)).replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max));
         event.setHidePlayers(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.HIDE_PLAYERS);
         event.setVersion(versionName);
     }
