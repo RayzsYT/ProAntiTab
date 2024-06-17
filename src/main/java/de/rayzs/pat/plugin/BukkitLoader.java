@@ -6,6 +6,7 @@ import de.rayzs.pat.plugin.commands.BukkitCommand;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitBlockCommandListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitPlayerConnectionListener;
+import de.rayzs.pat.plugin.listeners.bukkit.PaperServerListPing;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
@@ -77,6 +78,9 @@ public class BukkitLoader extends JavaPlugin {
             suggestions = true;
             manager.registerEvents(new BukkitAntiTabListener(), this);
         }
+
+        if(Reflection.isPaper() && Reflection.getMinor() >= 12) 
+            manager.registerEvents(new PaperServerListPing(), this);
 
         registerCommand("proantitab", "pat");
         startUpdaterTask();
