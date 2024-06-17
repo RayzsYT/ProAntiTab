@@ -20,7 +20,6 @@ public class VelocityAntiTabListener {
 
     private static ProxyServer server;
     private static final HashMap<String, CommandsCache> COMMANDS_CACHE_MAP = new HashMap<>();
-    private static final ExpireCache<String, CommandsCache> COMMANDS_CACHE = new ExpireCache<>(1, TimeUnit.HOURS);
 
     public VelocityAntiTabListener(ProxyServer server) {
         VelocityAntiTabListener.server = server;
