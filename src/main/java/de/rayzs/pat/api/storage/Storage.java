@@ -14,6 +14,7 @@ import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.api.storage.storages.IgnoredServersStorage;
 import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
 import de.rayzs.pat.plugin.*;
+import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.utils.Reflection;
@@ -22,6 +23,7 @@ import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Storage {
 
@@ -185,8 +187,10 @@ public class Storage {
         private static HashMap<String, GeneralBlacklist> SERVER_BLACKLISTS = new HashMap<>();
         private static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
         private static final IgnoredServersStorage IGNORED_SERVERS = new GeneralIgnoredServers();
+        private static final ExpireCache<String, List<GeneralBlacklist>> CACHED_SERVER_BLACKLIST = new ExpireCache<>(1, TimeUnit.HOURS);
 
         public static void loadAll() {
+            CACHED_SERVER_BLACKLIST.clear();
             SERVER_BLACKLISTS.clear();
             BLACKLIST.load();
 
@@ -236,10 +240,22 @@ public class Storage {
             return blacklists;
         }
 
+        public static void clearServerBlacklists() {
+            CACHED_SERVER_BLACKLIST.clear();
+        }
+
+        public static void clearServerBlacklists(String server) {
+            if(CACHED_SERVER_BLACKLIST.contains(server))
+                CACHED_SERVER_BLACKLIST.remove(server);
+        }
+
         public static List<GeneralBlacklist> getBlacklists(String server) {
+            if(CACHED_SERVER_BLACKLIST.contains(server))
+                return CACHED_SERVER_BLACKLIST.get(server);
+
             List<GeneralBlacklist> blacklists = new ArrayList<>();
             SERVER_BLACKLISTS.entrySet().stream().filter(entry -> entry.getKey().endsWith("*") ? isServer(entry.getKey(), server) : entry.getKey().equals(server)).forEach(entry -> blacklists.add(entry.getValue()));
-            return blacklists;
+            return CACHED_SERVER_BLACKLIST.putAndGet(server, blacklists);
         }
 
         public static boolean isListed(String command, String server) {
@@ -250,6 +266,7 @@ public class Storage {
                 blocked = blacklist.isBlocked(command, server, !turn);
                 if(blocked) break;
             }
+
             return blocked;
         }
 

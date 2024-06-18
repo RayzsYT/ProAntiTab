@@ -305,7 +305,7 @@ public class CommandProcess {
 
                                 if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
                                     Storage.Blacklist.getBlacklist(sub).clear().save();
-                                    handleChange();
+                                    handleChange(sub);
                                     sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER.replace("%server%", sub));
                                 } else {
                                     CONFIRMATION.put(uuid, confirmationString);
@@ -396,7 +396,7 @@ public class CommandProcess {
                                 bool = Storage.Blacklist.getBlacklist(sub).isListed(extra);
                                 if (!bool) {
                                     Storage.Blacklist.getBlacklist(sub).add(extra).save();
-                                    handleChange();
+                                    handleChange(sub);
                                 }
 
                                 sender.sendMessage((bool ? Storage.ConfigSections.Messages.BLACKLIST.ADD_SERVER_FAILED : Storage.ConfigSections.Messages.BLACKLIST.ADD_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra));
@@ -410,7 +410,7 @@ public class CommandProcess {
                                 bool = !Storage.Blacklist.getBlacklist(sub).isListed(extra);
                                 if (!bool) {
                                     Storage.Blacklist.getBlacklist(sub).remove(extra).save();
-                                    handleChange();
+                                    handleChange(sub);
                                 }
 
                                 sender.sendMessage((bool ? Storage.ConfigSections.Messages.BLACKLIST.REMOVE_SERVER_FAILED : Storage.ConfigSections.Messages.BLACKLIST.REMOVE_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra));
@@ -423,7 +423,7 @@ public class CommandProcess {
                                     for (Group groups : GroupManager.getGroupsByServer(sub))
                                         groups.clear(sub);
 
-                                    handleChange();
+                                    handleChange(sub);
                                     sender.sendMessage(Storage.ConfigSections.Messages.GROUP.CLEAR_SERVER.replace("%group%", extra).replace("%server%", sub));
                                 } else {
                                     CONFIRMATION.put(uuid, confirmationString);
@@ -487,7 +487,7 @@ public class CommandProcess {
                                 if (!bool) {
                                     group.getOrCreateGroupBlacklist(sub, true);
                                     group.add(extra, sub);
-                                    handleChange();
+                                    handleChange(sub);
                                 }
 
                                 sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.ADD_SERVER_FAILED : Storage.ConfigSections.Messages.GROUP.ADD_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra).replace("%group%", subExtra));
@@ -506,7 +506,7 @@ public class CommandProcess {
                                 if (!bool) {
                                     group.getOrCreateGroupBlacklist(sub, true);
                                     group.remove(extra, sub);
-                                    handleChange();
+                                    handleChange(sub);
                                 }
 
                                 sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.REMOVE_SERVER_FAILED : Storage.ConfigSections.Messages.GROUP.REMOVE_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra).replace("%group%", subExtra));
@@ -613,6 +613,17 @@ public class CommandProcess {
 
         suggestions.stream().filter(suggestion -> suggestion.startsWith(args[args.length-1].toLowerCase())).forEach(result::add);
         return result;
+    }
+
+    private static void handleChange(String server) {
+            Storage.Blacklist.clearServerBlacklists(server);
+            GroupManager.clearServerGroupBlacklists();
+            Communicator.syncData();
+
+            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+            else WaterfallAntiTabListener.updateCommands();
+
+            Communicator.sendPermissionReset();
     }
 
     private static void handleChange() {
