@@ -107,7 +107,10 @@ public class BukkitPacketAnalyzer {
                 if(packetObj.getClass() != null)
                     if (!PermissionUtil.hasBypassPermission(player, "proantitab.bypass")) {
                         String packetName = packetObj.getClass().getSimpleName();
-                        if (packetName.equals("PacketPlayOutTabComplete")) {
+                        if(packetName.contains("Tab") || packetName.contains("Command")) {
+                            System.out.println(packetName);
+                        }
+                        if (packetName.equals("PacketPlayOutTabComplete") || packetName.equals("ClientboundCommandSuggestionsPacket")) {
                             if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;
                         }
                     }

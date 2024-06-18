@@ -15,6 +15,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     @Override
     public boolean handleIncomingPacket(Player player, Object packetObj) throws Exception {
         Field stringField = Reflection.getFirstFieldByType(packetObj.getClass(), "String", Reflection.SearchOption.ENDS);
+
         if(stringField == null) {
             Logger.warning("Failed PacketAnalyze process! (#1)");
             return false;
@@ -28,6 +29,9 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     @Override
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         Object suggestionObj;
+
+        if(packetObj.getClass().getSimpleName().equals(" ClientboundCommandSuggestionsPacket"))
+            return false;
 
         if (Reflection.getMinor() < 17) {
             Field suggestionsField = Reflection.getFieldsByType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
