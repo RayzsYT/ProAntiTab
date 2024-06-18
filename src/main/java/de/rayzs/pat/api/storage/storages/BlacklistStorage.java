@@ -67,12 +67,18 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public boolean isListed(String command, boolean intensive, boolean convert) {
+        if(commands == null) {
+            Logger.warning("&cFailed to check command \"" + command + "\"! PAT couldn't read the commands from the storage.yml at section &4" + getNavigatePath() + "&c! Please ensure that your storage.yml isn't corrupt or contains any spaces or empty commands. If this problem still remains, please join my Discord server to ask for help there. &8(&erayzs.de/discord&8)");
+            return false;
+        }
+
         if(convert)
             if(!isConverted(command, intensive)) command = convertCommand(command, intensive, true);
 
-        for (String commands : commands)
-            if(commands.equals(command)) return true;
-
+        for (String commands : commands) {
+            if(commands == null) continue;
+            if (commands.equals(command)) return true;
+        }
         return false;
     }
 
