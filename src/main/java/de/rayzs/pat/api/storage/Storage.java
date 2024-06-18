@@ -245,16 +245,19 @@ public class Storage {
         }
 
         public static void clearServerBlacklists(String server) {
-            if(CACHED_SERVER_BLACKLIST.contains(server))
-                CACHED_SERVER_BLACKLIST.remove(server);
+            CACHED_SERVER_BLACKLIST.remove(server);
         }
 
         public static List<GeneralBlacklist> getBlacklists(String server) {
-            if(CACHED_SERVER_BLACKLIST.contains(server))
-                return CACHED_SERVER_BLACKLIST.get(server);
+            if(CACHED_SERVER_BLACKLIST.contains(server)) return CACHED_SERVER_BLACKLIST.get(server);
 
             List<GeneralBlacklist> blacklists = new ArrayList<>();
-            SERVER_BLACKLISTS.entrySet().stream().filter(entry -> entry.getKey().endsWith("*") ? isServer(entry.getKey(), server) : entry.getKey().equals(server)).forEach(entry -> blacklists.add(entry.getValue()));
+            SERVER_BLACKLISTS.entrySet()
+                    .stream().filter(entry -> entry.getKey().endsWith("*")
+                    ? isServer(entry.getKey(), server)
+                    : entry.getKey().equals(server))
+                    .forEach(entry -> blacklists.add(entry.getValue()));
+
             return CACHED_SERVER_BLACKLIST.putAndGet(server, blacklists);
         }
 
@@ -390,6 +393,9 @@ public class Storage {
             }
 
             blocked = turn ? blockedGlobal && blockedServer : blockedServer || blockedGlobal;
+            if(!blocked && CACHED_SERVER_BLACKLIST.get(server).size() == 0)
+                if(turn) blocked = true;
+
             return blocked;
         }
 

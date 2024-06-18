@@ -24,6 +24,11 @@ public class GeneralIgnoredServers extends IgnoredServersStorage {
     }
 
     @Override
+    public boolean isListEmpty() {
+        return super.isListEmpty();
+    }
+
+    @Override
     public void load() {
         super.load();
     }

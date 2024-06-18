@@ -3,8 +3,7 @@ package de.rayzs.pat.api.storage.storages;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.StorageTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class IgnoredServersStorage extends StorageTemplate {
 
@@ -28,7 +27,12 @@ public class IgnoredServersStorage extends StorageTemplate {
     }
 
     public boolean isListed(String server) {
+        if(servers.isEmpty()) return false;
         return Storage.isServer(server, servers);
+    }
+
+    public boolean isListEmpty() {
+        return servers.isEmpty();
     }
 
     @Override
@@ -38,5 +42,5 @@ public class IgnoredServersStorage extends StorageTemplate {
     public void load() {
         getConfig().reload();
         servers = (ArrayList<String>) getConfig().getOrSet(getNavigatePath(), servers);
-    }
+   }
 }

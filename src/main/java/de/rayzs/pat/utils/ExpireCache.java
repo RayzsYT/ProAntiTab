@@ -24,7 +24,7 @@ public class ExpireCache<T, K> {
     }
 
     public boolean remove(T t) {
-        if(contains(t)) return false;
+        if(!contains(t)) return false;
         cache.invalidate(t);
         return true;
     }
