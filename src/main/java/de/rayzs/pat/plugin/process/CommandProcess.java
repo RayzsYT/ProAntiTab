@@ -171,7 +171,7 @@ public class CommandProcess {
 
                     task = args[0].toLowerCase();
                     sub = args[1];
-                    bool = Storage.Blacklist.isListed(sub);
+                    bool = Storage.Blacklist.isListed(sub, false, false);
                     switch (task) {
                         case "ls":
                         case "list":
@@ -483,7 +483,7 @@ public class CommandProcess {
                                     return;
                                 }
 
-                                bool = group.containsOnServer(extra, sub);
+                                bool = group.containsOnServer(extra, sub, false);
                                 if (!bool) {
                                     group.getOrCreateGroupBlacklist(sub, true);
                                     group.add(extra, sub);
@@ -502,7 +502,7 @@ public class CommandProcess {
                                     return;
                                 }
 
-                                bool = !group.containsOnServer(extra, sub);
+                                bool = !group.containsOnServer(extra, sub, false);
                                 if (!bool) {
                                     group.getOrCreateGroupBlacklist(sub, true);
                                     group.remove(extra, sub);
