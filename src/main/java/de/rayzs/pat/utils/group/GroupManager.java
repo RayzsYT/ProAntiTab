@@ -124,6 +124,10 @@ public class GroupManager {
         return result;
     }
 
+    public static void clearServerGroupBlacklists() {
+        GROUPS.forEach(Group::clearServerGroupBlacklistsCache);
+    }
+
     public static List<Group> getGroupsByCommandAndServer(String command, String server) {
         List<Group> result = new ArrayList<>();
         GROUPS.stream().filter(group -> group.getAllServerGroupBlacklist(server).stream().anyMatch(groupBlacklist -> groupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))).forEach(result::add);

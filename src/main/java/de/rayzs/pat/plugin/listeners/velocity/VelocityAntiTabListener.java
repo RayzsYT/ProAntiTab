@@ -45,7 +45,7 @@ public class VelocityAntiTabListener {
 
         List<String> commandsAsString = new ArrayList<>();
         event.getRootNode().getChildren().stream().filter(command -> command != null && command.getName() != null).forEach(command -> commandsAsString.add(command.getName()));
-        commandsCache.handleCommands(commandsAsString);
+        commandsCache.handleCommands(commandsAsString, serverName);
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 

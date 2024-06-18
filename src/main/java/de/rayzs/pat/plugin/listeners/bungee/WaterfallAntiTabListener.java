@@ -28,7 +28,7 @@ public class WaterfallAntiTabListener implements Listener {
         CommandsCache commandsCache = COMMANDS_CACHE_MAP.get(serverName);
         List<String> commandsAsString = new ArrayList<>();
         event.getCommands().forEach((key, value) -> commandsAsString.add(key));
-        commandsCache.handleCommands(commandsAsString);
+        commandsCache.handleCommands(commandsAsString, serverName);
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 

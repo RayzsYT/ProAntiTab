@@ -165,6 +165,8 @@ public class BukkitLoader extends JavaPlugin {
 
             GroupManager.clearAllGroups();
             groupsPacket.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getCommands()));
+
+            Logger.info("Received data from proxy with " + Storage.Blacklist.getBlacklist().getCommands().size() + "/" + commandsPacket.getCommands().size() + " commands! (turn=" + Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED + ")");
         }
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();

@@ -334,6 +334,10 @@ public class Storage {
             return blocked;
         }
 
+        public static boolean isBlocked(String command, boolean intensive, String server) {
+            return isBlocked(command, intensive, server, false);
+        }
+
         public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server) {
             return isBlocked(targetObj, command, intensive, server, false);
         }
@@ -352,12 +356,9 @@ public class Storage {
             return GroupManager.getGroupsByCommandAndServer(command, server).stream().anyMatch(group -> group.hasPermission(targetObj));
         }
 
-        public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server, boolean focusOnBlock) {
-            if(GroupManager.getGroupsByCommandAndServer(command, server).stream().anyMatch(group -> group.hasPermission(targetObj)))
-                return false;
-
+        public static boolean isBlocked(String command, boolean intensive, String server, boolean focusOnBlock) {
             boolean turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
-                    blocked = false,
+                    blocked,
                     blockedGlobal = isBlockedGloballyOnServer(BLACKLIST.isBlockedIgnorePermission(command, intensive), server, turn),
                     blockedServer = false;
 
@@ -367,12 +368,23 @@ public class Storage {
                     blockedServer = blacklist.isBlockedIgnorePermission(command, intensive);
                     if (blockedServer) break;
                 } else {
-                    if(blacklist.isBlocked(targetObj, command, intensive)) return true;
+                    if(blacklist.isBlocked(command, intensive)) return true;
                 }
             }
 
-            boolean bypass = PermissionUtil.hasBypassPermission(targetObj, command);
-            if(!bypass) blocked = turn ? blockedGlobal && blockedServer : blockedServer || blockedGlobal;
+            blocked = turn ? blockedGlobal && blockedServer : blockedServer || blockedGlobal;
+            return blocked;
+        }
+
+        public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server, boolean focusOnBlock) {
+            if(GroupManager.getGroupsByCommandAndServer(command, server).stream().anyMatch(group -> group.hasPermission(targetObj)))
+                return false;
+
+            boolean blocked = isBlocked(command, intensive, server, focusOnBlock);
+
+            if(blocked)
+                if(PermissionUtil.hasBypassPermission(targetObj, command))
+                    blocked = false;
 
             return blocked;
         }

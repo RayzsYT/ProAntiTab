@@ -618,6 +618,7 @@ public class CommandProcess {
     private static void handleChange() {
         if(Reflection.isProxyServer()) {
 
+            GroupManager.clearServerGroupBlacklists();
             Communicator.syncData();
 
             if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();

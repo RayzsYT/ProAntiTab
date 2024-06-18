@@ -34,6 +34,10 @@ public class ExpireCache<T, K> {
         return k;
     }
 
+    public void clear() {
+        cache.cleanUp();
+    }
+
     public void putIgnoreIfContains(T t, K k) {
         cache.put(t, k);
     }

@@ -37,6 +37,29 @@ public class CommandsCache {
         }
     }
 
+    public void handleCommands(List<String> commands, String server) {
+        if(!isOutdated(commands)) return;
+
+        filteredCommands = new LinkedList<>();
+        allCommands = new ArrayList<>(commands);
+
+        for (String command : allCommands) {
+            if (filteredCommands.contains(command)) continue;
+
+            if (useList) {
+               if(Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
+                    continue;
+
+                filteredCommands.add(command);
+                continue;
+            }
+
+            if(!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
+                filteredCommands.add(command);
+
+        }
+    }
+
     public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid) {
         return getPlayerCommands(unfilteredCommands, targetObj, uuid, null);
     }

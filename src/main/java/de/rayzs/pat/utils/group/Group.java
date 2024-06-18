@@ -2,17 +2,20 @@ package de.rayzs.pat.utils.group;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Group implements Serializable {
 
     private final HashMap<String, GroupBlacklist> groupServerBlacklist = new HashMap<>();
     private final GroupBlacklist generalGroupBlacklist;
+    private final ExpireCache<String, List<GroupBlacklist>> cachedServerGroupBlacklists = new ExpireCache<>(1, TimeUnit.HOURS);
     private final String groupName;
 
     public Group(String groupName) {
@@ -102,7 +105,14 @@ public class Group implements Serializable {
         return groupBlacklist;
     }
 
+    public void clearServerGroupBlacklistsCache() {
+        cachedServerGroupBlacklists.clear();
+    }
+
     public List<GroupBlacklist> getAllServerGroupBlacklist(String server) {
+        if(cachedServerGroupBlacklists.contains(server))
+            return cachedServerGroupBlacklists.get(server);
+
         List<GroupBlacklist> groupBlacklists = new ArrayList<>();
         GroupBlacklist groupBlacklist;
 
@@ -114,7 +124,7 @@ public class Group implements Serializable {
              groupBlacklists.add(groupBlacklist);
         }
 
-        return groupBlacklists;
+        return cachedServerGroupBlacklists.putAndGet(server, groupBlacklists);
     }
 
     public List<String> getCommands() {
