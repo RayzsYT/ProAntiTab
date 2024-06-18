@@ -42,7 +42,7 @@ turn-blacklist-to-whitelist: true
 # (!) Warning: It's required to use Paper or Purpur to use this feature!
 # (!) Supported server versions: 1.12.2 - latest
 custom-protocol-ping:
-  enabled: true
+  enabled: false
 
   # Normally it would only display when someone pings the server with the wrong version.
   # Enabling this will always display the protocol and replace it with the normal player count.
