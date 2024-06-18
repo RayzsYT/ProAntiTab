@@ -20,7 +20,9 @@ public class PaperServerListPing implements Listener {
             event.setMaxPlayers(onlineExtend);
 
         String versionName = Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PROTOCOL.replace("%online_extended%", String.valueOf(onlineExtend)).replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max));
-        event.setHidePlayers(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.HIDE_PLAYERS);
+        if(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.HIDE_PLAYERS)
+            event.getPlayerSample().clear();
+
         event.setVersion(versionName);
     }
 }
