@@ -26,9 +26,10 @@ public class BungeeMessageTranslator implements Translator {
 
     @Override
     public void send(Object target, String text) {
-        boolean isPlayer = target instanceof ProxiedPlayer;
-        Audience audience = isPlayer ? audiences.player((ProxiedPlayer) target) : audiences.sender((CommandSender) target);
-        audience.sendMessage((isPlayer ? LegacyComponentSerializer.legacyAmpersand() : this.miniMessage).deserialize(text));
+        Audience audience = target instanceof ProxiedPlayer ? audiences.player((ProxiedPlayer) target) : audiences.sender((CommandSender) target);
+        text = this.miniMessage.serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(text.replace("§", "&")));
+        if(text.contains("\\")) text = text.replace("\\", "");
+        audience.sendMessage(this.miniMessage.deserialize(text));
     }
 
     @Override

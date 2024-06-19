@@ -27,7 +27,9 @@ public class BukkitMessageTranslator implements Translator {
     @Override
     public void send(Object target, String text) {
         Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
-        audience.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
+        text = this.miniMessage.serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(text.replace("§", "&")));
+        if(text.contains("\\")) text = text.replace("\\", "");
+        audience.sendMessage(this.miniMessage.deserialize(text));
     }
 
     @Override

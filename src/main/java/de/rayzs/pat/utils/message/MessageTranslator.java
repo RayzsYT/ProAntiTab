@@ -9,9 +9,10 @@ import java.util.*;
 
 public class MessageTranslator {
 
-    private static final HashMap<Character, String> colors = new HashMap<>();
+    private static final HashMap<Character, String> colors = new HashMap<>(), endingColors = new HashMap<>();
     private static boolean support;
     private static Translator translator = null;
+    private static final List<Character> notColors = Arrays.asList('m', 'r', 'k', 'l', 'o');
 
     public static void initialize() {
         colors.put('1', "<dark_blue>");
@@ -34,6 +35,9 @@ public class MessageTranslator {
         colors.put('r', "<reset>");
         colors.put('o', "<i>");
         colors.put('l', "<b>");
+
+        for (Map.Entry<Character, String> entry : colors.entrySet())
+            endingColors.put(entry.getKey(), "</" + entry.getValue().substring(1));
 
         support =  Reflection.getMinor() >= 18
                 || Reflection.isProxyServer();

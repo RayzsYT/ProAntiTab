@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.message.translators;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.*;
 import de.rayzs.pat.utils.message.*;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -17,12 +18,16 @@ public class VelocityMessageTranslator implements Translator {
 
     @Override
     public void send(Object target, String text) {
+        text = this.miniMessage.serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(text.replace("§", "&")));
+        if(text.contains("\\")) text = text.replace("\\", "");
+        final Component component = this.miniMessage.deserialize(text);
+
         if(target instanceof Player)
-            ((Player) target).sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
+            ((Player) target).sendMessage(component);
         else if(target instanceof CommandSource)
-            ((ConsoleCommandSource) target).sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+            ((ConsoleCommandSource) target).sendMessage(component);
         else if(target instanceof ConsoleCommandSource)
-            ((ConsoleCommandSource) target).sendMessage(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+            ((ConsoleCommandSource) target).sendMessage(component);
     }
 
     @Override
