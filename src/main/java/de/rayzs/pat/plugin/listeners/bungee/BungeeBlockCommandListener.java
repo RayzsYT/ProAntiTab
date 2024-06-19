@@ -60,8 +60,8 @@ public class BungeeBlockCommandListener implements Listener {
 
             if(Storage.Blacklist.doesGroupBypass(player, command, true, serverName)) return;
 
-            listed = Storage.Blacklist.isListed(command, true);
-            serverListed = Storage.Blacklist.isListed(player, command, true, listed, serverName);
+            listed = Storage.Blacklist.isListed(command, false);
+            serverListed = Storage.Blacklist.isListed(player, command, false, listed, serverName);
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
             if(ignored ? !listed && serverListed : serverListed) return;
 

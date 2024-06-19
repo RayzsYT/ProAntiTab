@@ -58,10 +58,10 @@ public class VelocityBlockCommandListener {
         boolean listed, serverListed, ignored;
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getCurrentServer().get().getServerInfo().getName())) return;
+            if(Storage.Blacklist.doesGroupBypass(player, command, false, player.getCurrentServer().get().getServerInfo().getName())) return;
 
-            listed = Storage.Blacklist.isListed(command, true);
-            serverListed = Storage.Blacklist.isListed(player, command, true, listed, serverName);
+            listed = Storage.Blacklist.isListed(command, false);
+            serverListed = Storage.Blacklist.isListed(player, command, false, listed, serverName);
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
             if(ignored ? !listed && serverListed : serverListed) return;
 
