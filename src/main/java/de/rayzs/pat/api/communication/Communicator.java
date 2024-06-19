@@ -8,6 +8,7 @@ import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.communication.impl.*;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.CommunicationPackets;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
@@ -154,8 +155,6 @@ public class Communicator {
         commandsPacket.setTurnBlacklistToWhitelist(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         commandsPacket.setCommands(commands);
 
-        //System.out.println("-> " + commands);
-
         bundle = new CommunicationPackets.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
         clientInfo.sendBytes(CommunicationPackets.convertToBytes(bundle));
     }
@@ -178,6 +177,7 @@ public class Communicator {
     }
 
     public static void sendFeedback() {
+        Logger.info("Send data :D");
         sendPacket(new CommunicationPackets.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString()));
     }
 

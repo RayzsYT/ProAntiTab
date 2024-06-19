@@ -16,7 +16,7 @@ public class VelocityClientInfo extends ClientInfo {
 
     @Override
     public void sendBytes(byte[] bytes) {
-        VelocityLoader.getServer().getAllServers().stream().filter(server -> server.getServerInfo().getName().equals(getName())).forEach(server -> server.sendPluginMessage(VelocityClient.getIdentifier(), bytes));
+        VelocityLoader.getServer().getAllServers().stream().filter(server -> server.getServerInfo().getName().equalsIgnoreCase(getName())).forEach(server -> server.sendPluginMessage(VelocityClient.getIdentifier(), bytes));
     }
 
     @Override
