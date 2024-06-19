@@ -32,14 +32,14 @@ public class BukkitBlockCommandListener implements Listener {
             if(!event.isCancelled())
                 if(!BukkitLoader.doesCommandExist(command, false)) {
                     event.setCancelled(true);
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE);
+                    MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE, "%command%", command);
                     return;
                 }
         }
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
             event.setCancelled(true);
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", command);
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
