@@ -177,7 +177,6 @@ public class Communicator {
     }
 
     public static void sendFeedback() {
-        Logger.info("Send data :D");
         sendPacket(new CommunicationPackets.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString()));
     }
 
