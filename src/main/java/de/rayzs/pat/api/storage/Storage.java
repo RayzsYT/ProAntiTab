@@ -88,7 +88,7 @@ public class Storage {
             originServer = originServer.replace("*", "");
             return targetServer.startsWith(originServer);
         }
-        return originServer.equals(targetServer);
+        return originServer.equalsIgnoreCase(targetServer);
     }
 
     public static class Files {
@@ -255,7 +255,7 @@ public class Storage {
             SERVER_BLACKLISTS.entrySet()
                     .stream().filter(entry -> entry.getKey().endsWith("*")
                     ? isServer(entry.getKey(), server)
-                    : entry.getKey().equals(server))
+                    : entry.getKey().equalsIgnoreCase(server))
                     .forEach(entry -> blacklists.add(entry.getValue()));
 
             return CACHED_SERVER_BLACKLIST.putAndGet(server, blacklists);
