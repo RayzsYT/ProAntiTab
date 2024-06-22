@@ -9,8 +9,6 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import org.bukkit.Bukkit;
-
 import java.util.List;
 
 public class VelocityBlockCommandListener {
@@ -45,10 +43,7 @@ public class VelocityBlockCommandListener {
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-                org.bukkit.entity.Player target = Bukkit.getServer().getPlayer(uuid);
-                MessageTranslator.send(target, notificationMessage);
-            });
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(server.getPlayer(uuid).get(), notificationMessage));
             return;
         }
 
@@ -82,9 +77,6 @@ public class VelocityBlockCommandListener {
         MessageTranslator.send(player, cancelCommandMessage);
 
         if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
-        Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-            org.bukkit.entity.Player target = Bukkit.getServer().getPlayer(uuid);
-            MessageTranslator.send(target, notificationMessage);
-        });
+        Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(server.getPlayer(uuid).get(), notificationMessage));
     }
 }

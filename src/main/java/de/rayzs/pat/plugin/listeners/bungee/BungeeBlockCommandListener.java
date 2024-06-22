@@ -5,13 +5,12 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.*;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.*;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import java.util.List;
 
 public class BungeeBlockCommandListener implements Listener {
@@ -44,9 +43,9 @@ public class BungeeBlockCommandListener implements Listener {
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-                Player target = Bukkit.getServer().getPlayer(uuid);
-                MessageTranslator.send(target, notificationMessage);
+            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+                ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
+                if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
             });
             return;
         }
@@ -81,9 +80,9 @@ public class BungeeBlockCommandListener implements Listener {
         MessageTranslator.send(player, cancelCommandMessage);
 
         if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
-        Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-            Player target = Bukkit.getServer().getPlayer(uuid);
-            MessageTranslator.send(target, notificationMessage);
+        Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+            ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
+            if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
         });
     }
 }
