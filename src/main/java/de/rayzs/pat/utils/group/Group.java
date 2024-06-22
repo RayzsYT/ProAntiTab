@@ -115,6 +115,8 @@ public class Group implements Serializable {
     }
 
     public List<GroupBlacklist> getAllServerGroupBlacklist(String server) {
+        server = server.toLowerCase();
+
         if(cachedServerGroupBlacklists.contains(server))
             return cachedServerGroupBlacklists.get(server);
 

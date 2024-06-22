@@ -245,20 +245,21 @@ public class Storage {
         }
 
         public static void clearServerBlacklists(String server) {
-            CACHED_SERVER_BLACKLIST.remove(server);
+            CACHED_SERVER_BLACKLIST.remove(server.toLowerCase());
         }
 
         public static List<GeneralBlacklist> getBlacklists(String server) {
-            if(CACHED_SERVER_BLACKLIST.contains(server)) return CACHED_SERVER_BLACKLIST.get(server);
+            final String finalServer = server.toLowerCase();
+            if(CACHED_SERVER_BLACKLIST.contains(finalServer)) return CACHED_SERVER_BLACKLIST.get(finalServer);
 
             List<GeneralBlacklist> blacklists = new ArrayList<>();
             SERVER_BLACKLISTS.entrySet()
                     .stream().filter(entry -> entry.getKey().endsWith("*")
-                    ? isServer(entry.getKey(), server)
-                    : entry.getKey().equalsIgnoreCase(server))
+                    ? isServer(entry.getKey(), finalServer)
+                    : entry.getKey().equalsIgnoreCase(finalServer))
                     .forEach(entry -> blacklists.add(entry.getValue()));
 
-            return CACHED_SERVER_BLACKLIST.putAndGet(server, blacklists);
+            return CACHED_SERVER_BLACKLIST.putAndGet(finalServer, blacklists);
         }
 
         public static boolean isListed(String command, String server) {
