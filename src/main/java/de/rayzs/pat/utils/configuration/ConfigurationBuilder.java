@@ -16,7 +16,7 @@ public interface ConfigurationBuilder {
     Object get(String target);
     Object get(String path, String target);
     Collection<String> getKeys(boolean deep);
-    Collection<String> getKeys(String section, boolean deep);;
+    Collection<String> getKeys(String section, boolean deep);
     File getFile();
     boolean loadDefault();
 }

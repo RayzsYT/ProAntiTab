@@ -1,24 +1,13 @@
 package de.rayzs.pat.utils.configuration.yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.representer.Representer;
+import java.nio.charset.StandardCharsets;
 import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.representer.*;
 import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.representer.Represent;
-
+import org.yaml.snakeyaml.*;
+import java.util.*;
+import java.io.*;
 
 public class YamlConfiguration extends ConfigurationProvider {
 
