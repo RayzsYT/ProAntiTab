@@ -12,6 +12,7 @@ import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.hooks.PlaceholderHook;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.configuration.Configurator;
@@ -53,6 +54,8 @@ public class BukkitLoader extends JavaPlugin {
         loadCommandMap();
 
         Reflection.initialize(getServer());
+        ConfigUpdater.initialize();
+
         Storage.CURRENT_VERSION = getDescription().getVersion();
 
         Storage.loadAll(true);
