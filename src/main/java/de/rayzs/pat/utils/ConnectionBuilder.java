@@ -1,13 +1,14 @@
 package de.rayzs.pat.utils;
 
-import de.rayzs.pat.plugin.logger.Logger;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.net.*;
 
 public class ConnectionBuilder {
 
     private String url = null, response = null;
+    private List<String> responseList = new ArrayList<>();
     private Object[] parameters = null;
 
     public ConnectionBuilder setUrl(String url) {
@@ -27,7 +28,7 @@ public class ConnectionBuilder {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
             connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            if(parameters.length > 0) {
+            if(parameters != null && parameters.length > 0) {
                 Object firstParam = null, secondParam = null;
                 for (Object parameter : parameters) {
                     if(firstParam == null) firstParam = parameter;
@@ -42,9 +43,19 @@ public class ConnectionBuilder {
 
             Scanner scanner = new Scanner(connection.getInputStream());
             StringBuilder builder = new StringBuilder("\\");
-            while (scanner.hasNextLine()) builder.append(" ").append(scanner.next());
+            String next;
+
+            while (scanner.hasNextLine()) {
+                next = scanner.nextLine();
+                responseList.add(next);
+                builder.append(" ").append(next);
+            }
+
             response = builder.toString().replace("\\ ", "");
-        } catch (Exception ignored) { }
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
         return this;
     }
 
@@ -54,5 +65,9 @@ public class ConnectionBuilder {
 
     public String getResponse() {
         return response;
+    }
+
+    public List<String> getResponseList() {
+        return responseList;
     }
 }
