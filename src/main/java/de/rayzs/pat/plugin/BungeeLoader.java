@@ -11,6 +11,7 @@ import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.configuration.Configurator;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -42,6 +43,8 @@ public class BungeeLoader extends Plugin {
         logger = getLogger();
 
         Reflection.initialize(getProxy());
+        ConfigUpdater.initialize();
+
         Storage.CURRENT_VERSION = getDescription().getVersion();
         Storage.loadAll(true);
 

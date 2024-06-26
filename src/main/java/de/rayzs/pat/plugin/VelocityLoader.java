@@ -21,6 +21,7 @@ import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.configuration.Configurator;
@@ -65,6 +66,8 @@ public class VelocityLoader {
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-placeholders.yml", "placeholders.yml", false);
 
         Reflection.initialize(server);
+        ConfigUpdater.initialize();
+
         Storage.CURRENT_VERSION = pluginContainer.getDescription().getVersion().get();
 
         Storage.loadAll(true);
