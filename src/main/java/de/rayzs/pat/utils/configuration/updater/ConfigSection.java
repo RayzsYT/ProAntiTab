@@ -7,11 +7,10 @@ import java.util.*;
 
 public class ConfigSection {
 
-    private final File oldConfigFile, newConfigFile;
+    private final File oldConfigFile;
 
-    public ConfigSection(File oldConfigFile, File newConfigFile) {
+    public ConfigSection(File oldConfigFile) {
         this.oldConfigFile = oldConfigFile;
-        this.newConfigFile = newConfigFile;
     }
 
     public List<String> createAndGetNewFileInput(int interceptLine, int from, int to) {
@@ -19,12 +18,12 @@ public class ConfigSection {
                      originalFileInput = new ArrayList<>();
 
         try {
-
             originalFileInput = Files.readAllLines(oldConfigFile.toPath());
+
+            while(!originalFileInput.get(interceptLine).isEmpty()) interceptLine++;
             originalFileInput.addAll(interceptLine, interceptedInput);
 
         } catch (Exception exception) {
-            Logger.warning("Failed to read file input!");
             exception.printStackTrace();
         }
 
@@ -36,7 +35,7 @@ public class ConfigSection {
 
         try {
 
-            lines = Files.readAllLines(newConfigFile.toPath());
+            lines = ConfigUpdater.getNewestConfigInput();
             String targetString = lines.get(from);
             boolean foundLine = false;
             int line = from;
