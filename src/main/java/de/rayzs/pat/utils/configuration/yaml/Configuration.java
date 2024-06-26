@@ -1,14 +1,9 @@
 package de.rayzs.pat.utils.configuration.yaml;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class Configuration {
+
     private static final char SEPARATOR = '.';
 
     final Map<String, Object> self;
