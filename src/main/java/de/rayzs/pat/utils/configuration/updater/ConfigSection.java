@@ -40,6 +40,8 @@ public class ConfigSection {
             boolean foundLine = false;
             int line = from;
 
+            sectionLines.add("");
+
             for (String currentLine : lines) {
 
                 if(!foundLine && targetString.equals(currentLine))
@@ -52,6 +54,8 @@ public class ConfigSection {
 
                 sectionLines.add(currentLine);
             }
+
+            sectionLines.add("");
 
         } catch (Exception exception) {
             Logger.warning("Failed to read file input!");
