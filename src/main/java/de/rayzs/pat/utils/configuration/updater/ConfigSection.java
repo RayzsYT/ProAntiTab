@@ -1,6 +1,8 @@
 package de.rayzs.pat.utils.configuration.updater;
 
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.StringUtils;
+
 import java.nio.file.Files;
 import java.io.File;
 import java.util.*;
@@ -66,15 +68,10 @@ public class ConfigSection {
     }
 
     private boolean hasFreeSpace(List<String> lines, int line) {
-        String lineText = getLineText(lines, line);
+        String lineText = StringUtils.getLineText(lines, line);
         if(lineText != null && !lineText.isEmpty()) return false;
 
-        lineText = getLineText(lines, line+1);
+        lineText = StringUtils.getLineText(lines, line+1);
         return lineText == null || !lineText.startsWith(" ");
-    }
-
-    private String getLineText(List<String> lines, int line) {
-        if(line >= lines.size() || line < 1) return null;
-        return lines.get(line);
     }
 }
