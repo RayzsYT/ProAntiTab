@@ -20,7 +20,7 @@ public class ConfigSection {
         try {
             originalFileInput = Files.readAllLines(oldConfigFile.toPath());
 
-            while(!originalFileInput.get(interceptLine).isEmpty()) interceptLine++;
+            while(!hasFreeSpace(originalFileInput, interceptLine)) interceptLine++;
             originalFileInput.addAll(interceptLine, interceptedInput);
 
         } catch (Exception exception) {
@@ -30,7 +30,7 @@ public class ConfigSection {
         return originalFileInput;
     }
 
-    public List<String> gatherLines(int from, int to) {
+    private List<String> gatherLines(int from, int to) {
         List<String> lines, sectionLines = new ArrayList<>();
 
         try {
@@ -59,5 +59,18 @@ public class ConfigSection {
         }
 
         return sectionLines;
+    }
+
+    private boolean hasFreeSpace(List<String> lines, int line) {
+        String lineText = getLineText(lines, line);
+        if(lineText != null && !lineText.isEmpty()) return false;
+
+        lineText = getLineText(lines, line+1);
+        return lineText == null || !lineText.startsWith(" ");
+    }
+
+    private String getLineText(List<String> lines, int line) {
+        if(line >= lines.size() || line < 1) return null;
+        return lines.get(line);
     }
 }
