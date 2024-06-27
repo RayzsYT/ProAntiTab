@@ -91,7 +91,7 @@ public class ConfigUpdater {
                 position--;
             } while (spaces != 0);
 
-            if(sectionPath.toString().equals(targetPath)) return new int[] { finalStartPos, finalEndPos };
+            if(sectionPath.toString().equals(targetPath)) return new int[] { targetPath.contains(".") ? finalStartPos : finalEndPos, finalEndPos };
         }
 
         return new int[] {0, 0};
