@@ -40,7 +40,7 @@ public class StringUtils {
     }
 
     public static int countLetters(String input, char trigger, boolean breakup) {
-        if(input == null || input.isEmpty()) return 0;
+        if(input == null || input.isEmpty()) return -1;
         int count = 0;
         for (char c : input.toCharArray()) {
             if(c != trigger && breakup) break;
