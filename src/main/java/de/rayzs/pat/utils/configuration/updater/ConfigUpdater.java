@@ -2,6 +2,8 @@ package de.rayzs.pat.utils.configuration.updater;
 
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.utils.*;
+
+import java.nio.file.Files;
 import java.util.*;
 import java.io.*;
 
@@ -18,7 +20,7 @@ public class ConfigUpdater {
     public static void updateConfigFile(ConfigurationBuilder configurationBuilder, int atLine, int from, int to) {
         File file = configurationBuilder.getFile();
         ConfigSection configSection = new ConfigSection(file);
-        String sectionAsString = StringUtils.buildStringList(configSection.createAndGetNewFileInput(atLine, from, to));
+        String sectionAsString = StringUtils.buildStringListWithoutColors(configSection.createAndGetNewFileInput(atLine, from, to));
 
         try {
             OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file, false));
@@ -27,6 +29,73 @@ public class ConfigUpdater {
         }catch (Exception exception) {
             exception.printStackTrace();
         }
+    }
+
+    public static int[] getSectionPositionByTarget(ConfigurationBuilder configurationBuilder, String targetPath) {
+        List<String> lines;
+        HashMap<Integer, String> hash = new HashMap<>();
+        int sections = 0;
+
+        String target = targetPath;
+        if(target.contains(".")) {
+            String[] pathSplit = target.split("\\.");
+            sections = pathSplit.length;
+            target = pathSplit[pathSplit.length-1];
+        }
+
+        try {
+            lines = Files.readAllLines(configurationBuilder.getFile().toPath());
+            String line;
+            int i;
+            for (i = 0; i < lines.size(); i++) {
+                line = lines.get(i);
+
+                if(line.isEmpty() || line.startsWith("#") || !line.contains(":")) continue;
+                line = line.split(":")[0];
+
+                if(!StringUtils.remove(line, " ").equals(target)) continue;
+                if(StringUtils.countLetters(line, ' ', true) != sections) continue;
+                hash.put(i, line);
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return new int[] {0, 0};
+        }
+
+        String line, sectionPath;
+        int position, spaces, removeSpaces, finalStartPos = 0, finalEndPos;
+        List<String> sectionNames;
+
+        for (Map.Entry<Integer, String> entry : hash.entrySet()) {
+            line = entry.getValue();
+            position = entry.getKey();
+            finalEndPos = entry.getKey();
+            removeSpaces = 2;
+            sectionNames = new LinkedList<>();
+            sectionNames.add(StringUtils.remove(line, " "));
+
+            sections -= 2;
+
+            do {
+                line = StringUtils.getLineText(lines, position);
+                spaces = StringUtils.countLetters(line, ' ', true);
+
+                if(spaces == sections) {
+                    sections -= removeSpaces;
+                    line = StringUtils.remove((line != null && line.contains(":") ? line.split(":")[0] : line), " ");
+                    finalStartPos = position;
+                    sectionNames.add(line);
+                }
+
+                if(position < 0) break;
+                position--;
+            } while (spaces != 0);
+
+            sectionPath = StringUtils.buildStringListWithoutColors(sectionNames, ".", false);
+            if(sectionPath.equals(targetPath)) return new int[] { finalStartPos, finalEndPos };
+        }
+
+        return new int[] {0, 0};
     }
 
     public static List<String> getNewestConfigInput() {
