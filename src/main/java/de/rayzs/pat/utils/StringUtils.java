@@ -34,6 +34,25 @@ public class StringUtils {
         return input;
     }
 
+    public static String getLineText(List<String> lines, int line) {
+        if(line >= lines.size() || line < 1) return null;
+        return lines.get(line);
+    }
+
+    public static int countLetters(String input, char trigger, boolean breakup) {
+        int count = 0;
+        for (char c : input.toCharArray()) {
+            if(c != trigger && breakup) break;
+            count++;
+        }
+
+        return count;
+    }
+
+    public static String remove(String input, String... targets) {
+        return replaceTriggers(input, "", targets);
+    }
+
     public static String replace(String input, String... replacements) {
         final HashMap<String, String> REPLACEMENTS = new HashMap<>();
 
@@ -85,6 +104,19 @@ public class StringUtils {
         for (int i = 0; i < list.size(); i++) {
             end = i >= list.size() - 1;
             builder.append(list.get(i).replace("&", "§"));
+            if (!end) builder.append("\n");
+        }
+
+        return builder.toString();
+    }
+
+    public static String buildStringListWithoutColors(List<String> list) {
+        StringBuilder builder = new StringBuilder();
+        boolean end;
+
+        for (int i = 0; i < list.size(); i++) {
+            end = i >= list.size() - 1;
+            builder.append(list.get(i));
             if (!end) builder.append("\n");
         }
 
