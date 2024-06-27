@@ -40,6 +40,7 @@ public class StringUtils {
     }
 
     public static int countLetters(String input, char trigger, boolean breakup) {
+        if(input == null || input.isEmpty()) return 0;
         int count = 0;
         for (char c : input.toCharArray()) {
             if(c != trigger && breakup) break;
@@ -111,13 +112,28 @@ public class StringUtils {
     }
 
     public static String buildStringListWithoutColors(List<String> list) {
+        return buildStringListWithoutColors(list, "\n");
+    }
+
+    public static String buildStringListWithoutColors(List<String> list, boolean reversed) {
+        return buildStringListWithoutColors(list, "\n", reversed);
+    }
+
+    public static String buildStringListWithoutColors(List<String> list, String splitter) {
+        return buildStringListWithoutColors(list, splitter, false);
+    }
+
+    public static String buildStringListWithoutColors(List<String> list, String splitter, boolean reversed) {
+        Collections.sort(list);
+        if(reversed) Collections.reverse(list);
+
         StringBuilder builder = new StringBuilder();
         boolean end;
 
         for (int i = 0; i < list.size(); i++) {
             end = i >= list.size() - 1;
             builder.append(list.get(i));
-            if (!end) builder.append("\n");
+            if (!end) builder.append(splitter);
         }
 
         return builder.toString();
