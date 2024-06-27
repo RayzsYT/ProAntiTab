@@ -39,7 +39,8 @@ public class ConfigUpdater {
         String target = targetPath;
         if(target.contains(".")) {
             String[] pathSplit = target.split("\\.");
-            sections = pathSplit.length;
+            sections = (pathSplit.length-1) * 2;
+
             target = pathSplit[pathSplit.length-1];
         }
 
@@ -62,18 +63,17 @@ public class ConfigUpdater {
             return new int[] {0, 0};
         }
 
-        String line, sectionPath;
-        int position, spaces, removeSpaces, finalStartPos = 0, finalEndPos;
-        List<String> sectionNames;
+        String line;
+        StringBuilder sectionPath;
+        int position, spaces, removeSpaces, finalStartPos = 0, finalEndPos, oldSections = sections;
 
         for (Map.Entry<Integer, String> entry : hash.entrySet()) {
             line = entry.getValue();
             position = entry.getKey();
             finalEndPos = entry.getKey();
             removeSpaces = 2;
-            sectionNames = new LinkedList<>();
-            sectionNames.add(StringUtils.remove(line, " "));
-
+            sectionPath = new StringBuilder(StringUtils.remove(line, " "));
+            sections = oldSections;
             sections -= 2;
 
             do {
@@ -84,15 +84,14 @@ public class ConfigUpdater {
                     sections -= removeSpaces;
                     line = StringUtils.remove((line != null && line.contains(":") ? line.split(":")[0] : line), " ");
                     finalStartPos = position;
-                    sectionNames.add(line);
+                    sectionPath.insert(0, line + ".");
                 }
 
                 if(position < 0) break;
                 position--;
             } while (spaces != 0);
 
-            sectionPath = StringUtils.buildStringListWithoutColors(sectionNames, ".", false);
-            if(sectionPath.equals(targetPath)) return new int[] { finalStartPos, finalEndPos };
+            if(sectionPath.toString().equals(targetPath)) return new int[] { finalStartPos, finalEndPos };
         }
 
         return new int[] {0, 0};
