@@ -80,6 +80,13 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         Object result = get(path, target);
         if (result != null)
             return result;
+
+        if(fileName.equals("config")) {
+            ConfigUpdater.updateConfigFile(file, target, configuration.getConfigurationSection(ConfigUpdater.getSection(path + "." + target)) == null);
+            reload();
+            return get(path, target);
+        }
+
         set(path, target, object);
         save();
         return get(path, target);
