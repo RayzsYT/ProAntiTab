@@ -2,6 +2,7 @@ package de.rayzs.pat.utils.configuration.impl;
 
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.ChatColor;
 import java.io.File;
@@ -89,6 +90,13 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         Object result = get(target);
         if (result != null)
             return result;
+
+        if(fileName.equals("config")) {
+            ConfigUpdater.updateConfigFile(file, target, configuration.getConfigurationSection(ConfigUpdater.getSection(target)) == null);
+            reload();
+            return get(target);
+        }
+
         set(target, object);
         save();
         return get(target);

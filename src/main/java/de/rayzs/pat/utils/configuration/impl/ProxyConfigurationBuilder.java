@@ -4,6 +4,8 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import java.io.File;
 import java.util.Collection;
+
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.configuration.yaml.*;
 
 public class ProxyConfigurationBuilder implements ConfigurationBuilder {
@@ -96,6 +98,12 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
         Object result = get(target);
         if (result != null)
             return result;
+
+        if(fileName.equals("config")) {
+            ConfigUpdater.updateConfigFile(file, target, configuration.getSection(ConfigUpdater.getSection(target)) == null);
+            reload();
+            return get(target);
+        }
 
         set(target, object);
         save();
