@@ -20,9 +20,11 @@ public class ConfigSection {
                 originalFileInput = getFileInput();
 
         while(!hasFreeSpace(originalFileInput, interceptLine)) interceptLine++;
-        originalFileInput.addAll(interceptLine, interceptedInput);
 
-        return originalFileInput;
+        List<String> newFileInput = originalFileInput.subList(0, interceptLine);
+        newFileInput.addAll(interceptedInput);
+        newFileInput.addAll(originalFileInput.subList(interceptLine + interceptedInput.size(), originalFileInput.size()));
+        return newFileInput;
     }
 
     public List<String> getFileInput() {
@@ -74,9 +76,6 @@ public class ConfigSection {
     private boolean hasFreeSpace(List<String> lines, int line) {
         String lineText = StringUtils.getLineText(lines, line);
         if(lineText != null && !lineText.isEmpty()) return false;
-
-        lineText = StringUtils.getLineText(lines, line-1);
-        if(lineText != null && lineText.startsWith(" ")) return false;
 
         lineText = StringUtils.getLineText(lines, line+1);
         return lineText == null || !lineText.startsWith(" ");

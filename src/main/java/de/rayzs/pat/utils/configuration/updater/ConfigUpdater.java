@@ -1,9 +1,7 @@
 package de.rayzs.pat.utils.configuration.updater;
 
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.utils.*;
-
 import java.nio.file.Files;
 import java.util.*;
 import java.io.*;
@@ -18,24 +16,31 @@ public class ConfigUpdater {
                 + "-config.yml").connect().getResponseList();
     }
 
-    public static void updateConfigFile(File file, String target) {
-        ConfigSection configSection = new ConfigSection(file);
-        int[] position = getSectionPositionByTarget(configSection.getFileInput(), target, true);
+    public static void updateConfigFile(File file, String target, boolean section) {
+        int[] position = section ? getPositionBySection(NEWEST_CONFIG_INPUT, target, true) : getSectionPositionByTarget(NEWEST_CONFIG_INPUT, target, true);
         updateConfigFile(file, position[0], position[0], position[1]);
     }
 
     public static void updateConfigFile(File file, int atLine, int from, int to) {
         ConfigSection configSection = new ConfigSection(file);
-        String sectionAsString = StringUtils.buildStringListWithoutColors(configSection.createAndGetNewFileInput(atLine, from, to));
+        List<String> a = configSection.createAndGetNewFileInput(atLine, from, to);
 
         try {
-            OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file, false));
-            writer.write(sectionAsString);
-            writer.close();
+            a.forEach(System.out::println);
+            Files.write(file.toPath(), a);
         }catch (Exception exception) {
             Logger.warning("Failed to read file input! (#2)");
             exception.printStackTrace();
         }
+    }
+
+    public static String getSection(String target) {
+        if(target.contains(".")) {
+            String[] pathSplit = target.split("\\.");
+            target = pathSplit[pathSplit.length-1];
+        }
+
+        return target;
     }
 
     public static int[] getSectionPositionByTarget(List<String> lines, String targetPath, boolean comments) {
@@ -104,11 +109,49 @@ public class ConfigUpdater {
                     }
                 }
 
-                return new int[] { finalStartPos, finalEndPos };
+                return new int[] { finalStartPos, finalEndPos + 1 };
             }
         }
 
         return new int[] {0, 0};
+    }
+
+    public static int[] getPositionBySection(List<String> lines, String target, boolean comments) {
+        int start = getSectionPositionByTarget(lines, target, comments)[0], end = start, i;
+        String line;
+
+        if(target.contains(".")) {
+            String[] pathSplit = target.split("\\.");
+            target = pathSplit[0];
+        }
+
+        boolean reachedSection = false;
+
+        for (i = start; i < lines.size(); i++) {
+            line = lines.get(i);
+
+            if(line.contains(":")) line = line.split(":")[0];
+            if(!reachedSection && target.equals(StringUtils.remove(line, " ")))
+                reachedSection = true;
+
+            if(line == null) continue;
+            System.out.println(target + "/" + line);
+
+            if(line.startsWith("#")) {
+                if(!reachedSection) continue;
+                end = i-1;
+                break;
+            }
+
+            if(StringUtils.countLetters(line, ' ', true) == 0 && !target.equals(StringUtils.remove(line, " "))) {
+                end = i-1;
+                break;
+            }
+
+            end = i;
+        }
+
+        return new int[] {start, end + 1};
     }
 
     public static List<String> getNewestConfigInput() {
