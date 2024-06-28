@@ -18,6 +18,10 @@ public class ConfigUpdater {
                 + "-config.yml").connect().getResponseList();
     }
 
+    public static void updateConfigFile(ConfigurationBuilder configurationBuilder, String target) {
+
+    }
+
     public static void updateConfigFile(ConfigurationBuilder configurationBuilder, int atLine, int from, int to) {
         File file = configurationBuilder.getFile();
         ConfigSection configSection = new ConfigSection(file);
@@ -33,8 +37,7 @@ public class ConfigUpdater {
         }
     }
 
-    public static int[] getSectionPositionByTarget(ConfigurationBuilder configurationBuilder, String targetPath, boolean comments) {
-        List<String> lines;
+    public static int[] getSectionPositionByTarget(List<String> lines, String targetPath, boolean comments) {
         HashMap<Integer, String> hash = new HashMap<>();
         int sections = 0;
 
@@ -46,27 +49,19 @@ public class ConfigUpdater {
             target = pathSplit[pathSplit.length-1];
         }
 
-        try {
-            lines = Files.readAllLines(configurationBuilder.getFile().toPath());
-            String line;
-            int i;
-            for (i = 0; i < lines.size(); i++) {
-                line = lines.get(i);
+        String line;
+        int i;
+        for (i = 0; i < lines.size(); i++) {
+            line = lines.get(i);
 
-                if(line.isEmpty() || line.startsWith("#") || !line.contains(":")) continue;
-                line = line.split(":")[0];
+            if(line.isEmpty() || line.startsWith("#") || !line.contains(":")) continue;
+            line = line.split(":")[0];
 
-                if(!StringUtils.remove(line, " ").equals(target)) continue;
-                if(StringUtils.countLetters(line, ' ', true) != sections) continue;
-                hash.put(i, line);
-            }
-        } catch (Exception exception) {
-            Logger.warning("Failed to read file input! (#3)");
-            exception.printStackTrace();
-            return new int[] {0, 0};
+            if(!StringUtils.remove(line, " ").equals(target)) continue;
+            if(StringUtils.countLetters(line, ' ', true) != sections) continue;
+            hash.put(i, line);
         }
 
-        String line;
         StringBuilder sectionPath;
         int position, spaces, removeSpaces, finalStartPos = 0, finalEndPos, oldSections = sections;
 
@@ -98,7 +93,7 @@ public class ConfigUpdater {
                 finalStartPos = targetPath.contains(".") ? finalStartPos : finalEndPos;
 
                 if(comments) {
-                    int i, start = finalStartPos-1;
+                    int start = finalStartPos-1;
                     for(i = start; i > 0; i--) {
                         line = StringUtils.getLineText(lines, i);
                         if(line != null && !line.startsWith("#")) {
