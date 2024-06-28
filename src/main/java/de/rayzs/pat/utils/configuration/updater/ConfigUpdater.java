@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.configuration.updater;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.utils.*;
 
@@ -27,6 +28,7 @@ public class ConfigUpdater {
             writer.write(sectionAsString);
             writer.close();
         }catch (Exception exception) {
+            Logger.warning("Failed to read file input! (#2)");
             exception.printStackTrace();
         }
     }
@@ -59,6 +61,7 @@ public class ConfigUpdater {
                 hash.put(i, line);
             }
         } catch (Exception exception) {
+            Logger.warning("Failed to read file input! (#3)");
             exception.printStackTrace();
             return new int[] {0, 0};
         }
