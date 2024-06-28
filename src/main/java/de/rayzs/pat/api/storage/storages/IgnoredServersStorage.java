@@ -2,6 +2,7 @@ package de.rayzs.pat.api.storage.storages;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.StorageTemplate;
+import de.rayzs.pat.utils.Reflection;
 
 import java.util.*;
 
@@ -40,6 +41,7 @@ public class IgnoredServersStorage extends StorageTemplate {
 
     @Override
     public void load() {
+        if(!Reflection.isProxyServer()) return;
         getConfig().reload();
         servers = (ArrayList<String>) getConfig().getOrSet(getNavigatePath(), servers);
    }
