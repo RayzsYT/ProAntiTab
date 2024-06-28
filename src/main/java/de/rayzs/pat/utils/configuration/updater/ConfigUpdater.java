@@ -23,11 +23,9 @@ public class ConfigUpdater {
 
     public static void updateConfigFile(File file, int atLine, int from, int to) {
         ConfigSection configSection = new ConfigSection(file);
-        List<String> a = configSection.createAndGetNewFileInput(atLine, from, to);
 
         try {
-            a.forEach(System.out::println);
-            Files.write(file.toPath(), a);
+            Files.write(file.toPath(), configSection.createAndGetNewFileInput(atLine, from, to));
         }catch (Exception exception) {
             Logger.warning("Failed to read file input! (#2)");
             exception.printStackTrace();
