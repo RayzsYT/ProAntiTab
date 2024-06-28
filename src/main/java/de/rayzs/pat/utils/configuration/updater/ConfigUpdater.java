@@ -32,7 +32,7 @@ public class ConfigUpdater {
     }
 
     public static int[] getSectionPositionByTarget(ConfigurationBuilder configurationBuilder, String targetPath, boolean comments) {
-        List<String> lines = new LinkedList<>();
+        List<String> lines;
         HashMap<Integer, String> hash = new HashMap<>();
         int sections = 0;
 
@@ -95,11 +95,11 @@ public class ConfigUpdater {
                 finalStartPos = targetPath.contains(".") ? finalStartPos : finalEndPos;
 
                 if(comments) {
-                    int i;
-                    for(i = finalStartPos; i > 0; i--) {
+                    int i, start = finalStartPos-1;
+                    for(i = start; i > 0; i--) {
                         line = StringUtils.getLineText(lines, i);
                         if(line != null && !line.startsWith("#")) {
-                            finalStartPos = i;
+                            finalStartPos = i+1;
                             break;
                         }
                     }
