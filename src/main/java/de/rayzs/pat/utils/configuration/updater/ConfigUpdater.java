@@ -19,7 +19,10 @@ public class ConfigUpdater {
     }
 
     public static void updateConfigFile(ConfigurationBuilder configurationBuilder, String target) {
-
+        File file = configurationBuilder.getFile();
+        ConfigSection configSection = new ConfigSection(file);
+        int[] position = getSectionPositionByTarget(configSection.getFileInput(), target, true);
+        updateConfigFile(configurationBuilder, position[0], position[0], position[1]);
     }
 
     public static void updateConfigFile(ConfigurationBuilder configurationBuilder, int atLine, int from, int to) {
