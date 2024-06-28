@@ -17,19 +17,23 @@ public class ConfigSection {
 
     public List<String> createAndGetNewFileInput(int interceptLine, int from, int to) {
         List<String> interceptedInput = gatherLines(from, to),
-                     originalFileInput = new ArrayList<>();
+                originalFileInput = getFileInput();
 
+        while(!hasFreeSpace(originalFileInput, interceptLine)) interceptLine++;
+        originalFileInput.addAll(interceptLine, interceptedInput);
+
+        return originalFileInput;
+    }
+
+    public List<String> getFileInput() {
         try {
-            originalFileInput = Files.readAllLines(oldConfigFile.toPath());
-
-            while(!hasFreeSpace(originalFileInput, interceptLine)) interceptLine++;
-            originalFileInput.addAll(interceptLine, interceptedInput);
-
+            return Files.readAllLines(oldConfigFile.toPath());
         } catch (Exception exception) {
+            Logger.warning("Failed to read file input! (#4)");
             exception.printStackTrace();
         }
 
-        return originalFileInput;
+        return Collections.emptyList();
     }
 
     private List<String> gatherLines(int from, int to) {
