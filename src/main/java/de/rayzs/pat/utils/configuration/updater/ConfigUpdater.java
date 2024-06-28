@@ -31,8 +31,8 @@ public class ConfigUpdater {
         }
     }
 
-    public static int[] getSectionPositionByTarget(ConfigurationBuilder configurationBuilder, String targetPath) {
-        List<String> lines;
+    public static int[] getSectionPositionByTarget(ConfigurationBuilder configurationBuilder, String targetPath, boolean comments) {
+        List<String> lines = new LinkedList<>();
         HashMap<Integer, String> hash = new HashMap<>();
         int sections = 0;
 
@@ -91,7 +91,22 @@ public class ConfigUpdater {
                 position--;
             } while (spaces != 0);
 
-            if(sectionPath.toString().equals(targetPath)) return new int[] { targetPath.contains(".") ? finalStartPos : finalEndPos, finalEndPos };
+            if(sectionPath.toString().equals(targetPath)) {
+                finalStartPos = targetPath.contains(".") ? finalStartPos : finalEndPos;
+
+                if(comments) {
+                    int i;
+                    for(i = finalStartPos; i > 0; i--) {
+                        line = StringUtils.getLineText(lines, i);
+                        if(line != null && !line.startsWith("#")) {
+                            finalStartPos = i;
+                            break;
+                        }
+                    }
+                }
+
+                return new int[] { finalStartPos, finalEndPos };
+            }
         }
 
         return new int[] {0, 0};
