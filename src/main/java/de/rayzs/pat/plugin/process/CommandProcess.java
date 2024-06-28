@@ -2,7 +2,6 @@ package de.rayzs.pat.plugin.process;
 
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.communication.client.ClientInfo;
-import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -35,7 +34,7 @@ public class CommandProcess {
 
         if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
 
-        for (String arg : args) if(arg.contains(".") || arg.contains("\"") || arg.contains("'")) return;
+       for (String arg : args) if(arg.contains(".") || arg.contains("\"") || arg.contains("'")) return;
 
         try {
             switch (length) {
