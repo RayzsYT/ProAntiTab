@@ -18,15 +18,13 @@ public class ConfigUpdater {
                 + "-config.yml").connect().getResponseList();
     }
 
-    public static void updateConfigFile(ConfigurationBuilder configurationBuilder, String target) {
-        File file = configurationBuilder.getFile();
+    public static void updateConfigFile(File file, String target) {
         ConfigSection configSection = new ConfigSection(file);
         int[] position = getSectionPositionByTarget(configSection.getFileInput(), target, true);
-        updateConfigFile(configurationBuilder, position[0], position[0], position[1]);
+        updateConfigFile(file, position[0], position[0], position[1]);
     }
 
-    public static void updateConfigFile(ConfigurationBuilder configurationBuilder, int atLine, int from, int to) {
-        File file = configurationBuilder.getFile();
+    public static void updateConfigFile(File file, int atLine, int from, int to) {
         ConfigSection configSection = new ConfigSection(file);
         String sectionAsString = StringUtils.buildStringListWithoutColors(configSection.createAndGetNewFileInput(atLine, from, to));
 
