@@ -60,7 +60,7 @@ public class ConfigSection {
             sectionLines.add("");
 
         } catch (Exception exception) {
-            Logger.warning("Failed to read file input!");
+            Logger.warning("Failed to read file input! (#1)");
             exception.printStackTrace();
         }
 
@@ -70,6 +70,9 @@ public class ConfigSection {
     private boolean hasFreeSpace(List<String> lines, int line) {
         String lineText = StringUtils.getLineText(lines, line);
         if(lineText != null && !lineText.isEmpty()) return false;
+
+        lineText = StringUtils.getLineText(lines, line-1);
+        if(lineText != null && lineText.startsWith(" ")) return false;
 
         lineText = StringUtils.getLineText(lines, line+1);
         return lineText == null || !lineText.startsWith(" ");
