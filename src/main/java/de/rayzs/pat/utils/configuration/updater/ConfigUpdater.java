@@ -18,6 +18,7 @@ public class ConfigUpdater {
 
     public static void updateConfigFile(File file, String target, boolean section) {
         int[] position = section ? getPositionBySection(NEWEST_CONFIG_INPUT, target, true) : getSectionPositionByTarget(NEWEST_CONFIG_INPUT, target, true);
+        System.out.println(target + " " + section + " | " + position[0] + "-" + position[1]);
         updateConfigFile(file, position[0], position[0], position[1]);
     }
 
@@ -32,10 +33,21 @@ public class ConfigUpdater {
         }
     }
 
-    public static String getSection(String target) {
+    public static String getVariable(String target) {
         if(target.contains(".")) {
             String[] pathSplit = target.split("\\.");
             target = pathSplit[pathSplit.length-1];
+        }
+
+        return target;
+    }
+
+    public static String getSection(String target) {
+        if(target.contains(".")) {
+            String[] pathSplit = target.split("\\.");
+            LinkedList<String> pathList = new LinkedList<>(Arrays.asList(pathSplit));
+            pathList.remove(pathList.size() - 1);
+            target = StringUtils.buildStringListWithoutColors(pathList, ".");
         }
 
         return target;
@@ -107,7 +119,7 @@ public class ConfigUpdater {
                     }
                 }
 
-                return new int[] { finalStartPos, finalEndPos + 1 };
+                return new int[] { finalStartPos, finalEndPos };
             }
         }
 
