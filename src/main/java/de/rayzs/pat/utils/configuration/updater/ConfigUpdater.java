@@ -145,7 +145,6 @@ public class ConfigUpdater {
                 reachedSection = true;
 
             if(line == null) continue;
-            System.out.println(target + "/" + line);
 
             if(line.startsWith("#")) {
                 if(!reachedSection) continue;
