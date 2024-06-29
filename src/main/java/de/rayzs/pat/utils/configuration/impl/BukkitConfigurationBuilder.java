@@ -82,13 +82,18 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
             return result;
 
         if(fileName.equals("config")) {
-            ConfigUpdater.updateConfigFile(file, target, configuration.getConfigurationSection(ConfigUpdater.getSection(path + "." + target)) == null);
-            reload();
-            return get(path, target);
+            if(configuration.getConfigurationSection(path) == null) {
+                ConfigUpdater.updateConfigFile(file, path + "." + target, true);
+                Logger.warning("Section '" + path + "' is missing! Loading default section from online config.yml.");
+                reload();
+                return get(path, target);
+            }
         }
 
         set(path, target, object);
         save();
+
+        Logger.warning("Variable for '" + path + "." + target + "' could not be found or is corrupt! Therefore it has been replaced by its default variable.");
         return get(path, target);
     }
 
@@ -98,14 +103,20 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
+        String section = ConfigUpdater.getSection(target);
         if(fileName.equals("config")) {
-            ConfigUpdater.updateConfigFile(file, target, configuration.getConfigurationSection(ConfigUpdater.getSection(target)) == null);
-            reload();
-            return get(target);
+            if(configuration.getConfigurationSection(section) == null) {
+                ConfigUpdater.updateConfigFile(file, target, true);
+                Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
+                reload();
+                return get(target);
+            }
         }
 
         set(target, object);
         save();
+
+        Logger.warning("Variable for '" + target + "' could not be found or is corrupt! Therefore it has been replaced by its default variable.");
         return get(target);
     }
 
