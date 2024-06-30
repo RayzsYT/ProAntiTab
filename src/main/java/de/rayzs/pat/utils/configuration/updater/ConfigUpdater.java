@@ -9,11 +9,14 @@ import java.io.*;
 public class ConfigUpdater {
 
     private static List<String> NEWEST_CONFIG_INPUT = new ArrayList<>();
+    private static boolean LOADED = false;
 
     public static void initialize() {
         NEWEST_CONFIG_INPUT = new ConnectionBuilder().setUrl("https://raw.githubusercontent.com/RayzsYT/ProAntiTab/main/src/main/resources/files/"
                 + (Reflection.isProxyServer() ? " proxy" : "bukkit")
                 + "-config.yml").connect().getResponseList();
+
+        LOADED = !NEWEST_CONFIG_INPUT.isEmpty();
     }
 
     public static void updateConfigFile(File file, String target, boolean section) {
@@ -51,6 +54,10 @@ public class ConfigUpdater {
         }
 
         return target;
+    }
+
+    public static boolean canUpdate() {
+        return LOADED;
     }
 
     public static int[] getSectionPositionByTarget(List<String> lines, String targetPath, boolean comments) {
