@@ -21,7 +21,6 @@ public class ConfigUpdater {
 
     public static void updateConfigFile(File file, String target, boolean section) {
         int[] position = section ? getPositionBySection(NEWEST_CONFIG_INPUT, target, true) : getSectionPositionByTarget(NEWEST_CONFIG_INPUT, target, true);
-        System.out.println(target + " " + section + " | " + position[0] + "-" + position[1]);
         updateConfigFile(file, position[0], position[0], position[1]);
     }
 
