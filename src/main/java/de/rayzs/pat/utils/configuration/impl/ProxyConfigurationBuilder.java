@@ -90,7 +90,7 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
             return result;
 
         if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate() && configuration.getSection(path) == null) {
+            if(ConfigUpdater.canUpdate() && (configuration.getSection(path) == null || configuration.getSection(path).getKeys().size() == 0)) {
                 ConfigUpdater.updateConfigFile(file, path + "." + target, true);
                 Logger.warning("Section '" + path + "' is missing! Loading default section from online config.yml.");
                 reload();
@@ -113,7 +113,7 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
 
         String section = ConfigUpdater.getSection(target);
         if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate() && configuration.getSection(section) == null) {
+            if(ConfigUpdater.canUpdate() && (configuration.getSection(section) == null || configuration.getSection(section).getKeys().size() == 0)) {
                 ConfigUpdater.updateConfigFile(file, target, true);
                 Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
                 reload();
