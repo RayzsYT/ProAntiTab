@@ -38,7 +38,7 @@ handle-through-proxy:
 # Enabling this will disable ALL commands except for those that are in the (group-)list.
 turn-blacklist-to-whitelist: true
 
-# Change the protocol for the version name when the server is being pinged
+# Here you can customize the server version that is displayed on a ping. (The text at the player-count)
 # (!) Warning: It's required to use Paper or Purpur to use this feature!
 # (!) Supported server versions: 1.12.2 - latest
 custom-protocol-ping:
