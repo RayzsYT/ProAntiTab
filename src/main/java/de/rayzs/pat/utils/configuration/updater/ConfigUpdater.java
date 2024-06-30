@@ -13,7 +13,7 @@ public class ConfigUpdater {
 
     public static void initialize() {
         NEWEST_CONFIG_INPUT = new ConnectionBuilder().setUrl("https://raw.githubusercontent.com/RayzsYT/ProAntiTab/main/src/main/resources/files/"
-                + (Reflection.isProxyServer() ? " proxy" : "bukkit")
+                + (Reflection.isProxyServer() ? "proxy" : "bukkit")
                 + "-config.yml").connect().getResponseList();
 
         LOADED = !NEWEST_CONFIG_INPUT.isEmpty();
