@@ -82,7 +82,7 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
             return result;
 
         if(fileName.equals("config")) {
-            if(configuration.getConfigurationSection(path) == null) {
+            if(ConfigUpdater.canUpdate() && configuration.getConfigurationSection(path) == null) {
                 ConfigUpdater.updateConfigFile(file, path + "." + target, true);
                 Logger.warning("Section '" + path + "' is missing! Loading default section from online config.yml.");
                 reload();
@@ -105,7 +105,7 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
 
         String section = ConfigUpdater.getSection(target);
         if(fileName.equals("config")) {
-            if(configuration.getConfigurationSection(section) == null) {
+            if(ConfigUpdater.canUpdate() && configuration.getConfigurationSection(section) == null) {
                 ConfigUpdater.updateConfigFile(file, target, true);
                 Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
                 reload();
