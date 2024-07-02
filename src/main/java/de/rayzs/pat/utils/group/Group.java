@@ -17,15 +17,32 @@ public class Group implements Serializable {
     private final GroupBlacklist generalGroupBlacklist;
     private final ExpireCache<String, List<GroupBlacklist>> cachedServerGroupBlacklists = new ExpireCache<>(1, TimeUnit.HOURS);
     private final String groupName;
+    private final int priority;
 
     public Group(String groupName) {
         this.groupName = groupName;
+        this.priority = 1;
+        this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
+        this.generalGroupBlacklist.load();
+    }
+
+    public Group(String groupName, int priority) {
+        this.groupName = groupName;
+        this.priority = priority;
         this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
         this.generalGroupBlacklist.load();
     }
 
     public Group(String groupName, List<String> commands) {
         this.groupName = groupName;
+        this.priority = 1;
+        this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
+        this.generalGroupBlacklist.setList(commands);
+    }
+
+    public Group(String groupName, int priority, List<String> commands) {
+        this.groupName = groupName;
+        this.priority = priority;
         this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
         this.generalGroupBlacklist.setList(commands);
     }
@@ -108,6 +125,10 @@ public class Group implements Serializable {
         if (groupBlacklist != null)
             groupBlacklist.load();
         return groupBlacklist;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     public void clearServerGroupBlacklistsCache() {
