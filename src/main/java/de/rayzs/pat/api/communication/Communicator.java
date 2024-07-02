@@ -144,7 +144,7 @@ public class Communicator {
         for (Group group : GroupManager.getGroups()) {
             if(groups.stream().anyMatch(cTG -> cTG.getGroupName().equals(group.getGroupName()))) continue;
 
-            tinyGroup = new TinyGroup(group.getGroupName(), group.getAllCommands(serverName));
+            tinyGroup = new TinyGroup(group.getGroupName(), group.getPriority(), group.getAllCommands(serverName));
             for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(serverName))
                 tinyGroup.addAll(groupBlacklist.getCommands());
 
