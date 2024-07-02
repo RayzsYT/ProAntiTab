@@ -6,11 +6,13 @@ import java.util.List;
 public class TinyGroup implements Serializable {
 
     private final String groupName;
+    private final int priority;
     private final List<String> commands;
 
-    public TinyGroup(String groupName, List<String> commands) {
+    public TinyGroup(String groupName, int priority, List<String> commands) {
         this.groupName = groupName;
         this.commands = commands;
+        this.priority = priority;
     }
 
     public void add(String command) {
@@ -24,6 +26,10 @@ public class TinyGroup implements Serializable {
 
     public String getGroupName() {
         return groupName;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     public List<String> getCommands() {
