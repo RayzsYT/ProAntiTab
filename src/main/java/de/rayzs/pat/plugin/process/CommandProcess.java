@@ -354,6 +354,8 @@ public class CommandProcess {
                             int priority = Integer.parseInt(extra);
                             group.setPriority(priority);
 
+                            handleChange();
+
                             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_SUCCESS.replace("%group%", sub).replace("%priority%", extra));
                         } catch (Throwable throwable) {
                             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_FAILED.replace("%group%", sub).replace("%priority%", extra));
