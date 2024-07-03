@@ -252,7 +252,7 @@ group:
     splitter-server: '&7, '
     command-server: '&f%group%'
 
-  list-priorites:
+  list-priorities:
     message: '&7List of all group priorities (&f%size%&7)&8: \n&f%groups%'
     splitter: '\n'
     group: '&8- &e%priority%&8: &f%group%'
