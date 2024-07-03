@@ -203,6 +203,10 @@ group:
   clear: '&aList of group %group% has been cleared!'
   clear-confirmation: '&4Warning! &7This command will &cclear the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
 
+  priority:
+    success: '&aSuccessfully set the priority of group &e%group% &ato &e%priority%&a!'
+    failed: '&cInvalid priority! Please choose a number which is greater than 0.'
+
   list:
     message: '&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%'
     splitter: '&7, '
