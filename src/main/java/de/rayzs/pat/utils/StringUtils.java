@@ -1,5 +1,7 @@
 package de.rayzs.pat.utils;
 
+import de.rayzs.pat.utils.group.Group;
+
 import java.util.*;
 
 public class StringUtils {
@@ -83,6 +85,22 @@ public class StringUtils {
         Collections.sort(list);
         if(reversed) Collections.reverse(list);
         return buildStringList(list, splitter, format, placeholder);
+    }
+
+    public static String buildGroupStringList(List<Group> list, String splitter, String format) {
+        StringBuilder builder = new StringBuilder();
+        boolean end;
+        Group group;
+
+        for (int i = 0; i < list.size(); i++) {
+            end = i >= list.size() - 1;
+            group = list.get(i);
+
+            builder.append(format.replace("%group%", group.getGroupName()).replace("%priority%", String.valueOf(group.getPriority())));
+            if (!end && splitter != null) builder.append(splitter);
+        }
+
+        return builder.toString();
     }
 
     public static String buildStringList(List<String> list, String splitter, String format, String placeholder) {
