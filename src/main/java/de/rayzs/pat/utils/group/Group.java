@@ -17,7 +17,7 @@ public class Group implements Serializable {
     private final GroupBlacklist generalGroupBlacklist;
     private final ExpireCache<String, List<GroupBlacklist>> cachedServerGroupBlacklists = new ExpireCache<>(1, TimeUnit.HOURS);
     private final String groupName;
-    private final int priority;
+    private int priority;
 
     public Group(String groupName) {
         this.groupName = groupName;
@@ -84,6 +84,11 @@ public class Group implements Serializable {
 
     public void setCommands(List<String> commands) {
         this.generalGroupBlacklist.setList(commands);
+    }
+
+    public void setPriority(int priority) {
+        Storage.Files.STORAGE.setAndSave("groups." + groupName + ".priority", priority);
+        this.priority = priority;
     }
 
     public boolean hasPermission(Object targetObj) {
