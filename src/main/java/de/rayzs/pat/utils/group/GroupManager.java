@@ -49,15 +49,23 @@ public class GroupManager {
     }
 
     public static void setGroup(String groupName, List<String> commands) {
+        setGroup(groupName, 1, commands);
+    }
+
+    public static void setGroup(String groupName, int priority, List<String> commands) {
         if(groupName.length() < 1) return;
-        Group group = registerAndGetGroup(groupName);
+        Group group = registerAndGetGroup(groupName, priority);
         group.setCommands(commands);
     }
 
     public static Group registerAndGetGroup(String groupName) {
+        return registerAndGetGroup(groupName, 1);
+    }
+
+    public static Group registerAndGetGroup(String groupName, int priority) {
         Group group = getGroupByName(groupName);
         if(group != null) return group;
-        group = new Group(groupName);
+        group = new Group(groupName, priority);
         GROUPS.add(group);
         return group;
     }

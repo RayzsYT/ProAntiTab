@@ -21,7 +21,7 @@ public class Group implements Serializable {
 
     public Group(String groupName) {
         this.groupName = groupName;
-        this.priority = 1;
+        this.priority = (int) Storage.Files.STORAGE.getOrSet("groups." + groupName + ".priority", 1);
         this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
         this.generalGroupBlacklist.load();
     }
@@ -35,7 +35,7 @@ public class Group implements Serializable {
 
     public Group(String groupName, List<String> commands) {
         this.groupName = groupName;
-        this.priority = 1;
+        this.priority = (int) Storage.Files.STORAGE.getOrSet("groups." + groupName + ".priority", 1);
         this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
         this.generalGroupBlacklist.setList(commands);
     }
