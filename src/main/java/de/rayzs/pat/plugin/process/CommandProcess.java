@@ -353,7 +353,6 @@ public class CommandProcess {
                         try {
                             int priority = Integer.parseInt(extra);
                             group.setPriority(priority);
-
                             handleChange();
 
                             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_SUCCESS.replace("%group%", sub).replace("%priority%", extra));
@@ -596,7 +595,7 @@ public class CommandProcess {
                     if (PermissionUtil.hasPermission(sender, "clear")) suggestions.add("clear");
                 }
 
-                if (!backend && args[0].equals("setpriority") && PermissionUtil.hasPermission(sender, "setpriority") && !Reflection.isProxyServer())
+                if (!backend && (args[0].equals("setpriority") || args[0].equals("sp")) && PermissionUtil.hasPermission(sender, "setpriority") && !Reflection.isProxyServer())
                     suggestions.addAll(GroupManager.getGroupNames());
 
                 if (!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer())

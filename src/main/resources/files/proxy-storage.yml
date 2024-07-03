@@ -13,6 +13,7 @@ global:
         - exameple-command-for-this-specific-server
 groups:
   examplegroup:
+    priority: 1
     commands:
       - example-command-for-this-group-to-bypass
       - another-example-command-for-this-group-to-bypass
