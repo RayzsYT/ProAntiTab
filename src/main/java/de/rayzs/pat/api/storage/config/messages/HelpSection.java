@@ -25,9 +25,10 @@ public class HelpSection extends ConfigStorage {
                         , "&f  notify &7to get alerted"
                         , "&f  creategroup (group) &7Create a group"
                         , "&f  deletegroup (group) &7Delete a group"
-                        , "&f  setpriority (group) (priority) &7Set its priority"
+                        , "&f  setpriority (group) (priority) &7to set the priority"
                         , "&f  list &8(optional: group) &7to see all listed commands"
                         , "&f  listgroups &7List all groups"
+                        , "&f  listpriorites &7to list all group priorities"
                         , "&f  add/rem (command) &8<group> &7to manage the list"
                         , "&f  clear &8<group> &7to clear the list")
                 :
@@ -38,9 +39,10 @@ public class HelpSection extends ConfigStorage {
                         , "&f  notify &7to get alerted"
                         , "&f  creategroup (group) &7Create a group"
                         , "&f  deletegroup (group) &7Delete a group"
-                        , "&f  setpriority (group) (priority) &7Set its priority"
+                        , "&f  setpriority (group) (priority) &7to set the priority"
                         , "&f  list &8<group> &7to see all listed commands"
                         , "&f  listgroups &8<server> &7List all groups"
+                        , "&f  listpriorites &7to list all group priorities"
                         , "&f  add/rem (command) &8<group> &7to manage the list"
                         , "&f  clear &8<group> &7to clear the list"
                         , "&7 For a specific server:"
