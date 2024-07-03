@@ -173,8 +173,8 @@ public class GroupManager {
         return result;
     }
 
-    public static TinyGroup convertToTinyGroup(String groupName, List<String> commands) {
-        return new TinyGroup(groupName, commands);
+    public static TinyGroup convertToTinyGroup(String groupName, int priority, List<String> commands) {
+        return new TinyGroup(groupName, priority, commands);
     }
 
     public static void clearAllGroups() {
