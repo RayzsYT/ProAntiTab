@@ -12,6 +12,7 @@ public class GroupSection extends ConfigStorage {
 
     public String LIST_MESSAGE, LIST_SPLITTER, LIST_COMMAND, LIST_SERVER_MESSAGE, LIST_SERVER_SPLITTER, LIST_SERVER_COMMAND;
     public String LIST_GROUP_MESSAGE, LIST_GROUP_SPLITTER, LIST_GROUP_GROUPS, LIST_GROUP_SERVER_MESSAGE, LIST_GROUP_SERVER_SPLITTER, LIST_GROUP_SERVER_GROUPS;
+    public String LIST_PRIORITY_MESSAGE, LIST_PRIORITY_SPLITTER, LIST_PRIORITY_GROUPS;
 
     public String ADD_SUCCESS, ADD_FAILED;
     public String REMOVE_SUCCESS, REMOVE_FAILED;
@@ -42,6 +43,10 @@ public class GroupSection extends ConfigStorage {
         LIST_MESSAGE = new ConfigSectionHelper<String>(this, "list.message", "&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%").getOrSet();
         LIST_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter", "&7, ").getOrSet();
         LIST_COMMAND = new ConfigSectionHelper<String>(this, "list.command", "&f").getOrSet();
+
+        LIST_PRIORITY_MESSAGE = new ConfigSectionHelper<String>(this, "list-priorities.message", "&7List of all group priorities (&f%size%&7)&8: &f%groups%").getOrSet();
+        LIST_PRIORITY_SPLITTER = new ConfigSectionHelper<String>(this, "list-priorities.splitter", "\\n").getOrSet();
+        LIST_PRIORITY_GROUPS = new ConfigSectionHelper<String>(this, "list-priorities.group", "&8- &e%priority%&8: &f%group%").getOrSet();
 
         LIST_GROUP_MESSAGE = new ConfigSectionHelper<String>(this, "list-groups.message", "&7All groups (&f%size%&7)&8: &f%groups%").getOrSet();
         LIST_GROUP_SPLITTER = new ConfigSectionHelper<String>(this, "list-groups.splitter", "&7, ").getOrSet();
