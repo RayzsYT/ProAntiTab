@@ -160,6 +160,24 @@ public class CommandProcess {
 
                             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_GROUP_MESSAGE.replace("%size%", String.valueOf(GroupManager.getGroupNames().size())).replace("%groups%", stringList));
                             return;
+
+                        case "listpriorities":
+                        case "lp":
+
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "listpriorities")) return;
+
+                            if(backend) {
+                                sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                                return;
+                            }
+
+                            stringList = StringUtils.buildGroupStringList(
+                                    GroupManager.getGroups(),
+                                    Storage.ConfigSections.Messages.GROUP.LIST_PRIORITY_SPLITTER,
+                                    Storage.ConfigSections.Messages.GROUP.LIST_PRIORITY_GROUPS);
+
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_PRIORITY_MESSAGE.replace("%size%", String.valueOf(GroupManager.getGroups().size())).replace("%groups%", stringList));
+                            return;
                     }
 
                 case 2:
@@ -563,8 +581,10 @@ public class CommandProcess {
                     suggestions.addAll(Arrays.asList("creategroup", "cg"));
                 if (!backend && PermissionUtil.hasPermission(sender, "deletegroup"))
                     suggestions.addAll(Arrays.asList("deletegroup", "dg"));
-                if (!backend && PermissionUtil.hasPermission(sender, "deletegroup"))
+                if (!backend && PermissionUtil.hasPermission(sender, "listgroups"))
                     suggestions.addAll(Arrays.asList("listgroups", "lg"));
+                if (!backend && PermissionUtil.hasPermission(sender, "listpriorities"))
+                    suggestions.addAll(Arrays.asList("listpriorities", "lp"));
                 if (!backend && PermissionUtil.hasPermission(sender, "setpriority"))
                     suggestions.addAll(Arrays.asList("setpriority", "sp"));
                 if (!backend && PermissionUtil.hasPermission(sender, "list"))
