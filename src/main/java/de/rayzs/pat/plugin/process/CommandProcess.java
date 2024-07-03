@@ -339,6 +339,32 @@ public class CommandProcess {
                     task = args[0].toLowerCase();
                     sub = args[1].toLowerCase();
                     extra = args[2].toLowerCase();
+                    group = GroupManager.getGroupByName(sub);
+
+                    if(task.equals("setpriority") || task.equals("sp")) {
+                        if(group == null) {
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", extra));
+                            return;
+                        }
+
+                        if (!PermissionUtil.hasPermissionWithResponse(sender, "setpriority")) return;
+                        sub = group.getGroupName();
+
+                        try {
+                            int priority = Integer.parseInt(extra);
+                            group.setPriority(priority);
+
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_SUCCESS.replace("%group%", sub).replace("%priority%", extra));
+                        } catch (Throwable throwable) {
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_FAILED.replace("%group%", sub).replace("%priority%", extra));
+                        }
+
+                        return;
+                    }
+
+                    task = args[0].toLowerCase();
+                    sub = args[1].toLowerCase();
+                    extra = args[2].toLowerCase();
                     group = GroupManager.getGroupByName(extra);
                     if(group == null) {
                         sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", extra));
@@ -538,6 +564,8 @@ public class CommandProcess {
                     suggestions.addAll(Arrays.asList("deletegroup", "dg"));
                 if (!backend && PermissionUtil.hasPermission(sender, "deletegroup"))
                     suggestions.addAll(Arrays.asList("listgroups", "lg"));
+                if (!backend && PermissionUtil.hasPermission(sender, "setpriority"))
+                    suggestions.addAll(Arrays.asList("setpriority", "sp"));
                 if (!backend && PermissionUtil.hasPermission(sender, "list"))
                     suggestions.addAll(Arrays.asList("list", "ls"));
                 if (!backend && PermissionUtil.hasPermission(sender, "clear")) suggestions.add("clear");
@@ -565,6 +593,9 @@ public class CommandProcess {
                         suggestions.addAll(Arrays.asList("ls", "list"));
                     if (PermissionUtil.hasPermission(sender, "clear")) suggestions.add("clear");
                 }
+
+                if (!backend && args[0].equals("setpriority") && PermissionUtil.hasPermission(sender, "setpriority") && !Reflection.isProxyServer())
+                    suggestions.addAll(GroupManager.getGroupNames());
 
                 if (!backend && args[0].equals("add") && PermissionUtil.hasPermission(sender, "add") && !Reflection.isProxyServer())
                     suggestions.addAll(BukkitLoader.getNotBlockedCommands());
