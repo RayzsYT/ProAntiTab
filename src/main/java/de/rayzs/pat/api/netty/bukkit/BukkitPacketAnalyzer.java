@@ -90,7 +90,7 @@ public class BukkitPacketAnalyzer {
         @Override
         public void channelRead(ChannelHandlerContext channel, Object packetObj) {
             try {
-                if (!PermissionUtil.hasBypassPermission(player, "proantitab.bypass") && packetObj.getClass() != null) {
+                if (!PermissionUtil.hasBypassPermission(player) && packetObj.getClass() != null) {
                     String packetName = packetObj.getClass().getSimpleName();
                     if (packetName.equals("PacketPlayInTabComplete")) {
                         if(!PACKET_HANDLER.handleIncomingPacket(player, packetObj)) return;
@@ -105,7 +105,7 @@ public class BukkitPacketAnalyzer {
         public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
             try {
                 if(packetObj.getClass() != null)
-                    if (!PermissionUtil.hasBypassPermission(player, "proantitab.bypass")) {
+                    if (!PermissionUtil.hasBypassPermission(player)) {
                         String packetName = packetObj.getClass().getSimpleName();
                         if (packetName.equals("PacketPlayOutTabComplete") || packetName.equals("ClientboundCommandSuggestionsPacket")) {
                             if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;
