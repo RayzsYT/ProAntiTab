@@ -93,7 +93,8 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         set(path, target, object);
         save();
 
-        Logger.warning("Variable for '" + path + "." + target + "' could not be found or is corrupt! Therefore it has been replaced by its default variable.");
+        if(fileName.equals("config"))
+            Logger.warning("Variable for '" + path + "." + target + "' could not be found or is corrupt! Therefore it has been replaced by its default variable.");
         return get(path, target);
     }
 
@@ -116,7 +117,8 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         set(target, object);
         save();
 
-        Logger.warning("Variable for '" + target + "' could not be found or is corrupt! Therefore it has been replaced by its default variable.");
+        if(fileName.equals("config"))
+            Logger.warning("Variable for '" + target + "' could not be found or is corrupt! Therefore it has been replaced by its default variable.");
         return get(target);
     }
 
