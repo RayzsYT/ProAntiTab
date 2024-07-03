@@ -167,7 +167,7 @@ public class BukkitLoader extends JavaPlugin {
                 Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = commandsPacket.turnBlacklistToWhitelistEnabled();
 
             GroupManager.clearAllGroups();
-            groupsPacket.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getCommands()));
+            groupsPacket.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getPriority(), group.getCommands()));
         }
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
