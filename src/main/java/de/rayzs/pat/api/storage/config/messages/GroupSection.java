@@ -8,6 +8,7 @@ public class GroupSection extends ConfigStorage {
 
     public String CREATE, ALREADY_EXIST, DOES_NOT_EXIST, DELETE, DELETE_CONFIRM, CREATE_SERVER, ALREADY_SERVER_EXIST, DOES_NOT_EXIST_SERVER, DELETE_SERVER, DELETE_SERVER_CONFIRM;
     public String CLEAR, CLEAR_CONFIRM, CLEAR_SERVER, CLEAR_SERVER_CONFIRM;
+    public String PRIORITY_SUCCESS, PRIORITY_FAILED;
 
     public String LIST_MESSAGE, LIST_SPLITTER, LIST_COMMAND, LIST_SERVER_MESSAGE, LIST_SERVER_SPLITTER, LIST_SERVER_COMMAND;
     public String LIST_GROUP_MESSAGE, LIST_GROUP_SPLITTER, LIST_GROUP_GROUPS, LIST_GROUP_SERVER_MESSAGE, LIST_GROUP_SERVER_SPLITTER, LIST_GROUP_SERVER_GROUPS;
@@ -34,6 +35,9 @@ public class GroupSection extends ConfigStorage {
 
         CLEAR = new ConfigSectionHelper<String>(this, "clear", "&aList of group %group% has been cleared!").getOrSet();
         CLEAR_CONFIRM = new ConfigSectionHelper<String>(this, "clear-confirmation", "&4Warning! &7This command will &cclear the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.").getOrSet();
+
+        PRIORITY_SUCCESS = new ConfigSectionHelper<String>(this, "priority.success", "&aSuccessfully set the priority of group &e%group% &ato &e%priority%&a!").getOrSet();
+        PRIORITY_FAILED = new ConfigSectionHelper<String>(this, "priority.failed", "&cInvalid priority! Please choose a number which is greater than 0.").getOrSet();
 
         LIST_MESSAGE = new ConfigSectionHelper<String>(this, "list.message", "&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%").getOrSet();
         LIST_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter", "&7, ").getOrSet();
