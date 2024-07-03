@@ -77,24 +77,22 @@ public class LuckPermsAdapter {
     }
 
     private static void onNoteMutate(NodeMutateEvent event) {
-        if (!event.isUser()) return;
+        boolean relevant = false, inheritance = false;
+        if(event.isUser()) for(Node node : event.getDataAfter()) {
 
-        boolean relevant = false;
-        for(Node node : event.getDataAfter()) {
-            if (node.getType() != NodeType.INHERITANCE && node.getType() != NodeType.PERMISSION
-                    || !(event.getTarget() instanceof User)
-                    || !node.getKey().startsWith("proantitab.") && !node.getKey().equals("*")) {
-                continue;
+            if(!inheritance) inheritance = node.getType() == NodeType.INHERITANCE;
+            if(node.getType() != NodeType.PERMISSION && (node.getKey().startsWith("proantitab.") || !node.getKey().equals("*"))) {
+                relevant = true;
+                break;
             }
-            relevant = true;
-            break;
         }
 
-        if(!relevant) return;
+        if(!relevant && !inheritance) return;
 
-        User user = (User) event.getTarget();
-
-        if(Reflection.isProxyServer()) PermissionUtil.reloadPermissions(user.getUniqueId());
-        else BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
+        if (event.isUser() && event.getTarget() instanceof User) {
+            User user = (User) event.getTarget();
+            if (Reflection.isProxyServer()) PermissionUtil.reloadPermissions(user.getUniqueId());
+            else BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
+        }
     }
 }
