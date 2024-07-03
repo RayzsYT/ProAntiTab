@@ -1,12 +1,10 @@
 package de.rayzs.pat.utils.permission;
 
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandSender;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
-
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PermissionUtil {
 
