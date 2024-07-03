@@ -94,6 +94,10 @@ public class Group implements Serializable {
         return this.generalGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
     }
 
+    public boolean contains(String command, boolean intensive) {
+        return this.generalGroupBlacklist.isListed(command, intensive);
+    }
+
     public boolean contains(String command, String server) {
         GroupBlacklist groupBlacklist = getOrCreateGroupBlacklist(server);
         return (this.generalGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) || groupBlacklist != null && getOrCreateGroupBlacklist(server).isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED));
