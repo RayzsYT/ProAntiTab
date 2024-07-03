@@ -193,10 +193,6 @@ blacklist:
   clear-confirmation: '&4Warning! &7This command will &cclear the entire list&7! &7Repeat the &esame command &7to confirm this action.'
   clear-confirmation-server: '&4Warning! &7This command will &cclear the entire list of this server&7! &7Repeat the &esame command &7to confirm this action.'
 
-  priority:
-    success: '&aSuccessfully set the priority of group &e%group% &ato &e%priority%&a!'
-    failed: '&cInvalid priority! Please choose a number which is greater than 0.'
-
   list:
     message: '&7Listed commands (&f%size%&7)&8: &f%commands%'
     splitter: '&7, '
@@ -235,6 +231,10 @@ group:
   delete-confirmation-server: '&4Warning! &7This command will &cdelete the group of the server %server% with the entire list&7 of this group! &7Repeat the &esame command &7to confirm this action.'
   clear-server: '&aList of group %group% from %server% has been cleared!'
   clear-confirmation-server: '&4Warning! &7This command will &cclear the entire list&7 of this group for %server%! &7Repeat the &esame command &7to confirm this action.'
+
+  priority:
+    success: '&aSuccessfully set the priority of group &e%group% &ato &e%priority%&a!'
+    failed: '&cInvalid priority! Please choose a number which is greater than 0.'
 
   list:
     message: '&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%'
