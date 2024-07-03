@@ -370,7 +370,13 @@ public class CommandProcess {
 
                         try {
                             int priority = Integer.parseInt(extra);
+                            if(priority < 1) {
+                                sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_FAILED.replace("%group%", sub).replace("%priority%", extra));
+                                return;
+                            }
+
                             group.setPriority(priority);
+                            GroupManager.sort();
                             handleChange();
 
                             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_SUCCESS.replace("%group%", sub).replace("%priority%", extra));
