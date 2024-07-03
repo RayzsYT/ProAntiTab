@@ -218,6 +218,11 @@ group:
     splitter: '&7, '
     command: '&f%group%'
 
+  list-priorites:
+    message: '&7List of all group priorities (&f%size%&7)&8: \n&f%groups%'
+    splitter: '\n'
+    group: '&8- &e%priority%&8: &f%group%'
+
   add:
     success: '&aSuccessfully added %command% to the list of group %group%!'
     failed: '&c%command% is already in the list of group %group%!'
