@@ -30,21 +30,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         Object suggestionObj;
 
-        if(packetObj.getClass().getSimpleName().equals(" ClientboundCommandSuggestionsPacket"))
-            return false;
-
-        if (Reflection.getMinor() < 17) {
-            Field suggestionsField = Reflection.getFieldsByType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
-            if (suggestionsField == null) return false;
-            suggestionObj = suggestionsField.get(packetObj);
-        } else {
-            Method suggestionsMethod = Reflection.getMethodsByReturnType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
-            if (suggestionsMethod == null) return false;
-            suggestionObj = suggestionsMethod.invoke(packetObj);
-        }
-
         String input = BukkitPacketAnalyzer.getPlayerInput(player);
-
         if(input == null) return false;
 
         boolean cancelsBeforeHand = false;
@@ -60,9 +46,23 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
         }
 
-        Suggestions suggestions = (Suggestions) suggestionObj;
-        if((input.length() < 1 || cancelsBeforeHand) && Reflection.isWeird()) return false;
+        if(packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket")) {
+            return !cancelsBeforeHand;
+        }
 
+        if (Reflection.getMinor() < 17) {
+            Field suggestionsField = Reflection.getFieldsByType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
+            if (suggestionsField == null) return false;
+            suggestionObj = suggestionsField.get(packetObj);
+        } else {
+            Method suggestionsMethod = Reflection.getMethodsByReturnType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
+            if (suggestionsMethod == null) return false;
+            suggestionObj = suggestionsMethod.invoke(packetObj);
+        }
+
+        Suggestions suggestions = (Suggestions) suggestionObj;
+
+        if((input.length() < 1 || cancelsBeforeHand) && Reflection.isWeird()) return false;
         if(spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
             suggestions.getList().clear();
             return true;

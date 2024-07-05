@@ -92,7 +92,8 @@ public class BukkitPacketAnalyzer {
             try {
                 if (!PermissionUtil.hasBypassPermission(player) && packetObj.getClass() != null) {
                     String packetName = packetObj.getClass().getSimpleName();
-                    if (packetName.equals("PacketPlayInTabComplete")) {
+
+                    if (packetName.equals("PacketPlayInTabComplete") || packetName.equals("ServerboundCommandSuggestionPacket")) {
                         if(!PACKET_HANDLER.handleIncomingPacket(player, packetObj)) return;
                     }
                 }
