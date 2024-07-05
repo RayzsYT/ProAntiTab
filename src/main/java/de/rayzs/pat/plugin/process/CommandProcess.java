@@ -397,8 +397,8 @@ public class CommandProcess {
                     }
 
                     extra = group.getGroupName();
+                    bool = group.contains(sub, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, true, false);
 
-                    bool = group.contains(sub);
                     switch (task) {
 
                         case "add":
@@ -410,6 +410,7 @@ public class CommandProcess {
 
                             sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.ADD_FAILED : Storage.ConfigSections.Messages.GROUP.ADD_SUCCESS).replace("%command%", sub).replace("%group%", extra));
                             return;
+
                         case "remove":
                         case "rem":
                         case "rm":
