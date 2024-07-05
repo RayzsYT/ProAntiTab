@@ -1,8 +1,6 @@
 package de.rayzs.pat.utils;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
+import com.google.common.cache.*;
 import java.util.concurrent.TimeUnit;
 
 public class ExpireCache<T, K> {
