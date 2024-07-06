@@ -26,7 +26,7 @@ public class InfoSection extends ConfigStorage {
                 Arrays.asList(
                         "&7ProAntiTab information:"
                         , "&7  Version: &e%current_version%"
-                        , "&7  Status: %updated%"
+                        , "&7  Status: %version_status%"
                         , "&7  Last sync with proxy: &e%sync%"
                 )
         );
