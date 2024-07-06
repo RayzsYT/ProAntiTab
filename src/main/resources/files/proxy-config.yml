@@ -162,6 +162,20 @@ help:
   - '&f  serv add/rem (server) (command) &8<group> '
   - '&f  serv clear (server) &8<group>'
 
+info:
+  version:
+    updated: '&aUpdated'
+    outdated: '&cOutdated (%newest_version%)'
+
+  proxy-sync:
+    time: '&e%time%'
+    disabled: '&cDisabled!'
+
+  message:
+    - '&7ProAntiTab information:'
+    - '&7  Version: &e%version_status%'
+    - '&7  Status: %updated%'
+    - '&7  Last sync with proxy: %sync_time%'
 
 stats:
   fail: '&cThis command works on Bungeecord/Velocity servers only!'

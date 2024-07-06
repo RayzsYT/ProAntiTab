@@ -172,6 +172,21 @@ help:
   - '&f  add/rem (command) &8<group> &7to manage the list'
   - '&f  clear &8<group> &7to clear the list'
 
+info:
+  version:
+    updated: '&aUpdated'
+    outdated: '&cOutdated (%newest_version%)'
+
+  proxy-sync:
+    time: '&e%time%'
+    disabled: '&cDisabled!'
+
+  message:
+    - '&7ProAntiTab information:'
+    - '&7  Version: &e%version_status%'
+    - '&7  Status: %updated%'
+    - '&7  Last sync with proxy: %sync_time%'
+
 notification:
   enabled: '&aEnabled notifications'
   disabled: '&cDisabled notifications'
