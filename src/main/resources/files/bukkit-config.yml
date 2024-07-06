@@ -162,6 +162,7 @@ help:
   - '&7Format: &8<optional> (required)'
   - '&f  reload &7to reload the plugin'
   - '&f  notify &7to get alerted'
+  - '&f  info &7to get a few information'
   - '&f  creategroup (group) &7Create a group'
   - '&f  deletegroup (group) &7Delete a group'
   - '&f  setpriority (group) (priority) &7to set the priority'
