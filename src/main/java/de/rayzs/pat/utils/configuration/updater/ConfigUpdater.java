@@ -2,13 +2,15 @@ package de.rayzs.pat.utils.configuration.updater;
 
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
+
 import java.nio.file.Files;
 import java.util.*;
 import java.io.*;
 
 public class ConfigUpdater {
 
-    private static List<String> NEWEST_CONFIG_INPUT = new ArrayList<>();
+    private static List<String> NEWEST_CONFIG_INPUT = new ArrayList<>(), MISSING_PARTS = new ArrayList<>();
     private static boolean LOADED = false;
 
     public static void initialize() {
@@ -19,12 +21,66 @@ public class ConfigUpdater {
         LOADED = !NEWEST_CONFIG_INPUT.isEmpty();
     }
 
-    public static void updateConfigFile(File file, String target, boolean section) {
+    public static void updateConfigFile(ConfigurationBuilder configurationBuilder, String target, boolean section) {
+        configurationBuilder.reload();
         int[] position = section ? getPositionBySection(NEWEST_CONFIG_INPUT, target, true) : getSectionPositionByTarget(NEWEST_CONFIG_INPUT, target, true);
-        updateConfigFile(file, position[0], position[0], position[1]);
+        updateConfigFile(configurationBuilder.getFile(), target, position[0], position[0], position[1]);
     }
 
-    public static void updateConfigFile(File file, int atLine, int from, int to) {
+    public static void addMissingPart(String part) {
+        MISSING_PARTS.add(part);
+    }
+
+    public static void broadcastMissingParts() {
+        File outdatedConfig = new File("./plugins/ProAntiTab/comparable-config.yml");
+        if(MISSING_PARTS.isEmpty()) {
+            if(outdatedConfig.delete())
+                Logger.info("Deleted 'comparable-config.yml' because it's not needed anymore.");
+            return;
+        }
+
+        List<String> fileInput = new LinkedList<>(Arrays.asList("# WARNING: This file is auto generated with to solely purpose to be used as comparison!", " ", " "));
+        fileInput.addAll(NEWEST_CONFIG_INPUT);
+
+        try {
+            outdatedConfig.createNewFile();
+            Files.write(outdatedConfig.toPath(), fileInput);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        Logger.warning("The config.yml is missing a few parts that can't be replaced automatically.");
+        Logger.warning("What can be done to solve this issue? There are two options:");
+        Logger.warning("Option 1: Delete your current config.yml and restart the server.");
+        Logger.warning("Option 2: Set the missing parts/sections yourself in the config.yml.");
+        Logger.warning("To simplify that process, a new file with the newest config.yml content has been created as comparison. (plugins/ProAntiTab/comparable-config.yml)");
+        Logger.warning(" ");
+
+        HashMap<String, List<String>> map = new HashMap<>();
+        String section, part;
+        List<String> list;
+
+        for (String missingPart : MISSING_PARTS) {
+            section = getSection(missingPart, false);
+            part = getVariable(missingPart);
+
+            list = map.getOrDefault(section, new ArrayList<>());
+            if(!list.contains(part)) list.add(part);
+
+            map.putIfAbsent(section, list);
+        }
+
+        int[] line;
+        for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+            Logger.warning("Missing parts at section " + entry.getKey() + ":");
+            for (String missingPart : entry.getValue()) {
+                line = getSectionPositionByTarget(fileInput, entry.getKey() + "." + missingPart, false);
+                Logger.warning(" - " + missingPart + " [in comparable-config.yml at line " + (line[1] + 1) + "]");
+            }
+        }
+    }
+
+    private static void updateConfigFile(File file, String target, int atLine, int from, int to) {
         ConfigSection configSection = new ConfigSection(file);
 
         try {
@@ -44,9 +100,11 @@ public class ConfigUpdater {
         return target;
     }
 
-    public static String getSection(String target) {
+    public static String getSection(String target, boolean first) {
         if(target.contains(".")) {
             String[] pathSplit = target.split("\\.");
+            if(first) return pathSplit.length > 0 ? pathSplit[0] : target;
+
             LinkedList<String> pathList = new LinkedList<>(Arrays.asList(pathSplit));
             pathList.remove(pathList.size() - 1);
             target = StringUtils.buildStringListWithoutColors(pathList, ".");
