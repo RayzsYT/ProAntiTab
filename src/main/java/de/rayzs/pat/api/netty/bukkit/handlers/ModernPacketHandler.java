@@ -44,6 +44,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             }
 
             cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+            if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input);
         }
 
         if(packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket")) {
