@@ -20,7 +20,7 @@ public class CustomVersionSection extends ConfigStorage {
     public void load() {
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
-        MESSAGE = new MultipleMessagesHelper(this, "message", Collections.singletonList("&fThis server is running CraftBukkit version git-ProSpigot-294 (MC: 1.8-1.21) (Implementing API version cool-api-version-SNAPSHOT)"));
+        MESSAGE = new MultipleMessagesHelper(this, "message", Collections.singletonList("&fThis server is running CraftBukkit version git-NasaSpigot-294 (MC: X)"));
     }
 
     public boolean isCommand(String command) {
