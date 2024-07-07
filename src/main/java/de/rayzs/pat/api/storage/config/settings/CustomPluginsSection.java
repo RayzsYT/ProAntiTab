@@ -22,7 +22,7 @@ public class CustomPluginsSection extends ConfigStorage {
         MESSAGE = new MultipleMessagesHelper(this, "message", Collections.singletonList("&fPlugins (0):"));
     }
 
-    public boolean isPluginsCommand(String command) {
+    public boolean isCommand(String command) {
         if(!ENABLED) return false;
 
         if (command.contains(" ")) {
