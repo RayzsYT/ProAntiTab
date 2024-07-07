@@ -10,6 +10,7 @@ public class BlacklistCreator {
     }
 
     public static GeneralBlacklist createGeneralBlacklist(String server) {
+        server = server.toLowerCase();
         return new GeneralBlacklist("servers." + server + ".commands");
     }
 
