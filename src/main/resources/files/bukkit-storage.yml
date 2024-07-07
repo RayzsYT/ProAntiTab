@@ -2,6 +2,9 @@ global:
   commands:
     - pl
     - plugins
+    - ver
+    - version
+    - icanhasbukkit
 groups:
   examplegroup:
     priority: 1

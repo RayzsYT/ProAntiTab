@@ -1,26 +1,30 @@
 global:
   commands:
+    - hub
     - pl
     - plugins
+    - ver
+    - version
+    - icanhasbukkit
   ignored-servers:
     - auth-*
   servers:
     lobby-*:
       commands:
-        - exameple-command-for-all-lobbies
+        - spawn
     faction-1:
       commands:
-        - exameple-command-for-this-specific-server
+        - kit
 groups:
   examplegroup:
     priority: 1
     commands:
-      - example-command-for-this-group-to-bypass
-      - another-example-command-for-this-group-to-bypass
+      - tell
+      - msg
     servers:
       lobby-*:
         commands:
-          - example-command-to-bypass-in-this-group-for-all-lobby-servers
+          - cosmetics
       factions-1:
         commands:
-          - example-command-to-bypass-in-this-group-for-this-specific-server
+          - premiumkit
