@@ -87,7 +87,15 @@ public class PermissionUtil {
 
         return hasBypassPermission(targetObj)
                 || hasPermission(targetObj, "bypass." + command.toLowerCase())
-                || GroupManager.canAccessCommand(targetObj, command);
+                || GroupManager.canAccessCommand(targetObj, command, slash);
+    }
+
+    public static boolean hasBypassPermission(Object targetObj, String command, boolean slash, String server) {
+        command = Storage.Blacklist.convertCommand(command, false, true, slash);
+
+        return hasBypassPermission(targetObj)
+                || hasPermission(targetObj, "bypass." + command.toLowerCase())
+                || GroupManager.canAccessCommand(targetObj, command, slash, server);
     }
 
     public static boolean hasBypassPermission(Object targetObj, String command) {
