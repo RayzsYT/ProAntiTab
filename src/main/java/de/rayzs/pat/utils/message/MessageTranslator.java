@@ -39,8 +39,7 @@ public class MessageTranslator {
         for (Map.Entry<Character, String> entry : colors.entrySet())
             endingColors.put(entry.getKey(), "</" + entry.getValue().substring(1));
 
-        support =  Reflection.getMinor() >= 18
-                || Reflection.isProxyServer();
+        support = !Storage.USE_SIMPLECLOUD && (Reflection.getMinor() >= 18 || Reflection.isProxyServer());
 
         if(support)
             translator = Reflection.isVelocityServer() ? new VelocityMessageTranslator()
