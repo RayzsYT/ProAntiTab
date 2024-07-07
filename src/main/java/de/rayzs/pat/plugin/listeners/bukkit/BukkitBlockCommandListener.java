@@ -15,6 +15,20 @@ import java.util.List;
 
 public class BukkitBlockCommandListener implements Listener {
 
+    @EventHandler (priority = EventPriority.HIGHEST)
+    public void onUnknownCommandRecognition(PlayerCommandPreprocessEvent event) {
+        Player player = event.getPlayer();
+        World world = player.getWorld();
+        String rawCommand = StringUtils.getFirstArg(event.getMessage()), command =  StringUtils.replaceFirst(rawCommand, "/", "");
+
+        if(!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled()) return;
+        if(BukkitLoader.doesCommandExist(command, false)) return;
+        if(Bukkit.getHelpMap().getHelpTopic(rawCommand) != null) return;
+
+        event.setCancelled(true);
+        MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE, "%command%", command, "%world%", world.getName());
+    }
+
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
@@ -27,19 +41,22 @@ public class BukkitBlockCommandListener implements Listener {
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%world%", worldName);
 
-        if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED) {
-
-            if(!event.isCancelled())
-                if(!BukkitLoader.doesCommandExist(command, false)) {
-                    event.setCancelled(true);
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE, "%command%", command);
-                    return;
-                }
-        }
-
-        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
             event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", command);
+
+            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
+                Player target = Bukkit.getServer().getPlayer(uuid);
+                MessageTranslator.send(target, notificationMessage);
+            });
+
+            return;
+        }
+
+        if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            event.setCancelled(true);
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", command);
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
@@ -55,14 +72,14 @@ public class BukkitBlockCommandListener implements Listener {
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.isListed(command, true)) return;
-            if(PermissionUtil.hasBypassPermission(player, command)) return;
+            if(PermissionUtil.hasBypassPermission(player, command, false)) return;
             event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);
             return;
         }
 
-        if (!Storage.Blacklist.isBlocked(player, command)) return;
-        if (PermissionUtil.hasBypassPermission(player, command)) return;
+        if (!Storage.Blacklist.isListed(command, false)) return;
+        if (PermissionUtil.hasBypassPermission(player, command, false)) return;
         event.setCancelled(true);
         MessageTranslator.send(player, cancelCommandMessage);
 
