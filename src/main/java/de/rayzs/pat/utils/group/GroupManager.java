@@ -23,12 +23,39 @@ public class GroupManager {
     public static boolean canAccessCommand(Object targetObj, String command) {
         command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false);
 
+        int priority = -1;
         final List<Group> finalList = new ArrayList<>(GROUPS);
+
+        if(finalList.isEmpty()) return false;
         for (Group group : finalList) {
             if(group == null) continue;
+            if (priority == -1 || group.getPriority() <= priority) {
 
-            if (group.contains(command))
-                if (group.hasPermission(targetObj)) return true;
+                if (group.hasPermission(targetObj)) {
+                    priority = group.getPriority();
+                    if (group.contains(command)) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean canAccessCommand(Object targetObj, String command, boolean slash) {
+        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false, slash);
+
+        int priority = -1;
+        final List<Group> finalList = new ArrayList<>(GROUPS);
+
+        if(finalList.isEmpty()) return false;
+        for (Group group : finalList) {
+            if(group == null) continue;
+            if (priority == -1 || group.getPriority() <= priority) {
+
+                if (group.hasPermission(targetObj)) {
+                    priority = group.getPriority();
+                    if (group.contains(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false)) return true;
+                }
+            }
         }
         return false;
     }
@@ -38,6 +65,28 @@ public class GroupManager {
         server = server.toLowerCase();
 
         final List<Group> finalList = new ArrayList<>(GROUPS);
+
+        if(finalList.isEmpty())
+            return false;
+
+        for (Group group : finalList) {
+            if(group == null) continue;
+
+            if (group.contains(command, server))
+                if (group.hasPermission(targetObj)) return true;
+        }
+        return false;
+    }
+
+    public static boolean canAccessCommand(Object targetObj, String command, boolean slash, String server) {
+        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false,  slash);
+        server = server.toLowerCase();
+
+        final List<Group> finalList = new ArrayList<>(GROUPS);
+
+        if(finalList.isEmpty())
+            return false;
+
         for (Group group : finalList) {
             if(group == null) continue;
 
@@ -66,14 +115,18 @@ public class GroupManager {
         if(group != null) return group;
         group = new Group(groupName, priority);
         GROUPS.add(group);
-        GROUPS.sort(Comparator.comparingInt(Group::getPriority));
+        sort();
         return group;
+    }
+
+    public static void sort() {
+        GROUPS.sort(Comparator.comparingInt(Group::getPriority));
     }
 
     public static void registerGroup(String groupName) {
         if(isGroupRegistered(groupName)) return;
         GROUPS.add(new Group(groupName));
-        GROUPS.sort(Comparator.comparingInt(Group::getPriority));
+        sort();
     }
 
     public static void addToGroup(String groupName, String command) {
@@ -110,7 +163,7 @@ public class GroupManager {
         if(server != null) group.deleteGroup(server);
         else group.deleteGroup();
         GROUPS.remove(group);
-        GROUPS.sort(Comparator.comparingInt(Group::getPriority));
+        sort();
     }
 
     public static Group getGroupByName(String groupName) {
