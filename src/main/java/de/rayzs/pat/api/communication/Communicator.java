@@ -8,7 +8,6 @@ import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.communication.impl.*;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.CommunicationPackets;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
@@ -189,7 +188,7 @@ public class Communicator {
     }
 
     public static ClientInfo getClientByName(String name) {
-        return CLIENTS.isEmpty() ? null : CLIENTS.stream().filter(client -> client != null && client.getName().equals(name)).findFirst().orElse(null);
+        return CLIENTS.isEmpty() ? null : CLIENTS.stream().filter(client -> client != null && client.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     public static ClientInfo getQueueClientById(String id) {
