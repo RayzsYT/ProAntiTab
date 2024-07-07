@@ -2,6 +2,7 @@ package de.rayzs.pat.utils.group;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
@@ -103,6 +104,14 @@ public class Group implements Serializable {
         return this.generalGroupBlacklist.isListed(command, intensive);
     }
 
+    public boolean contains(String command, boolean intensive, boolean convert) {
+        return this.generalGroupBlacklist.isListed(command, intensive, convert);
+    }
+
+    public boolean contains(String command, boolean intensive, boolean convert, boolean slash) {
+        return this.generalGroupBlacklist.isListed(command, intensive, convert, slash);
+    }
+
     public boolean contains(String command, String server) {
         GroupBlacklist groupBlacklist = getOrCreateGroupBlacklist(server);
         return (this.generalGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) || groupBlacklist != null && getOrCreateGroupBlacklist(server).isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED));
@@ -145,12 +154,24 @@ public class Group implements Serializable {
     }
 
     public List<GroupBlacklist> getAllServerGroupBlacklist(String server) {
+        return getAllServerGroupBlacklist(server, false);
+    }
+
+    /*
+    CHECK IF GROUP COMMANDS PER SERVER WORK OR NOT
+     */
+
+    public List<GroupBlacklist> getAllServerGroupBlacklist(String server, boolean useDefault) {
         server = server.toLowerCase();
 
-        if(cachedServerGroupBlacklists.contains(server))
-            return cachedServerGroupBlacklists.get(server);
+        if (cachedServerGroupBlacklists.contains(server)) {
+            if(cachedServerGroupBlacklists.get(server).size() > (useDefault ? 1 : 0))
+                return cachedServerGroupBlacklists.get(server);
+        }
 
         List<GroupBlacklist> groupBlacklists = new ArrayList<>();
+        if(useDefault) groupBlacklists.add(generalGroupBlacklist);
+
         GroupBlacklist groupBlacklist;
 
         for (String key : groupServerBlacklist.keySet()) {
