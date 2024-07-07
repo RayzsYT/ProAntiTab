@@ -97,6 +97,11 @@ public class BukkitLoader extends JavaPlugin {
 
         if(getServer().getPluginManager().getPlugin("ViaVersion") != null)
             ViaVersionAdapter.initialize();
+
+        if(Storage.USE_SIMPLECLOUD)
+            Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
+
+        ConfigUpdater.broadcastMissingParts();
     }
 
     @Override
@@ -116,7 +121,7 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public void startUpdaterTask() {
-        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
+        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
         updaterTaskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
@@ -151,6 +156,7 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public static void synchronize(CommunicationPackets.PacketBundle packetBundle) {
+        Storage.LAST_SYNC = System.currentTimeMillis();
         Communicator.sendFeedback();
         CommunicationPackets.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
 
@@ -171,8 +177,9 @@ public class BukkitLoader extends JavaPlugin {
         }
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
-        if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
+        if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled()) {
             Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = unknownCommandPacket.isEnabled();
+        }
 
         if(!loaded) loaded = true;
 
@@ -188,24 +195,8 @@ public class BukkitLoader extends JavaPlugin {
 
     public static boolean doesCommandExist(String command, boolean replace) {
         if(commandsMap == null) return false;
-        if(replace) if(command.startsWith("/"))
-                command = StringUtils.replaceFirst(command, "/", "");
-
-        boolean detected = false;
-
-        Command commandObj;
-        for (String currentCommand : commandsMap.keySet()) {
-            if(detected) break;
-
-            detected = currentCommand.equals(command);
-            if(!detected) {
-                commandObj = commandsMap.get(currentCommand);
-                if(commandObj == null) continue;
-                detected = commandsMap.get(currentCommand).getAliases().contains(command);
-            }
-        }
-
-        return detected;
+        if(replace) command = StringUtils.replaceFirst(command, "/", "");
+        return getAllCommands().contains(command);
     }
 
     private void loadCommandMap() {
@@ -233,11 +224,24 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public static List<String> getAllCommands() {
-        if(commandsMap == null) {
-            return getNotBlockedCommands();
-        }
+        if(commandsMap == null) return getNotBlockedCommands();
 
-        return Arrays.asList(commandsMap.keySet().toArray(new String[] { }));
+        List<String> result = new LinkedList<>();
+        for (String command : commandsMap.keySet()) if(!result.contains(command)) result.add(command);
+
+        if(Reflection.getMinor() == 20 && Reflection.getRelease() >= 5 || Reflection.getMinor() >= 21)
+            for (String s : commandsMap.keySet())
+                    if (commandsMap.containsKey(s)) {
+                        if(!commandsMap.get(s).getAliases().isEmpty()) {
+                            for (String alias : commandsMap.get(s).getAliases())
+                                if (!result.contains(alias)) result.add(alias);
+
+                        } else if(Bukkit.getServer().getCommandAliases().get(s) != null)
+                            for (String alias : Bukkit.getServer().getCommandAliases().get(s))
+                                if (!result.contains(alias)) result.add(alias);
+                    }
+
+        return result;
     }
 
 
