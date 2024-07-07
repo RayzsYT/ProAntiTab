@@ -82,19 +82,26 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
             return result;
 
         if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate() && configuration.getConfigurationSection(path) == null) {
-                ConfigUpdater.updateConfigFile(file, path + "." + target, true);
-                Logger.warning("Section '" + path + "' is missing! Loading default section from online config.yml.");
-                reload();
-                return get(path, target);
+            if(ConfigUpdater.canUpdate()) {
+                String section = ConfigUpdater.getSection(path + "." + target, true);
+                if (configuration.getConfigurationSection(section) == null) {
+                    ConfigUpdater.updateConfigFile(this, path + "." + target, true);
+                    Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
+
+                    reload();
+                    return get(target);
+                }
             }
+        }
+
+        if (fileName.equals("config")) {
+            ConfigUpdater.addMissingPart(path + "." + target);
+            return object;
         }
 
         set(path, target, object);
         save();
 
-        if(fileName.equals("config"))
-            Logger.warning("Variable for '" + path + "." + target + "' could not be found or is corrupt! Therefore it has been replaced by its default variable.");
         return get(path, target);
     }
 
@@ -104,21 +111,27 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        String section = ConfigUpdater.getSection(target);
         if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate() && configuration.getConfigurationSection(section) == null) {
-                ConfigUpdater.updateConfigFile(file, target, true);
-                Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
-                reload();
-                return get(target);
+            if(ConfigUpdater.canUpdate()) {
+                String section = ConfigUpdater.getSection(target, true);
+                if (configuration.getConfigurationSection(section) == null) {
+                    ConfigUpdater.updateConfigFile(this, target, true);
+                    Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
+
+                    reload();
+                    return get(target);
+                }
             }
+        }
+
+        if (fileName.equals("config")) {
+            ConfigUpdater.addMissingPart(target);
+            return object;
         }
 
         set(target, object);
         save();
 
-        if(fileName.equals("config"))
-            Logger.warning("Variable for '" + target + "' could not be found or is corrupt! Therefore it has been replaced by its default variable.");
         return get(target);
     }
 
