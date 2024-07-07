@@ -78,7 +78,7 @@ public class CommandsCache {
 
                 permitted = Reflection.isProxyServer() && serverName != null
                         ? !Storage.Blacklist.isBlocked(targetObj, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, serverName)
-                        : PermissionUtil.hasBypassPermission(targetObj, command);
+                        : PermissionUtil.hasBypassPermission(targetObj, command, false);
 
                 if(useList && !permitted || !useList && permitted) continue;
                 playerCommands.add(command);
