@@ -45,7 +45,9 @@ public class BungeeLoader extends Plugin {
         Reflection.initialize(getProxy());
         ConfigUpdater.initialize();
 
+        Storage.USE_SIMPLECLOUD = Reflection.doesClassExist("eu.thesimplecloud.plugin.startup.CloudPlugin");
         Storage.CURRENT_VERSION = getDescription().getVersion();
+
         Storage.loadAll(true);
 
         MessageTranslator.initialize();
@@ -80,7 +82,11 @@ public class BungeeLoader extends Plugin {
             Logger.info("Successfully hooked into PAPIProxyBridge!");
         }
 
+        if(Storage.USE_SIMPLECLOUD)
+            Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
+
         BungeePacketAnalyzer.injectAll();
+        ConfigUpdater.broadcastMissingParts();
     }
 
     @Override
@@ -131,6 +137,10 @@ public class BungeeLoader extends Plugin {
     }
 
     public static List<String> getServerNames() {
-        return new ArrayList<>(ProxyServer.getInstance().getServers().keySet());
+        List<String> servers = new LinkedList<>();
+        for (String serverName : ProxyServer.getInstance().getServers().keySet())
+            servers.add(serverName.toLowerCase());
+
+        return servers;
     }
 }

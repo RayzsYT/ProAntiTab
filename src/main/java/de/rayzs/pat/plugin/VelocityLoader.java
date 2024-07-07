@@ -68,6 +68,7 @@ public class VelocityLoader {
         Reflection.initialize(server);
         ConfigUpdater.initialize();
 
+        Storage.USE_SIMPLECLOUD = Reflection.doesClassExist("eu.thesimplecloud.plugin.startup.CloudPlugin");
         Storage.CURRENT_VERSION = pluginContainer.getDescription().getVersion().get();
 
         Storage.loadAll(true);
@@ -99,6 +100,9 @@ public class VelocityLoader {
             Storage.USE_PAPIPROXYBRIDGE = true;
             Logger.info("Successfully hooked into PAPIProxyBridge!");
         }
+
+        if(Storage.USE_SIMPLECLOUD)
+            Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
         ConfigUpdater.broadcastMissingParts();
     }
