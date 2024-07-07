@@ -1,5 +1,6 @@
 package de.rayzs.pat.api.storage.config.settings;
 
+import com.sun.xml.internal.stream.dtd E.DTDGrammarUtil;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
@@ -19,7 +20,7 @@ public class CustomVersionSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
-        ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", false).getOrSet();
+        ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
         MESSAGE = new MultipleMessagesHelper(this, "message", Collections.singletonList("&fThis server is running CraftBukkit version git-ProSpigot-294 (MC: 1.8-1.21) (Implementing API version cool-api-version-SNAPSHOT)"));
     }
 
