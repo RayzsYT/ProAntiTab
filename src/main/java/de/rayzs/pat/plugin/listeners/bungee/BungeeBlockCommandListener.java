@@ -30,7 +30,7 @@ public class BungeeBlockCommandListener implements Listener {
         command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
-        if(PermissionUtil.hasBypassPermission(player, command)) return;
+        if(PermissionUtil.hasBypassPermission(player, command, false)) return;
 
         if(rawCommand.equals("/")) return;
         ServerInfo serverInfo = player.getServer().getInfo();
@@ -38,7 +38,7 @@ public class BungeeBlockCommandListener implements Listener {
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%server%", serverName);
 
 
-        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
             event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
 
@@ -47,6 +47,20 @@ public class BungeeBlockCommandListener implements Listener {
                 ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
                 if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
             });
+
+            return;
+        }
+
+        if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            event.setCancelled(true);
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
+
+            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+                ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
+                if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
+            });
+
             return;
         }
 
@@ -56,12 +70,11 @@ public class BungeeBlockCommandListener implements Listener {
 
         boolean listed, serverListed, ignored;
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-
-            if(Storage.Blacklist.doesGroupBypass(player, command, true, serverName)) return;
-
-            listed = Storage.Blacklist.isListed(command, false);
-            serverListed = Storage.Blacklist.isListed(player, command, false, listed, serverName);
+            if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) return;
+            listed = Storage.Blacklist.isListed(command, false, true, false);
+            serverListed = Storage.Blacklist.isListed(player, command, false, listed, false, serverName);
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
+
             if(ignored ? !listed && serverListed : serverListed) return;
 
             event.setCancelled(true);
@@ -69,10 +82,10 @@ public class BungeeBlockCommandListener implements Listener {
             return;
         }
 
-        if(Storage.Blacklist.doesGroupBypass(player, command, true, serverName)) return;
+        if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) return;
 
-        listed = Storage.Blacklist.isListed(command, true);
-        serverListed = Storage.Blacklist.isListed(player, command, true, listed, serverName);
+        listed = Storage.Blacklist.isListed(command, true, true, false);
+        serverListed = Storage.Blacklist.isListed(player, command, true, listed, false, serverName);
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
         if(!listed && !serverListed || listed && serverListed && ignored) return;
