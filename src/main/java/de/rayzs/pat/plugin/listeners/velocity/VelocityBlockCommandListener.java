@@ -34,16 +34,27 @@ public class VelocityBlockCommandListener {
         command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
-        if(PermissionUtil.hasBypassPermission(player, command)) return;
+        if(PermissionUtil.hasBypassPermission(player, command, false)) return;
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
-        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isPluginsCommand(command)) {
+        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(server.getPlayer(uuid).get(), notificationMessage));
+
+            return;
+        }
+
+        if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+            event.setResult(CommandExecuteEvent.CommandResult.denied());
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", command.replaceFirst("/", ""));
+
+            if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> server.getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(server.getPlayer(uuid).get(), notificationMessage));
+
             return;
         }
 
@@ -53,11 +64,12 @@ public class VelocityBlockCommandListener {
         boolean listed, serverListed, ignored;
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(Storage.Blacklist.doesGroupBypass(player, command, false, player.getCurrentServer().get().getServerInfo().getName())) return;
+            if(Storage.Blacklist.doesGroupBypass(player, command, false, true, false, player.getCurrentServer().get().getServerInfo().getName())) return;
 
-            listed = Storage.Blacklist.isListed(command, false);
-            serverListed = Storage.Blacklist.isListed(player, command, false, listed, serverName);
+            listed = Storage.Blacklist.isListed(command, false, true, false);
+            serverListed = Storage.Blacklist.isListed(player, command, false, listed, false, serverName);
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
+
             if(ignored ? !listed && serverListed : serverListed) return;
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
@@ -65,10 +77,10 @@ public class VelocityBlockCommandListener {
             return;
         }
 
-        if(Storage.Blacklist.doesGroupBypass(player, command, true, player.getCurrentServer().get().getServerInfo().getName())) return;
+        if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, player.getCurrentServer().get().getServerInfo().getName())) return;
 
-        listed = Storage.Blacklist.isListed(command, true);
-        serverListed = Storage.Blacklist.isListed(player, command, true, listed, serverName);
+        listed = Storage.Blacklist.isListed(command, true, true, false);
+        serverListed = Storage.Blacklist.isListed(player, command, true, listed, false, serverName);
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
         if(!listed && !serverListed || listed && serverListed && ignored) return;
