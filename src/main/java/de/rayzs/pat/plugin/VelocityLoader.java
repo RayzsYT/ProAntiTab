@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "1.7.6",
+version = "1.8.0",
 authors = "Rayzs_YT",
 description = "Hide more then just plugins. Hide almost everything!",
 dependencies = {
@@ -46,7 +46,7 @@ public class VelocityLoader {
     private static ProxyServer server;
     private final EventManager manager;
     private final VelocityMetrics.Factory metricsFactory;
-    private ScheduledTask task;
+    private ScheduledTask updaterTask;
     private static boolean checkUpdate = false;
 
     @Inject
@@ -99,12 +99,14 @@ public class VelocityLoader {
             Storage.USE_PAPIPROXYBRIDGE = true;
             Logger.info("Successfully hooked into PAPIProxyBridge!");
         }
+
+        ConfigUpdater.broadcastMissingParts();
     }
 
     public void startUpdaterTask() {
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
 
-        task = server.getScheduler().buildTask(this, () -> {
+        updaterTask = server.getScheduler().buildTask(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
 
@@ -138,7 +140,7 @@ public class VelocityLoader {
 
     public static List<String> getServerNames() {
         List<String> servers = new ArrayList<>();
-        server.getAllServers().forEach(server -> servers.add(server.getServerInfo().getName()));
+        server.getAllServers().forEach(server -> servers.add(server.getServerInfo().getName().toLowerCase()));
         return servers;
     }
 }
