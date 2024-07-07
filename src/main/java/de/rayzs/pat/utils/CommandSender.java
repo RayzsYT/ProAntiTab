@@ -59,7 +59,12 @@ public class CommandSender {
 
     public void sendMessage(String text) {
         if(MessageTranslator.isSupported()) MessageTranslator.send(sender, text);
-        else if(sender instanceof Player) ((Player) sender).sendMessage(MessageTranslator.replaceMessage(sender, text));
+        else if(Reflection.isProxyServer()) {
+          if(!Reflection.isVelocityServer()) {
+              if (sender instanceof net.md_5.bungee.api.CommandSender)
+                  ((net.md_5.bungee.api.CommandSender) sender).sendMessage(MessageTranslator.replaceMessage(sender, text));
+          }
+        } else if(sender instanceof Player) ((Player) sender).sendMessage(MessageTranslator.replaceMessage(sender, text));
         else if(sender instanceof org.bukkit.command.CommandSender) ((org.bukkit.command.CommandSender) sender).sendMessage(MessageTranslator.replaceMessage(sender, text));
     }
 
