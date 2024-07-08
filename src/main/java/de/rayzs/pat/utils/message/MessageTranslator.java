@@ -12,7 +12,6 @@ public class MessageTranslator {
     private static final HashMap<Character, String> colors = new HashMap<>(), endingColors = new HashMap<>();
     private static boolean support;
     private static Translator translator = null;
-    private static final List<Character> notColors = Arrays.asList('m', 'r', 'k', 'l', 'o');
 
     public static void initialize() {
         colors.put('1', "<dark_blue>");
