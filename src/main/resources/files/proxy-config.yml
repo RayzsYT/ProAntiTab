@@ -179,10 +179,11 @@ info:
     disabled: '&cDisabled!'
 
   message:
-    - '&7ProAntiTab information:'
+    - '&7Necessary information about &fPAT&8:'
     - '&7  Version: &e%current_version%'
     - '&7  Status: %version_status%'
     - '&7  Last sync: %sync_time%'
+    - '&7  Proxy sync-token: &e%token%'
 
 stats:
   fail: '&cThis command works on Bungeecord/Velocity servers only!'

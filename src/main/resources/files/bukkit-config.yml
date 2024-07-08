@@ -189,10 +189,12 @@ info:
     disabled: '&cDisabled!'
 
   message:
-    - '&7ProAntiTab information:'
+    - '&7Necessary information about &fPAT&8:'
     - '&7  Version: &e%current_version%'
     - '&7  Status: %version_status%'
     - '&7  Last sync with proxy: %sync_time%'
+    - '&7  Proxy sync-token: &e%token%'
+    - '&7  Proxy-received server name: &e%sync_server_name%'
 
 notification:
   enabled: '&aEnabled notifications'

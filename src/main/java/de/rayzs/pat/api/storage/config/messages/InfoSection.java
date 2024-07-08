@@ -24,10 +24,12 @@ public class InfoSection extends ConfigStorage {
 
         MESSAGE = new MultipleMessagesHelper(this, "message",
                 Arrays.asList(
-                        "&7ProAntiTab information:"
+                        "&7Necessary information about &fPAT&8:"
                         , "&7  Version: &e%current_version%"
                         , "&7  Status: %version_status%"
                         , "&7  Last sync with proxy: &e%sync_time%"
+                        , "&7  Proxy sync-token: &e%token%"
+                        , "&7  Proxy-received server name: &e%sync_server_name%"
                 )
         );
     }

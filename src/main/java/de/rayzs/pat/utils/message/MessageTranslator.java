@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.message;
 
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.message.translators.*;
@@ -109,7 +110,7 @@ public class MessageTranslator {
 
     public static String replaceMessage(Object targetObj, String text) {
         CommandSender sender = targetObj instanceof CommandSender ? (CommandSender) targetObj : new CommandSender(targetObj);
-        text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "").replace("&", "§").replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX).replace("%token%", Storage.TOKEN).replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
+        text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "").replace("&", "§").replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX).replace("%token%", Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || Reflection.isProxyServer() ? Storage.TOKEN : "/").replace("%sync_server_name%", Storage.SERVER_NAME == null ? "/" : Storage.SERVER_NAME).replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
         return PlaceholderReplacer.replace(targetObj, text);
     }
 
