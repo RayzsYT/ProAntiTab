@@ -110,7 +110,7 @@ public class MessageTranslator {
 
     public static String replaceMessage(Object targetObj, String text) {
         CommandSender sender = targetObj instanceof CommandSender ? (CommandSender) targetObj : new CommandSender(targetObj);
-        text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "").replace("&", "§").replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX).replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
+        text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "").replace("&", "§").replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX).replace("%token%", Storage.TOKEN).replace("%current_version%", Storage.CURRENT_VERSION).replace("%newest_version%", Storage.NEWER_VERSION).replace("\\n", "\n");
         return PlaceholderReplacer.replace(targetObj, text);
     }
 
