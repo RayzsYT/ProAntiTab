@@ -10,6 +10,7 @@ import de.rayzs.pat.api.storage.Storage;
 import net.md_5.bungee.api.connection.*;
 import net.md_5.bungee.api.ProxyServer;
 import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.api.event.*;
 import net.md_5.bungee.event.*;
 import java.util.List;
 
@@ -39,6 +40,8 @@ public class BungeeBlockCommandListener implements Listener {
 
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_PLUGINS_COMMAND)) return;
+
             event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
 
@@ -52,6 +55,8 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_VERSION_COMMAND)) return;
+
             event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
 
@@ -76,6 +81,7 @@ public class BungeeBlockCommandListener implements Listener {
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
             if(ignored ? !listed && serverListed : serverListed) return;
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
 
             event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);

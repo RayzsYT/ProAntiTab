@@ -9,6 +9,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.api.event.*;
 import java.util.List;
 
 public class VelocityBlockCommandListener {
@@ -39,6 +40,8 @@ public class VelocityBlockCommandListener {
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_PLUGINS_COMMAND)) return;
+
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
@@ -49,6 +52,8 @@ public class VelocityBlockCommandListener {
         }
 
         if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_VERSION_COMMAND)) return;
+
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
@@ -71,6 +76,7 @@ public class VelocityBlockCommandListener {
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
             if(ignored ? !listed && serverListed : serverListed) return;
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, cancelCommandMessage);
@@ -84,6 +90,7 @@ public class VelocityBlockCommandListener {
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
         if(!listed && !serverListed || listed && serverListed && ignored) return;
+        if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
 
         event.setResult(CommandExecuteEvent.CommandResult.denied());
         MessageTranslator.send(player, cancelCommandMessage);

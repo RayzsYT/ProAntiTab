@@ -8,6 +8,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.utils.StringUtils;
 import org.bukkit.entity.Player;
+import de.rayzs.pat.api.event.*;
 import org.bukkit.event.*;
 import java.util.List;
 import org.bukkit.*;
@@ -41,6 +42,8 @@ public class BukkitBlockCommandListener implements Listener {
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%world%", worldName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_PLUGINS_COMMAND)) return;
+
             event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", command);
 
@@ -54,6 +57,8 @@ public class BukkitBlockCommandListener implements Listener {
         }
 
         if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_VERSION_COMMAND)) return;
+
             event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", command);
 
@@ -72,6 +77,8 @@ public class BukkitBlockCommandListener implements Listener {
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.isListed(command, true)) return;
             if(PermissionUtil.hasBypassPermission(player, command, false)) return;
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+
             event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);
             return;
@@ -79,6 +86,8 @@ public class BukkitBlockCommandListener implements Listener {
 
         if (!Storage.Blacklist.isListed(command, false)) return;
         if (PermissionUtil.hasBypassPermission(player, command, false)) return;
+        if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+
         event.setCancelled(true);
         MessageTranslator.send(player, cancelCommandMessage);
 
