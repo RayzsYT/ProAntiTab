@@ -22,9 +22,9 @@ public class PATEventManager {
     public static boolean useDefaultActions(Object executor, String command, PATEvent.Situation situation) {
         for (PATEvent event : EVENTS) {
             if(event.situation != situation) continue;
-            if(event.shouldHandleByDefault(executor, command)) return true;
+            if(!event.shouldHandleByDefault(executor, command)) return false;
         }
 
-        return false;
+        return true;
     }
 }
