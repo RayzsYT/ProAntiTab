@@ -1,7 +1,7 @@
 package de.rayzs.pat.utils.configuration;
 
-import java.io.File;
 import java.util.Collection;
+import java.io.File;
 
 public interface ConfigurationBuilder {
     void reload();

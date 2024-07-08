@@ -1,10 +1,10 @@
 package de.rayzs.pat.utils.configuration;
 
-import java.io.*;
-import java.net.*;
-import java.util.HashMap;
-import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.configuration.impl.*;
+import de.rayzs.pat.utils.*;
+import java.util.HashMap;
+import java.net.*;
+import java.io.*;
 
 public class Configurator {
 

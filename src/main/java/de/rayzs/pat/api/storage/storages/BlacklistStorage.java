@@ -1,10 +1,8 @@
 package de.rayzs.pat.api.storage.storages;
 
-import de.rayzs.pat.api.storage.*;
-import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.storage.*;
 import java.io.Serializable;
 import java.util.*;
 

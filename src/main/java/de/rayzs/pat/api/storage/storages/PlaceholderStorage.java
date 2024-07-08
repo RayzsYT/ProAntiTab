@@ -1,7 +1,6 @@
 package de.rayzs.pat.api.storage.storages;
 
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.api.storage.StorageTemplate;
+import de.rayzs.pat.api.storage.*;
 import org.bukkit.entity.Player;
 
 public abstract class PlaceholderStorage extends StorageTemplate {

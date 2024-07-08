@@ -1,17 +1,15 @@
 package de.rayzs.pat.api.netty.proxy;
 
-import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.*;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.VelocityLoader;
-import de.rayzs.pat.utils.CommandsCache;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import com.velocitypowered.proxy.protocol.packet.*;
+import java.util.concurrent.ConcurrentHashMap;
+import com.velocitypowered.api.proxy.Player;
+import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.*;
 import io.netty.channel.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class VelocityPacketAnalyzer {
 

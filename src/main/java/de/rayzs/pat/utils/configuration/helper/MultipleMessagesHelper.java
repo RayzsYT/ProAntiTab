@@ -1,7 +1,6 @@
 package de.rayzs.pat.utils.configuration.helper;
 
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
-
 import java.io.Serializable;
 import java.util.*;
 

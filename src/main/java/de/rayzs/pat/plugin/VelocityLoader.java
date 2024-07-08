@@ -1,35 +1,27 @@
 package de.rayzs.pat.plugin;
 
-import com.google.inject.Inject;
-import com.velocitypowered.api.event.EventManager;
-import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
-import com.velocitypowered.api.plugin.Dependency;
-import com.velocitypowered.api.plugin.Plugin;
-import com.velocitypowered.api.plugin.PluginContainer;
-import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.scheduler.ScheduledTask;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.commands.VelocityCommand;
-import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
-import de.rayzs.pat.plugin.listeners.velocity.VelocityBlockCommandListener;
-import de.rayzs.pat.plugin.listeners.velocity.VelocityConnectionListener;
-import de.rayzs.pat.plugin.listeners.velocity.VelocityPingListener;
-import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
-import de.rayzs.pat.utils.ConnectionBuilder;
-import de.rayzs.pat.api.brand.CustomServerBrand;
+import com.velocitypowered.api.scheduler.ScheduledTask;
+import de.rayzs.pat.utils.configuration.Configurator;
+import de.rayzs.pat.plugin.commands.VelocityCommand;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
-import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.configuration.Configurator;
+import com.velocitypowered.api.proxy.ProxyServer;
+import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.listeners.velocity.*;
+import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.utils.group.GroupManager;
-
-import java.util.ArrayList;
-import java.util.List;
+import de.rayzs.pat.plugin.logger.Logger;
+import com.velocitypowered.api.plugin.*;
+import de.rayzs.pat.api.storage.Storage;
+import com.velocitypowered.api.event.*;
+import de.rayzs.pat.utils.Reflection;
 import java.util.concurrent.TimeUnit;
+import com.google.inject.Inject;
+import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",

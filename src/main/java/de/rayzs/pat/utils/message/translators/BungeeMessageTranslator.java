@@ -1,14 +1,14 @@
 package de.rayzs.pat.utils.message.translators;
 
-import de.rayzs.pat.plugin.BungeeLoader;
-import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.utils.message.Translator;
-import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import de.rayzs.pat.utils.message.MessageTranslator;
+import net.kyori.adventure.audience.Audience;
+import de.rayzs.pat.utils.message.Translator;
+import net.md_5.bungee.api.CommandSender;
+import de.rayzs.pat.plugin.BungeeLoader;
 
 public class BungeeMessageTranslator implements Translator {
 

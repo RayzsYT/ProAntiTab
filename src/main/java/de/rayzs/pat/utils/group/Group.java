@@ -1,16 +1,14 @@
 package de.rayzs.pat.utils.group;
 
-import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
-import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.ExpireCache;
+import java.util.concurrent.TimeUnit;
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Group implements Serializable {
 

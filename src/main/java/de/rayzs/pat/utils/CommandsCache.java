@@ -1,8 +1,8 @@
 package de.rayzs.pat.utils;
 
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.api.storage.Storage;
 import java.util.*;
 
 public class CommandsCache {

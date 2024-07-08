@@ -1,12 +1,12 @@
 package de.rayzs.pat.utils.configuration.impl;
 
-import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
+import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import org.bukkit.configuration.file.YamlConfiguration;
+import de.rayzs.pat.plugin.logger.Logger;
 import org.bukkit.ChatColor;
-import java.io.File;
 import java.util.Collection;
+import java.io.File;
 
 public class BukkitConfigurationBuilder implements ConfigurationBuilder {
 

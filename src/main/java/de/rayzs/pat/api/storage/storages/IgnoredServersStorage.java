@@ -1,9 +1,7 @@
 package de.rayzs.pat.api.storage.storages;
 
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.api.storage.StorageTemplate;
 import de.rayzs.pat.utils.Reflection;
-
+import de.rayzs.pat.api.storage.*;
 import java.util.*;
 
 public class IgnoredServersStorage extends StorageTemplate {

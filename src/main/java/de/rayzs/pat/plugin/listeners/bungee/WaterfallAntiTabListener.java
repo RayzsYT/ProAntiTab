@@ -1,16 +1,12 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
-import de.rayzs.pat.utils.CommandsCache;
-import de.rayzs.pat.utils.permission.PermissionUtil;
 import io.github.waterfallmc.waterfall.event.ProxyDefineCommandsEvent;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.event.EventPriority;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import de.rayzs.pat.utils.CommandsCache;
+import net.md_5.bungee.event.*;
+import java.util.*;
 
 public class WaterfallAntiTabListener implements Listener {
 

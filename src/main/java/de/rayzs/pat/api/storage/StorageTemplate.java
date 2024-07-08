@@ -1,7 +1,6 @@
 package de.rayzs.pat.api.storage;
 
 import de.rayzs.pat.utils.configuration.*;
-
 import java.io.Serializable;
 
 public abstract class StorageTemplate implements Serializable {

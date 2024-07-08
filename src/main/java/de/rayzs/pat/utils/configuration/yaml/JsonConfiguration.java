@@ -7,6 +7,12 @@ import java.util.*;
 import java.io.*;
 
 public class JsonConfiguration extends ConfigurationProvider {
+
+    /*
+        Original code from Bungeecord source:
+        https://github.com/SpigotMC/BungeeCord/blob/master/config/src/main/java/net/md_5/bungee/config/JsonConfiguration.java
+     */
+
     private final Gson json = (new GsonBuilder()).serializeNulls().setPrettyPrinting().registerTypeAdapter(Configuration.class, new JsonSerializer<Configuration>() {
         public JsonElement serialize(Configuration src, Type typeOfSrc, JsonSerializationContext context) {
             return context.serialize(src.self);

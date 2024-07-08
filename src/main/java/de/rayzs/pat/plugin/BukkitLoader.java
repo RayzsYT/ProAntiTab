@@ -1,34 +1,28 @@
 package de.rayzs.pat.plugin;
 
-import de.rayzs.pat.api.communication.BackendUpdater;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.commands.BukkitCommand;
-import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
-import de.rayzs.pat.plugin.listeners.bukkit.BukkitBlockCommandListener;
-import de.rayzs.pat.plugin.listeners.bukkit.BukkitPlayerConnectionListener;
-import de.rayzs.pat.plugin.listeners.bukkit.PaperServerListPing;
-import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.metrics.bStats;
-import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.hooks.PlaceholderHook;
-import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
+import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.utils.configuration.Configurator;
-import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.plugin.*;
+import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
+import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.plugin.commands.BukkitCommand;
+import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.utils.hooks.PlaceholderHook;
+import de.rayzs.pat.plugin.listeners.bukkit.*;
+import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.plugin.metrics.bStats;
+import de.rayzs.pat.plugin.logger.Logger;
 import org.bukkit.plugin.java.JavaPlugin;
-import de.rayzs.pat.utils.*;
-
+import de.rayzs.pat.api.storage.Storage;
 import java.lang.reflect.Field;
+import de.rayzs.pat.utils.*;
+import org.bukkit.command.*;
+import org.bukkit.plugin.*;
+import org.bukkit.Bukkit;
 import java.util.*;
 
 public class BukkitLoader extends JavaPlugin {

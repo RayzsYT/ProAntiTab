@@ -1,12 +1,11 @@
 package de.rayzs.pat.utils.configuration.impl;
 
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
-import java.io.File;
-import java.util.Collection;
-
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.configuration.yaml.*;
+import de.rayzs.pat.plugin.logger.Logger;
+import java.util.Collection;
+import java.io.File;
 
 public class ProxyConfigurationBuilder implements ConfigurationBuilder {
 

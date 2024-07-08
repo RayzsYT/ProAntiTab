@@ -1,26 +1,23 @@
 package de.rayzs.pat.api.netty.proxy;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import com.mojang.brigadier.tree.CommandNode;
-import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.communication.client.ClientInfo;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.StringUtils;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import io.netty.channel.*;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import net.md_5.bungee.api.ProxyServer;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Command;
+import de.rayzs.pat.api.communication.Communicator;
 import net.md_5.bungee.protocol.PacketWrapper;
-import net.md_5.bungee.protocol.packet.Commands;
-import net.md_5.bungee.protocol.packet.TabCompleteResponse;
-import java.lang.reflect.Field;
-import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import com.mojang.brigadier.tree.CommandNode;
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.protocol.packet.*;
+import de.rayzs.pat.api.storage.Storage;
+import net.md_5.bungee.api.ProxyServer;
+import com.mojang.brigadier.builder.*;
+import java.lang.reflect.Field;
+import de.rayzs.pat.utils.*;
+import io.netty.channel.*;
+import java.util.*;
 
 public class BungeePacketAnalyzer {
 

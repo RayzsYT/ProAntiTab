@@ -1,15 +1,13 @@
 package de.rayzs.pat.api.communication.impl;
 
-import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.PluginMessageEvent;
-import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.rayzs.pat.plugin.VelocityLoader;
-import de.rayzs.pat.api.communication.Client;
-import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.CommunicationPackets;
+import com.velocitypowered.api.event.Subscribe;
+import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.api.communication.*;
+import com.velocitypowered.api.proxy.*;
 
 public class VelocityClient implements Client {
 

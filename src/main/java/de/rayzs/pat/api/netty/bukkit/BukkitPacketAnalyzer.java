@@ -1,16 +1,14 @@
 package de.rayzs.pat.api.netty.bukkit;
 
-import de.rayzs.pat.api.netty.bukkit.handlers.LegacyPacketHandler;
-import de.rayzs.pat.api.netty.bukkit.handlers.ModernPacketHandler;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.api.netty.bukkit.handlers.*;
+import java.util.concurrent.ConcurrentHashMap;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.permission.PermissionUtil;
+import org.bukkit.entity.Player;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class BukkitPacketAnalyzer {
 

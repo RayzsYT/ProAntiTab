@@ -1,7 +1,7 @@
 package de.rayzs.pat.api.storage.placeholders.messages;
 
-import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
 import org.bukkit.entity.Player;
 

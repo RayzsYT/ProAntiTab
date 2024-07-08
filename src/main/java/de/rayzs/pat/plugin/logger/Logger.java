@@ -1,13 +1,12 @@
 package de.rayzs.pat.plugin.logger;
 
-import de.rayzs.pat.plugin.*;
-import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
-
-import java.util.List;
+import de.rayzs.pat.utils.Reflection;
 import java.util.logging.Level;
+import de.rayzs.pat.plugin.*;
 import org.bukkit.Bukkit;
+import java.util.List;
 
 public class Logger {
 

@@ -1,7 +1,7 @@
 package de.rayzs.pat.api.storage.placeholders.general;
 
-import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
+import de.rayzs.pat.api.storage.Storage;
 import org.bukkit.entity.Player;
 
 public class GeneralNewestVersionPlaceholder extends PlaceholderStorage {

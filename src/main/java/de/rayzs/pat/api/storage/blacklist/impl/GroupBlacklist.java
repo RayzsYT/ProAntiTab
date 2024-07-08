@@ -1,9 +1,7 @@
 package de.rayzs.pat.api.storage.blacklist.impl;
 
-import de.rayzs.pat.api.storage.StorageTemplate;
 import de.rayzs.pat.api.storage.storages.BlacklistStorage;
-
-import java.io.Serializable;
+import de.rayzs.pat.api.storage.StorageTemplate;
 import java.util.List;
 
 public class GroupBlacklist extends BlacklistStorage {

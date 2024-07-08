@@ -1,7 +1,7 @@
 package de.rayzs.pat.utils.message.replacer;
 
-import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.message.replacer.impl.*;
+import de.rayzs.pat.api.storage.Storage;
 import java.util.function.Consumer;
 
 public class PlaceholderReplacer {

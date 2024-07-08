@@ -1,10 +1,10 @@
 package de.rayzs.pat.utils;
 
-import io.netty.channel.Channel;
 import net.md_5.bungee.api.ProxyServer;
-import org.bukkit.Bukkit;
+import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import java.lang.reflect.*;
+import org.bukkit.Bukkit;
 import java.util.*;
 
 public class Reflection {

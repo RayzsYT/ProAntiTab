@@ -1,10 +1,10 @@
 package de.rayzs.pat.utils.message;
 
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.message.translators.*;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.*;
 import java.util.*;
 
 public class MessageTranslator {

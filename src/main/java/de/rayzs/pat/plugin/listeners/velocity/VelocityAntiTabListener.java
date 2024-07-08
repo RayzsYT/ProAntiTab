@@ -1,20 +1,13 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
-import com.velocitypowered.api.event.PostOrder;
-import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
-import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandsCache;
-import de.rayzs.pat.utils.ExpireCache;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.velocitypowered.api.proxy.*;
+import com.velocitypowered.api.event.*;
+import java.util.*;
 
 public class VelocityAntiTabListener {
 

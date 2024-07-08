@@ -1,10 +1,9 @@
 package de.rayzs.pat.utils.message.replacer.impl;
 
-import de.rayzs.pat.utils.CommandSender;
-import de.rayzs.pat.utils.Reflection;
 import net.william278.papiproxybridge.api.PlaceholderAPI;
-import java.util.UUID;
 import java.util.function.Consumer;
+import de.rayzs.pat.utils.*;
+import java.util.UUID;
 
 public class ProxyPlaceholderReplacer {
 

@@ -1,7 +1,6 @@
 package de.rayzs.pat.plugin.metrics;
 
-import de.rayzs.pat.plugin.metrics.impl.BukkitMetrics;
-import de.rayzs.pat.plugin.metrics.impl.BungeeMetrics;
+import de.rayzs.pat.plugin.metrics.impl.*;
 import de.rayzs.pat.utils.Reflection;
 
 public class bStats {

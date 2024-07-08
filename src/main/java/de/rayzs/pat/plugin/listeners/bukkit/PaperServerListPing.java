@@ -2,8 +2,8 @@ package de.rayzs.pat.plugin.listeners.bukkit;
 
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import de.rayzs.pat.api.storage.Storage;
-import org.bukkit.Bukkit;
 import org.bukkit.event.*;
+import org.bukkit.Bukkit;
 
 public class PaperServerListPing implements Listener {
 

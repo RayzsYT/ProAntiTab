@@ -1,12 +1,11 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.BungeeLoader;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.BungeeLoader;
 import net.md_5.bungee.event.*;
+import net.md_5.bungee.api.*;
 
 public class BungeePingListener implements Listener {
 

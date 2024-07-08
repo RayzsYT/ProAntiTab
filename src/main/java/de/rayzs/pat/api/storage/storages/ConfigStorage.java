@@ -1,7 +1,6 @@
 package de.rayzs.pat.api.storage.storages;
 
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.api.storage.StorageTemplate;
+import de.rayzs.pat.api.storage.*;
 
 public class ConfigStorage extends StorageTemplate {
 

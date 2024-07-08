@@ -2,7 +2,6 @@ package de.rayzs.pat.utils.configuration.updater;
 
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
-
 import java.nio.file.Files;
 import java.io.File;
 import java.util.*;

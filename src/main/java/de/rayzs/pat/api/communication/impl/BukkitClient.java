@@ -1,11 +1,11 @@
 package de.rayzs.pat.api.communication.impl;
 
+import org.bukkit.plugin.messaging.PluginMessageListener;
 import de.rayzs.pat.utils.CommunicationPackets;
-import org.bukkit.*;
-import org.bukkit.entity.Player;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.communication.*;
-import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.bukkit.entity.Player;
+import org.bukkit.*;
 
 public class BukkitClient implements Client, PluginMessageListener {
 

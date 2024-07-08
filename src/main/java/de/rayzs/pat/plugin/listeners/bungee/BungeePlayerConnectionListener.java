@@ -1,21 +1,17 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.brand.impl.BungeeServerBrand;
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.event.ServerSwitchEvent;
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.event.EventPriority;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.BungeeLoader;
+import net.md_5.bungee.api.ProxyServer;
 import java.util.concurrent.TimeUnit;
+import net.md_5.bungee.api.event.*;
+import net.md_5.bungee.event.*;
 
 public class BungeePlayerConnectionListener implements Listener {
 

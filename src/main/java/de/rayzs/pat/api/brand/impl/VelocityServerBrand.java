@@ -1,24 +1,18 @@
 package de.rayzs.pat.api.brand.impl;
 
-import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.VelocityLoader;
-import de.rayzs.pat.utils.PacketUtils;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.api.brand.ServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.protocol.ProtocolConstants;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import de.rayzs.pat.api.brand.ServerBrand;
+import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.api.storage.Storage;
+import com.velocitypowered.api.proxy.*;
+import java.util.concurrent.TimeUnit;
+import java.lang.reflect.Method;
+import io.netty.buffer.ByteBuf;
+import de.rayzs.pat.utils.*;
+import java.util.Optional;
 
 public class VelocityServerBrand implements ServerBrand {
 

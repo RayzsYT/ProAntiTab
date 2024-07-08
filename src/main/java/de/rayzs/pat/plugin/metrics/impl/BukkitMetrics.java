@@ -1,26 +1,19 @@
 package de.rayzs.pat.plugin.metrics.impl;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.ServicePriority;
-
-import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.logging.Level;
+import javax.net.ssl.HttpsURLConnection;
 import java.util.zip.GZIPOutputStream;
+import org.bukkit.entity.Player;
+import java.util.logging.Level;
+import java.util.concurrent.*;
+import org.bukkit.plugin.*;
+import java.lang.reflect.*;
+import com.google.gson.*;
+import org.bukkit.Bukkit;
+import java.net.URL;
+import java.util.*;
+import java.io.*;
 
 /**
  * bStats collects some data for plugin authors.

@@ -1,9 +1,8 @@
 package de.rayzs.pat.plugin.commands;
 
 import de.rayzs.pat.plugin.process.CommandProcess;
-import org.bukkit.command.*;
 import org.bukkit.entity.Player;
-
+import org.bukkit.command.*;
 import java.util.List;
 
 public class BukkitCommand implements CommandExecutor, TabCompleter {

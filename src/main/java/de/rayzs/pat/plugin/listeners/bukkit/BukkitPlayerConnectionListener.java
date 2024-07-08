@@ -1,17 +1,17 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.brand.impl.BukkitServerBrand;
 import de.rayzs.pat.api.communication.BackendUpdater;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.utils.message.MessageTranslator;
-import org.bukkit.Bukkit;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.BukkitLoader;
 import org.bukkit.event.player.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
+import org.bukkit.Bukkit;
 
 public class BukkitPlayerConnectionListener implements Listener {
 

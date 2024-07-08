@@ -1,11 +1,11 @@
 package de.rayzs.pat.utils.hooks;
 
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.plugin.logger.Logger;
-import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.*;
+import org.bukkit.entity.Player;
 
 public class PlaceholderHook extends PlaceholderExpansion {
 

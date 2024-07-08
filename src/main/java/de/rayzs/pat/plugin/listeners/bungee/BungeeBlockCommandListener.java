@@ -1,15 +1,15 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.*;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.storage.Storage;
+import net.md_5.bungee.api.connection.*;
+import net.md_5.bungee.api.ProxyServer;
+import de.rayzs.pat.utils.StringUtils;
 import net.md_5.bungee.event.*;
 import java.util.List;
 

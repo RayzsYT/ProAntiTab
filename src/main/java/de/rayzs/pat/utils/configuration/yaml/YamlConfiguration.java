@@ -11,6 +11,11 @@ import java.io.*;
 
 public class YamlConfiguration extends ConfigurationProvider {
 
+    /*
+        Original code from Bungeecord source:
+        https://github.com/SpigotMC/BungeeCord/blob/master/config/src/main/java/net/md_5/bungee/config/YamlConfiguration.java
+     */
+
     private final ThreadLocal<Yaml> yaml = new ThreadLocal<Yaml>()
     {
         @Override

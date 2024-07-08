@@ -1,10 +1,8 @@
 package de.rayzs.pat.api.storage.config.messages;
 
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
+import de.rayzs.pat.utils.configuration.helper.*;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
-import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
-
 import java.util.Collections;
 
 public class NotificationSection extends ConfigStorage {

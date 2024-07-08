@@ -1,14 +1,14 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
-import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
-import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.StringUtils;
+import com.velocitypowered.api.command.CommandSource;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.proxy.Player;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.StringUtils;
 import java.util.List;
 
 public class VelocityBlockCommandListener {

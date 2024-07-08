@@ -1,11 +1,11 @@
 package de.rayzs.pat.utils.message.translators;
 
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import com.velocitypowered.api.command.CommandSource;
+import net.kyori.adventure.text.Component;
 import com.velocitypowered.api.proxy.*;
 import de.rayzs.pat.utils.message.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class VelocityMessageTranslator implements Translator {
 

@@ -1,42 +1,20 @@
 package de.rayzs.pat.plugin.metrics.impl;
 
-import com.google.inject.Inject;
-import com.velocitypowered.api.plugin.PluginContainer;
-import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.zip.GZIPOutputStream;
+import com.velocitypowered.api.plugin.*;
 import javax.net.ssl.HttpsURLConnection;
+import java.util.zip.GZIPOutputStream;
+import java.util.stream.Collectors;
+import com.google.inject.Inject;
+import java.util.regex.Pattern;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.nio.file.Path;
+import java.net.URL;
+import java.util.*;
+import java.io.*;
 
     public class VelocityMetrics {
 

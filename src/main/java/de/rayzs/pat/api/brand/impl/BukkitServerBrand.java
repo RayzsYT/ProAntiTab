@@ -1,25 +1,18 @@
 package de.rayzs.pat.api.brand.impl;
 
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
+import de.rayzs.pat.utils.message.MessageTranslator;
+import java.util.concurrent.atomic.AtomicInteger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
-import de.rayzs.pat.utils.PacketUtils;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.brand.ServerBrand;
-import de.rayzs.pat.utils.message.MessageTranslator;
 import io.netty.channel.Channel;
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
+import de.rayzs.pat.api.brand.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import de.rayzs.pat.utils.*;
+import java.lang.reflect.*;
+import org.bukkit.*;
+import java.util.*;
 
 public class BukkitServerBrand implements ServerBrand {
 

@@ -1,17 +1,17 @@
 package de.rayzs.pat.utils.adapter;
 
+import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
+import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
+import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import net.luckperms.api.event.sync.PreNetworkSyncEvent;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+import net.luckperms.api.model.user.User;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
-import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
-import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
-import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import net.luckperms.api.event.sync.PreNetworkSyncEvent;
-import net.luckperms.api.model.user.User;
 import net.luckperms.api.event.EventBus;
 import net.luckperms.api.event.node.*;
+import de.rayzs.pat.utils.Reflection;
 import net.luckperms.api.node.*;
 import net.luckperms.api.*;
 import java.util.*;

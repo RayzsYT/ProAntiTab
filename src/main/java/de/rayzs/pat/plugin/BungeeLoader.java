@@ -1,27 +1,24 @@
 package de.rayzs.pat.plugin;
 
-import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.commands.BungeeCommand;
-import de.rayzs.pat.plugin.listeners.bungee.*;
-import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.metrics.bStats;
-import de.rayzs.pat.utils.ConnectionBuilder;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.Communicator;
-import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
+import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.api.plugin.PluginManager;
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.api.communication.Communicator;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-
-import java.util.*;
+import de.rayzs.pat.plugin.commands.BungeeCommand;
+import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.listeners.bungee.*;
+import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.plugin.metrics.bStats;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.storage.Storage;
+import net.md_5.bungee.api.ProxyServer;
 import java.util.concurrent.TimeUnit;
+import net.md_5.bungee.api.plugin.*;
+import de.rayzs.pat.utils.*;
+import java.util.*;
 
 public class BungeeLoader extends Plugin {
 

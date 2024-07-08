@@ -4,6 +4,12 @@ import java.util.*;
 import java.io.*;
 
 public abstract class ConfigurationProvider {
+
+    /*
+        Original code from Bungeecord source:
+        https://github.com/SpigotMC/BungeeCord/blob/master/config/src/main/java/net/md_5/bungee/config/ConfigurationProvider.java
+     */
+
     private static final Map<Class<? extends ConfigurationProvider>, ConfigurationProvider> providers = new HashMap<>();
 
     static {

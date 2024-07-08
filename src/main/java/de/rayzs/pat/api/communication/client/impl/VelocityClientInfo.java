@@ -1,7 +1,7 @@
 package de.rayzs.pat.api.communication.client.impl;
 
-import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.communication.impl.VelocityClient;
+import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.plugin.VelocityLoader;
 
 public class VelocityClientInfo extends ClientInfo {

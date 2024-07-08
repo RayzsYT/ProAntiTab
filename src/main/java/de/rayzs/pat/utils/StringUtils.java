@@ -1,7 +1,6 @@
 package de.rayzs.pat.utils;
 
 import de.rayzs.pat.utils.group.Group;
-
 import java.util.*;
 
 public class StringUtils {

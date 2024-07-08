@@ -4,6 +4,11 @@ import java.util.*;
 
 public final class Configuration {
 
+    /*
+        Original code from Bungeecord source:
+        https://github.com/SpigotMC/BungeeCord/blob/master/config/src/main/java/net/md_5/bungee/config/Configuration.java
+     */
+
     private static final char SEPARATOR = '.';
 
     final Map<String, Object> self;
