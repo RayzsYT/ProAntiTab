@@ -176,7 +176,7 @@ public class CommandProcess {
 
                         case "update":
 
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update")) return;
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update_permissions")) return;
 
                             PermissionUtil.reloadPermissions();
                             sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATED);
@@ -628,6 +628,8 @@ public class CommandProcess {
 
         switch (args.length) {
             case 1:
+                if(PermissionUtil.hasPermission(sender, "update_permissions"))
+                    suggestions.add("update");
                 if (!backend && PermissionUtil.hasPermission(sender, "stats") && Reflection.isProxyServer())
                     suggestions.add("stats");
                 if (!backend && PermissionUtil.hasPermission(sender, "notify")) suggestions.add("notify");
