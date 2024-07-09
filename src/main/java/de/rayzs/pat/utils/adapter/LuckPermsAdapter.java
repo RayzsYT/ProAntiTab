@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.adapter;
 
+import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
@@ -33,7 +34,10 @@ public class LuckPermsAdapter {
             if (BukkitLoader.useSuggestions())
                 eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitAntiTabListener.luckpermsNetworkSync());
         } else {
-            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+            if(Reflection.isVelocityServer()) {
+                eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> VelocityLoader.delayedPermissionsReload());
+                VelocityAntiTabListener.updateCommands();
+            }
             else WaterfallAntiTabListener.updateCommands();
         }
     }
@@ -91,7 +95,10 @@ public class LuckPermsAdapter {
 
         if (event.isUser() && event.getTarget() instanceof User) {
             User user = (User) event.getTarget();
-            if (Reflection.isProxyServer()) PermissionUtil.reloadPermissions(user.getUniqueId());
+            if (Reflection.isProxyServer()) {
+                if(Reflection.isVelocityServer())
+                PermissionUtil.reloadPermissions(user.getUniqueId());
+            }
             else BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
         }
     }

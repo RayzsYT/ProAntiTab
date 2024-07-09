@@ -21,6 +21,8 @@ import com.velocitypowered.api.event.*;
 import de.rayzs.pat.utils.Reflection;
 import java.util.concurrent.TimeUnit;
 import com.google.inject.Inject;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+
 import java.util.*;
 
 @Plugin(name = "ProAntiTab",
@@ -97,6 +99,11 @@ public class VelocityLoader {
             Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
         ConfigUpdater.broadcastMissingParts();
+    }
+
+    public static void delayedPermissionsReload() {
+        Logger.info("Updating permissions!");
+        server.getScheduler().buildTask(VelocityLoader.server, PermissionUtil::reloadPermissions).delay(1, TimeUnit.SECONDS).schedule();
     }
 
     public void startUpdaterTask() {
