@@ -5,6 +5,7 @@ import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.utils.configuration.Configurator;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.plugin.commands.VelocityCommand;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.api.communication.Communicator;
@@ -21,8 +22,6 @@ import com.velocitypowered.api.event.*;
 import de.rayzs.pat.utils.Reflection;
 import java.util.concurrent.TimeUnit;
 import com.google.inject.Inject;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-
 import java.util.*;
 
 @Plugin(name = "ProAntiTab",
@@ -102,8 +101,7 @@ public class VelocityLoader {
     }
 
     public static void delayedPermissionsReload() {
-        Logger.info("Updating permissions!");
-        server.getScheduler().buildTask(VelocityLoader.server, PermissionUtil::reloadPermissions).delay(1, TimeUnit.SECONDS).schedule();
+        server.getScheduler().buildTask(VelocityLoader.instance, PermissionUtil::reloadPermissions).delay(1, TimeUnit.SECONDS).schedule();
     }
 
     public void startUpdaterTask() {
