@@ -39,6 +39,7 @@ public class CommandsCache {
 
     public void handleCommands(List<String> commands, String server) {
         if(!isOutdated(commands)) return;
+        server = server.toLowerCase();
 
         filteredCommands = new LinkedList<>();
         allCommands = new ArrayList<>(commands);
@@ -65,13 +66,17 @@ public class CommandsCache {
     }
 
     public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid, String serverName) {
+        if(serverName != null) serverName = serverName.toLowerCase();
+
         List<String> playerCommands = new LinkedList<>();
+
         if(filteredCommands == null)
             return useList ? playerCommands : new LinkedList<>(unfilteredCommands);
 
         if(useList && !Storage.Blacklist.isOnIgnoredServer(serverName)) playerCommands = new LinkedList<>(filteredCommands);
 
         boolean permitted;
+
         if (!(Storage.USE_LUCKPERMS && !LuckPermsAdapter.hasAnyPermissions(uuid))) {
             for (String command : unfilteredCommands) {
                 if (playerCommands.contains(command)) continue;

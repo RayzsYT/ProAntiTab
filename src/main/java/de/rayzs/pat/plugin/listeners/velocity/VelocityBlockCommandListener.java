@@ -5,9 +5,9 @@ import com.velocitypowered.api.command.CommandSource;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.api.storage.Storage;
+import com.velocitypowered.api.event.*;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.api.event.*;
 import java.util.List;
@@ -20,7 +20,7 @@ public class VelocityBlockCommandListener {
         this.server = server;
     }
 
-    @Subscribe
+    @Subscribe (order = PostOrder.EARLY)
     public void onCommandExecute(CommandExecuteEvent event) {
         if(!event.getResult().isAllowed()) return;
         CommandSource commandSource = event.getCommandSource();

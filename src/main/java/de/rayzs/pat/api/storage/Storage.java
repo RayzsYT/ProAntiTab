@@ -353,12 +353,15 @@ public class Storage {
         }
 
         public static boolean isBlocked(String command, boolean intensive, String server, boolean focusOnBlock) {
+            server = server.toLowerCase();
+
             boolean turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
                     blocked,
                     blockedGlobal = isBlockedGloballyOnServer(BLACKLIST.isBlockedIgnorePermission(command, intensive), server, turn),
                     blockedServer = false;
 
             if(focusOnBlock && blockedGlobal) return true;
+
             for (GeneralBlacklist blacklist : getBlacklists(server)) {
                 if(!focusOnBlock) {
                     blockedServer = blacklist.isBlockedIgnorePermission(command, intensive);
@@ -378,6 +381,8 @@ public class Storage {
         }
 
         public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server, boolean focusOnBlock) {
+            if(server != null) server = server.toLowerCase();
+
             if(doesGroupBypass(targetObj, command, intensive, server))
                 return false;
 
