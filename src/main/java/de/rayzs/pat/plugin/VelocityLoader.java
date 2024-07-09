@@ -101,7 +101,10 @@ public class VelocityLoader {
     }
 
     public static void delayedPermissionsReload() {
-        server.getScheduler().buildTask(VelocityLoader.instance, PermissionUtil::reloadPermissions).delay(1, TimeUnit.SECONDS).schedule();
+        server.getScheduler().buildTask(VelocityLoader.instance, () -> {
+            PermissionUtil.reloadPermissions();
+            VelocityAntiTabListener.updateCommands();
+        }).delay(1, TimeUnit.SECONDS).schedule();
     }
 
     public void startUpdaterTask() {
