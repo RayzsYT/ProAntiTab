@@ -139,7 +139,7 @@ custom-server-brand:
 prefix: '&8[&4ProAntiTab&8]'
 no-permissions: '&cYou are not allowed to execute this command! Missing permission: &4%permission%'
 command-failed: '&cFailed to execute this command! Use "/bpat" to see all available commands.'
-update: '&aUpdated permissions!'
+update-permissions: '&aUpdated permissions!'
 
 notification:
   enabled: '&aEnabled notifications'
@@ -157,6 +157,7 @@ help:
   - '&f  reload &7to reload the plugin'
   - '&f  notify &7to get alerted'
   - '&f  info &7to get a few information'
+  - '&f  update &7to update all player permissions'
   - '&f  add/rem (command) &8<group> &7to manage the list'
   - '&f  clear &8<group> &7to clear the list'
   - '&f  creategroup (group) &7to create a group'

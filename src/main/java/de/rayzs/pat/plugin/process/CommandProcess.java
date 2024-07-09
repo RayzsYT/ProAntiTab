@@ -1,7 +1,7 @@
 package de.rayzs.pat.plugin.process;
 
-import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
+import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
@@ -172,6 +172,14 @@ public class CommandProcess {
                                     Storage.ConfigSections.Messages.GROUP.LIST_PRIORITY_GROUPS);
 
                             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.LIST_PRIORITY_MESSAGE.replace("%size%", String.valueOf(GroupManager.getGroups().size())).replace("%groups%", stringList));
+                            return;
+
+                        case "update":
+
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update")) return;
+
+                            PermissionUtil.reloadPermissions();
+                            sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATED);
                             return;
                     }
 

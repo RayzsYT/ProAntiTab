@@ -130,6 +130,7 @@ public class Storage {
             public static ReloadSection RELOAD = new ReloadSection();
             public static ServerListSection SERV_LIST = new ServerListSection();
             public static StatsSection STATS = new StatsSection();
+            public static UpdatePermissionsSection UPDATE_PERMISSIONS = new UpdatePermissionsSection();
 
             public static void initialize() {}
         }
