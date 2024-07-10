@@ -139,8 +139,10 @@ public class VelocityPacketAnalyzer {
                         if(spaces > 0) playerInput = split[0];
                     }
 
-                    if(!playerInput.equals("/"))
+                    if(!playerInput.equals("/")) {
                         cancelsBeforeHand = Storage.Blacklist.isBlocked(player, StringUtils.replaceFirst(playerInput, "/", ""), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server);
+                        if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(StringUtils.replaceFirst(playerInput, "/", ""));
+                    }
 
                     final String cursor = playerInput;
 
