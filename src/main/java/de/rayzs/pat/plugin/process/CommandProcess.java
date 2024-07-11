@@ -1,5 +1,7 @@
 package de.rayzs.pat.plugin.process;
 
+import de.rayzs.pat.plugin.BungeeLoader;
+import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
@@ -176,10 +178,10 @@ public class CommandProcess {
 
                         case "update":
 
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update_permissions")) return;
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update.permissions")) return;
 
                             PermissionUtil.reloadPermissions();
-                            sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATED);
+                            sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_ALL);
                             return;
                     }
 
@@ -322,9 +324,20 @@ public class CommandProcess {
                             }
                             sender.sendMessage((!bool ? Storage.ConfigSections.Messages.BLACKLIST.REMOVE_FAILED : Storage.ConfigSections.Messages.BLACKLIST.REMOVE_SUCCESS).replace("%command%", sub));
                             return;
+
+                        case "update":
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update.permissions")) return;
+                            uuid = !Reflection.isProxyServer() ? BukkitLoader.getUUIDByName(sub) : Reflection.isVelocityServer() ? VelocityLoader.getUUIDByName(sub) : BungeeLoader.getUUIDByName(sub);
+
+                            if(uuid != null) {
+                                PermissionUtil.reloadPermissions(uuid);
+                                sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_SPECIFIC.replace("%target%", sub));
+                            } else sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.PLAYER_NOT_ONLINE.replace("%target%", sub));
+                            return;
                     }
 
                 case 3:
+
                     if(args[0].equals("serv") || args[0].equals("server")) {
 
                         if(!Reflection.isProxyServer()) {
@@ -628,7 +641,7 @@ public class CommandProcess {
 
         switch (args.length) {
             case 1:
-                if(PermissionUtil.hasPermission(sender, "update_permissions"))
+                if(PermissionUtil.hasPermission(sender, "update.permissions"))
                     suggestions.add("update");
                 if (!backend && PermissionUtil.hasPermission(sender, "stats") && Reflection.isProxyServer())
                     suggestions.add("stats");
@@ -659,6 +672,8 @@ public class CommandProcess {
                     suggestions.addAll(GroupManager.getGroupNames());
                 if (!backend && args[0].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
                     suggestions.addAll(GroupManager.getGroupNames());
+                if (args[0].toLowerCase().contains("update") && PermissionUtil.hasPermission(sender, "update.permissions"))
+                    suggestions.addAll(!Reflection.isProxyServer() ? BukkitLoader.getPlayerNames() : Reflection.isVelocityServer() ? VelocityLoader.getPlayerNames() : BungeeLoader.getPlayerNames());
                 if (Arrays.asList("ls", "list").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "list"))
                     suggestions.addAll(GroupManager.getGroupNames());
                 if (Reflection.isProxyServer() && Arrays.asList("lg", "listgroups").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "listgroups"))
