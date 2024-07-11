@@ -5,7 +5,7 @@ import de.rayzs.pat.api.storage.storages.ConfigStorage;
 
 public class UpdatePermissionsSection extends ConfigStorage {
 
-    public String UPDATED;
+    public String UPDATE_ALL, UPDATE_SPECIFIC;
 
     public UpdatePermissionsSection() {
         super("update-permissions");
@@ -14,6 +14,7 @@ public class UpdatePermissionsSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
-        UPDATED = new ConfigSectionHelper<String>(this, null, "&aUpdated permissions!").getOrSet();
+        UPDATE_ALL = new ConfigSectionHelper<String>(this, "all-players", "&aUpdated permissions!").getOrSet();
+        UPDATE_SPECIFIC = new ConfigSectionHelper<String>(this, "specific-player", "&aUpdated %target%'s permissions!").getOrSet();
     }
 }

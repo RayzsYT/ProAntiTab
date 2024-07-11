@@ -139,7 +139,10 @@ custom-server-brand:
 prefix: '&8[&4ProAntiTab&8]'
 no-permissions: '&cYou are not allowed to execute this command! Missing permission: &4%permission%'
 command-failed: '&cFailed to execute this command! Use "/bpat" to see all available commands.'
-update-permissions: '&aUpdated permissions!'
+
+update-permissions:
+  all-players: '&aUpdated permissions!'
+  specific-player: '&aUpdated %target%''s permissions'
 
 notification:
   enabled: '&aEnabled notifications'
