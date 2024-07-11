@@ -142,7 +142,8 @@ command-failed: '&cFailed to execute this command! Use "/bpat" to see all availa
 
 update-permissions:
   all-players: '&aUpdated permissions!'
-  specific-player: '&aUpdated %target%''s permissions'
+  specific-player: '&aUpdated %target%''s permissions!'
+  player-not-online: '&c%target% is not online!'
 
 notification:
   enabled: '&aEnabled notifications'

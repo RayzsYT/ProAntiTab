@@ -162,7 +162,8 @@ command-failed: '&cFailed to execute this command! Use "/pat" to see all availab
 
 update-permissions:
   all-players: '&aUpdated permissions!'
-  specific-player: '&aUpdated %target%''s permissions'
+  specific-player: '&aUpdated %target%''s permissions!'
+  player-not-online: '&c%target% is not online!'
 
 reload:
   loading: '&eReloading all configuration files...'
