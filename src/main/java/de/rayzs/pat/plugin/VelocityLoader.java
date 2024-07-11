@@ -108,6 +108,12 @@ public class VelocityLoader {
         }).delay(1, TimeUnit.SECONDS).schedule();
     }
 
+    public static List<String> getPlayerNames() {
+        List<String> result = new LinkedList<>();
+        server.getAllPlayers().forEach(player -> result.add(player.getUsername()));
+        return result;
+    }
+
     public static UUID getUUIDByName(String playerName) {
         if (!server.getPlayer(playerName).isPresent()) return null;
         return server.getPlayer(playerName).get().getUniqueId();

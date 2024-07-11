@@ -115,6 +115,12 @@ public class BukkitLoader extends JavaPlugin {
         }
     }
 
+    public static List<String> getPlayerNames() {
+        List<String> result = new LinkedList<>();
+        Bukkit.getServer().getOnlinePlayers().forEach(player -> result.add(player.getName()));
+        return result;
+    }
+
     public static UUID getUUIDByName(String playerName) {
         Player player = Bukkit.getServer().getPlayer(playerName);
         return player != null ? player.getUniqueId() : null;

@@ -100,6 +100,12 @@ public class BungeeLoader extends Plugin {
         }
     }
 
+    public static List<String> getPlayerNames() {
+        List<String> result = new LinkedList<>();
+        ProxyServer.getInstance().getPlayers().forEach(player -> result.add(player.getName()));
+        return result;
+    }
+
     public static UUID getUUIDByName(String playerName) {
         ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(playerName);
         return proxiedPlayer != null ? proxiedPlayer.getUniqueId() : null;
