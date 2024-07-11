@@ -16,6 +16,7 @@ import de.rayzs.pat.plugin.listeners.bukkit.*;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.api.storage.Storage;
 import java.lang.reflect.Field;
@@ -112,6 +113,11 @@ public class BukkitLoader extends JavaPlugin {
             pluginCommand.setExecutor(command);
             pluginCommand.setTabCompleter(command);
         }
+    }
+
+    public static UUID getUUIDByName(String playerName) {
+        Player player = Bukkit.getServer().getPlayer(playerName);
+        return player != null ? player.getUniqueId() : null;
     }
 
     public void startUpdaterTask() {

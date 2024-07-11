@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin;
 
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import com.velocitypowered.api.scheduler.ScheduledTask;
@@ -105,6 +106,11 @@ public class VelocityLoader {
             PermissionUtil.reloadPermissions();
             VelocityAntiTabListener.updateCommands();
         }).delay(1, TimeUnit.SECONDS).schedule();
+    }
+
+    public static UUID getUUIDByName(String playerName) {
+        if (!server.getPlayer(playerName).isPresent()) return null;
+        return server.getPlayer(playerName).get().getUniqueId();
     }
 
     public void startUpdaterTask() {
