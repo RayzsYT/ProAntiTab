@@ -169,7 +169,7 @@ help:
   - '&f  setpriority (group) (priority) &7to set the priority'
   - '&f  list &8<group> &7to see all listed commands'
   - '&f  listgroups &8<server> &7List all groups'
-  - '&f  listpriorites &7to list all group priorities'
+  - '&f  listpriorities &7to list all group priorities'
   - '&7 For a specific server:'
   - '&f  serv list (server) &8<group>'
   - '&f  serv add/rem (server) (command) &8<group> '
