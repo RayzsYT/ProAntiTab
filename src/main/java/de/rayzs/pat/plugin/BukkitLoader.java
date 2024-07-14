@@ -16,9 +16,9 @@ import de.rayzs.pat.plugin.listeners.bukkit.*;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.api.storage.Storage;
+import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import de.rayzs.pat.utils.*;
 import org.bukkit.command.*;
@@ -172,8 +172,11 @@ public class BukkitLoader extends JavaPlugin {
 
             if (commandsPacket.getCommands() == null || commandsPacket.getCommands().isEmpty())
                 Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
-            else if (!Storage.Blacklist.getBlacklist().getCommands().containsAll(commandsPacket.getCommands()) || !commandsPacket.getCommands().containsAll(Storage.Blacklist.getBlacklist().getCommands()))
+
+            else if (!ArrayUtils.compareStringArrays(Storage.Blacklist.getBlacklist().getCommands(), commandsPacket.getCommands())) {
+                BukkitAntiTabListener.setChangeStatus();
                 Storage.Blacklist.getBlacklist().setList(commandsPacket.getCommands());
+            }
 
             if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != commandsPacket.turnBlacklistToWhitelistEnabled())
                 Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = commandsPacket.turnBlacklistToWhitelistEnabled();
@@ -191,10 +194,8 @@ public class BukkitLoader extends JavaPlugin {
 
         if(Reflection.getMinor() < 16) return;
 
-        if(Storage.USE_VELOCITY) {
+        if(Storage.USE_VELOCITY)
             BukkitAntiTabListener.updateCommands();
-            return;
-        }
 
         BukkitAntiTabListener.handleTabCompletion(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? Storage.Blacklist.getBlacklist().getCommands() : getNotBlockedCommands());
     }
