@@ -20,7 +20,7 @@ public class BukkitAntiTabListener implements Listener {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
 
-        if(Storage.USE_VELOCITY || !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && player.isOp()) return;
+        if(Storage.USE_VELOCITY || player.isOp()) return;
 
         if(!BukkitLoader.isLoaded()) {
             event.getCommands().clear();
@@ -50,6 +50,10 @@ public class BukkitAntiTabListener implements Listener {
 
     public static void updateCommands() {
         if(Reflection.getMinor() >= 16) Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::updateCommands);
+    }
+
+    public static void setChangeStatus() {
+        COMMANDS_CACHE.updateChangeState();
     }
 
     public static void handleTabCompletion(List<String> commands) {
