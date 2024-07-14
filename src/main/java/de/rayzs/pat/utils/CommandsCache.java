@@ -9,6 +9,7 @@ public class CommandsCache {
 
     private List<String> filteredCommands = null, allCommands = null;
     private boolean useList = true;
+    private boolean change = false;
 
     public CommandsCache reverse() {
         this.useList = !useList;
@@ -16,6 +17,7 @@ public class CommandsCache {
     }
 
     public void handleCommands(List<String> commands) {
+        if(change) return;
         if(!isOutdated(commands)) return;
 
         filteredCommands = new LinkedList<>();
@@ -35,9 +37,12 @@ public class CommandsCache {
             if (!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))
                 filteredCommands.add(command);
         }
+
+        change = true;
     }
 
     public void handleCommands(List<String> commands, String server) {
+        if(change) return;
         if(!isOutdated(commands)) return;
         server = server.toLowerCase();
 
@@ -58,6 +63,7 @@ public class CommandsCache {
             if(!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
                 filteredCommands.add(command);
 
+            change = true;
         }
     }
 
@@ -93,11 +99,16 @@ public class CommandsCache {
         return playerCommands;
     }
 
+    public void updateChangeState() {
+        change = false;
+    }
+
     public void reset() {
+        if(change) return;
         filteredCommands = null;
     }
 
     public boolean isOutdated(List<String> commands) {
-        return filteredCommands == null || allCommands == null || !Arrays.equals(commands.toArray(), allCommands.toArray());
+        return filteredCommands == null || !ArrayUtils.compareStringArrays(commands, allCommands);
     }
 }
