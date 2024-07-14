@@ -42,7 +42,6 @@ public class CommandsCache {
     }
 
     public void handleCommands(List<String> commands, String server) {
-        if(change) return;
         if(!isOutdated(commands)) return;
         server = server.toLowerCase();
 
@@ -62,8 +61,6 @@ public class CommandsCache {
 
             if(!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
                 filteredCommands.add(command);
-
-            change = true;
         }
     }
 
