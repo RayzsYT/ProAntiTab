@@ -66,7 +66,13 @@ public class CommandProcess {
                             }
 
                             int finalFound = found;
-                            Storage.ConfigSections.Messages.STATS.STATISTIC.getLines().forEach(message -> sender.sendMessage(message.replace("%groups_amount%", String.valueOf(GroupManager.getGroupNames().size())).replace("%server_count%", String.valueOf(Communicator.SERVER_DATA_SYNC_COUNT)).replace("%last_sync_time%", TimeConverter.calcAndGetTime(Communicator.LAST_DATA_UPDATE)).replace("%servers%", finalFound > 0 ? statsBuilder : Storage.ConfigSections.Messages.STATS.NO_SERVER)));
+
+                            Storage.ConfigSections.Messages.STATS.STATISTIC.getLines().forEach(message -> sender.sendMessage(message.replace("%groups_amount%", String.valueOf(GroupManager.getGroupNames().size()))
+                                    .replace("%server_count%", String.valueOf(Communicator.SERVER_DATA_SYNC_COUNT))
+                                    .replace("%last_sync_time%", TimeConverter.calcAndGetTime(Communicator.LAST_DATA_UPDATE))
+                                    .replace("%servers%", finalFound > 0 ? statsBuilder : Storage.ConfigSections.Messages.STATS.NO_SERVER))
+                            );
+
                             return;
 
                         case "reload":
@@ -89,7 +95,7 @@ public class CommandProcess {
 
                             sender.sendMessage(
                                     StringUtils.buildStringList(Storage.ConfigSections.Messages.INFO.MESSAGE.getLines())
-                                            .replace("%sync_time%", Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || Reflection.isProxyServer() ? Storage.ConfigSections.Messages.INFO.SYNC_TIME.replace("%time%", TimeConverter.calcAndGetTime(Reflection.isProxyServer() ? Communicator.LAST_DATA_UPDATE : Storage.LAST_SYNC)) : Storage.ConfigSections.Messages.INFO.SYNC_DISABLED)
+                                            .replace("%sync_time%", Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || Reflection.isProxyServer() ? Storage.ConfigSections.Messages.INFO.SYNC_TIME.replace("%time%", TimeConverter.calcAndGetTime(Reflection.isProxyServer() ? Communicator.LAST_DATA_UPDATE : Communicator.LAST_BUKKIT_SYNC)) : Storage.ConfigSections.Messages.INFO.SYNC_DISABLED)
                                             .replace("%version_status%", Storage.OUTDATED ? Storage.ConfigSections.Messages.INFO.VERSION_OUTDATED : Storage.ConfigSections.Messages.INFO.VERSION_UPDATED)
                             );
 
