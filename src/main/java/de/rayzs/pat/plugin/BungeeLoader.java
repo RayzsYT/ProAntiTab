@@ -65,10 +65,7 @@ public class BungeeLoader extends Plugin {
             manager.registerListener(this, new WaterfallAntiTabListener());
 
         startUpdaterTask();
-        ProxyServer.getInstance().getScheduler().schedule(this, () -> {
-            Communicator.syncData();
-            Communicator.syncData();
-        }, 5, TimeUnit.SECONDS);
+        ProxyServer.getInstance().getScheduler().schedule(this, Communicator::syncData, 5, TimeUnit.SECONDS);
 
         Storage.PLUGIN_OBJECT = this;
 
