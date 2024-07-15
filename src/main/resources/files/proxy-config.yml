@@ -72,6 +72,11 @@ cancel-blocked-commands:
 # Here you can customize your own fake '/plugins' command.
 custom-plugins:
   enabled: true
+  commands:
+    - pl
+    - plugins
+    - bukkit:pl
+    - bukkit:plugins
   message:
     - '&fPlugins (0):'
 
@@ -79,6 +84,12 @@ custom-plugins:
 # Here you can customize your own fake '/version' command.
 custom-version:
   enabled: true
+  commands:
+    - version
+    - ver
+    - icanhasbukkit
+    - bukkit:ver
+    - bukkit:version
   message:
     - '&fThis server is running CraftBukkit version git-NasaSpigot-294 (MC: X)'
 
