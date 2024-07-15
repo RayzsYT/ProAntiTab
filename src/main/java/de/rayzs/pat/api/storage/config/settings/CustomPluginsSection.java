@@ -2,13 +2,12 @@ package de.rayzs.pat.api.storage.config.settings;
 
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.configuration.helper.*;
-import java.util.Collections;
+import java.util.*;
 
 public class CustomPluginsSection extends ConfigStorage {
 
     public boolean ENABLED;
-    public MultipleMessagesHelper MESSAGE;
-    private final String[] PLUGIN_COMMANDS = new String[] { "pl", "plugins", "bukkit:pl", "bukkit:plugins" };
+    public MultipleMessagesHelper MESSAGE, COMMANDS;
 
     public CustomPluginsSection() {
         super("custom-plugins");
@@ -18,6 +17,7 @@ public class CustomPluginsSection extends ConfigStorage {
     public void load() {
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
+        COMMANDS = new MultipleMessagesHelper(this, "commands", Arrays.asList("pl", "plugins", "bukkit:pl", "bukkit:plugins"));
         MESSAGE = new MultipleMessagesHelper(this, "message", Collections.singletonList("&fPlugins (0):"));
     }
 
@@ -30,7 +30,7 @@ public class CustomPluginsSection extends ConfigStorage {
                 command = split[0];
             command = command.split(" ")[0];
         }
-        for (String currentCommand : PLUGIN_COMMANDS) {
+        for (String currentCommand : COMMANDS.getLines()) {
             if (currentCommand.equals(command.toLowerCase()))
                 return true;
         }
