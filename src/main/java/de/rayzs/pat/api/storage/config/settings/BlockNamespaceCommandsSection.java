@@ -4,11 +4,11 @@ import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.StringUtils;
 
-public class NamespaceSection extends ConfigStorage {
+public class BlockNamespaceCommandsSection extends ConfigStorage {
 
     public boolean ENABLED;
 
-    public NamespaceSection() {
+    public BlockNamespaceCommandsSection() {
         super("block-namespace-commands");
     }
 
