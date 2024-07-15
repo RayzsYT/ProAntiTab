@@ -2,6 +2,7 @@ package de.rayzs.pat.utils;
 
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import java.util.*;
 
@@ -92,6 +93,9 @@ public class CommandsCache {
                 playerCommands.add(command);
             }
         }
+
+        if(playerCommands.isEmpty() && filteredCommands.size() >= 1)
+            Logger.warning("Failed to create commands list for player with uuid " + uuid + "! (" + unfilteredCommands.size() + ", " + filteredCommands.size() + ")");
 
         return playerCommands;
     }
