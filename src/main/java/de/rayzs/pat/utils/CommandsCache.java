@@ -79,11 +79,16 @@ public class CommandsCache {
 
         if(useList && !Storage.Blacklist.isOnIgnoredServer(serverName)) playerCommands = new LinkedList<>(filteredCommands);
 
-        boolean permitted;
+        boolean permitted, bypassNamespace = true;
+
+        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED)
+            bypassNamespace = PermissionUtil.hasPermission(targetObj, "namespace");
 
         if (!(Storage.USE_LUCKPERMS && !LuckPermsAdapter.hasAnyPermissions(uuid))) {
             for (String command : unfilteredCommands) {
                 if (playerCommands.contains(command)) continue;
+                if(!bypassNamespace && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command))
+                    continue;
 
                 permitted = Reflection.isProxyServer() && serverName != null
                         ? !Storage.Blacklist.isBlocked(targetObj, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, serverName)
