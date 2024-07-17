@@ -421,7 +421,15 @@ public class Storage {
             return BLACKLIST.isBlocked(targetObj, command, intensive);
         }
 
+        public static boolean isBlocked(Object targetObj, String command, boolean intensive, boolean convert, boolean slash) {
+            return BLACKLIST.isBlocked(targetObj, command, intensive, convert, slash);
+        }
+
         public static boolean isBlocked(String command, boolean intensive, boolean convert) {
+            return BLACKLIST.isBlocked(command, intensive, convert);
+        }
+
+        public static boolean isBlocked(String command, boolean intensive, boolean convert, boolean slash) {
             return BLACKLIST.isBlocked(command, intensive, convert);
         }
 
