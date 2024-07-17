@@ -164,7 +164,7 @@ update-permissions:
   player-not-online: '&c%target% is not online!'
 
 post-debug:
-  success: '&aSuccessfully uploaded debug logs: &e%link%'
+  success: '&aSuccessfully uploaded debug logs: &e%link% &8(<click:open_url:%link%><gray>CLICK</click>&8)'
   failed: '&cFailed to upload debug logs!'
 
 notification:
