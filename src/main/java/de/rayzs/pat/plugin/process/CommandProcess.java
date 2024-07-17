@@ -24,7 +24,7 @@ public class CommandProcess {
     private static final ExpireCache<UUID, String> CONFIRMATION = new ExpireCache<>(4, TimeUnit.SECONDS);
 
     public static void handleCommand(Object senderObj, String[] args, String label) {
-        Logger.debug("Execute PAT command: " + Arrays.toString(args));
+        Logger.debug("Execute PAT command: " + label + " " + StringUtils.buildStringListWithoutColors(Arrays.asList(args), " "));
 
         CommandSender sender = new CommandSender(senderObj);
 
