@@ -82,7 +82,7 @@ public class CommandsCache {
         boolean permitted, bypassNamespace = true, turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
 
         if(!turn && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED)
-            bypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(uuid);
+            bypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(targetObj);
 
         if (!(Storage.USE_LUCKPERMS && !LuckPermsAdapter.hasAnyPermissions(uuid))) {
             for (String command : unfilteredCommands) {
