@@ -95,8 +95,8 @@ custom-version:
 
 #>> HTP (Overwritten)
 # Here you can disable all namespace commands.
-# Namespace commands are commands like plugin:essentials (e.g: essentials:warp)
-# You can bypass that restriction with the proantitab.namespace permission.
+# Namespace commands are commands like plugin:command (e.g: essentials:warp)
+# You can bypass this restriction with the proantitab.namespace permission.
 block-namespace-commands:
   enabled: false
 
