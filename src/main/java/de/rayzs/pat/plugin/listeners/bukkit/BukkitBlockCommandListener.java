@@ -86,6 +86,7 @@ public class BukkitBlockCommandListener implements Listener {
 
         if (!Storage.Blacklist.isListed(command, false)) return;
         if (PermissionUtil.hasBypassPermission(player, command, false)) return;
+        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) return;
         if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
 
         event.setCancelled(true);
