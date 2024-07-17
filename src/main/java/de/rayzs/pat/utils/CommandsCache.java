@@ -105,8 +105,8 @@ public class CommandsCache {
             }
         }
 
-        if(playerCommands.isEmpty() && filteredCommands.size() >= 1)
-            Logger.warning("Failed to create commands list for player with uuid " + uuid + "! (" + unfilteredCommands.size() + ", " + filteredCommands.size() + ")");
+        if(playerCommands.isEmpty())
+            Logger.debug("Commands list for player with uuid " + uuid + " is empty! (" + (filteredCommands != null ? filteredCommands.size() : "null") + " | " + (unfilteredCommands != null ?  unfilteredCommands.size() : "null") + ")");
 
         return playerCommands;
     }
