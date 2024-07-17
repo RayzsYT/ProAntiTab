@@ -52,6 +52,7 @@ public class CommandProcess {
                                 sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.SUCCESS.replace("%link%", Objects.requireNonNull(Logger.post())));
                             } catch (Exception exception) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.FAILED);
+                                exception.printStackTrace();
                             }
 
                             return;

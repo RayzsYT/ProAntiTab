@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -19,20 +20,31 @@ public class BukkitAntiTabListener implements Listener {
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
+        String uuidSubstring = uuid.toString().substring(uuid.toString().length() - 5);
 
-        if(Storage.USE_VELOCITY || player.isOp()) return;
-
-        if(!BukkitLoader.isLoaded()) {
-            event.getCommands().clear();
+        if(Storage.USE_VELOCITY || player.isOp()) {
+            Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (Veloctiy? " + Storage.USE_VELOCITY + ". OP? " + player.isOp() + ")");
             return;
         }
 
-        if(event.getCommands().size() == 0) return;
+        if(!BukkitLoader.isLoaded()) {
+            event.getCommands().clear();
+            Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (not loaded)");
+            return;
+        }
+
+        if(event.getCommands().size() == 0) {
+            Logger.debug("No available commands to filter! Ignoring rest of the code until at least one command is listed in there.");
+            return;
+        }
         List<String> allCommands = getCommands();
 
         COMMANDS_CACHE.handleCommands(allCommands);
 
-        if (PermissionUtil.hasBypassPermission(player)) return;
+        if (PermissionUtil.hasBypassPermission(player)) {
+            Logger.debug("Player with uuid " + uuidSubstring + " skipped the commands-list creation due to its permissions.");
+            return;
+        }
 
         if(Storage.USE_VIAVERSION)
             if(Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754)
@@ -41,6 +53,8 @@ public class BukkitAntiTabListener implements Listener {
         final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(event.getCommands(), player, player.getUniqueId());
         event.getCommands().clear();
         event.getCommands().addAll(playerCommands);
+
+        Logger.debug("Player with uuid " + uuidSubstring + " has a total of " + playerCommands.size() + " commands.");
     }
 
     public static void updateCommands(Player player) {
