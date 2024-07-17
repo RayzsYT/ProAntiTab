@@ -124,6 +124,7 @@ public class CommunicationPackets {
         private final CommandsPacket commandsPacket;
         private final GroupsPacket groupsPacket;
         private final UnknownCommandPacket unknownCommandPacket;
+        private final NamespaceCommandsPacket namespaceCommandsPacket;
         private final String proxyToken, serverId;
         private final boolean velocity;
 
@@ -133,6 +134,7 @@ public class CommunicationPackets {
             this.commandsPacket = commandsPacket;
             this.groupsPacket = groupsPacket;
             this.unknownCommandPacket = new UnknownCommandPacket();
+            this.namespaceCommandsPacket = new NamespaceCommandsPacket();
             this.velocity = Reflection.isVelocityServer();
         }
 
@@ -161,6 +163,23 @@ public class CommunicationPackets {
         }
 
         public UnknownCommandPacket getUnknownCommandPacket() { return unknownCommandPacket; }
+
+        public NamespaceCommandsPacket getNamespaceCommandsPacket() {
+            return namespaceCommandsPacket;
+        }
+    }
+
+    public static class NamespaceCommandsPacket implements Serializable {
+
+        private final boolean enabled;
+
+        public NamespaceCommandsPacket() {
+            enabled = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
     }
 
     public static class UnknownCommandPacket implements Serializable {
