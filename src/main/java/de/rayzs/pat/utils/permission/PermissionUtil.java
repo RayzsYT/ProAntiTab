@@ -25,6 +25,12 @@ public class PermissionUtil {
         setPlayerPermissions(uuid);
     }
 
+    public static String getPermissions(UUID uuid) {
+        PermissionMap permissionMap = MAP.get(uuid);
+        if(permissionMap == null) return "";
+        return Arrays.toString(permissionMap.getHashedPermissions().toArray());
+    }
+
     public static void setPlayerPermissions(UUID uuid) {
         if(Storage.USE_LUCKPERMS) LuckPermsAdapter.setPermissions(uuid);
     }
