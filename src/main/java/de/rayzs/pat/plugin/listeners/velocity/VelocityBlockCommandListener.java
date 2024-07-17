@@ -90,6 +90,7 @@ public class VelocityBlockCommandListener {
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
         if(!listed && !serverListed || listed && serverListed && ignored) return;
+        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) return;
         if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
 
         event.setResult(CommandExecuteEvent.CommandResult.denied());
