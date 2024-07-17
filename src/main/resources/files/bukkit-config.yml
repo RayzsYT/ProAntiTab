@@ -197,6 +197,7 @@ help:
   - '&f  reload &7to reload the plugin'
   - '&f  notify &7to get alerted'
   - '&f  info &7to get a few information'
+  - '&f  postdebug &7to post the PAT logs'
   - '&f  update <player> &7to update player(s) permissions'
   - '&f  add/rem (command) &8<group> &7to manage the list'
   - '&f  clear &8<group> &7to clear the list'
