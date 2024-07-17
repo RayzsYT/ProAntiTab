@@ -79,22 +79,28 @@ public class CommandsCache {
 
         if(useList && !Storage.Blacklist.isOnIgnoredServer(serverName)) playerCommands = new LinkedList<>(filteredCommands);
 
-        boolean permitted, bypassNamespace = true;
+        boolean permitted, bypassNamespace = true, turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
 
-        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED)
-            bypassNamespace = PermissionUtil.hasPermission(targetObj, "namespace");
+        if(!turn && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED)
+            bypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(uuid);
 
         if (!(Storage.USE_LUCKPERMS && !LuckPermsAdapter.hasAnyPermissions(uuid))) {
             for (String command : unfilteredCommands) {
-                if (playerCommands.contains(command)) continue;
-                if(!bypassNamespace && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command))
+
+                if(useList && !turn && !bypassNamespace && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)) {
+                    playerCommands.remove(command);
                     continue;
+                }
+
+                if (playerCommands.contains(command)) continue;
 
                 permitted = Reflection.isProxyServer() && serverName != null
-                        ? !Storage.Blacklist.isBlocked(targetObj, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, serverName)
-                        : PermissionUtil.hasBypassPermission(targetObj, command, false);
+                        ? !Storage.Blacklist.isBlocked(targetObj, command, !turn, serverName)
+                        : !Storage.Blacklist.isBlocked(targetObj, command, !turn, false, false);
 
-                if(useList && !permitted || !useList && permitted) continue;
+                    if (useList && !permitted || !useList && permitted)
+                        continue;
+
                 playerCommands.add(command);
             }
         }
