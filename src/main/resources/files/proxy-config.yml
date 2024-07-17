@@ -80,7 +80,6 @@ custom-plugins:
   message:
     - '&fPlugins (0):'
 
-#>> HTP (Overwritten)
 # Here you can customize your own fake '/version' command.
 custom-version:
   enabled: true
@@ -93,7 +92,6 @@ custom-version:
   message:
     - '&fThis server is running CraftBukkit version git-NasaSpigot-294 (MC: X)'
 
-#>> HTP (Overwritten)
 # Here you can disable all namespace commands.
 # Namespace commands are commands like plugin:command (e.g: essentials:warp)
 # You can bypass this restriction with the proantitab.namespace permission.
