@@ -15,6 +15,14 @@ public class PermissionMap {
         permissionMap.remove(permission);
     }
 
+    public Map<String, Boolean> getPermissionMap() {
+        return permissionMap;
+    }
+
+    public Set<String> getHashedPermissions() {
+        return permissionMap.keySet();
+    }
+
     public void clear() {
         permissionMap.clear();
     }
