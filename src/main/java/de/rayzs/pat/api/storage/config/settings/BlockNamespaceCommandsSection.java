@@ -2,7 +2,11 @@ package de.rayzs.pat.api.storage.config.settings;
 
 import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+
+import java.util.UUID;
 
 public class BlockNamespaceCommandsSection extends ConfigStorage {
 
@@ -19,7 +23,11 @@ public class BlockNamespaceCommandsSection extends ConfigStorage {
     }
 
     public boolean isCommand(String command) {
-        if(!ENABLED) return false;
+        if(!ENABLED || Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) return false;
         return StringUtils.getFirstArg(command).contains(":");
+    }
+
+    public boolean doesBypass(UUID uuid) {
+        return !ENABLED || PermissionUtil.hasPermission(uuid, "namespace");
     }
 }
