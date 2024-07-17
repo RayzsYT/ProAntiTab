@@ -17,7 +17,7 @@ import java.io.*;
 public class Logger {
 
     private static final ArrayList<String> LOGS = new ArrayList<>();
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss:SS"), DATE_FORMAT = new SimpleDateFormat("yy:MM:dd");
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss:SS");
 
     private final static java.util.logging.Logger LOGGER =
             Reflection.isVelocityServer() ? null
@@ -29,6 +29,7 @@ public class Logger {
     public static void warning(List<String> texts) { texts.forEach(text -> send(Priority.WARNING, text)); }
     public static void info(String text) { send(Priority.INFO, text); }
     public static void warning(String text) { send(Priority.WARNING, text); }
+    public static void debug(String text) { send(Priority.DEBUG, text); }
 
     protected static void send(Priority priority, String text) {
         text = MessageTranslator.replaceMessage(text);
@@ -36,6 +37,8 @@ public class Logger {
         String time = TIME_FORMAT.format(new Date(System.currentTimeMillis()));
         if(time.length() != 12) time = time.substring(0, 9) + 0 + time.split(":")[3];
         LOGS.add("[" + priority.name() + " |" + time + "] " + MessageTranslator.colorless(text));
+
+        if(priority == Priority.DEBUG) return;
 
         if(LOGGER == null) {
             System.out.println(text);
@@ -89,5 +92,5 @@ public class Logger {
         return "https://haste.rayzs.de/" + response + ".txt";
     }
 
-    protected enum Priority { INFO, WARNING }
+    protected enum Priority { INFO, WARNING, DEBUG }
 }
