@@ -165,6 +165,7 @@ public class BukkitLoader extends JavaPlugin {
         Storage.LAST_SYNC = System.currentTimeMillis();
         Communicator.sendFeedback();
         CommunicationPackets.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
+        CommunicationPackets.NamespaceCommandsPacket namespaceCommandsPacket = packetBundle.getNamespaceCommandsPacket();
 
         if(!Storage.USE_VELOCITY) {
             CommunicationPackets.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
@@ -186,9 +187,11 @@ public class BukkitLoader extends JavaPlugin {
         }
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
-        if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled()) {
+        if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
             Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = unknownCommandPacket.isEnabled();
-        }
+
+        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED != namespaceCommandsPacket.isEnabled())
+            Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED = namespaceCommandsPacket.isEnabled();
 
         if(!loaded) loaded = true;
 
