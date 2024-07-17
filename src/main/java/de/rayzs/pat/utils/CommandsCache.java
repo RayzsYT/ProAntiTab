@@ -105,10 +105,12 @@ public class CommandsCache {
             }
         }
 
-        if(playerCommands.isEmpty())
-            Logger.debug("Commands list for player with uuid " + uuid.toString().substring(uuid.toString().length() - 5) + " is empty! (" + (filteredCommands != null ? filteredCommands.size() : "null") + " | " + (unfilteredCommands != null ?  unfilteredCommands.size() : "null") + ")");
-        else
-            Logger.debug("Created list of commands for player with uuid " + uuid.toString().substring(uuid.toString().length()) + " with a total of " + playerCommands.size() + " commands!");
+        String uuidSubstring = uuid.toString().substring(uuid.toString().length() - 5);
+        if(playerCommands.isEmpty()) {
+            Logger.debug("Commands list for player with uuid " + uuidSubstring + " is empty! (" + (filteredCommands != null ? filteredCommands.size() : "null") + " | " + (unfilteredCommands != null ?  unfilteredCommands.size() : "null") + ")");
+        }
+        else Logger.debug("Created list of commands for player with uuid " + uuidSubstring + " with a total of " + playerCommands.size() + " commands!");
+        uuidSubstring = null;
 
         return playerCommands;
     }
