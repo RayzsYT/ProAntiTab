@@ -27,7 +27,8 @@ public class BlockNamespaceCommandsSection extends ConfigStorage {
         return StringUtils.getFirstArg(command).contains(":");
     }
 
-    public boolean doesBypass(UUID uuid) {
-        return !ENABLED || PermissionUtil.hasPermission(uuid, "namespace");
+    public boolean doesBypass(Object targetObj) {
+
+        return !ENABLED || PermissionUtil.hasPermission(targetObj, "namespace");
     }
 }
