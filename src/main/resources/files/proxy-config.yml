@@ -163,6 +163,10 @@ update-permissions:
   specific-player: '&aUpdated %target%''s permissions!'
   player-not-online: '&c%target% is not online!'
 
+post-debug:
+  success: '&aSuccessfully uploaded debug logs: &e%link%'
+  failed: '&cFailed to upload debug logs!'
+
 notification:
   enabled: '&aEnabled notifications'
   disabled: '&cDisabled notifications'

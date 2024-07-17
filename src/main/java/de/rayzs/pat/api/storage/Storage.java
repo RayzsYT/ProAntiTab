@@ -127,6 +127,7 @@ public class Storage {
             public static InfoSection INFO = new InfoSection();
             public static NoPermissionSection NO_PERMISSION = new NoPermissionSection();
             public static NotificationSection NOTIFICATION = new NotificationSection();
+            public static PostDebugSection POST_DEBUG = new PostDebugSection();
             public static OnlyForProxySection NO_PROXY = new OnlyForProxySection();
             public static ReloadSection RELOAD = new ReloadSection();
             public static ServerListSection SERV_LIST = new ServerListSection();

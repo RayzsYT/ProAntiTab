@@ -183,6 +183,10 @@ update-permissions:
   specific-player: '&aUpdated %target%''s permissions!'
   player-not-online: '&c%target% is not online!'
 
+post-debug:
+  success: '&aSuccessfully uploaded debug logs: &e%link%'
+  failed: '&cFailed to upload debug logs!'
+
 reload:
   loading: '&eReloading all configuration files...'
   done: '&aSuccessfully reloaded all configuration files!'

@@ -5,6 +5,7 @@ import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.communication.client.ClientInfo;
@@ -43,6 +44,17 @@ public class CommandProcess {
                     task = args[0].toLowerCase();
 
                     switch (task) {
+
+                        case "postdebug":
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "postdebug")) return;
+
+                            try {
+                                sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.SUCCESS.replace("%link%", Objects.requireNonNull(Logger.post())));
+                            } catch (Exception exception) {
+                                sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.FAILED);
+                            }
+
+                            return;
 
                         case "stats":
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "stats")) return;
@@ -647,6 +659,8 @@ public class CommandProcess {
 
         switch (args.length) {
             case 1:
+                if(PermissionUtil.hasPermission(senderObj, "postdebug"))
+                    suggestions.add("postdebug");
                 if(PermissionUtil.hasPermission(sender, "update_permissions"))
                     suggestions.add("update");
                 if (!backend && PermissionUtil.hasPermission(sender, "stats") && Reflection.isProxyServer())
