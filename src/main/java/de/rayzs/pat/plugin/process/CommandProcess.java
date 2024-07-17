@@ -1,11 +1,8 @@
 package de.rayzs.pat.plugin.process;
 
-import de.rayzs.pat.plugin.BungeeLoader;
-import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.communication.client.ClientInfo;
@@ -13,10 +10,12 @@ import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import java.util.concurrent.TimeUnit;
 import de.rayzs.pat.utils.group.*;
+import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 
@@ -25,6 +24,7 @@ public class CommandProcess {
     private static final ExpireCache<UUID, String> CONFIRMATION = new ExpireCache<>(4, TimeUnit.SECONDS);
 
     public static void handleCommand(Object senderObj, String[] args, String label) {
+        Logger.debug("Execute PAT command: " + StringUtils.buildStringList(Arrays.asList(args)));
 
         CommandSender sender = new CommandSender(senderObj);
 
