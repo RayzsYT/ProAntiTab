@@ -38,7 +38,6 @@ public class BungeeBlockCommandListener implements Listener {
         String serverName = serverInfo != null ? serverInfo.getName() : "unknown";
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%server%", serverName);
 
-
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
             if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_PLUGINS_COMMAND)) return;
 
@@ -81,12 +80,25 @@ public class BungeeBlockCommandListener implements Listener {
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
             if(ignored ? !listed && serverListed : serverListed) return;
-            if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) return;
-
             if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
 
             event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);
+            return;
+        }
+
+        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+
+            event.setCancelled(true);
+            MessageTranslator.send(player, cancelCommandMessage);
+
+            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+                ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
+                if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
+            });
+
             return;
         }
 
@@ -97,6 +109,8 @@ public class BungeeBlockCommandListener implements Listener {
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
         if(!listed && !serverListed || listed && serverListed && ignored) return;
+        if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+
         event.setCancelled(true);
         MessageTranslator.send(player, cancelCommandMessage);
 

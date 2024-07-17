@@ -84,9 +84,23 @@ public class BukkitBlockCommandListener implements Listener {
             return;
         }
 
+        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
+            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+
+            event.setCancelled(true);
+            MessageTranslator.send(player, cancelCommandMessage);
+
+            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
+                Player target = Bukkit.getServer().getPlayer(uuid);
+                MessageTranslator.send(target, notificationMessage);
+            });
+
+            return;
+        }
+
         if (!Storage.Blacklist.isListed(command, false)) return;
         if (PermissionUtil.hasBypassPermission(player, command, false)) return;
-        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) return;
         if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
 
         event.setCancelled(true);
