@@ -200,6 +200,7 @@ public class BukkitLoader extends JavaPlugin {
         if(Storage.USE_VELOCITY)
             BukkitAntiTabListener.updateCommands();
 
+        Logger.debug("Force server to load all players tab-completion due to received sync!");
         BukkitAntiTabListener.handleTabCompletion(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? Storage.Blacklist.getBlacklist().getCommands() : getNotBlockedCommands());
     }
 
