@@ -59,7 +59,7 @@ public class Logger {
     public static String post() throws IOException {
         ArrayList<String> clonedLogs = (ArrayList<String>) LOGS.clone();
         int startIndex = clonedLogs.size() > 980 ? clonedLogs.size() - 980 : 0;
-        StringBuilder textBuilder = new StringBuilder("[ProAntiTab " + Storage.CURRENT_VERSION + " | " + (Reflection.isProxyServer() ? Reflection.isVelocityServer() ? "Velocity" : "Proxy" : Reflection.isPaper() ? "Paper" : "Bukkit") + "] Server version: " + Reflection.getVersionName() + " " + Reflection.getRawVersionName().replace("_", ".") + "\n" + (startIndex != 0 ? "... another part is split!\n\n" : ""));
+        StringBuilder textBuilder = new StringBuilder("[ProAntiTab " + Storage.CURRENT_VERSION + " | " + (Reflection.isProxyServer() ? Reflection.isVelocityServer() ? "Velocity" : "Proxy" : Reflection.isPaper() ? "Paper" : "Bukkit") + "] Server version: " + Reflection.getVersionName() + (Reflection.getRawVersionName() != null ? " " + Reflection.getRawVersionName().replace("_", ".") : "") + "\n" + (startIndex != 0 ? "... another part is split!\n\n" : ""));
 
         for(int i = startIndex; i < clonedLogs.size(); i++) {
             if (clonedLogs.get(i) == null) continue;
