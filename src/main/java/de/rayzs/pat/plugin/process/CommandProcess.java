@@ -436,7 +436,7 @@ public class CommandProcess {
                         }
 
                         if(group == null) {
-                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", extra));
+                            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", sub));
                             return;
                         }
                         sub = group.getGroupName();
