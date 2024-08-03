@@ -50,6 +50,9 @@ public class CommandsCache {
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
+            if(filteredCommands == null)
+                filteredCommands = new LinkedList<>();
+
             if (filteredCommands.contains(command)) continue;
 
             if (useList) {
