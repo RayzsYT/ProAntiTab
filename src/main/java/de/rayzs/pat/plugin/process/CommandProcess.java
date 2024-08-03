@@ -439,6 +439,7 @@ public class CommandProcess {
                             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", sub));
                             return;
                         }
+
                         sub = group.getGroupName();
 
                         try {
