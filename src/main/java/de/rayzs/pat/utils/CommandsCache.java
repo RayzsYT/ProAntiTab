@@ -25,7 +25,11 @@ public class CommandsCache {
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
-            if (filteredCommands.contains(command)) continue;
+            if(filteredCommands == null) {
+                Logger.debug("FilterList didn't exist during built! Created new List instead.");
+                filteredCommands = new LinkedList<>();
+
+            } else if (filteredCommands.contains(command)) continue;
 
             if (useList) {
                 if (Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))
@@ -50,10 +54,11 @@ public class CommandsCache {
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
-            if(filteredCommands == null)
+            if(filteredCommands == null) {
+                Logger.debug("FilterList didn't exist during built! Created new List instead. (server: " + server + ")");
                 filteredCommands = new LinkedList<>();
 
-            if (filteredCommands.contains(command)) continue;
+            } else if (filteredCommands.contains(command)) continue;
 
             if (useList) {
                if(Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
