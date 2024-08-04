@@ -26,8 +26,8 @@ public class CommandsCache {
 
         for (String command : allCommands) {
             if(filteredCommands == null) {
-                Logger.debug("FilterList didn't exist during built! Created new List instead.");
-                filteredCommands = new LinkedList<>();
+                Logger.debug("FilterList didn't exist during built!");
+                return;
 
             } else if (filteredCommands.contains(command)) continue;
 
@@ -55,8 +55,8 @@ public class CommandsCache {
 
         for (String command : allCommands) {
             if(filteredCommands == null) {
-                Logger.debug("FilterList didn't exist during built! Created new List instead. (server: " + server + ")");
-                filteredCommands = new LinkedList<>();
+                Logger.debug("FilterList didn't exist during built! (server: " + server + ")");
+                return;
 
             } else if (filteredCommands.contains(command)) continue;
 
