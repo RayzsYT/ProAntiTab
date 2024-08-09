@@ -110,10 +110,12 @@ public class VelocityPacketAnalyzer {
 
             if(packet instanceof TabCompleteRequestPacket) {
                 TabCompleteRequestPacket request = (TabCompleteRequestPacket) msg;
-                insertPlayerInput(player, request.getCommand());
-            }
-
-            super.channelRead(ctx, msg);
+                if(request.getCommand() != null) {
+                    System.out.println("> " + request.getCommand());
+                    insertPlayerInput(player, request.getCommand());
+                    super.channelRead(ctx, msg);
+                }
+            } else super.channelRead(ctx, msg);
         }
 
         @Override
@@ -144,9 +146,9 @@ public class VelocityPacketAnalyzer {
                         if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(StringUtils.replaceFirst(playerInput, "/", ""));
                     }
 
-                    final String cursor = playerInput;
+                    //final String cursor = playerInput;
 
-                    if(cursor.startsWith("/")) {
+                    //if(cursor.startsWith("/")) {
                         if (spaces == 0) {
                             response.getOffers().removeIf(offer -> {
                                 String command = offer.getText();
@@ -157,7 +159,7 @@ public class VelocityPacketAnalyzer {
                         } else {
                             if (cancelsBeforeHand) return;
                         }
-                    }
+                    //}
                 }
 
             } else if(packet instanceof AvailableCommandsPacket) {
