@@ -127,6 +127,8 @@ public class VelocityPacketAnalyzer {
             MinecraftPacket packet = (MinecraftPacket) msg;
 
             if(packet instanceof TabCompleteResponsePacket) {
+                if(player.getProtocolVersion().getProtocol() >= 754) return;
+
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
 
@@ -145,9 +147,9 @@ public class VelocityPacketAnalyzer {
                         if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(StringUtils.replaceFirst(playerInput, "/", ""));
                     }
 
-                    //final String cursor = playerInput;
+                    final String cursor = playerInput;
 
-                    //if(cursor.startsWith("/")) {
+                    if(cursor.startsWith("/")) {
                         if (spaces == 0) {
                             response.getOffers().removeIf(offer -> {
                                 String command = offer.getText();
@@ -158,7 +160,7 @@ public class VelocityPacketAnalyzer {
                         } else {
                             if (cancelsBeforeHand) return;
                         }
-                    //}
+                    }
                 }
 
             } else if(packet instanceof AvailableCommandsPacket) {
