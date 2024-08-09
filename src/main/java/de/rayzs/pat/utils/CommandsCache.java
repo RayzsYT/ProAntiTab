@@ -1,6 +1,5 @@
 package de.rayzs.pat.utils;
 
-import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
@@ -25,22 +24,18 @@ public class CommandsCache {
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
-            if(filteredCommands == null) {
-                Logger.debug("FilterList didn't exist during built!");
-                return;
-
-            } else if (filteredCommands.contains(command)) continue;
+            if (isFilterListAvailable() && filteredCommands.contains(command)) continue;
 
             if (useList) {
                 if (Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))
                     continue;
 
-                filteredCommands.add(command);
+                if(isFilterListAvailable()) filteredCommands.add(command);
                 continue;
             }
 
             if (!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))
-                filteredCommands.add(command);
+                if(isFilterListAvailable()) filteredCommands.add(command);
         }
 
         change = true;
@@ -54,22 +49,18 @@ public class CommandsCache {
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
-            if(filteredCommands == null) {
-                Logger.debug("FilterList didn't exist during built! (server: " + server + ")");
-                return;
-
-            } else if (filteredCommands.contains(command)) continue;
+            if (isFilterListAvailable(server) && filteredCommands.contains(command)) continue;
 
             if (useList) {
                if(Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
                     continue;
 
-                filteredCommands.add(command);
+                if(isFilterListAvailable(server)) filteredCommands.add(command);
                 continue;
             }
 
             if(!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
-                filteredCommands.add(command);
+                if(isFilterListAvailable(server)) filteredCommands.add(command);
         }
     }
 
@@ -120,6 +111,16 @@ public class CommandsCache {
             Logger.debug("Created list of commands for player with uuid " + uuidSubstring + " with a total of " + playerCommands.size() + " commands!");
 
         return playerCommands;
+    }
+
+    public boolean isFilterListAvailable() {
+        return isFilterListAvailable(null);
+    }
+
+    public boolean isFilterListAvailable(String server) {
+        boolean available = this.filteredCommands != null;
+        if(!available) Logger.debug("FilterList didn't exist during built!" + (server != null ? "(server: " + server + ")" : ""));
+        return available;
     }
 
     public void updateChangeState() {
