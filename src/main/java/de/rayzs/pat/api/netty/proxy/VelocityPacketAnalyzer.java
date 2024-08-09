@@ -111,7 +111,6 @@ public class VelocityPacketAnalyzer {
             if(packet instanceof TabCompleteRequestPacket) {
                 TabCompleteRequestPacket request = (TabCompleteRequestPacket) msg;
                 if(request.getCommand() != null) {
-                    System.out.println("> " + request.getCommand());
                     insertPlayerInput(player, request.getCommand());
                     super.channelRead(ctx, msg);
                 }
