@@ -72,7 +72,7 @@ public class BukkitLoader extends JavaPlugin {
 
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
-        if(Reflection.getMinor() >= 16) {
+        if(Reflection.getMinor() >= 13) {
             suggestions = true;
             manager.registerEvents(new BukkitAntiTabListener(), this);
         }
