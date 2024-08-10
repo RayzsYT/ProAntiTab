@@ -128,11 +128,6 @@ public class VelocityPacketAnalyzer {
             MinecraftPacket packet = (MinecraftPacket) msg;
 
             if(packet instanceof TabCompleteResponsePacket) {
-                if(player.getProtocolVersion().getProtocol() >= 754) {
-                    Logger.debug("Player won't receive TabCompleteResponsePacket because the client protocol id is " + player.getProtocolVersion().getProtocol() + "! This doesn't makes sense, that's why.");
-                    return;
-                }
-
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
 
@@ -152,6 +147,11 @@ public class VelocityPacketAnalyzer {
                     }
 
                     final String cursor = playerInput;
+
+                    if(!cursor.startsWith("/") && spaces < 2 && player.getProtocolVersion().getProtocol() >= 754) {
+                        Logger.debug("Player won't receive TabCompleteResponsePacket because the client protocol id is " + player.getProtocolVersion().getProtocol() + "! This doesn't makes sense, that's why.");
+                        return;
+                    }
 
                     if(cursor.startsWith("/")) {
                         if (spaces == 0) {
