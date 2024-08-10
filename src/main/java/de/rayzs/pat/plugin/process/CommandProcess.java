@@ -197,7 +197,7 @@ public class CommandProcess {
 
                         case "update":
 
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update_permissions")) return;
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update")) return;
 
                             PermissionUtil.reloadPermissions();
                             sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_ALL);
@@ -345,7 +345,7 @@ public class CommandProcess {
                             return;
 
                         case "update":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update_permissions")) return;
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update")) return;
                             uuid = !Reflection.isProxyServer() ? BukkitLoader.getUUIDByName(sub) : Reflection.isVelocityServer() ? VelocityLoader.getUUIDByName(sub) : BungeeLoader.getUUIDByName(sub);
 
                             if(uuid != null) {
@@ -672,8 +672,10 @@ public class CommandProcess {
             case 1:
                 if(PermissionUtil.hasPermission(senderObj, "postdebug"))
                     suggestions.add("postdebug");
-                if(PermissionUtil.hasPermission(sender, "update_permissions"))
+                if(PermissionUtil.hasPermission(sender, "update"))
                     suggestions.add("update");
+                if(PermissionUtil.hasPermission(sender, "perms"))
+                    suggestions.add("perms");
                 if (!backend && PermissionUtil.hasPermission(sender, "stats") && Reflection.isProxyServer())
                     suggestions.add("stats");
                 if (!backend && PermissionUtil.hasPermission(sender, "notify")) suggestions.add("notify");
@@ -703,7 +705,7 @@ public class CommandProcess {
                     suggestions.addAll(GroupManager.getGroupNames());
                 if (!backend && args[0].equals("clear") && PermissionUtil.hasPermission(sender, "clear"))
                     suggestions.addAll(GroupManager.getGroupNames());
-                if (args[0].toLowerCase().contains("update") && PermissionUtil.hasPermission(sender, "update_permissions"))
+                if (args[0].toLowerCase().contains("update") && PermissionUtil.hasPermission(sender, "update") || args[0].toLowerCase().contains("perms") && PermissionUtil.hasPermission(sender, "perms"))
                     suggestions.addAll(!Reflection.isProxyServer() ? BukkitLoader.getPlayerNames() : Reflection.isVelocityServer() ? VelocityLoader.getPlayerNames() : BungeeLoader.getPlayerNames());
                 if (Arrays.asList("ls", "list").contains(args[0].toLowerCase()) && PermissionUtil.hasPermission(sender, "list"))
                     suggestions.addAll(GroupManager.getGroupNames());
