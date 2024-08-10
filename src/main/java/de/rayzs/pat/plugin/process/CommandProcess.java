@@ -353,6 +353,15 @@ public class CommandProcess {
                                 sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_SPECIFIC.replace("%target%", sub));
                             } else sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.PLAYER_NOT_ONLINE.replace("%target%", sub));
                             return;
+
+                        case "perms":
+                            if(!PermissionUtil.hasPermissionWithResponse(sender, "perms")) return;
+                            uuid = !Reflection.isProxyServer() ? BukkitLoader.getUUIDByName(sub) : Reflection.isVelocityServer() ? VelocityLoader.getUUIDByName(sub) : BungeeLoader.getUUIDByName(sub);
+
+                            if(uuid != null) {
+                                sender.sendMessage("§7Permissions from §f" + sub + "§7: §e" + PermissionUtil.getPermissions(uuid));
+                            } else sender.sendMessage("§cThis player isn't online!");
+                            return;
                     }
 
                 case 3:
