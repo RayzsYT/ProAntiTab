@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.netty.proxy;
 
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.proxy.protocol.packet.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -127,7 +128,10 @@ public class VelocityPacketAnalyzer {
             MinecraftPacket packet = (MinecraftPacket) msg;
 
             if(packet instanceof TabCompleteResponsePacket) {
-                if(player.getProtocolVersion().getProtocol() >= 754) return;
+                if(player.getProtocolVersion().getProtocol() >= 754) {
+                    Logger.debug("Player won't receive TabCompleteResponsePacket because the client protocol id is " + player.getProtocolVersion().getProtocol() + "! This doesn't makes sense, that's why.");
+                    return;
+                }
 
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
