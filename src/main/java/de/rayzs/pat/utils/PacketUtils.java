@@ -30,6 +30,7 @@ public class PacketUtils {
     }
 
     /*
+        Copyright (c) 2012, md_5. All rights reserved.
         Original code from Bungeecord source:
         https://github.com/SpigotMC/BungeeCord/blob/master/protocol/src/main/java/net/md_5/bungee/protocol/DefinedPacket.java#L233-L261
      */
