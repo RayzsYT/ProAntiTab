@@ -90,6 +90,9 @@ public class MessageTranslator {
 
     public static void send(Object target, String text, String... replacements) {
         text = replaceMessageString(target, text, replacements);
+
+        if(text.contains("%no-message%")) return;
+
         if(translator == null) {
             CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
 
