@@ -6,6 +6,7 @@ import java.io.*;
 public abstract class ConfigurationProvider {
 
     /*
+        Copyright (c) 2012, md_5. All rights reserved.
         Original code from Bungeecord source:
         https://github.com/SpigotMC/BungeeCord/blob/master/config/src/main/java/net/md_5/bungee/config/ConfigurationProvider.java
      */
