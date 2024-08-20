@@ -107,7 +107,10 @@ public class VelocityBlockCommandListener {
             return;
         }
 
-        if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, player.getCurrentServer().get().getServerInfo().getName())) return;
+        if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
+            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            return;
+        }
 
         listed = Storage.Blacklist.isListed(command, true, true, false);
         serverListed = Storage.Blacklist.isListed(player, command, true, listed, false, serverName);
