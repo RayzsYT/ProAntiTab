@@ -8,6 +8,12 @@ public abstract class ExecuteCommandEvent extends PATEvent<ExecuteCommandEvent> 
     private final String command;
     private boolean blocked;
 
+    public ExecuteCommandEvent() {
+        super(null);
+        this.blocked = false;
+        this.command = null;
+    }
+
     public ExecuteCommandEvent(UUID senderUniqueId, String command, boolean blocked) {
         super(senderUniqueId);
         this.blocked = blocked;

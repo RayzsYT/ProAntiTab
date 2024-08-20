@@ -8,6 +8,12 @@ public abstract class FilteredTabCompletionEvent extends PATEvent<FilteredTabCom
     private String cursor;
     private List<String> completion;
 
+    public FilteredTabCompletionEvent() {
+        super(null);
+        this.cursor = null;
+        this.completion = null;
+    }
+
     public FilteredTabCompletionEvent(UUID senderUniqueId, String cursor, List<String> completion) {
         super(senderUniqueId);
         this.cursor = cursor;

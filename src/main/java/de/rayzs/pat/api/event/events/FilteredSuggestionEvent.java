@@ -7,6 +7,11 @@ public abstract class FilteredSuggestionEvent extends PATEvent<FilteredSuggestio
 
     private List<String> suggestions;
 
+    public FilteredSuggestionEvent() {
+        super(null);
+        this.suggestions = null;
+    }
+
     public FilteredSuggestionEvent(UUID senderUniqueId, List<String> suggestions) {
         super(senderUniqueId);
         this.suggestions = suggestions;
