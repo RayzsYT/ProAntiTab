@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.listeners.velocity;
 
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.command.CommandSource;
+import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -28,7 +29,7 @@ public class VelocityBlockCommandListener {
         if(!(commandSource instanceof Player)) return;
 
         Player player = (Player) commandSource;
-        String command = event.getCommand(),
+        String rawCommand = event.getCommand(), command = rawCommand,
                 serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown";
 
         command = StringUtils.replaceFirst(command, "/", "");
@@ -40,7 +41,8 @@ public class VelocityBlockCommandListener {
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
-            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_PLUGINS_COMMAND)) return;
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isCancelled()) return;
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
@@ -52,7 +54,8 @@ public class VelocityBlockCommandListener {
         }
 
         if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
-            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_VERSION_COMMAND)) return;
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isCancelled()) return;
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", command.replaceFirst("/", ""));
@@ -69,14 +72,22 @@ public class VelocityBlockCommandListener {
         boolean listed, serverListed, ignored;
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(Storage.Blacklist.doesGroupBypass(player, command, false, true, false, player.getCurrentServer().get().getServerInfo().getName())) return;
+            if(Storage.Blacklist.doesGroupBypass(player, command, false, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
+                PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                return;
+            }
 
             listed = Storage.Blacklist.isListed(command, false, true, false);
             serverListed = Storage.Blacklist.isListed(player, command, false, listed, false, serverName);
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
-            if(ignored ? !listed && serverListed : serverListed) return;
-            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+            if(ignored ? !listed && serverListed : serverListed) {
+                PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                return;
+            }
+
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isCancelled()) return;
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, cancelCommandMessage);
@@ -84,7 +95,8 @@ public class VelocityBlockCommandListener {
         }
 
         if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
-            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isCancelled()) return;
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, cancelCommandMessage);
@@ -101,9 +113,18 @@ public class VelocityBlockCommandListener {
         serverListed = Storage.Blacklist.isListed(player, command, true, listed, false, serverName);
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
-        if(!listed && !serverListed || listed && serverListed && ignored) return;
-        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) return;
-        if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+        if(!listed && !serverListed || listed && serverListed && ignored) {
+            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            return;
+        }
+
+        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) {
+            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            return;
+        }
+
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+        if(executeCommandEvent.isCancelled()) return;
 
         event.setResult(CommandExecuteEvent.CommandResult.denied());
         MessageTranslator.send(player, cancelCommandMessage);
