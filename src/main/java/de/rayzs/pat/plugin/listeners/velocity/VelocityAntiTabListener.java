@@ -2,7 +2,9 @@ package de.rayzs.pat.plugin.listeners.velocity;
 
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
+import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandsCache;
 import com.velocitypowered.api.proxy.*;
@@ -24,6 +26,8 @@ public class VelocityAntiTabListener {
         if(PermissionUtil.hasBypassPermission(player) || event.getSuggestions().isEmpty() || !player.getCurrentServer().isPresent()) return;
 
         event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName()));
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(player.getUniqueId(), event.getSuggestions());
+        if(filteredSuggestionEvent.isCancelled()) event.getSuggestions().clear();
     }
 
     @Subscribe (order = PostOrder.LAST)
@@ -42,8 +46,37 @@ public class VelocityAntiTabListener {
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 
+        /*
+        ConcurrentHashMap<String, CommandNode<?>> commandsMap = new ConcurrentHashMap<>();
+        for (CommandNode<?> child : event.getRootNode().getChildren()) {
+            if(child == null || child.getName() == null) continue;
+            commandsMap.put(child.getName(), child);
+        }
+
+        ConcurrentHashMap<String, CommandNode<?>> filteredCommandsMap = new ConcurrentHashMap<>(commandsMap);
+        final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
+        event.getRootNode().getChildren().removeIf(command -> {
+            if (command == null || command.getName() == null || playerCommands.contains(command.getName())) {
+                if(command != null && command.getName() != null) filteredCommandsMap.remove(command.getName());
+                return true;
+            }
+            return false;
+        });*/
+
         final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
         event.getRootNode().getChildren().removeIf(command -> command == null || command.getName() == null || playerCommands.contains(command.getName()));
+
+        /*
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(player.getUniqueId(), new ArrayList<>(filteredCommandsMap.keySet()));
+        if(filteredSuggestionEvent.isCancelled()) event.getRootNode().getChildren().clear();
+
+        for (String commandName : filteredSuggestionEvent.getSuggestions()) {
+            CommandNode<?> commandNode = commandsMap.get(commandName);
+            event.getRootNode().getChildren().add(commandNode);
+            if(!filteredCommandsMap.containsKey(commandName)) event.getRootNode().addChild(commandNode);
+        }
+
+        commandsMap = null;*/
     }
 
     public static void updateCommands() {
