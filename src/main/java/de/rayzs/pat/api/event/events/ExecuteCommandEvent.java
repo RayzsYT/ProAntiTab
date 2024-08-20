@@ -14,7 +14,7 @@ public abstract class ExecuteCommandEvent extends PATEvent {
         this.command = command;
     }
 
-    public abstract boolean handle(ExecuteCommandEvent event);
+    public abstract void handle(ExecuteCommandEvent event);
 
     public String getCommand() {
         return command;
