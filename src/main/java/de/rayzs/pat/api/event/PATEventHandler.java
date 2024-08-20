@@ -7,7 +7,7 @@ public class PATEventHandler {
 
     private static List<PATEvent> EVENTS = new ArrayList<>();
 
-    public static void call(UUID senderUniqueId, String command, boolean blocked) {
+    public static ExecuteCommandEvent call(UUID senderUniqueId, String command, boolean blocked) {
         ExecuteCommandEvent event = EmptyEvent.createEmptyExecuteCommandEvent(senderUniqueId, command, blocked);
 
         for (PATEvent patEvent : EVENTS) {
@@ -16,9 +16,11 @@ public class PATEventHandler {
                 executeCommandEvent.handle(event);
             }
         }
+
+        return event;
     }
 
-    public static void call(UUID senderUniqueId, List<String> suggestions) {
+    public static FilteredSuggestionEvent call(UUID senderUniqueId, List<String> suggestions) {
         FilteredSuggestionEvent event = EmptyEvent.createEmptyFilteredSuggestionEvent(senderUniqueId, suggestions);
 
         for (PATEvent patEvent : EVENTS) {
@@ -27,9 +29,11 @@ public class PATEventHandler {
                 filteredSuggestion.handle(event);
             }
         }
+
+        return event;
     }
 
-    public static void call(UUID senderUniqueId, String cursor, List<String> completion) {
+    public static FilteredTabCompletionEvent call(UUID senderUniqueId, String cursor, List<String> completion) {
         FilteredTabCompletionEvent event = EmptyEvent.createEmptyFilteredTabCompletion(senderUniqueId, cursor, completion);
 
         for (PATEvent patEvent : EVENTS) {
@@ -38,6 +42,8 @@ public class PATEventHandler {
                 filteredTabCompletion.handle(event);
             }
         }
+
+        return event;
     }
 
     public static void register(PATEvent event) {
