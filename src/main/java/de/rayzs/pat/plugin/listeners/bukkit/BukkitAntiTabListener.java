@@ -1,9 +1,11 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
-import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
-import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
+import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import org.bukkit.entity.Player;
@@ -52,7 +54,11 @@ public class BukkitAntiTabListener implements Listener {
 
         final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(event.getCommands(), player, player.getUniqueId());
         event.getCommands().clear();
-        event.getCommands().addAll(playerCommands);
+
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(uuid, playerCommands);
+        if(filteredSuggestionEvent.isCancelled()) return;
+
+        event.getCommands().addAll(filteredSuggestionEvent.getSuggestions());
 
         Logger.debug("Player with uuid " + uuidSubstring + " has a total of " + playerCommands.size() + " commands.");
     }

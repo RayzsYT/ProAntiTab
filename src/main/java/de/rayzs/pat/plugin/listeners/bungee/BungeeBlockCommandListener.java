@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -39,7 +40,8 @@ public class BungeeBlockCommandListener implements Listener {
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%server%", serverName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
-            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_PLUGINS_COMMAND)) return;
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isCancelled()) return;
 
             event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
@@ -54,7 +56,8 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
-            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_VERSION_COMMAND)) return;
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isCancelled()) return;
 
             event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
@@ -74,13 +77,22 @@ public class BungeeBlockCommandListener implements Listener {
 
         boolean listed, serverListed, ignored;
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) return;
+            if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) {
+                PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                return;
+            }
+
             listed = Storage.Blacklist.isListed(command, false, true, false);
             serverListed = Storage.Blacklist.isListed(player, command, false, listed, false, serverName);
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
-            if(ignored ? !listed && serverListed : serverListed) return;
-            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+            if(ignored ? !listed && serverListed : serverListed) {
+                PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                return;
+            }
+
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isCancelled()) return;
 
             event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);
@@ -88,7 +100,8 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
-            if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isCancelled()) return;
 
             event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);
@@ -102,14 +115,25 @@ public class BungeeBlockCommandListener implements Listener {
             return;
         }
 
-        if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) return;
+        if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) {
+            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            return;
+        }
 
         listed = Storage.Blacklist.isListed(command, true, true, false);
         serverListed = Storage.Blacklist.isListed(player, command, true, listed, false, serverName);
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
-        if(!listed && !serverListed || listed && serverListed && ignored) return;
-        if(!PATEventManager.useDefaultActions(player, command, PATEvent.Situation.EXECUTED_BLOCKED_COMMAND)) return;
+        if(!listed && !serverListed || listed && serverListed && ignored) {
+            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            return;
+        }
+
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+        if(executeCommandEvent.isCancelled()) {
+            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            return;
+        }
 
         event.setCancelled(true);
         MessageTranslator.send(player, cancelCommandMessage);
