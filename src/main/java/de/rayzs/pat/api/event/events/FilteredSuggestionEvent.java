@@ -1,25 +1,15 @@
 package de.rayzs.pat.api.event.events;
 
 import de.rayzs.pat.api.event.PATEvent;
-import de.rayzs.pat.utils.CommandSender;
+import java.util.*;
 
-import java.util.List;
+public abstract class FilteredSuggestionEvent extends PATEvent<FilteredSuggestionEvent> {
 
-public abstract class FilteredSuggestionEvent extends PATEvent {
-
-    private String cursor;
     private List<String> suggestions;
 
-    public FilteredSuggestionEvent(CommandSender sender, String cursor, List<String> suggestions) {
-        super(sender);
-        this.cursor = cursor;
+    public FilteredSuggestionEvent(UUID senderUniqueId, List<String> suggestions) {
+        super(senderUniqueId);
         this.suggestions = suggestions;
-    }
-
-    public abstract void handle(FilteredSuggestionEvent event);
-
-    public String getCursor() {
-        return cursor;
     }
 
     public List<String> getSuggestions() {
@@ -27,8 +17,8 @@ public abstract class FilteredSuggestionEvent extends PATEvent {
     }
 
     @Override
-    public CommandSender getSender() {
-        return super.getSender();
+    public UUID getSenderUniqueId() {
+        return super.getSenderUniqueId();
     }
 
     public void setSuggestions(List<String> suggestions) {

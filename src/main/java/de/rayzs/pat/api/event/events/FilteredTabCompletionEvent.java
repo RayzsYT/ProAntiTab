@@ -1,36 +1,35 @@
 package de.rayzs.pat.api.event.events;
 
-import de.rayzs.pat.utils.CommandSender;
 import de.rayzs.pat.api.event.PATEvent;
-import java.util.List;
+import java.util.*;
 
-public abstract class FilteredTabCompletionEvent extends PATEvent {
+public abstract class FilteredTabCompletionEvent extends PATEvent<FilteredTabCompletionEvent> {
 
-    private String command;
-    private List<String> suggestions;
+    private String cursor;
+    private List<String> completion;
 
-    public FilteredTabCompletionEvent(CommandSender sender, String command, List<String> suggestions) {
-        super(sender);
-        this.command = command;
-        this.suggestions = suggestions;
+    public FilteredTabCompletionEvent(UUID senderUniqueId, String cursor, List<String> completion) {
+        super(senderUniqueId);
+        this.cursor = cursor;
+        this.completion = completion;
     }
 
     public abstract void handle(FilteredTabCompletionEvent event);
 
     public String getCursor() {
-        return command;
+        return cursor;
     }
 
-    public List<String> getSuggestions() {
-        return suggestions;
+    public List<String> getCompletion() {
+        return completion;
     }
 
     @Override
-    public CommandSender getSender() {
-        return super.getSender();
+    public UUID getSenderUniqueId() {
+        return super.getSenderUniqueId();
     }
 
-    public void setSuggestions(List<String> suggestions) {
-        this.suggestions = suggestions;
+    public void setCompletion(List<String> completion) {
+        this.completion = completion;
     }
 }

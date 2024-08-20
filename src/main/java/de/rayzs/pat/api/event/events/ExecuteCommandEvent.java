@@ -1,28 +1,26 @@
 package de.rayzs.pat.api.event.events;
 
-import de.rayzs.pat.utils.CommandSender;
 import de.rayzs.pat.api.event.PATEvent;
+import java.util.UUID;
 
-public abstract class ExecuteCommandEvent extends PATEvent {
+public abstract class ExecuteCommandEvent extends PATEvent<ExecuteCommandEvent> {
 
     private final String command;
     private boolean blocked;
 
-    public ExecuteCommandEvent(CommandSender sender, String command, boolean blocked) {
-        super(sender);
+    public ExecuteCommandEvent(UUID senderUniqueId, String command, boolean blocked) {
+        super(senderUniqueId);
         this.blocked = blocked;
         this.command = command;
     }
-
-    public abstract void handle(ExecuteCommandEvent event);
 
     public String getCommand() {
         return command;
     }
 
     @Override
-    public CommandSender getSender() {
-        return super.getSender();
+    public UUID getSenderUniqueId() {
+        return super.getSenderUniqueId();
     }
 
     public boolean isBlocked() {
