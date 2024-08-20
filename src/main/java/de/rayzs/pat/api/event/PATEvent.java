@@ -1,9 +1,25 @@
 package de.rayzs.pat.api.event;
 
-public abstract class PATEvent {
+import de.rayzs.pat.utils.CommandSender;
 
-    public Situation situation;
-    public abstract boolean shouldHandleByDefault(Object executor, String command);
+public class PATEvent {
 
-    public enum Situation { EXECUTED_PLUGINS_COMMAND, EXECUTED_VERSION_COMMAND, EXECUTED_BLOCKED_COMMAND }
+    private CommandSender sender;
+    private boolean cancelled = false;
+
+    public PATEvent(CommandSender sender) {
+        this.sender = sender;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    public CommandSender getSender() {
+        return sender;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
 }
