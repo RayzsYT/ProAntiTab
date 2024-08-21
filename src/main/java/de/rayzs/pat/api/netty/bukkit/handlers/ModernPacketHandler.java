@@ -1,6 +1,10 @@
 package de.rayzs.pat.api.netty.bukkit.handlers;
 
+import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
+import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
+import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -8,6 +12,8 @@ import de.rayzs.pat.api.netty.bukkit.*;
 import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ModernPacketHandler implements BukkitPacketHandler {
 
@@ -29,7 +35,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         Object suggestionObj;
 
-        String input = BukkitPacketAnalyzer.getPlayerInput(player);
+        String rawInput = BukkitPacketAnalyzer.getPlayerInput(player), input = rawInput;
         if(input == null) return false;
 
         boolean cancelsBeforeHand = false;
@@ -62,7 +68,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
 
         Suggestions suggestions = (Suggestions) suggestionObj;
 
-        if((input.length() < 1 || cancelsBeforeHand) && Reflection.isWeird()) return false;
+        if((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird()) return false;
         if(spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
             suggestions.getList().clear();
             return true;
@@ -74,6 +80,14 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 return Storage.Blacklist.isBlocked(player, command);
             });
             return true;
+        } else {
+            List<String> suggestionsAsString = new ArrayList<>();
+            for (Suggestion suggestion : suggestions.getList())
+                suggestionsAsString.add(suggestion.getText());
+
+            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.call(player.getUniqueId(), rawInput, suggestionsAsString);
+            if(filteredTabCompletionEvent.isCancelled()) suggestions.getList().clear();
+            suggestions.getList().removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(suggestion.getText()));
         }
 
         return true;
