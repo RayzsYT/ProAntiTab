@@ -1,10 +1,8 @@
 package de.rayzs.pat.api.netty.bukkit.handlers;
 
-import com.mojang.brigadier.suggestion.Suggestion;
-import com.mojang.brigadier.suggestion.Suggestions;
-import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
+import de.rayzs.pat.api.event.PATEventHandler;
+import com.mojang.brigadier.suggestion.*;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -53,6 +51,58 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         }
 
         if(packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket")) {
+            try {
+                Field suggestionsField = Reflection.getFieldsByTypeNormal(packetObj.getClass(), "List", Reflection.SearchOption.ENDS).get(0);
+                List<?> suggestionsTmp = (List<?>) suggestionsField.get(packetObj),
+                suggestions = new ArrayList<>(suggestionsTmp);
+
+                List<Field> intFields = Reflection.getFieldsByTypeNormal(packetObj.getClass(), "int", Reflection.SearchOption.ENDS);
+                int id = (int) intFields.get(0).get(packetObj),
+                        start = (int) intFields.get(1).get(packetObj),
+                        length = (int) intFields.get(2).get(packetObj);
+
+                Class<?> clientboundCommandSuggestionsPacketClass = Class.forName("net.minecraft.network.protocol.game.ClientboundCommandSuggestionsPacket");
+
+                if ((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird()) return false;
+                if (spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
+                    suggestions.clear();
+                    return true;
+                }
+
+                if (spaces == 0) {
+                    suggestions.removeIf(suggestion -> {
+                        String command = getSuggestionFromEntry(suggestion);
+                        return Storage.Blacklist.isBlocked(player, command);
+                    });
+                    return true;
+
+                } else {
+                    List<String> suggestionsAsString = new ArrayList<>();
+                    for (Object suggestion : suggestions)
+                        suggestionsAsString.add(getSuggestionFromEntry(suggestion));
+
+                    FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.call(player.getUniqueId(), rawInput, suggestionsAsString);
+                    if (filteredTabCompletionEvent.isCancelled()) suggestions.clear();
+
+                    for (int i = 0; i < suggestions.size(); i++) {
+                        Object csO = suggestions.get(i);
+
+                        String suggestionAsString = getSuggestionFromEntry(csO);
+                        if(!filteredTabCompletionEvent.getCompletion().contains(getSuggestionFromEntry(suggestionAsString)))
+                            suggestions.remove(csO);
+                    }
+                    suggestions.removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(getSuggestionFromEntry(suggestion)));
+                }
+
+                Object clientboundCommandSuggestionsPacketObj = clientboundCommandSuggestionsPacketClass
+                        .getConstructor(int.class, int.class, int.class, List.class)
+                        .newInstance(id, start, length, suggestions);
+
+                BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), clientboundCommandSuggestionsPacketObj);
+
+                return false;
+
+            } catch (Throwable throwable) { throwable.printStackTrace(); }
             return !cancelsBeforeHand;
         }
 
@@ -91,5 +141,21 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         }
 
         return true;
+    }
+
+    private String getSuggestionFromEntry(Object suggestionObj) {
+        try {
+            List<Field> fields = Reflection.getFieldsByTypeNormal(suggestionObj.getClass(), "String", Reflection.SearchOption.ENDS);
+            if(fields.isEmpty()) return "";
+
+            Field field = fields.get(0);
+            String result = (String) field.get(suggestionObj);
+            field.setAccessible(false);
+            return result;
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+        return "";
     }
 }

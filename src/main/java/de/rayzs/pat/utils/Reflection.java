@@ -203,6 +203,22 @@ public class Reflection {
         return result;
     }
 
+    public static List<Field> getFieldsByTypeNormal(Class<?> clazz, String target, SearchOption type) {
+        List<Field> result = new ArrayList<>(), fieldLists = getFields(clazz);
+
+        for (Field field : fieldLists) {
+            String typeName = field.getType().getTypeName();
+            if(type == SearchOption.CONTAINS && typeName.contains(target)
+                    || type == SearchOption.STARTS && typeName.startsWith(target)
+                    || type == SearchOption.ENDS && typeName.endsWith(target)
+                    || type == SearchOption.EQUALS && typeName.equals(target)) {
+                openAccess(field, true);
+                result.add(field);
+            }
+        }
+        return result;
+    }
+
     public static Field getFirstFieldByType(Class<?> clazz, String target, SearchOption type) {
         return getFieldsByType(clazz, target, type).get(0);
     }
