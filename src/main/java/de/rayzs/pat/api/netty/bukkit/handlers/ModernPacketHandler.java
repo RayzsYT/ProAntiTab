@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ModernPacketHandler implements BukkitPacketHandler {
@@ -88,9 +89,10 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                         Object csO = suggestions.get(i);
 
                         String suggestionAsString = getSuggestionFromEntry(csO);
-                        if(!filteredTabCompletionEvent.getCompletion().contains(getSuggestionFromEntry(suggestionAsString)))
+                        if (!filteredTabCompletionEvent.getCompletion().contains(suggestionAsString))
                             suggestions.remove(csO);
                     }
+
                     suggestions.removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(getSuggestionFromEntry(suggestion)));
                 }
 
