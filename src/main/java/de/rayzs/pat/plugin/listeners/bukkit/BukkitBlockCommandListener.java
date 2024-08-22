@@ -44,9 +44,9 @@ public class BukkitBlockCommandListener implements Listener {
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             if(executeCommandEvent.isCancelled()) return;
 
-            event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", command);
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
@@ -60,9 +60,9 @@ public class BukkitBlockCommandListener implements Listener {
 
         if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             if(executeCommandEvent.isCancelled()) return;
 
-            event.setCancelled(true);
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", command);
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
@@ -80,19 +80,21 @@ public class BukkitBlockCommandListener implements Listener {
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
 
             if(Storage.Blacklist.isListed(command, true)) {
-                PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                if(executeCommandEvent.isBlocked()) event.setCancelled(true);
                 return;
             }
 
             if(PermissionUtil.hasBypassPermission(player, command, false)) {
-                PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                if(executeCommandEvent.isBlocked()) event.setCancelled(true);
                 return;
             }
 
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             if(executeCommandEvent.isCancelled()) return;
 
-            event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);
             return;
         }
@@ -100,9 +102,9 @@ public class BukkitBlockCommandListener implements Listener {
         if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
 
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             if(executeCommandEvent.isCancelled()) return;
 
-            event.setCancelled(true);
             MessageTranslator.send(player, cancelCommandMessage);
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
@@ -115,19 +117,21 @@ public class BukkitBlockCommandListener implements Listener {
         }
 
         if (!Storage.Blacklist.isListed(command, false)) {
-            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             return;
         }
 
         if (PermissionUtil.hasBypassPermission(player, command, false)) {
-            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             return;
         }
 
         ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+        if(executeCommandEvent.isBlocked()) event.setCancelled(true);
         if(executeCommandEvent.isCancelled()) return;
 
-        event.setCancelled(true);
         MessageTranslator.send(player, cancelCommandMessage);
 
         if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);

@@ -42,9 +42,9 @@ public class VelocityBlockCommandListener {
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             if(executeCommandEvent.isCancelled()) return;
 
-            event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
@@ -55,9 +55,9 @@ public class VelocityBlockCommandListener {
 
         if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             if(executeCommandEvent.isCancelled()) return;
 
-            event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
@@ -73,7 +73,8 @@ public class VelocityBlockCommandListener {
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.doesGroupBypass(player, command, false, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
-                PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
                 return;
             }
 
@@ -82,23 +83,24 @@ public class VelocityBlockCommandListener {
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
             if(ignored ? !listed && serverListed : serverListed) {
-                PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
                 return;
             }
 
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             if(executeCommandEvent.isCancelled()) return;
 
-            event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, cancelCommandMessage);
             return;
         }
 
         if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             if(executeCommandEvent.isCancelled()) return;
 
-            event.setResult(CommandExecuteEvent.CommandResult.denied());
             MessageTranslator.send(player, cancelCommandMessage);
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
@@ -108,7 +110,8 @@ public class VelocityBlockCommandListener {
         }
 
         if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
-            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
 
@@ -117,19 +120,21 @@ public class VelocityBlockCommandListener {
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
         if(!listed && !serverListed || listed && serverListed && ignored) {
-            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
 
         if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) {
-            PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
 
         ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+        if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
         if(executeCommandEvent.isCancelled()) return;
 
-        event.setResult(CommandExecuteEvent.CommandResult.denied());
         MessageTranslator.send(player, cancelCommandMessage);
 
         if(Storage.SEND_CONSOLE_NOTIFICATION) MessageTranslator.send(server.getConsoleCommandSource(), notificationMessage);
