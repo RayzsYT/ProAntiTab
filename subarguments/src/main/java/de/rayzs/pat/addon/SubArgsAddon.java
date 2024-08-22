@@ -71,8 +71,6 @@ public class SubArgsAddon extends JavaPlugin {
 
             if (!c.startsWith(cursor)) continue;
 
-            System.out.println(c + " | " + cursor + " | " + Arrays.toString(commands.toArray()));
-
             if(c.endsWith("_-")) {
                 nothing = true;
                 break;
