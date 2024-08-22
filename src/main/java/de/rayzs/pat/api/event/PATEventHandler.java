@@ -46,6 +46,19 @@ public class PATEventHandler {
         return event;
     }
 
+    public static UpdatePluginEvent call() {
+        UpdatePluginEvent event = EmptyEvent.createEmptyUpdatePluginEvent();
+
+        for (PATEvent patEvent : EVENTS) {
+            if(patEvent instanceof UpdatePluginEvent) {
+                UpdatePluginEvent updatePluginEvent = (UpdatePluginEvent) patEvent;
+                updatePluginEvent.handle(event);
+            }
+        }
+
+        return event;
+    }
+
     public static void register(PATEvent event) {
         EVENTS.add(event);
     }
@@ -55,6 +68,15 @@ public class PATEventHandler {
     }
 
     public static class EmptyEvent {
+
+        public static UpdatePluginEvent createEmptyUpdatePluginEvent() {
+            return new UpdatePluginEvent(null) {
+                @Override
+                public void handle(UpdatePluginEvent event) {
+
+                }
+            };
+        }
 
         public static ExecuteCommandEvent createEmptyExecuteCommandEvent(UUID senderUniqueId, String command, boolean blocked) {
             return new ExecuteCommandEvent(senderUniqueId, command, blocked) {

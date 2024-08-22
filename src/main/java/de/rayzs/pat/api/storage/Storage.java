@@ -1,5 +1,6 @@
 package de.rayzs.pat.api.storage;
 
+import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.placeholders.commands.general.*;
 import de.rayzs.pat.api.storage.placeholders.commands.group.*;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
@@ -33,6 +34,8 @@ public class Storage {
         loadConfig();
         loadToken();
         if(loadBlacklist) Blacklist.loadAll();
+
+        PATEventHandler.call();
     }
 
     public static void loadToken() {
