@@ -9,7 +9,7 @@ public abstract class UpdatePluginEvent extends PATEvent<UpdatePluginEvent> {
         super(null);;
     }
 
-    public UpdatePluginEvent(UUID senderUniqueId) {
-        super(senderUniqueId);
+    public UpdatePluginEvent(Object senderObj) {
+        super(senderObj);
     }
 }

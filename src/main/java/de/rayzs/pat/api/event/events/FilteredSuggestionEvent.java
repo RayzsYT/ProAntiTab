@@ -12,18 +12,13 @@ public abstract class FilteredSuggestionEvent extends PATEvent<FilteredSuggestio
         this.suggestions = null;
     }
 
-    public FilteredSuggestionEvent(UUID senderUniqueId, List<String> suggestions) {
-        super(senderUniqueId);
+    public FilteredSuggestionEvent(Object senderObj, List<String> suggestions) {
+        super(senderObj);
         this.suggestions = suggestions;
     }
 
     public List<String> getSuggestions() {
         return suggestions;
-    }
-
-    @Override
-    public UUID getSenderUniqueId() {
-        return super.getSenderUniqueId();
     }
 
     public void setSuggestions(List<String> suggestions) {

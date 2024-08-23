@@ -1,14 +1,12 @@
 package de.rayzs.pat.api.event;
 
-import java.util.UUID;
-
 public abstract class PATEvent<T> {
 
-    private final UUID senderUniqueId;
+    private final Object senderObj;
     private boolean cancelled = false;
 
-    public PATEvent(UUID senderUniqueId) {
-        this.senderUniqueId = senderUniqueId;
+    public PATEvent(Object senderObj) {
+        this.senderObj = senderObj;
     }
 
     public abstract void handle(T t);
@@ -16,9 +14,8 @@ public abstract class PATEvent<T> {
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
-
-    public UUID getSenderUniqueId() {
-        return senderUniqueId;
+    public Object getSenderObj() {
+        return senderObj;
     }
 
     public boolean isCancelled() {

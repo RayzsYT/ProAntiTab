@@ -13,8 +13,8 @@ public abstract class ReceiveSyncEvent extends PATEvent<ReceiveSyncEvent> {
         this.packetBundle = null;
     }
 
-    public ReceiveSyncEvent(UUID senderUniqueId, CommunicationPackets.PacketBundle packetBundle) {
-        super(senderUniqueId);
+    public ReceiveSyncEvent(Object senderObj, CommunicationPackets.PacketBundle packetBundle) {
+        super(senderObj);
         this.packetBundle = packetBundle;
     }
 

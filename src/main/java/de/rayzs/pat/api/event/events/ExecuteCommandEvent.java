@@ -14,19 +14,14 @@ public abstract class ExecuteCommandEvent extends PATEvent<ExecuteCommandEvent> 
         this.command = null;
     }
 
-    public ExecuteCommandEvent(UUID senderUniqueId, String command, boolean blocked) {
-        super(senderUniqueId);
+    public ExecuteCommandEvent(Object senderObj, String command, boolean blocked) {
+        super(senderObj);
         this.blocked = blocked;
         this.command = command;
     }
 
     public String getCommand() {
         return command;
-    }
-
-    @Override
-    public UUID getSenderUniqueId() {
-        return super.getSenderUniqueId();
     }
 
     public boolean isBlocked() {

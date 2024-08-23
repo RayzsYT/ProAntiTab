@@ -15,8 +15,8 @@ public abstract class SentSyncEvent extends PATEvent<SentSyncEvent> {
         this.serverName = null;
     }
 
-    public SentSyncEvent(UUID senderUniqueId, CommunicationPackets.PacketBundle packetBundle, String serverName) {
-        super(senderUniqueId);
+    public SentSyncEvent(Object senderObj, CommunicationPackets.PacketBundle packetBundle, String serverName) {
+        super(senderObj);
         this.packetBundle = packetBundle;
         this.serverName = serverName;
     }
