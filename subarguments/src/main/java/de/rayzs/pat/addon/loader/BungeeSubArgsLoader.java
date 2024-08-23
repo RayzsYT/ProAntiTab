@@ -8,6 +8,5 @@ public class BungeeSubArgsLoader extends Plugin {
 
     @Override
     public void onEnable() {
-        SubArgsAddon.onLoad(new ProxyConfigurationBuilder("subarguments", "./plugins/ProAntiTab/addons"));
-    }
-}
+        SubArgsAddon.onLoad(new ProxyConfigurationBuilder("./plugins/ProAntiTab/addons", "subarguments"));
+    }}

@@ -5,5 +5,5 @@ author: Rayzs_YT
 description: An additional addon to extend the possibilities with ProAntiTab.
 main: de.rayzs.pat.addon.loader.BungeeSubArgsLoader
 
-depend:
+depends:
   - ProAntiTab

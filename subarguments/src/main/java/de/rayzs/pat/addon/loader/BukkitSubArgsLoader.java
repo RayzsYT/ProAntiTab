@@ -8,6 +8,6 @@ public class BukkitSubArgsLoader extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        SubArgsAddon.onLoad(new BukkitConfigurationBuilder("subarguments", "./plugins/ProAntiTab/addons"));
+        SubArgsAddon.onLoad(new BukkitConfigurationBuilder("./plugins/ProAntiTab/addons", "subarguments"));
     }
 }

@@ -14,6 +14,8 @@ public class SubArgsAddon {
     private static ConfigurationBuilder CONFIGURATION;
 
     public static void onLoad(ConfigurationBuilder configuration) {
+        CONFIGURATION = configuration;
+
         updateList();
         updateMessages();
 
