@@ -11,9 +11,9 @@ public class SubArgsAddon {
 
     public static List<String> GENERAL_LIST;
     public static List<String> BLOCKED_MESSAGE;
-    private static ConfigurationBuilder CONFIGURATION = Configurator.get("config", "./plugins/ProAntiTab/addons/SubArguments");
+    private static ConfigurationBuilder CONFIGURATION;
 
-    public static void onLoad() {
+    public static void onLoad(ConfigurationBuilder configuration) {
         updateList();
         updateMessages();
 
@@ -30,6 +30,11 @@ public class SubArgsAddon {
 
     public static void updateMessages() {
         CONFIGURATION.reload();
-        BLOCKED_MESSAGE = (List<String>) CONFIGURATION.getOrSet("blocked-message", new ArrayList<>(List.of("Subcommand %sub% for %command% is blocked", "Sry mate!")));
+
+        ArrayList<String> MESSAGE = new ArrayList<>();
+        MESSAGE.add("Subcommand blocked");
+        MESSAGE.add("Sorry mate");
+
+        BLOCKED_MESSAGE = (List<String>) CONFIGURATION.getOrSet("blocked-message", MESSAGE);
     }
 }
