@@ -20,6 +20,13 @@ public class SubArgsAddon extends JavaPlugin {
                 SubArgsAddon.this.updateGeneralList();
             }
         });
+
+        PATEventHandler.register(new ReceiveSyncEvent(null, null) {
+            public void handle(ReceiveSyncEvent receiveSyncEvent) {
+                SubArgsAddon.this.updateGeneralList();
+            }
+        });
+
         PATEventHandler.register(new ExecuteCommandEvent() {
             public void handle(ExecuteCommandEvent event) {
                 String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
