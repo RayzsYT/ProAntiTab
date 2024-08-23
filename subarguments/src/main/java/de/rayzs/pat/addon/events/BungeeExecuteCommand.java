@@ -33,13 +33,20 @@ public class BungeeExecuteCommand extends ExecuteCommandEvent {
             if (!spaces && s.contains(" ") && command.contains(" "))
                 spaces = true;
 
-            if (!command.toLowerCase().startsWith(s.toLowerCase())) continue;
+            if (!command.toLowerCase().startsWith(s.toLowerCase() + " ")) continue;
             listed = true;
         }
 
         if (spaces) {
 
             if (turn && !blocked && (!(listed || equals) || ignored)) {
+                event.setBlocked(true);
+                event.setCancelled(true);
+
+                MessageTranslator.send(player, SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
+            }
+
+            if (!turn && !blocked && ((listed || equals) || ignored)) {
                 event.setBlocked(true);
                 event.setCancelled(true);
 

@@ -39,8 +39,14 @@ public class BukkitExecuteCommand extends ExecuteCommandEvent {
 
         if (spaces) {
 
-
             if (turn && !blocked && (!(listed || equals) || ignored)) {
+                event.setBlocked(true);
+                event.setCancelled(true);
+
+                MessageTranslator.send(player, SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
+            }
+
+            if (!turn && !blocked && ((listed || equals) || ignored)) {
                 event.setBlocked(true);
                 event.setCancelled(true);
 
