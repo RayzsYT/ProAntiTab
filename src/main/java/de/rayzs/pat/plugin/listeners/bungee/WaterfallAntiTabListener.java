@@ -39,7 +39,7 @@ public class WaterfallAntiTabListener implements Listener {
         List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
         event.getCommands().entrySet().removeIf(command -> playerCommands.contains(command.getKey()));
 
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(player.getUniqueId(), new ArrayList<>(event.getCommands().keySet()));
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(player, new ArrayList<>(event.getCommands().keySet()));
         if(filteredSuggestionEvent.isCancelled()) event.getCommands().clear();
 
         for (String commandName : filteredSuggestionEvent.getSuggestions()) {

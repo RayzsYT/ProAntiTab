@@ -40,7 +40,7 @@ public class BungeeBlockCommandListener implements Listener {
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%server%", serverName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
             if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             if(executeCommandEvent.isCancelled()) return;
 
@@ -56,7 +56,7 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
             if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             if(executeCommandEvent.isCancelled()) return;
 
@@ -78,7 +78,7 @@ public class BungeeBlockCommandListener implements Listener {
         boolean listed, serverListed, ignored;
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) {
-                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, false);
                 if(executeCommandEvent.isBlocked()) event.setCancelled(true);
                 return;
             }
@@ -88,12 +88,12 @@ public class BungeeBlockCommandListener implements Listener {
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
             if(ignored ? !listed && serverListed : serverListed) {
-                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, false);
                 if(executeCommandEvent.isBlocked()) event.setCancelled(true);
                 return;
             }
 
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
             if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             if(executeCommandEvent.isCancelled()) return;
 
@@ -102,7 +102,7 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
             if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             if(executeCommandEvent.isCancelled()) return;
 
@@ -118,7 +118,7 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, false);
             if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             return;
         }
@@ -128,12 +128,12 @@ public class BungeeBlockCommandListener implements Listener {
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
         if(!listed && !serverListed || listed && serverListed && ignored) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, false);
             if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             return;
         }
 
-        ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player.getUniqueId(), rawCommand, true);
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
         if(executeCommandEvent.isBlocked()) event.setCancelled(true);
         if(executeCommandEvent.isCancelled()) return;
 
