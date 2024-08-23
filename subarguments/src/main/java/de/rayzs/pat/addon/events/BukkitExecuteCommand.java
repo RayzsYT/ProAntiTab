@@ -30,7 +30,7 @@ public class BukkitExecuteCommand extends ExecuteCommandEvent {
             if (!equals && s.equalsIgnoreCase(command))
                 equals = true;
 
-            if (!spaces && s.contains(" "))
+            if (!spaces && s.contains(" ") && command.contains(" "))
                 spaces = true;
 
             if (!command.toLowerCase().startsWith(s.toLowerCase())) continue;
@@ -44,7 +44,7 @@ public class BukkitExecuteCommand extends ExecuteCommandEvent {
                 event.setBlocked(true);
                 event.setCancelled(true);
 
-                MessageTranslator.send(player, SubArgsAddon.BLOCKED_MESSAGE);
+                MessageTranslator.send(player, SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
             }
         }
     }

@@ -34,9 +34,7 @@ public class SubArgsAddon {
         CONFIGURATION.reload();
 
         ArrayList<String> MESSAGE = new ArrayList<>();
-        MESSAGE.add("Subcommand blocked");
-        MESSAGE.add("Sorry mate");
-
+        MESSAGE.add("&cSry mate but command &4%command% &cdoesn't work that way!");
         BLOCKED_MESSAGE = (List<String>) CONFIGURATION.getOrSet("blocked-message", MESSAGE);
     }
 }
