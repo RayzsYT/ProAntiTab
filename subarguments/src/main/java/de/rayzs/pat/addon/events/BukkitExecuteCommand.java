@@ -13,14 +13,23 @@ public class BukkitExecuteCommand extends ExecuteCommandEvent {
     @Override
     public void handle(ExecuteCommandEvent event) {
         Player player = Bukkit.getPlayer(event.getSenderUniqueId());
-
         String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
+
+        if (!command.contains(" ")) return;
+
         boolean listed = false, spaces = false, equals = false,
                 turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
                 blocked = event.isBlocked(),
-                ignored = false;
+                ignored = false,
+                useFilter = false;
 
         for (String s : SubArgsAddon.GENERAL_LIST) {
+
+            if(s.split(" ")[0].equalsIgnoreCase(command.split(" ")[0]))
+                useFilter = true;
+
+            if (!command.toLowerCase().startsWith(s.toLowerCase())) continue;
+            if (!listed) listed = true;
 
             if (s.endsWith(" _-")) {
                 s = StringUtils.replaceFirst(command, " _-", "");
@@ -30,28 +39,18 @@ public class BukkitExecuteCommand extends ExecuteCommandEvent {
             if (!equals && s.equalsIgnoreCase(command))
                 equals = true;
 
-            if (!spaces && s.contains(" ") && command.contains(" "))
+            if (!spaces && command.contains(" ") && !s.endsWith("_-"))
                 spaces = true;
-
-            if (!command.toLowerCase().startsWith(s.toLowerCase())) continue;
-            listed = true;
         }
 
-        if (spaces) {
+        if (blocked || !useFilter) return;
 
-            if (turn && !blocked && (!(listed || equals) || ignored)) {
-                event.setBlocked(true);
-                event.setCancelled(true);
+        if (turn != listed || ignored) {
+            event.setBlocked(true);
+            event.setCancelled(true);
 
-                MessageTranslator.send(player, SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
-            }
+            MessageTranslator.send(player, SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
 
-            if (!turn && !blocked && ((listed || equals) || ignored)) {
-                event.setBlocked(true);
-                event.setCancelled(true);
-
-                MessageTranslator.send(player, SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
-            }
         }
     }
 }
