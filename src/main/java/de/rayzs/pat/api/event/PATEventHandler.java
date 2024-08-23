@@ -1,6 +1,8 @@
 package de.rayzs.pat.api.event;
 
 import de.rayzs.pat.api.event.events.*;
+import de.rayzs.pat.utils.CommunicationPackets;
+
 import java.util.*;
 
 public class PATEventHandler {
@@ -59,6 +61,32 @@ public class PATEventHandler {
         return event;
     }
 
+    public static SentSyncEvent call(CommunicationPackets.PacketBundle packetBundle, String serverName) {
+        SentSyncEvent event = EmptyEvent.createEmptySentSyncEvent(packetBundle, serverName);
+
+        for (PATEvent patEvent : EVENTS) {
+            if(patEvent instanceof SentSyncEvent) {
+                SentSyncEvent sentSyncEvent = (SentSyncEvent) patEvent;
+                sentSyncEvent.handle(event);
+            }
+        }
+
+        return event;
+    }
+
+    public static ReceiveSyncEvent call(CommunicationPackets.PacketBundle packetBundle) {
+        ReceiveSyncEvent event = EmptyEvent.createEmptyReceiveSyncEvent(packetBundle);
+
+        for (PATEvent patEvent : EVENTS) {
+            if(patEvent instanceof ReceiveSyncEvent) {
+                ReceiveSyncEvent proxySyncEvent = (ReceiveSyncEvent) patEvent;
+                proxySyncEvent.handle(event);
+            }
+        }
+
+        return event;
+    }
+
     public static void register(PATEvent event) {
         EVENTS.add(event);
     }
@@ -68,6 +96,24 @@ public class PATEventHandler {
     }
 
     public static class EmptyEvent {
+
+        public static SentSyncEvent createEmptySentSyncEvent(CommunicationPackets.PacketBundle packetBundle, String serverName) {
+            return new SentSyncEvent(null, packetBundle, serverName) {
+                @Override
+                public void handle(SentSyncEvent event) {
+
+                }
+            };
+        }
+
+        public static ReceiveSyncEvent createEmptyReceiveSyncEvent(CommunicationPackets.PacketBundle packetBundle) {
+            return new ReceiveSyncEvent(null, packetBundle) {
+                @Override
+                public void handle(ReceiveSyncEvent event) {
+
+                }
+            };
+        }
 
         public static UpdatePluginEvent createEmptyUpdatePluginEvent() {
             return new UpdatePluginEvent(null) {

@@ -2,6 +2,7 @@ package de.rayzs.pat.api.communication;
 
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.communication.client.impl.*;
+import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.blacklist.impl.*;
 import de.rayzs.pat.api.communication.impl.*;
@@ -149,6 +150,8 @@ public class Communicator {
 
         bundle = new CommunicationPackets.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
         clientInfo.sendBytes(CommunicationPackets.convertToBytes(bundle));
+
+        PATEventHandler.call(bundle, serverName);
     }
 
     public static void sendRequest() {

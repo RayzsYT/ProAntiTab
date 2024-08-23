@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin;
 
+import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
@@ -195,13 +196,16 @@ public class BukkitLoader extends JavaPlugin {
 
         if(!loaded) loaded = true;
 
-        if(Reflection.getMinor() < 16) return;
+        if(Reflection.getMinor() >= 16) {
 
-        if(Storage.USE_VELOCITY)
-            BukkitAntiTabListener.updateCommands();
+            if (Storage.USE_VELOCITY)
+                BukkitAntiTabListener.updateCommands();
 
-        Logger.debug("Force server to load all players tab-completion due to received sync!");
-        BukkitAntiTabListener.handleTabCompletion(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? Storage.Blacklist.getBlacklist().getCommands() : getNotBlockedCommands());
+            Logger.debug("Force server to load all players tab-completion due to received sync!");
+            BukkitAntiTabListener.handleTabCompletion(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? Storage.Blacklist.getBlacklist().getCommands() : getNotBlockedCommands());
+        }
+
+        PATEventHandler.call(packetBundle);
     }
 
     public static boolean doesCommandExist(String command, boolean replace) {
