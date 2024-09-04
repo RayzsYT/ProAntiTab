@@ -29,7 +29,7 @@ import java.util.*;
 id = "proantitab",
 version = "1.8.0",
 authors = "Rayzs_YT",
-description = "Hide more then just plugins. Hide almost everything!",
+description = "Hide more than just your plugins. Hide almost everything!",
 dependencies = {
         @Dependency(id = "luckperms", optional = true),
         @Dependency(id = "papiproxybridge", optional = true)
