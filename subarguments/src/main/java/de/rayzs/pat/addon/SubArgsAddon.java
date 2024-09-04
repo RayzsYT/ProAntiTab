@@ -3,7 +3,6 @@ package de.rayzs.pat.addon;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.addon.events.*;
 import java.util.*;
 
@@ -20,7 +19,7 @@ public class SubArgsAddon {
         updateMessages();
 
         PATEventHandler.register(new TabCompletion());
-        PATEventHandler.register(Reflection.isProxyServer() ? new BungeeExecuteCommand() : new BukkitExecuteCommand());
+        PATEventHandler.register(new ExecuteCommand());
 
         PATEventHandler.register(UpdateList.UPDATE_PLUGIN_EVENT);
         PATEventHandler.register(UpdateList.RECEIVE_SYNC_EVENT);

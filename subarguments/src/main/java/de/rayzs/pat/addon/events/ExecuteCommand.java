@@ -4,20 +4,26 @@ import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.addon.SubArgsAddon;
-import de.rayzs.pat.utils.StringUtils;
-import org.bukkit.entity.Player;
-import org.bukkit.Bukkit;
+import de.rayzs.pat.utils.*;
 
-public class BukkitExecuteCommand extends ExecuteCommandEvent {
+public class ExecuteCommand extends ExecuteCommandEvent {
 
     @Override
     public void handle(ExecuteCommandEvent event) {
-        Player player = Bukkit.getPlayer(event.getSenderUniqueId());
         String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
-
         if (!command.contains(" ")) return;
 
-        boolean listed = false, spaces = false, equals = false,
+        if (shouldCommandBeBlocked(event, command, false)) {
+            event.setBlocked(true);
+            event.setCancelled(true);
+
+            MessageTranslator.send(event.getSenderObj(), SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
+
+        }
+    }
+
+    private boolean shouldCommandBeBlocked(ExecuteCommandEvent event, String command, boolean inGroup) {
+        boolean listed = false,
                 turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
                 blocked = event.isBlocked(),
                 ignored = false,
@@ -30,27 +36,9 @@ public class BukkitExecuteCommand extends ExecuteCommandEvent {
 
             if (!command.toLowerCase().startsWith(s.toLowerCase())) continue;
             if (!listed) listed = true;
-
-            if (s.endsWith(" _-")) {
-                s = StringUtils.replaceFirst(command, " _-", "");
-                ignored = true;
-            }
-
-            if (!equals && s.equalsIgnoreCase(command))
-                equals = true;
-
-            if (!spaces && command.contains(" ") && !s.endsWith("_-"))
-                spaces = true;
+            if (s.endsWith(" _-")) ignored = true;
         }
 
-        if (blocked || !useFilter) return;
-
-        if (turn != listed || ignored) {
-            event.setBlocked(true);
-            event.setCancelled(true);
-
-            MessageTranslator.send(player, SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
-
-        }
+        return !(blocked || !useFilter) && turn != listed || ignored;
     }
 }

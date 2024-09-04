@@ -13,7 +13,6 @@ public class TabCompletion extends FilteredTabCompletionEvent {
         String cursor = StringUtils.replaceFirst(event.getCursor(), "/", "");
         if (event.getCompletion().isEmpty()) return;
 
-
         event.setCompletion(checkAndFilterCompletions(cursor, event.getCompletion(), SubArgsAddon.GENERAL_LIST, false));
     }
 
@@ -22,25 +21,50 @@ public class TabCompletion extends FilteredTabCompletionEvent {
         if (isGroup || Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             possibilities = new ArrayList<>();
 
-        boolean nothing = false,
-                emptyStart = true;
+        boolean hideAll = false, showAll = false,
+                emptyStart = true, hideAfter = false;
 
-        String cursorStart = cursor.contains(" ") ? cursor.split(" ")[0] : cursor;
+        String cursorStart = cursor;
+        int cursorSpaces = 0, spaces = 0;
+
+        if(cursor.contains(" ")) {
+            String[] cursorParts = cursor.split(" ");
+            cursorSpaces = cursorParts.length;
+            cursorStart = cursorParts[0];
+        }
 
         for (String c : commands) {
-            if(!c.startsWith(cursorStart)) continue;
+            if (!c.startsWith(cursorStart)) continue;
 
             emptyStart = false;
 
             if (!c.startsWith(cursor)) continue;
 
-            if(c.endsWith("_-")) {
-                nothing = true;
-                break;
-            }
+            if (c.contains(" "))
+                spaces = c.split(" ").length - 1;
 
             String[] parts = c.split(" ");
             String tmpCursor = (!cursor.endsWith(" ") && parts.length > 0) ? parts[parts.length - 1] : c.substring(cursor.length());
+
+            if (cursorSpaces == spaces) {
+                if (tmpCursor.equals("_-")) {
+                    hideAll = true;
+                    break;
+                }
+
+                if (tmpCursor.equals("_*")) {
+                    showAll = true;
+                    break;
+                }
+
+            } else if (cursorSpaces >= spaces && tmpCursor.equals("_--")) {
+                hideAfter = true;
+                break;
+
+
+            } else if (cursorSpaces > spaces) {
+                //if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+            }
             if (isGroup || Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
                 possibilities.add(tmpCursor);
                 continue;
@@ -49,7 +73,9 @@ public class TabCompletion extends FilteredTabCompletionEvent {
             possibilities.remove(tmpCursor);
         }
 
-        if(nothing) possibilities = new ArrayList<>();
+        if(hideAll || hideAfter) possibilities = new ArrayList<>();
+        else if(showAll) possibilities = new ArrayList<>(oldPossibilities);
+
         return !emptyStart ? possibilities : oldPossibilities;
     }
 }
