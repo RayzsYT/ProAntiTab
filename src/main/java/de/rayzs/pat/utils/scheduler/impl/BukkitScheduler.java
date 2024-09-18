@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 
 public class BukkitScheduler implements PATSchedulerTask {
 
-    private int taskId = -5;
+    private int taskId = -1;
 
     @Override
     public PATSchedulerTask getInstance(boolean async, Runnable runnable, long time, long period) {
@@ -37,6 +37,6 @@ public class BukkitScheduler implements PATSchedulerTask {
     @Override
     public void cancelTask() {
         Bukkit.getScheduler().cancelTask(taskId);
-        this.taskId = -5;
+        this.taskId = -1;
     }
 }

@@ -14,11 +14,11 @@ public class BackendUpdater {
     }
 
     public static boolean isRunning() {
-        return TASK.isActive();
+        return TASK != null && TASK.isActive();
     }
 
     public static void start() {
-        if(TASK != null && TASK.isActive()) return;
+        if(isRunning()) return;
 
         TASK = PATScheduler.createScheduler(() -> {
             if (shouldRun()) Communicator.sendRequest();
@@ -27,9 +27,9 @@ public class BackendUpdater {
     }
 
     public static void stop() {
-        if(!TASK.isActive()) return;
-
+        if(TASK == null || !TASK.isActive()) return;
         TASK.cancelTask();
+        TASK = null;
     }
 
     private static boolean shouldRun() {
