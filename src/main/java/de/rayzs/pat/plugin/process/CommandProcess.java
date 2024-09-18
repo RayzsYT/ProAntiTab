@@ -202,6 +202,10 @@ public class CommandProcess {
                             PermissionUtil.reloadPermissions();
                             sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_ALL);
                             return;
+
+                        case "perms":
+                            sender.sendMessage("§cPlease specify the player you want to check!");
+                            return;
                     }
 
                 case 2:
