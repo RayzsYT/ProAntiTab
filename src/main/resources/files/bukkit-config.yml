@@ -194,7 +194,7 @@ reload:
 perms-check:
   message: "&7All of &e%player%'s &7PAT-related permission: &e%permissions%"
   player-is-missing: "&cPlease specify the player whose permission you want to check."
-  player-not-online: "&c%target% is not online!"
+  player-not-online: "&c%player% is not online!"
 
 help:
   - '&7Available commands are: &f/%label%&7... &8[&fBUKKIT&8]'
