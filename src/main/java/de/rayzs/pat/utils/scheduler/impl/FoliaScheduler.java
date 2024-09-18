@@ -37,7 +37,6 @@ public class FoliaScheduler implements PATSchedulerTask {
 
     @Override
     public void cancelTask() {
-        setTaskId(-1);
         this.task.cancel();
     }
 }
