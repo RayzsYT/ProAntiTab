@@ -204,6 +204,7 @@ help:
   - '&f  info &7to get a few information'
   - '&f  postdebug &7to post the PAT logs'
   - '&f  update <player> &7to update player(s) permissions'
+  - "&f  perms <player> &7to check a player's permissions"
   - '&f  add/rem (command) &8<group> &7to manage the list'
   - '&f  clear &8<group> &7to clear the list'
   - '&f  creategroup (group) &7to create a group'
