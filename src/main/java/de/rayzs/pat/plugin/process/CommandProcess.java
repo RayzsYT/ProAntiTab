@@ -204,7 +204,7 @@ public class CommandProcess {
                             return;
 
                         case "perms":
-                            sender.sendMessage("§cPlease specify the player you want to check!");
+                            sender.sendMessage(Storage.ConfigSections.Messages.PERMS_CHECK.PLAYER_MISSING);
                             return;
                     }
 
@@ -362,9 +362,11 @@ public class CommandProcess {
                             if(!PermissionUtil.hasPermissionWithResponse(sender, "perms")) return;
                             uuid = !Reflection.isProxyServer() ? BukkitLoader.getUUIDByName(sub) : Reflection.isVelocityServer() ? VelocityLoader.getUUIDByName(sub) : BungeeLoader.getUUIDByName(sub);
 
-                            if(uuid != null) {
-                                sender.sendMessage("§7Permissions from §f" + sub + "§7: §e" + PermissionUtil.getPermissions(uuid));
-                            } else sender.sendMessage("§cThis player isn't online!");
+                            sender.sendMessage((uuid != null
+                                    ? Storage.ConfigSections.Messages.PERMS_CHECK.MESSAGE.replace("%permissions%", PermissionUtil.getPermissions(uuid))
+                                    : Storage.ConfigSections.Messages.PERMS_CHECK.PLAYER_NOT_ONLINE
+                                    ).replace("%player%", sub)
+                                    );
                             return;
                     }
 
