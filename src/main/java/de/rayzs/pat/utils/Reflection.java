@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Reflection {
 
-    private static boolean legacy, proxy, velocity, paper, weird;
+    private static boolean legacy, proxy, velocity, paper, folia, weird;
     private static String versionName, rawVersionName, versionPackageName;
     private static Version version;
     private static int major, minor, release;
@@ -24,6 +24,15 @@ public class Reflection {
             weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() > 20;
             proxy = false;
         } catch (Throwable ignored) { proxy = true; }
+
+        if(!proxy) {
+            try {
+                Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
+                folia = true;
+            } catch (Throwable throwable) {
+                folia = false;
+            }
+        }
 
         try {
             Class.forName("com.destroystokyo.paper.Metrics");
@@ -54,6 +63,10 @@ public class Reflection {
     public static boolean isModern() { return !legacy; }
     public static boolean isLegacy() { return legacy; }
     public static boolean isWeird() { return weird; }
+
+    public static boolean isFoliaServer() {
+        return folia;
+    }
 
     public static boolean isProxyServer() {
         return proxy;
