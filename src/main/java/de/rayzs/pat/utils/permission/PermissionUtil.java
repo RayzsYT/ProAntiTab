@@ -28,7 +28,7 @@ public class PermissionUtil {
     public static String getPermissions(UUID uuid) {
         PermissionMap permissionMap = MAP.get(uuid);
         if(permissionMap == null) return "";
-        return Arrays.toString(permissionMap.getHashedPermissions().toArray());
+        return Arrays.toString(permissionMap.getHashedPermissions().toArray()).replace("[", "").replace("]", "");
     }
 
     public static void setPlayerPermissions(UUID uuid) {
