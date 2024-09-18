@@ -1,9 +1,8 @@
 package de.rayzs.pat.utils.scheduler.impl;
 
-import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
-import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import io.papermc.paper.threadedregions.scheduler.*;
+import de.rayzs.pat.plugin.BukkitLoader;
 import org.bukkit.Bukkit;
 
 public class FoliaScheduler implements PATSchedulerTask {
@@ -13,13 +12,13 @@ public class FoliaScheduler implements PATSchedulerTask {
     private ScheduledTask task;
 
     @Override
-    public PATSchedulerTask getInstance(Runnable runnable, int time, int period) {
+    public PATSchedulerTask getInstance(boolean async, Runnable runnable, int time, int period) {
         this.task = SCHEDULER.runAtFixedRate(BukkitLoader.getPlugin(), __ -> runnable.run(), time, period);
         return this;
     }
 
     @Override
-    public PATSchedulerTask getInstance(Runnable runnable, int time) {
+    public PATSchedulerTask getInstance(boolean async, Runnable runnable, int time) {
         this.task = SCHEDULER.runDelayed(BukkitLoader.getPlugin(), __ -> runnable.run(), time);
         return this;
     }
