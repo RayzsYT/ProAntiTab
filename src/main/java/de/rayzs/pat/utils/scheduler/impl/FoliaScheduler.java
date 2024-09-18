@@ -12,13 +12,13 @@ public class FoliaScheduler implements PATSchedulerTask {
     private ScheduledTask task;
 
     @Override
-    public PATSchedulerTask getInstance(boolean async, Runnable runnable, int time, int period) {
+    public PATSchedulerTask getInstance(boolean async, Runnable runnable, long time, long period) {
         this.task = SCHEDULER.runAtFixedRate(BukkitLoader.getPlugin(), __ -> runnable.run(), time, period);
         return this;
     }
 
     @Override
-    public PATSchedulerTask getInstance(boolean async, Runnable runnable, int time) {
+    public PATSchedulerTask getInstance(boolean async, Runnable runnable, long time) {
         this.task = SCHEDULER.runDelayed(BukkitLoader.getPlugin(), __ -> runnable.run(), time);
         return this;
     }

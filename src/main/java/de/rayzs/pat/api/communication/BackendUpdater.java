@@ -1,12 +1,12 @@
 package de.rayzs.pat.api.communication;
 
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.scheduler.*;
 import org.bukkit.Bukkit;
 
 public class BackendUpdater {
 
-    private static int TASK = -1;
+    private static PATSchedulerTask TASK;
 
     public static void handle() {
         if(isRunning() || !shouldRun() || !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
@@ -14,23 +14,22 @@ public class BackendUpdater {
     }
 
     public static boolean isRunning() {
-        return TASK != -1;
+        return TASK.isActive();
     }
 
     public static void start() {
-        if(TASK != -1) return;
+        if(TASK != null && TASK.isActive()) return;
 
-        TASK = Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
-            if(shouldRun()) Communicator.sendRequest();
+        TASK = PATScheduler.createScheduler(() -> {
+            if (shouldRun()) Communicator.sendRequest();
             else stop();
         }, 5, 20);
     }
 
     public static void stop() {
-        if(TASK == -1) return;
+        if(!TASK.isActive()) return;
 
-        Bukkit.getScheduler().cancelTask(TASK);
-        TASK = -1;
+        TASK.cancelTask();
     }
 
     private static boolean shouldRun() {

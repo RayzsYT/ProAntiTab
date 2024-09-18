@@ -1,6 +1,5 @@
 package de.rayzs.pat.plugin;
 
-import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
@@ -14,11 +13,13 @@ import de.rayzs.pat.plugin.commands.BukkitCommand;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.utils.hooks.PlaceholderHook;
 import de.rayzs.pat.plugin.listeners.bukkit.*;
+import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.scheduler.*;
 import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import de.rayzs.pat.utils.*;
@@ -33,7 +34,7 @@ public class BukkitLoader extends JavaPlugin {
     private static java.util.logging.Logger logger;
     private static boolean loaded = false, checkUpdate = false, suggestions = false;
     private static Map<String, Command> commandsMap = null;
-    private int updaterTaskId;
+    private PATSchedulerTask updaterTask;
 
     @Override
     public void onLoad() {
@@ -129,7 +130,7 @@ public class BukkitLoader extends JavaPlugin {
 
     public void startUpdaterTask() {
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
-        updaterTaskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, () -> {
+        updaterTask = PATScheduler.createAsyncScheduler(() -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
 
@@ -137,7 +138,7 @@ public class BukkitLoader extends JavaPlugin {
             Storage.NEWER_VERSION = result;
 
             if (!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
-                Bukkit.getScheduler().cancelTask(updaterTaskId);
+                updaterTask.cancelTask();
                 switch (result) {
                     case "internet":
                         Logger.warning("Failed to build connection to website! (No internet?)");

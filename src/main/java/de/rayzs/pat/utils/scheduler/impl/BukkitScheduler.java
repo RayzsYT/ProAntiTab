@@ -9,7 +9,7 @@ public class BukkitScheduler implements PATSchedulerTask {
     private int taskId = -5;
 
     @Override
-    public PATSchedulerTask getInstance(boolean async, Runnable runnable, int time, int period) {
+    public PATSchedulerTask getInstance(boolean async, Runnable runnable, long time, long period) {
         this.taskId = async
                 ? Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), runnable, time, period)
                 : Bukkit.getScheduler().scheduleSyncRepeatingTask(BukkitLoader.getPlugin(), runnable, time, period);
@@ -17,7 +17,7 @@ public class BukkitScheduler implements PATSchedulerTask {
     }
 
     @Override
-    public PATSchedulerTask getInstance(boolean async, Runnable runnable, int time) {
+    public PATSchedulerTask getInstance(boolean async, Runnable runnable, long time) {
         this.taskId = async
                 ? Bukkit.getScheduler().scheduleAsyncDelayedTask(BukkitLoader.getPlugin(), runnable, time)
                 : Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), runnable, time);
