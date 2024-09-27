@@ -33,7 +33,9 @@ public class VelocityAntiTabListener {
     @Subscribe (order = PostOrder.LAST)
     public void onPlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
         Player player = event.getPlayer();
+
         if(event.getRootNode().getChildren().isEmpty() || !player.getCurrentServer().isPresent()) return;
+
         String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
 
         if(!COMMANDS_CACHE_MAP.containsKey(serverName))
@@ -46,37 +48,16 @@ public class VelocityAntiTabListener {
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        /*
-        ConcurrentHashMap<String, CommandNode<?>> commandsMap = new ConcurrentHashMap<>();
-        for (CommandNode<?> child : event.getRootNode().getChildren()) {
-            if(child == null || child.getName() == null) continue;
-            commandsMap.put(child.getName(), child);
-        }
-
-        ConcurrentHashMap<String, CommandNode<?>> filteredCommandsMap = new ConcurrentHashMap<>(commandsMap);
+        final boolean newer = player.getProtocolVersion().getProtocol() > 340;
         final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
-        event.getRootNode().getChildren().removeIf(command -> {
-            if (command == null || command.getName() == null || playerCommands.contains(command.getName())) {
-                if(command != null && command.getName() != null) filteredCommandsMap.remove(command.getName());
-                return true;
-            }
-            return false;
-        });*/
 
-        final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
+        if(event.getRootNode().getChildren().size() == 1 && newer
+                && event.getRootNode().getChild("args") != null
+                && event.getRootNode().getChild("args").getChildren().isEmpty())
+            return;
+
+        if(event.getRootNode().getChildren().size() == 1 && newer && event.getRootNode().getChild("args") != null) return;
         event.getRootNode().getChildren().removeIf(command -> command == null || command.getName() == null || playerCommands.contains(command.getName()));
-
-        /*
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(player.getUniqueId(), new ArrayList<>(filteredCommandsMap.keySet()));
-        if(filteredSuggestionEvent.isCancelled()) event.getRootNode().getChildren().clear();
-
-        for (String commandName : filteredSuggestionEvent.getSuggestions()) {
-            CommandNode<?> commandNode = commandsMap.get(commandName);
-            event.getRootNode().getChildren().add(commandNode);
-            if(!filteredCommandsMap.containsKey(commandName)) event.getRootNode().addChild(commandNode);
-        }
-
-        commandsMap = null;*/
     }
 
     public static void updateCommands() {

@@ -1,5 +1,7 @@
 package de.rayzs.pat.api.netty.proxy;
 
+import com.mojang.brigadier.tree.CommandNode;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -170,22 +172,33 @@ public class VelocityPacketAnalyzer {
             } else if(packet instanceof AvailableCommandsPacket) {
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     AvailableCommandsPacket commands = (AvailableCommandsPacket) packet;
-                    if(commands.getRootNode().getChildren().isEmpty() || !player.getCurrentServer().isPresent()) return;
 
-                    String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
+                    if(!commands.getRootNode().getChildren().isEmpty()) {
+                        String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
 
-                    if(!COMMANDS_CACHE_MAP.containsKey(serverName))
-                        COMMANDS_CACHE_MAP.put(serverName, new CommandsCache().reverse());
-                    CommandsCache commandsCache = COMMANDS_CACHE_MAP.get(serverName);
+                        if (!COMMANDS_CACHE_MAP.containsKey(serverName))
+                            COMMANDS_CACHE_MAP.put(serverName, new CommandsCache().reverse());
+                        CommandsCache commandsCache = COMMANDS_CACHE_MAP.get(serverName);
 
-                    List<String> commandsAsString = new ArrayList<>();
-                    commands.getRootNode().getChildren().stream().filter(command -> command != null && command.getName() != null).forEach(command -> commandsAsString.add(command.getName()));
-                    commandsCache.handleCommands(commandsAsString, serverName);
+                        List<String> commandsAsString = new ArrayList<>();
+                        commands.getRootNode().getChildren().stream().filter(command -> command != null && command.getName() != null).forEach(command -> commandsAsString.add(command.getName()));
+                        commandsCache.handleCommands(commandsAsString, serverName);
 
-                    if(PermissionUtil.hasBypassPermission(player)) return;
+                        if (PermissionUtil.hasBypassPermission(player)) return;
 
-                    final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
-                    commands.getRootNode().getChildren().removeIf(command -> command == null || command.getName() == null || playerCommands.contains(command.getName()));
+                        final boolean newer = player.getProtocolVersion().getProtocol() > 340;
+                        final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
+
+                        if(commands.getRootNode().getChildren().size() == 1 && newer
+                                && commands.getRootNode().getChild("args") != null
+                                && commands.getRootNode().getChild("args").getChildren().isEmpty()) {
+
+                            super.write(ctx, msg, promise);
+                            return;
+                        }
+
+                        commands.getRootNode().getChildren().removeIf(command -> command == null || command.getName() == null || playerCommands.contains(command.getName()));
+                    }
                 }
             }
 
