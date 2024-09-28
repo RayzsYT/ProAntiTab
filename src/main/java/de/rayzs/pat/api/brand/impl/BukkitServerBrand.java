@@ -115,6 +115,11 @@ public class BukkitServerBrand implements ServerBrand {
         }
     }
 
+    @Override
+    public PacketUtils.BrandManipulate createPacket(Object playerObj) {
+        return null;
+    }
+
     private boolean isModified(Player player) {
         if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return false;
         return MODIFIED_BRAND_PLAYERS.contains(player);

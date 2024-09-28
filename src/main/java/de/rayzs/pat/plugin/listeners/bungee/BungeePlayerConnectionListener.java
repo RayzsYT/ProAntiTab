@@ -18,6 +18,15 @@ public class BungeePlayerConnectionListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPostLogin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
+
+        if(CustomServerBrand.isEnabled() && Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+
+            ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
+                if (player.isConnected()) CustomServerBrand.sendBrandToPlayer(player);
+            }, 500, TimeUnit.MILLISECONDS);
+
+        }
+
         PermissionUtil.setPlayerPermissions(player.getUniqueId());
 
         if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
@@ -41,6 +50,7 @@ public class BungeePlayerConnectionListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerDisconnectEvent(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
+
         PermissionUtil.resetPermissions(player.getUniqueId());
         BungeePacketAnalyzer.uninject(player);
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;

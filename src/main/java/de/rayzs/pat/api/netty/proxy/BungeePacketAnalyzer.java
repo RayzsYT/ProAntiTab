@@ -1,12 +1,17 @@
 package de.rayzs.pat.api.netty.proxy;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.client.ClientInfo;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import de.rayzs.pat.api.communication.Communicator;
+import net.md_5.bungee.protocol.DefinedPacket;
 import net.md_5.bungee.protocol.PacketWrapper;
+
+import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 import com.mojang.brigadier.tree.CommandNode;
 import net.md_5.bungee.api.plugin.Command;
@@ -159,7 +164,12 @@ public class BungeePacketAnalyzer {
                 return;
             }
 
-            if (wrapper.packet instanceof Commands) {
+            if(wrapper.packet instanceof PluginMessage) {
+                PluginMessage pluginMessage = (PluginMessage) wrapper.packet;
+                if(CustomServerBrand.isEnabled() && CustomServerBrand.isBrandTag(pluginMessage.getTag()))
+                    return;
+
+            } else if (wrapper.packet instanceof Commands) {
                 Commands response = (Commands) wrapper.packet;
                 modifyCommands(player, response, commands);
                 player.unsafe().sendPacket(response);

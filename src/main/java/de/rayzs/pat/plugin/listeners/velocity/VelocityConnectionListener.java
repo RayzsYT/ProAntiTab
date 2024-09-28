@@ -25,6 +25,15 @@ public class VelocityConnectionListener {
     @Subscribe
     public void onServerPreConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
+
+        if(CustomServerBrand.isEnabled() && Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+
+            server.getScheduler().buildTask(loader, () -> {
+                if (player.isActive()) CustomServerBrand.sendBrandToPlayer(player);
+            }).delay(500, TimeUnit.MILLISECONDS).schedule();
+
+        }
+
         PermissionUtil.setPlayerPermissions(player.getUniqueId());
 
         if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {

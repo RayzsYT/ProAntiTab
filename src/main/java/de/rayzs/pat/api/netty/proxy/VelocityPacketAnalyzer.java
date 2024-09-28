@@ -3,6 +3,7 @@ package de.rayzs.pat.api.netty.proxy;
 import com.mojang.brigadier.tree.CommandNode;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.proxy.protocol.packet.*;
@@ -129,7 +130,15 @@ public class VelocityPacketAnalyzer {
 
             MinecraftPacket packet = (MinecraftPacket) msg;
 
-            if(packet instanceof TabCompleteResponsePacket) {
+            if(packet instanceof PluginMessagePacket) {
+                PluginMessagePacket pluginMessagePacket = (PluginMessagePacket) packet;
+                if(CustomServerBrand.isEnabled() && CustomServerBrand.isBrandTag(pluginMessagePacket.getChannel()) && !player.getCurrentServer().isPresent()) {
+                    PacketUtils.BrandManipulate brandManipulatePacket = CustomServerBrand.createBrandPacket(player);
+                    super.write(ctx, new PluginMessagePacket(pluginMessagePacket.getChannel(), brandManipulatePacket.getByteBuf()), promise);
+                    return;
+                }
+
+            } else if(packet instanceof TabCompleteResponsePacket) {
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
 

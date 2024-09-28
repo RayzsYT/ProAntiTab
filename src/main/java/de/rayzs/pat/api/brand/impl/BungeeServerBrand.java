@@ -57,4 +57,17 @@ public class BungeeServerBrand implements ServerBrand {
         String brand = player.getPendingConnection().getVersion() >= ProtocolConstants.MINECRAFT_1_13 ? "minecraft:brand" : "MC|Brand";
         player.sendData(brand, serverBrand.getBytes());
     }
+
+    @Override
+    public PacketUtils.BrandManipulate createPacket(Object playerObj) {
+        if (!(playerObj instanceof ProxiedPlayer) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return null;
+        ProxiedPlayer player = (ProxiedPlayer) playerObj;
+
+        String serverName = "", playerName = player.getName(), customBrand;
+        Server server = player.getServer();
+        if(server != null) serverName = server.getInfo().getName();
+        customBrand = BRAND.replace("%player%", playerName).replace("%server%", serverName);
+
+        return new PacketUtils.BrandManipulate(customBrand);
+    }
 }

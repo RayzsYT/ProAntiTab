@@ -80,4 +80,25 @@ public class VelocityServerBrand implements ServerBrand {
             exception.printStackTrace();
         }
     }
+
+    @Override
+    public PacketUtils.BrandManipulate createPacket(Object playerObj) {
+        if (!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return null;
+
+        try {
+            Player player = (Player) playerObj;
+
+            String serverName = "", playerName = player.getUsername(), customBrand;
+            Optional<ServerConnection> serverConnection = player.getCurrentServer();
+
+            if(serverConnection.isPresent()) serverName = serverConnection.get().getServerInfo().getName();
+            customBrand = BRAND.replace("%player%", playerName).replace("%server%", serverName).replace("%ping%", String.valueOf(player.getPing()));
+
+            return new PacketUtils.BrandManipulate(customBrand, false);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        return null;
+    }
 }

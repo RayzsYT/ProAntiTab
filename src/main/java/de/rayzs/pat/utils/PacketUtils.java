@@ -132,6 +132,10 @@ public class PacketUtils {
             return bytes;
         }
 
+        public String getBrand() {
+            return brand;
+        }
+
         public ByteBuf getByteBuf() {
             return byteBuf;
         }
