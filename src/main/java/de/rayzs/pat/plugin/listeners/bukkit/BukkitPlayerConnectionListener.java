@@ -51,5 +51,6 @@ public class BukkitPlayerConnectionListener implements Listener {
         Player player = event.getPlayer();
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
         BukkitServerBrand.removeFromModified(player);
+        CustomServerBrand.sendBrandToPlayer(player);
     }
 }
