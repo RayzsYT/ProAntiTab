@@ -25,10 +25,16 @@ public class PermissionUtil {
         setPlayerPermissions(uuid);
     }
 
-    public static String getPermissions(UUID uuid) {
+    public static String getPermissionsAsString(UUID uuid) {
         PermissionMap permissionMap = MAP.get(uuid);
         if(permissionMap == null) return "";
         return Arrays.toString(permissionMap.getHashedPermissions().toArray()).replace("[", "").replace("]", "");
+    }
+
+    public static Set<String> getPermissions(UUID uuid) {
+        PermissionMap permissionMap = MAP.get(uuid);
+        if(permissionMap == null) return null;
+        return permissionMap.getHashedPermissions();
     }
 
     public static void setPlayerPermissions(UUID uuid) {

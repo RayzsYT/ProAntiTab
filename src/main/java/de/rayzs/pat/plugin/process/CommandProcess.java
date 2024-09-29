@@ -363,7 +363,7 @@ public class CommandProcess {
                             uuid = !Reflection.isProxyServer() ? BukkitLoader.getUUIDByName(sub) : Reflection.isVelocityServer() ? VelocityLoader.getUUIDByName(sub) : BungeeLoader.getUUIDByName(sub);
 
                             sender.sendMessage((uuid != null
-                                    ? Storage.ConfigSections.Messages.PERMS_CHECK.MESSAGE.replace("%permissions%", PermissionUtil.getPermissions(uuid))
+                                    ? Storage.ConfigSections.Messages.PERMS_CHECK.MESSAGE.replace("%permissions%", PermissionUtil.getPermissionsAsString(uuid))
                                     : Storage.ConfigSections.Messages.PERMS_CHECK.PLAYER_NOT_ONLINE
                                     ).replace("%player%", sub)
                                     );
