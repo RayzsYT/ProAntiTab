@@ -61,6 +61,19 @@ public class PATEventHandler {
         return event;
     }
 
+    public static UpdatePlayerCommandsEvent call(Object playerObj, List<String> commands, boolean serverBased) {
+        UpdatePlayerCommandsEvent event = EmptyEvent.createEmptyUpdatePlayerCommandsEvent(playerObj, commands, serverBased);
+
+        for (PATEvent patEvent : EVENTS) {
+            if(patEvent instanceof UpdatePlayerCommandsEvent) {
+                UpdatePlayerCommandsEvent updatePlayerCommandsEvent = (UpdatePlayerCommandsEvent) patEvent;
+                updatePlayerCommandsEvent.handle(event);
+            }
+        }
+
+        return event;
+    }
+
     public static SentSyncEvent call(CommunicationPackets.PacketBundle packetBundle, String serverName) {
         SentSyncEvent event = EmptyEvent.createEmptySentSyncEvent(packetBundle, serverName);
 
@@ -110,6 +123,15 @@ public class PATEventHandler {
             return new ReceiveSyncEvent(null, packetBundle) {
                 @Override
                 public void handle(ReceiveSyncEvent event) {
+
+                }
+            };
+        }
+
+        public static UpdatePlayerCommandsEvent createEmptyUpdatePlayerCommandsEvent(Object playerObj, List<String> commands, boolean serverBased) {
+            return new UpdatePlayerCommandsEvent(playerObj, commands, serverBased) {
+                @Override
+                public void handle(UpdatePlayerCommandsEvent event) {
 
                 }
             };

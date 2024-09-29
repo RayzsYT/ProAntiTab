@@ -191,7 +191,7 @@ public class VelocityPacketAnalyzer {
 
                         List<String> commandsAsString = new ArrayList<>();
                         commands.getRootNode().getChildren().stream().filter(command -> command != null && command.getName() != null).forEach(command -> commandsAsString.add(command.getName()));
-                        commandsCache.handleCommands(commandsAsString, serverName);
+                        commandsCache.handleCommands(commandsAsString, serverName, player);
 
                         if (PermissionUtil.hasBypassPermission(player)) return;
 

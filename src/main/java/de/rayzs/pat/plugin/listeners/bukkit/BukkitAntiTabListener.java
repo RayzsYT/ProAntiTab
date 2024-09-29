@@ -41,7 +41,7 @@ public class BukkitAntiTabListener implements Listener {
         }
         List<String> allCommands = getCommands();
 
-        COMMANDS_CACHE.handleCommands(allCommands);
+        COMMANDS_CACHE.handleCommands(allCommands, player);
 
         if (PermissionUtil.hasBypassPermission(player)) {
             Logger.debug("Player with uuid " + uuidSubstring + " skipped the commands-list creation due to its permissions.");

@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils;
 
+import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
@@ -16,7 +17,7 @@ public class CommandsCache {
         return this;
     }
 
-    public void handleCommands(List<String> commands) {
+    public void handleCommands(List<String> commands, Object playerObj) {
         if(change) return;
         if(!isOutdated(commands)) return;
 
@@ -39,9 +40,10 @@ public class CommandsCache {
         }
 
         change = true;
+        PATEventHandler.call(playerObj, filteredCommands, false);
     }
 
-    public void handleCommands(List<String> commands, String server) {
+    public void handleCommands(List<String> commands, String server, Object playerObj) {
         if(!isOutdated(commands)) return;
         server = server.toLowerCase();
 
@@ -62,6 +64,8 @@ public class CommandsCache {
             if(!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
                 if(isFilterListAvailable(server)) filteredCommands.add(command);
         }
+
+        PATEventHandler.call(playerObj, filteredCommands, true);
     }
 
     public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid) {
