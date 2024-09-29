@@ -15,7 +15,7 @@ public class TabCompletion extends FilteredTabCompletionEvent {
         if (event.getCompletion().isEmpty()) return;
 
         List<String> possibilities = event.getCompletion(),
-                result = Argument.getResult(cursor);
+                result = Argument.getOptions(cursor);
 
         if(!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(result.contains("_*")) possibilities.clear();

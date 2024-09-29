@@ -15,6 +15,8 @@ import java.util.*;
 public class SubArgsAddon {
 
     public static List<String> GENERAL_LIST, BLOCKED_MESSAGE, STARTING_LIST;
+    public static HashMap<UUID, List<String>> PLAYER_COMMANDS = new HashMap<>();
+
     private static ConfigurationBuilder CONFIGURATION;
 
     public static void onLoad(ConfigurationBuilder configuration) {
@@ -34,8 +36,8 @@ public class SubArgsAddon {
         GENERAL_LIST = Storage.Blacklist.getBlacklist().getCommands().stream().filter(command -> command.contains(" ")).toList();
         STARTING_LIST = new ArrayList<>();
 
-        Argument.clearAllArguments();
-        GENERAL_LIST.forEach(Argument::buildArgumentStacks);
+        Argument.clearArguments();
+        GENERAL_LIST.forEach(Argument::buildArguments);
     }
 
     public static void updateMessages() {

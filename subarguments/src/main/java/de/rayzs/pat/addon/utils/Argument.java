@@ -5,9 +5,23 @@ import java.util.*;
 
 public class Argument {
 
-    private static final HashMap<String, ArgumentStack> ARGUMENT_STACKS = new HashMap<>();
+    private static final Argument GENERAL = new Argument();
 
-    public static List<String> getResult(String input) {
+    private final HashMap<String, ArgumentStack> ARGUMENT_STACKS = new HashMap<>();
+
+    public static List<String> getOptions(String input) {
+        return GENERAL.getResult(input);
+    }
+
+    public static void clearArguments() {
+        GENERAL.clearAllArguments();
+    }
+
+    public static void buildArguments(String input) {
+        GENERAL.buildArgumentStacks(input);
+    }
+
+    public List<String> getResult(String input) {
         String firstInputArg = input.contains(" ") ? input.split(" ")[0] : input;
 
         for (Map.Entry<String, ArgumentStack> entry : ARGUMENT_STACKS.entrySet()) {
@@ -18,11 +32,11 @@ public class Argument {
         return Collections.emptyList();
     }
 
-    public static void clearAllArguments() {
+    public void clearAllArguments() {
         ARGUMENT_STACKS.clear();
     }
 
-    public static void buildArgumentStacks(String input) {
+    public void buildArgumentStacks(String input) {
         if(!input.contains(" ")) {
             SubArgsAddon.STARTING_LIST.add(input);
             return;
@@ -47,7 +61,7 @@ public class Argument {
         }
     }
 
-    public static class ArgumentStack {
+    private static class ArgumentStack {
 
         private final HashMap<String, ArgumentStack> argumentStacks = new HashMap<>();
         private final List<String> suggestions = new ArrayList<>();
