@@ -17,7 +17,7 @@ public class CommandsCache {
         return this;
     }
 
-    public void handleCommands(List<String> commands, Object playerObj) {
+    public void handleCommands(List<String> commands) {
         if(change) return;
         if(!isOutdated(commands)) return;
 
@@ -40,10 +40,9 @@ public class CommandsCache {
         }
 
         change = true;
-        PATEventHandler.call(playerObj, filteredCommands, false);
     }
 
-    public void handleCommands(List<String> commands, String server, Object playerObj) {
+    public void handleCommands(List<String> commands, String server) {
         if(!isOutdated(commands)) return;
         server = server.toLowerCase();
 
@@ -64,8 +63,6 @@ public class CommandsCache {
             if(!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
                 if(isFilterListAvailable(server)) filteredCommands.add(command);
         }
-
-        PATEventHandler.call(playerObj, filteredCommands, true);
     }
 
     public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid) {
@@ -114,6 +111,7 @@ public class CommandsCache {
         else
             Logger.debug("Created list of commands for player with uuid " + uuidSubstring + " with a total of " + playerCommands.size() + " commands!");
 
+        PATEventHandler.call(targetObj, playerCommands, serverName != null);
         return playerCommands;
     }
 
