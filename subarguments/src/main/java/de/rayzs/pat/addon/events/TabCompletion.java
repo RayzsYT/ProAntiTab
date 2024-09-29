@@ -4,6 +4,7 @@ import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.addon.utils.Argument;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.addon.SubArgsAddon;
+import de.rayzs.pat.utils.CommandSender;
 import de.rayzs.pat.utils.StringUtils;
 import java.util.*;
 
@@ -14,13 +15,12 @@ public class TabCompletion extends FilteredTabCompletionEvent {
         String cursor = StringUtils.replaceFirst(event.getCursor(), "/", "");
         if (event.getCompletion().isEmpty()) return;
 
-        List<String> possibilities = event.getCompletion(),
-                result = Argument.getOptions(cursor);
+        UUID uuid = event.getSenderObj() instanceof UUID ? (UUID) event.getSenderObj() : new CommandSender(event.getSenderObj()).getUniqueId();
+        Argument argument = SubArgsAddon.PLAYER_COMMANDS.getOrDefault(uuid, Argument.getGeneralArgument());
+        List<String> possibilities = event.getCompletion(), result = argument.getResult(cursor);
 
-        if(!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(result.contains("_*")) possibilities.clear();
-            else possibilities.removeAll(result);
-        } else if(!result.contains("_*")) possibilities = result;
+        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) possibilities = result;
+        else possibilities.removeAll(result);
 
         cursor = StringUtils.getFirstArg(cursor.toLowerCase());
         if(possibilities.isEmpty() && !SubArgsAddon.GENERAL_LIST.contains(cursor)) return;

@@ -2,6 +2,7 @@ package de.rayzs.pat.addon.events;
 
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.addon.utils.Argument;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.addon.SubArgsAddon;
 import de.rayzs.pat.utils.*;
@@ -22,13 +23,14 @@ public class ExecuteCommand extends ExecuteCommandEvent {
     }
 
     private boolean shouldCommandBeBlocked(ExecuteCommandEvent event, String command) {
+        CommandSender sender = new CommandSender(event.getSenderObj());
         boolean listed = false,
                 turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
                 blocked = event.isBlocked(),
                 ignored = false,
                 useFilter = false;
 
-        for (String s : SubArgsAddon.GENERAL_LIST) {
+        for (String s : SubArgsAddon.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Argument.getGeneralArgument()).getInputs()) {
 
             if(s.split(" ")[0].equalsIgnoreCase(command.split(" ")[0]))
                 useFilter = true;

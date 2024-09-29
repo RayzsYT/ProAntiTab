@@ -14,8 +14,8 @@ import java.util.*;
 
 public class SubArgsAddon {
 
-    public static List<String> GENERAL_LIST, BLOCKED_MESSAGE, STARTING_LIST;
-    public static HashMap<UUID, List<String>> PLAYER_COMMANDS = new HashMap<>();
+    public static List<String> GENERAL_LIST, BLOCKED_MESSAGE;
+    public static HashMap<UUID, Argument> PLAYER_COMMANDS = new HashMap<>();
 
     private static ConfigurationBuilder CONFIGURATION;
 
@@ -30,11 +30,11 @@ public class SubArgsAddon {
 
         PATEventHandler.register(UpdateList.UPDATE_PLUGIN_EVENT);
         PATEventHandler.register(UpdateList.RECEIVE_SYNC_EVENT);
+        PATEventHandler.register(UpdateList.UPDATE_PLAYER_COMMANDS_EVENT);
     }
 
     public static void updateList() {
         GENERAL_LIST = Storage.Blacklist.getBlacklist().getCommands().stream().filter(command -> command.contains(" ")).toList();
-        STARTING_LIST = new ArrayList<>();
 
         Argument.clearArguments();
         GENERAL_LIST.forEach(Argument::buildArguments);

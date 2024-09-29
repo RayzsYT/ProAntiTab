@@ -7,7 +7,13 @@ public class Argument {
 
     private static final Argument GENERAL = new Argument();
 
+
+    private final List<String> INPUTS = new ArrayList<>();
     private final HashMap<String, ArgumentStack> ARGUMENT_STACKS = new HashMap<>();
+
+    public static Argument getGeneralArgument() {
+        return GENERAL;
+    }
 
     public static List<String> getOptions(String input) {
         return GENERAL.getResult(input);
@@ -19,6 +25,15 @@ public class Argument {
 
     public static void buildArguments(String input) {
         GENERAL.buildArgumentStacks(input);
+    }
+
+    public static List<String> getAllInputs() {
+        return GENERAL.getInputs();
+    }
+
+
+    public List<String> getInputs() {
+        return INPUTS;
     }
 
     public List<String> getResult(String input) {
@@ -33,14 +48,15 @@ public class Argument {
     }
 
     public void clearAllArguments() {
+        INPUTS.clear();
         ARGUMENT_STACKS.clear();
     }
 
     public void buildArgumentStacks(String input) {
-        if(!input.contains(" ")) {
-            SubArgsAddon.STARTING_LIST.add(input);
-            return;
-        }
+        if(!input.contains(" ")) return;
+
+        if(!INPUTS.contains(input))
+            INPUTS.add(input);
 
         boolean first = true;
         ArgumentStack argumentStack = null;
