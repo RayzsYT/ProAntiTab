@@ -1,5 +1,6 @@
 package de.rayzs.pat.addon.utils;
 
+import de.rayzs.pat.addon.SubArgsAddon;
 import java.util.*;
 
 public class Argument {
@@ -8,7 +9,17 @@ public class Argument {
 
     public static List<String> getResult(String input) {
         String firstInputArg = input.contains(" ") ? input.split(" ")[0] : input;
-        return ARGUMENT_STACKS.get(input).getResult(firstInputArg);
+
+        for (Map.Entry<String, ArgumentStack> entry : ARGUMENT_STACKS.entrySet()) {
+            if(!entry.getKey().startsWith(firstInputArg)) continue;
+            return ARGUMENT_STACKS.get(entry.getKey()).getResult(input);
+        }
+
+        return Collections.emptyList();
+    }
+
+    public static HashMap<String, ArgumentStack> getArgumentStacks() {
+        return ARGUMENT_STACKS;
     }
 
     public static void clearAllArguments() {
@@ -17,6 +28,7 @@ public class Argument {
 
     public static void buildArgumentStacks(String input) {
         if(!input.contains(" ")) {
+            SubArgsAddon.STARTING_LIST.add(input);
             return;
         }
 
@@ -31,7 +43,7 @@ public class Argument {
 
             argumentStack = ARGUMENT_STACKS.get(s);
             if (argumentStack == null) {
-                argumentStack = new ArgumentStack(s);
+                argumentStack = new ArgumentStack();
                 ARGUMENT_STACKS.put(s, argumentStack);
             }
 
@@ -41,45 +53,36 @@ public class Argument {
 
     public static class ArgumentStack {
 
-        private final ArgumentStack instance;
-
         private final HashMap<String, ArgumentStack> argumentStacks = new HashMap<>();
         private final List<String> suggestions = new ArrayList<>();
-        private final String origin;
 
-        public ArgumentStack(String origin) {
-            this.instance = this;
-            this.origin = origin;
-        }
-
-        public boolean hasResult(String input) {
-            return argumentStacks.containsKey(input);
+        public HashMap<String, ArgumentStack> getArgumentStacks() {
+            return argumentStacks;
         }
 
         public List<String> getResult(String input) {
-            ArgumentStack tmpArgumentStack = this;
+            String current;
+            while(input.contains(" ")) {
+                current = input.split(" ")[0];
+                input = input.replaceFirst(current, "");
+                input = input.startsWith(" ") ? input.replaceFirst(" ", "") : input;
 
-            while (!input.contains(" ")) {
-                if (!tmpArgumentStack.hasResult(input)) break;
-
-                input = input.contains(" ") ? input.substring(0, origin.length() + 1) : input;
-                tmpArgumentStack = getInstance();
+                for (Map.Entry<String, ArgumentStack> entry : argumentStacks.entrySet()) {
+                    if(!entry.getKey().startsWith(current)) continue;
+                    return entry.getValue().getResult(input);
+                }
             }
 
-            return tmpArgumentStack.getResult(input);
-        }
-
-        public String getOrigin() {
-            return origin;
-        }
-
-        public ArgumentStack getInstance() {
-            return instance;
+            return suggestions;
         }
 
         public ArgumentStack createAndGetArgumentStack(String origin) {
+
+            if(!suggestions.contains(origin))
+                suggestions.add(origin);
+
             if(!argumentStacks.containsKey(origin)) {
-                ArgumentStack argumentStack = new ArgumentStack(origin);
+                ArgumentStack argumentStack = new ArgumentStack();
                 argumentStacks.put(origin, argumentStack);
                 return argumentStack;
             }

@@ -13,16 +13,15 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
         if (!command.contains(" ")) return;
 
-        if (shouldCommandBeBlocked(event, command, false)) {
+        if (shouldCommandBeBlocked(event, command)) {
             event.setBlocked(true);
             event.setCancelled(true);
 
             MessageTranslator.send(event.getSenderObj(), SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
-
         }
     }
 
-    private boolean shouldCommandBeBlocked(ExecuteCommandEvent event, String command, boolean inGroup) {
+    private boolean shouldCommandBeBlocked(ExecuteCommandEvent event, String command) {
         boolean listed = false,
                 turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
                 blocked = event.isBlocked(),
