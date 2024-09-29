@@ -18,10 +18,6 @@ public class Argument {
         return Collections.emptyList();
     }
 
-    public static HashMap<String, ArgumentStack> getArgumentStacks() {
-        return ARGUMENT_STACKS;
-    }
-
     public static void clearAllArguments() {
         ARGUMENT_STACKS.clear();
     }
@@ -55,10 +51,6 @@ public class Argument {
 
         private final HashMap<String, ArgumentStack> argumentStacks = new HashMap<>();
         private final List<String> suggestions = new ArrayList<>();
-
-        public HashMap<String, ArgumentStack> getArgumentStacks() {
-            return argumentStacks;
-        }
 
         public List<String> getResult(String input) {
             String current;
