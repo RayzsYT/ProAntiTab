@@ -45,6 +45,7 @@ public class BungeeLoader extends Plugin {
 
         Storage.USE_SIMPLECLOUD = Reflection.doesClassExist("eu.thesimplecloud.plugin.startup.CloudPlugin");
         Storage.CURRENT_VERSION = getDescription().getVersion();
+        VersionComparer.setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
 
@@ -114,21 +115,40 @@ public class BungeeLoader extends Plugin {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
             Storage.NEWER_VERSION = result;
+            VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
 
-            if (!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
+            if(VersionComparer.isDeveloperVersion()) {
                 getProxy().getScheduler().cancel(updaterTask);
-                if (result.equals("unknown")) {
-                    Logger.warning("Failed reaching web host! (firewall enabled? website down?)");
-                } else if (result.equals("exception")) {
-                    Logger.warning("Failed creating web instance! (outdated java version?)");
-                } else {
-                    Storage.OUTDATED = true;
-                    Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
+                Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
+
+            } else if(!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
+                getProxy().getScheduler().cancel(updaterTask);
+                checkUpdate = true;
+
+                if(VersionComparer.isUnreleased()) {
+                    Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using an §eunreleased §7version of ProAntiTab.");
+                    return;
                 }
-            } else {
-                if(!checkUpdate) {
-                    checkUpdate = true;
-                    Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
+
+                checkUpdate = true;
+                Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
+
+            } else if(VersionComparer.isOutdated()) {
+                Storage.OUTDATED = true;
+                Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
+
+            } else if(!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
+                getProxy().getScheduler().cancel(updaterTask);
+                switch (result) {
+                    case "internet":
+                        Logger.warning("Failed to build connection to website! (No internet?)");
+                        break;
+                    case "unknown":
+                        Logger.warning("Failed to build connection to website! (Firewall enabled or website down?)");
+                        break;
+                    case "exception":
+                        Logger.warning("Failed to build connection to website! (Outdated java version?)");
+                        break;
                 }
             }
         }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);

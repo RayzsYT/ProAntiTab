@@ -54,6 +54,7 @@ public class BukkitLoader extends JavaPlugin {
         ConfigUpdater.initialize();
 
         Storage.CURRENT_VERSION = getDescription().getVersion();
+        VersionComparer.setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
 
@@ -136,8 +137,29 @@ public class BukkitLoader extends JavaPlugin {
 
             if(result == null) result = "internet";
             Storage.NEWER_VERSION = result;
+            VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
 
-            if (!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
+            if(VersionComparer.isDeveloperVersion()) {
+                updaterTask.cancelTask();
+                Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
+
+            } else if(!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
+                updaterTask.cancelTask();
+                checkUpdate = true;
+
+                if(VersionComparer.isUnreleased()) {
+                    Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using an §eunreleased §7version of ProAntiTab.");
+                    return;
+                }
+
+                Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
+
+            } else if(VersionComparer.isOutdated()) {
+                updaterTask.cancelTask();
+                Storage.OUTDATED = true;
+                Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
+
+            } else if(!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
                 updaterTask.cancelTask();
                 switch (result) {
                     case "internet":
@@ -149,15 +171,6 @@ public class BukkitLoader extends JavaPlugin {
                     case "exception":
                         Logger.warning("Failed to build connection to website! (Outdated java version?)");
                         break;
-                    default:
-                        Storage.OUTDATED = true;
-                        Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
-                        break;
-                }
-            } else {
-                if(!checkUpdate) {
-                    checkUpdate = true;
-                    Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
                 }
             }
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
