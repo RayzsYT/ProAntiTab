@@ -157,6 +157,15 @@ custom-server-brand:
     - '&fProAntiTab -'
     - '&fProAntiTab \'
 
+# Patches a small exploit which causes the server to lag.
+# Due to the fact that PAT interact with Tab-Completion and their packets directly,
+# it would be a shame to not use it then to also block some exploits, while being at it. ^^
+patch-exploits:
+  enabled: true
+  alert-message: '%prefix% &4%player% &ctried to crash/lag the server.'
+  kick-message:
+    - '&cFailed to read packet! Please reconnect.'
+
 # ------------------------------------------------------------------------------
 #       __  ___
 #      /  |/  /__  ______________ _____ ____  _____
