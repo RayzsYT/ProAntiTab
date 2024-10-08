@@ -108,6 +108,7 @@ public class Storage {
 
             public static BlockNamespaceCommandsSection BLOCK_NAMESPACE_COMMANDS = new BlockNamespaceCommandsSection();
             public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
+            public static PatchExploitSection PATCH_EXPLOITS = new PatchExploitSection();
             public static CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
             public static CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
             public static CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
