@@ -31,8 +31,8 @@ public class ModernPacketHandler implements BukkitPacketHandler {
 
         String text = (String) stringField.get(packetObj);
         if(Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
+            MessageTranslator.send(Bukkit.getConsoleSender(), Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getName()));
             PATScheduler.createScheduler(() -> player.kickPlayer(ChatColor.translateAlternateColorCodes('&', Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get())));
-            Logger.info(Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("&", "§"));
             return false;
         }
 
