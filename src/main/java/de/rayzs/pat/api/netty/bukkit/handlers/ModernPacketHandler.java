@@ -10,6 +10,7 @@ import de.rayzs.pat.api.netty.bukkit.*;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import java.lang.reflect.*;
@@ -30,7 +31,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
 
         String text = (String) stringField.get(packetObj);
         if(Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
-            PATScheduler.createScheduler(() -> player.kickPlayer(StringUtils.buildStringList(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.getLines())));
+            PATScheduler.createScheduler(() -> player.kickPlayer(ChatColor.translateAlternateColorCodes('&', Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get())));
             Logger.info(Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("&", "§"));
             return false;
         }

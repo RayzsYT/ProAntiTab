@@ -121,7 +121,7 @@ public class VelocityPacketAnalyzer {
                 if(request.getCommand() != null) {
 
                     if(Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(request.getCommand())) {
-                        PATScheduler.createScheduler(() -> player.disconnect(LegacyComponentSerializer.legacyAmpersand().deserialize(StringUtils.buildStringList(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.getLines()))));
+                        PATScheduler.createScheduler(() -> player.disconnect(LegacyComponentSerializer.legacyAmpersand().deserialize(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get())));
                         Logger.info(Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("&", "§"));
                     } else {
                         insertPlayerInput(player, request.getCommand());
