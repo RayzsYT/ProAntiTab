@@ -33,13 +33,15 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     @Override
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         Object suggestionObj;
-
         String rawInput = BukkitPacketAnalyzer.getPlayerInput(player), input = rawInput;
         if(input == null) return false;
 
-        boolean cancelsBeforeHand = false;
+
+        boolean is121Packet = packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket"),
+                cancelsBeforeHand = false;
+
         int spaces = 0;
-        if(input.startsWith("/")) {
+        if(input.startsWith("/") || is121Packet) {
             input = input.replace("/", "");
             if(input.contains(" ")) {
                 String[] split = input.split(" ");
@@ -51,7 +53,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input);
         }
 
-        if(packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket")) {
+        if(is121Packet) {
             try {
                 Field suggestionsField = Reflection.getFieldsByTypeNormal(packetObj.getClass(), "List", Reflection.SearchOption.ENDS).get(0);
                 List<?> suggestionsTmp = (List<?>) suggestionsField.get(packetObj),
@@ -71,6 +73,10 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 }
 
                 if (spaces == 0) {
+                    for (Object suggestion : suggestions) {
+                        System.out.println(suggestion);
+                    }
+
                     suggestions.removeIf(suggestion -> {
                         String command = getSuggestionFromEntry(suggestion);
                         return Storage.Blacklist.isBlocked(player, command);
@@ -101,7 +107,6 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                         .newInstance(id, start, length, suggestions);
 
                 BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), clientboundCommandSuggestionsPacketObj);
-
                 return false;
 
             } catch (Throwable throwable) { throwable.printStackTrace(); }
