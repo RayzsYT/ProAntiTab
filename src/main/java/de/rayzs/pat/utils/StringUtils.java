@@ -17,6 +17,15 @@ public class StringUtils {
         return input;
     }
 
+    public static int countMatches(Character character, String string) {
+        int count = 0;
+        for (char c : string.toCharArray()) {
+            if(character == c) count++;
+        }
+
+        return count;
+    }
+
     public static String replaceTriggers(String input, String replacement, String... triggers) {
         for (String trigger : triggers) {
             if(!input.contains(trigger)) continue;
