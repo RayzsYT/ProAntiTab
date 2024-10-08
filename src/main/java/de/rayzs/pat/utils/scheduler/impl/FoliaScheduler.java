@@ -24,6 +24,12 @@ public class FoliaScheduler implements PATSchedulerTask {
     }
 
     @Override
+    public PATSchedulerTask getInstance(boolean async, Runnable runnable) {
+        this.task = SCHEDULER.run(BukkitLoader.getPlugin(), __ -> runnable.run());
+        return this;
+    }
+
+    @Override
     public boolean isActive() {
         return !this.task.isCancelled();
     }

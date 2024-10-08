@@ -25,6 +25,14 @@ public class BukkitScheduler implements PATSchedulerTask {
     }
 
     @Override
+    public PATSchedulerTask getInstance(boolean async, Runnable runnable) {
+        this.taskId = async
+                ? Bukkit.getScheduler().scheduleAsyncDelayedTask(BukkitLoader.getPlugin(), runnable)
+                : Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), runnable);
+        return this;
+    }
+
+    @Override
     public boolean isActive() {
         return this.taskId != 1;
     }
