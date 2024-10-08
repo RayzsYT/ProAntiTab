@@ -5,6 +5,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.proxy.protocol.packet.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +13,10 @@ import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.scheduler.PATScheduler;
 import io.netty.channel.*;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+
 import java.util.*;
 
 public class VelocityPacketAnalyzer {
@@ -115,8 +119,14 @@ public class VelocityPacketAnalyzer {
             if(packet instanceof TabCompleteRequestPacket) {
                 TabCompleteRequestPacket request = (TabCompleteRequestPacket) msg;
                 if(request.getCommand() != null) {
-                    insertPlayerInput(player, request.getCommand());
-                    super.channelRead(ctx, msg);
+
+                    if(Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(request.getCommand())) {
+                        PATScheduler.createScheduler(() -> player.disconnect(LegacyComponentSerializer.legacyAmpersand().deserialize(StringUtils.buildStringList(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.getLines()))));
+                        Logger.info(Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("&", "§"));
+                    } else {
+                        insertPlayerInput(player, request.getCommand());
+                        super.channelRead(ctx, msg);
+                    }
                 }
             } else super.channelRead(ctx, msg);
         }

@@ -7,6 +7,9 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.netty.bukkit.*;
+import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.scheduler.PATScheduler;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import java.lang.reflect.*;
@@ -26,6 +29,12 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         }
 
         String text = (String) stringField.get(packetObj);
+        if(Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
+            PATScheduler.createScheduler(() -> player.kickPlayer(StringUtils.buildStringList(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.getLines())));
+            Logger.info(Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("&", "§"));
+            return false;
+        }
+
         BukkitPacketAnalyzer.insertPlayerInput(player, text);
         return true;
     }
