@@ -142,8 +142,7 @@ custom-server-brand:
 patch-exploits:
   enabled: true
   alert-message: '%prefix% &4%player% &ctried to crash/lag the server.'
-  kick-message:
-    - '&cFailed to read packet! Please reconnect.'
+  kick-message: '&cFailed to read packet! Please reconnect.'
 
 # ------------------------------------------------------------------------------
 #       __  ___
