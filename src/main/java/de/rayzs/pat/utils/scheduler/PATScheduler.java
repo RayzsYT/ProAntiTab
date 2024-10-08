@@ -17,6 +17,12 @@ public class PATScheduler {
                 : new BukkitScheduler().getInstance(false, runnable, time);
     }
 
+    public static PATSchedulerTask createScheduler(Runnable runnable) {
+        return Reflection.isFoliaServer()
+                ? new FoliaScheduler().getInstance(false, runnable)
+                : new BukkitScheduler().getInstance(false, runnable);
+    }
+
     public static PATSchedulerTask createAsyncScheduler(Runnable runnable, long time, long period) {
         return Reflection.isFoliaServer()
                 ? new FoliaScheduler().getInstance(true, runnable, time, period)
@@ -27,5 +33,11 @@ public class PATScheduler {
         return Reflection.isFoliaServer()
                 ? new FoliaScheduler().getInstance(true, runnable, time)
                 : new BukkitScheduler().getInstance(true, runnable, time);
+    }
+
+    public static PATSchedulerTask createAsyncScheduler(Runnable runnable) {
+        return Reflection.isFoliaServer()
+                ? new FoliaScheduler().getInstance(true, runnable)
+                : new BukkitScheduler().getInstance(true, runnable);
     }
 }
