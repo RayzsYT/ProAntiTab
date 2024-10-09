@@ -1,19 +1,21 @@
 package de.rayzs.pat.api.netty.proxy;
 
-import com.mojang.brigadier.tree.CommandNode;
-import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.proxy.crypto.SignedChatCommand;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
+import com.velocitypowered.proxy.protocol.packet.chat.session.UnsignedPlayerCommandPacket;
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.listeners.velocity.VelocityBlockCommandListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.proxy.protocol.packet.*;
+
+import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
-import de.rayzs.pat.utils.scheduler.PATScheduler;
 import io.netty.channel.*;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -27,7 +29,7 @@ public class VelocityPacketAnalyzer {
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
     private static HashMap<String, CommandsCache> COMMANDS_CACHE_MAP = new HashMap<>();
 
-    private static Class<?> minecraftConnectionClass, connectedPlayerConnectionClass;
+    private static Class<?> minecraftConnectionClass, connectedPlayerConnectionClass, signedChatCommandPacketClass;
 
     public static void injectAll() {
         VelocityLoader.getServer().getAllPlayers().forEach(VelocityPacketAnalyzer::inject);
@@ -115,6 +117,29 @@ public class VelocityPacketAnalyzer {
             }
 
             MinecraftPacket packet = (MinecraftPacket) msg;
+
+            if(packet.getClass().getSimpleName().equals("SignedChatCommand")) {
+                try {
+                    if(signedChatCommandPacketClass == null)
+                        signedChatCommandPacketClass = Class.forName("com.velocitypowered.proxy.crypto.SignedChatCommand");
+
+                    Object signedChatCommandPacket = signedChatCommandPacketClass.cast(packet);
+                    Field commandField = signedChatCommandPacket.getClass().getField("command");
+                    String command = (String) commandField.get(signedChatCommandPacket);
+
+                    if(!VelocityBlockCommandListener.handleCommand(player, command))
+                        return;
+
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+
+            if(packet instanceof UnsignedPlayerCommandPacket) {
+                UnsignedPlayerCommandPacket unsignedPlayerCommandPacket = (UnsignedPlayerCommandPacket) packet;
+                if(!VelocityBlockCommandListener.handleCommand(player, unsignedPlayerCommandPacket.getCommand()))
+                    return;
+            }
 
             if(packet instanceof TabCompleteRequestPacket) {
                 TabCompleteRequestPacket request = (TabCompleteRequestPacket) msg;
