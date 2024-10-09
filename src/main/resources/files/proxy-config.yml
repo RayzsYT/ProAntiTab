@@ -99,8 +99,8 @@ block-namespace-commands:
   enabled: false
 
 # Patches a small exploit which causes the server to lag.
-# Due to the fact that PAT interact with Tab-Completion and their packets directly,
-# it would be a shame to not use it then to also block some exploits, while being at it. ^^
+# Due to the fact that PAT interacts directly with Tab-Completions and their packets,
+# it would be a waste not to provide some simple patches like these. ^^
 patch-exploits:
   enabled: true
   alert-message: '%prefix% &4%player% &ctried to crash/lag the server.'
