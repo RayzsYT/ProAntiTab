@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ModernPacketHandler implements BukkitPacketHandler {
@@ -75,7 +74,6 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                         length = (int) intFields.get(2).get(packetObj);
 
                 Class<?> clientboundCommandSuggestionsPacketClass = Class.forName("net.minecraft.network.protocol.game.ClientboundCommandSuggestionsPacket");
-
                 if ((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird()) return false;
                 if (spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
                     suggestions.clear();
@@ -83,10 +81,6 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 }
 
                 if (spaces == 0) {
-                    for (Object suggestion : suggestions) {
-                        System.out.println(suggestion);
-                    }
-
                     suggestions.removeIf(suggestion -> {
                         String command = getSuggestionFromEntry(suggestion);
                         return Storage.Blacklist.isBlocked(player, command);
@@ -115,7 +109,6 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 Object clientboundCommandSuggestionsPacketObj = clientboundCommandSuggestionsPacketClass
                         .getConstructor(int.class, int.class, int.class, List.class)
                         .newInstance(id, start, length, suggestions);
-
                 BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), clientboundCommandSuggestionsPacketObj);
                 return false;
 
