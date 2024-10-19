@@ -30,12 +30,38 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                 ignored = false,
                 useFilter = false;
 
+        String[] split;
+        String tmpCommand;
         for (String s : SubArgsAddon.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Argument.getGeneralArgument()).getInputs()) {
+            tmpCommand = command;
 
-            if(s.split(" ")[0].equalsIgnoreCase(command.split(" ")[0]))
+            if(s.split(" ")[0].equalsIgnoreCase(tmpCommand.split(" ")[0]))
                 useFilter = true;
 
-            if (!command.toLowerCase().startsWith(s.toLowerCase())) continue;
+            String[] originCommandSplit = tmpCommand.split(" ");
+            split = s.split(" ");
+            int i;
+
+            for(i = 0; i < split.length; i++) {
+                if(!split[i].equals("%online_players%")) continue;
+
+                boolean foundPlayer = false;
+                for (String playerName : SubArgsAddon.getPlayerNames()) {
+                    if(i >= originCommandSplit.length) continue;
+                    if(!playerName.equalsIgnoreCase(originCommandSplit[i])) continue;
+
+                    foundPlayer = true;
+                    originCommandSplit[i] = "%online_players%";
+                    break;
+                }
+
+                if(!foundPlayer) return turn;
+                tmpCommand = String.join(" ", originCommandSplit);
+            }
+
+            if (!tmpCommand.toLowerCase().startsWith(s.toLowerCase()))
+                continue;
+
             if (!listed) listed = true;
             if (s.endsWith(" _-")) ignored = true;
         }
