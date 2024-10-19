@@ -2,6 +2,10 @@ package de.rayzs.pat.addon;
 
 import de.rayzs.pat.addon.utils.Argument;
 import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.plugin.BungeeLoader;
+import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.*;
 import de.rayzs.pat.api.storage.Storage;
@@ -31,6 +35,14 @@ public class SubArgsAddon {
         PATEventHandler.register(UpdateList.UPDATE_PLUGIN_EVENT);
         PATEventHandler.register(UpdateList.RECEIVE_SYNC_EVENT);
         PATEventHandler.register(UpdateList.UPDATE_PLAYER_COMMANDS_EVENT);
+    }
+
+    public static List<String> getPlayerNames() {
+        return Reflection.isProxyServer()
+                    ? Reflection.isVelocityServer()
+                        ? VelocityLoader.getPlayerNames()
+                        : BungeeLoader.getPlayerNames()
+                : BukkitLoader.getPlayerNames();
     }
 
     public static void updateList() {
