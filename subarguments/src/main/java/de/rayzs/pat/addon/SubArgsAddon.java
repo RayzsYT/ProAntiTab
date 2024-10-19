@@ -18,7 +18,7 @@ import java.util.*;
 
 public class SubArgsAddon {
 
-    public static List<String> GENERAL_LIST, BLOCKED_MESSAGE;
+    public static List<String> GENERAL_LIST, BLOCKED_MESSAGE, PLAYER_NAMES;
     public static HashMap<UUID, Argument> PLAYER_COMMANDS = new HashMap<>();
 
     private static ConfigurationBuilder CONFIGURATION;
@@ -28,6 +28,7 @@ public class SubArgsAddon {
 
         updateList();
         updateMessages();
+        updatePlayerNames();
 
         PATEventHandler.register(new TabCompletion());
         PATEventHandler.register(new ExecuteCommand());
@@ -35,14 +36,19 @@ public class SubArgsAddon {
         PATEventHandler.register(UpdateList.UPDATE_PLUGIN_EVENT);
         PATEventHandler.register(UpdateList.RECEIVE_SYNC_EVENT);
         PATEventHandler.register(UpdateList.UPDATE_PLAYER_COMMANDS_EVENT);
+        PATEventHandler.register(UpdateList.SERVER_PLAYERS_CHANGE_EVENT);
+    }
+
+    public static void updatePlayerNames() {
+        PLAYER_NAMES = Reflection.isProxyServer()
+                ? Reflection.isVelocityServer()
+                ? VelocityLoader.getPlayerNames()
+                : BungeeLoader.getPlayerNames()
+                : BukkitLoader.getPlayerNames();
     }
 
     public static List<String> getPlayerNames() {
-        return Reflection.isProxyServer()
-                    ? Reflection.isVelocityServer()
-                        ? VelocityLoader.getPlayerNames()
-                        : BungeeLoader.getPlayerNames()
-                : BukkitLoader.getPlayerNames();
+        return PLAYER_NAMES;
     }
 
     public static void updateList() {
