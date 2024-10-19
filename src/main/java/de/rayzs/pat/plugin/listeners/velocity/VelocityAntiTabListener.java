@@ -61,6 +61,6 @@ public class VelocityAntiTabListener {
     }
 
     public static void updateCommands() {
-        COMMANDS_CACHE_MAP.values().forEach(CommandsCache::reset);
+        new ArrayList<>(COMMANDS_CACHE_MAP.values()).forEach(CommandsCache::reset);
     }
 }
