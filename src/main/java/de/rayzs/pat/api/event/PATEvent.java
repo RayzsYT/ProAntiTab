@@ -11,14 +11,15 @@ public abstract class PATEvent<T> {
 
     public abstract void handle(T t);
 
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
     public Object getSenderObj() {
         return senderObj;
     }
 
     public boolean isCancelled() {
         return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 }

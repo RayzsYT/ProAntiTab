@@ -1,10 +1,16 @@
 package de.rayzs.pat.utils.configuration;
 
-import de.rayzs.pat.utils.configuration.impl.*;
-import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.configuration.impl.BukkitConfigurationBuilder;
+import de.rayzs.pat.utils.configuration.impl.ProxyConfigurationBuilder;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
-import java.net.*;
-import java.io.*;
 
 public class Configurator {
 
@@ -12,7 +18,7 @@ public class Configurator {
 
     public static ConfigurationBuilder get(String fileName, String filePath) {
         String keyName = filePath + "/" + fileName;
-        if(CONFIGURATION_HASHES.containsKey(keyName))
+        if (CONFIGURATION_HASHES.containsKey(keyName))
             return CONFIGURATION_HASHES.get(keyName);
 
         ConfigurationBuilder configurationBuilder = Reflection.isProxyServer()
@@ -24,7 +30,7 @@ public class Configurator {
 
     public static ConfigurationBuilder get(String fileName) {
         String keyName = "./plugins/ProAntiTab/" + fileName;
-        if(CONFIGURATION_HASHES.containsKey(keyName))
+        if (CONFIGURATION_HASHES.containsKey(keyName))
             return CONFIGURATION_HASHES.get(keyName);
 
         ConfigurationBuilder configurationBuilder = Reflection.isProxyServer()
@@ -65,7 +71,7 @@ public class Configurator {
                 byte[] buffer = new byte[1024];
                 int length;
 
-                while((length = inputStream.read(buffer)) > 0) outputStream.write(buffer, 0, length);
+                while ((length = inputStream.read(buffer)) > 0) outputStream.write(buffer, 0, length);
                 outputStream.close();
                 inputStream.close();
             }

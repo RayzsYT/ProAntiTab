@@ -1,12 +1,15 @@
 package de.rayzs.pat.api.storage.blacklist.impl;
 
-import de.rayzs.pat.api.storage.storages.BlacklistStorage;
 import de.rayzs.pat.api.storage.StorageTemplate;
+import de.rayzs.pat.api.storage.storages.BlacklistStorage;
+
 import java.util.List;
 
 public class GeneralBlacklist extends BlacklistStorage {
 
-    public GeneralBlacklist(String navigatePath) { super("global." + navigatePath); }
+    public GeneralBlacklist(String navigatePath) {
+        super("global." + navigatePath);
+    }
 
     @Override
     public List<String> getCommands() {

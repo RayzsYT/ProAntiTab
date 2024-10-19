@@ -2,9 +2,12 @@ package de.rayzs.pat.utils.configuration.updater;
 
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
-import java.nio.file.Files;
+
 import java.io.File;
-import java.util.*;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ConfigSection {
 
@@ -18,7 +21,7 @@ public class ConfigSection {
         List<String> interceptedInput = gatherLines(from, to),
                 originalFileInput = getFileInput();
 
-        while(!hasFreeSpace(originalFileInput, interceptLine)) interceptLine++;
+        while (!hasFreeSpace(originalFileInput, interceptLine)) interceptLine++;
 
         List<String> newFileInput = originalFileInput.subList(0, interceptLine);
         newFileInput.addAll(interceptedInput);
@@ -51,13 +54,13 @@ public class ConfigSection {
 
             for (String currentLine : lines) {
 
-                if(!foundLine && targetString.equals(currentLine))
+                if (!foundLine && targetString.equals(currentLine))
                     foundLine = true;
 
-                if(!foundLine) continue;
+                if (!foundLine) continue;
 
                 line++;
-                if(line > to) break;
+                if (line > to) break;
 
                 sectionLines.add(currentLine);
             }
@@ -74,9 +77,9 @@ public class ConfigSection {
 
     private boolean hasFreeSpace(List<String> lines, int line) {
         String lineText = StringUtils.getLineText(lines, line);
-        if(lineText != null && !lineText.isEmpty()) return false;
+        if (lineText != null && !lineText.isEmpty()) return false;
 
-        lineText = StringUtils.getLineText(lines, line+1);
+        lineText = StringUtils.getLineText(lines, line + 1);
         return lineText == null || !lineText.startsWith(" ");
     }
 }

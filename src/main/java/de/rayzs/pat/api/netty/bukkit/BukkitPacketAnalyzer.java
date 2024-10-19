@@ -1,16 +1,19 @@
 package de.rayzs.pat.api.netty.bukkit;
 
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.netty.bukkit.handlers.*;
-import java.util.concurrent.ConcurrentHashMap;
+import de.rayzs.pat.api.netty.bukkit.handlers.LegacyPacketHandler;
+import de.rayzs.pat.api.netty.bukkit.handlers.ModernPacketHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
-import java.util.concurrent.TimeUnit;
-import org.bukkit.entity.Player;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
-import java.util.*;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class BukkitPacketAnalyzer {
 
@@ -32,23 +35,23 @@ public class BukkitPacketAnalyzer {
 
     public static void sendPacket(UUID uuid, Object object) {
         Channel channel = INJECTED_PLAYERS.get(uuid);
-        if(channel == null) return;
+        if (channel == null) return;
 
         SENT_PACKET.put(uuid, object);
         channel.pipeline().writeAndFlush(object);
     }
 
     public static boolean inject(Player player) {
-        if(Storage.USE_VELOCITY) return true;
+        if (Storage.USE_VELOCITY) return true;
 
         try {
             Channel channel = Reflection.getPlayerChannel(player);
-            if(channel == null) {
+            if (channel == null) {
                 System.err.println("Failed to inject " + player.getName() + "! Channel is null.");
                 return false;
             }
 
-            if(channel.pipeline().names().contains(BukkitPacketAnalyzer.HANDLER_NAME))
+            if (channel.pipeline().names().contains(BukkitPacketAnalyzer.HANDLER_NAME))
                 uninject(channel);
 
             channel.pipeline().addBefore(BukkitPacketAnalyzer.PIPELINE_NAME, BukkitPacketAnalyzer.HANDLER_NAME, new PacketDecoder(player));
@@ -56,22 +59,23 @@ public class BukkitPacketAnalyzer {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return false;
-        } return true;
+        }
+        return true;
     }
 
     public static void uninject(UUID uuid) {
-        if(Storage.USE_VELOCITY) return;
+        if (Storage.USE_VELOCITY) return;
 
-        if(BukkitPacketAnalyzer.INJECTED_PLAYERS.containsKey(uuid)) {
+        if (BukkitPacketAnalyzer.INJECTED_PLAYERS.containsKey(uuid)) {
             Channel channel = BukkitPacketAnalyzer.INJECTED_PLAYERS.get(uuid);
             uninject(channel);
         }
     }
 
     public static void uninject(Channel channel) {
-        if(Storage.USE_VELOCITY) return;
+        if (Storage.USE_VELOCITY) return;
 
-        if(channel != null) {
+        if (channel != null) {
             channel.eventLoop().submit(() -> {
                 ChannelPipeline pipeline = channel.pipeline();
                 if (pipeline.names().contains(BukkitPacketAnalyzer.HANDLER_NAME)) pipeline.remove(BukkitPacketAnalyzer.HANDLER_NAME);
@@ -92,6 +96,7 @@ public class BukkitPacketAnalyzer {
     private static class PacketDecoder extends ChannelDuplexHandler {
 
         private final Player player;
+
         private PacketDecoder(Player player) {
             this.player = player;
         }
@@ -108,32 +113,36 @@ public class BukkitPacketAnalyzer {
                 }
 
                 super.channelRead(channel, packetObj);
-            } catch (Throwable exception) { exception.printStackTrace(); }
+            } catch (Throwable exception) {
+                exception.printStackTrace();
+            }
         }
 
         @Override
         public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
             try {
-                if(packetObj.getClass() != null)
+                if (packetObj.getClass() != null)
                     if (!PermissionUtil.hasBypassPermission(player)) {
                         String packetName = packetObj.getClass().getSimpleName();
                         if (packetName.equals("PacketPlayOutTabComplete") || packetName.equals("ClientboundCommandSuggestionsPacket")) {
 
                             UUID uuid = player.getUniqueId();
 
-                            if(packetName.equals("ClientboundCommandSuggestionsPacket") && SENT_PACKET.contains(player.getUniqueId())) {
+                            if (packetName.equals("ClientboundCommandSuggestionsPacket") && SENT_PACKET.contains(player.getUniqueId())) {
                                 Object newPacketObj = SENT_PACKET.get(uuid);
                                 SENT_PACKET.remove(uuid);
                                 super.write(channel, newPacketObj, promise);
                                 return;
                             }
 
-                            if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;
+                            if (!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;
                         }
                     }
 
                 super.write(channel, packetObj, promise);
-            } catch (Throwable exception) { exception.printStackTrace(); }
+            } catch (Throwable exception) {
+                exception.printStackTrace();
+            }
         }
     }
 }

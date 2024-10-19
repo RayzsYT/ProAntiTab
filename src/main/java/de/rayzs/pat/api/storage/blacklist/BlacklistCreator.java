@@ -1,7 +1,8 @@
 package de.rayzs.pat.api.storage.blacklist;
 
-import de.rayzs.pat.api.storage.blacklist.impl.*;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 
 public class BlacklistCreator {
 

@@ -3,7 +3,8 @@ package de.rayzs.pat.api.event;
 import de.rayzs.pat.api.event.events.*;
 import de.rayzs.pat.utils.CommunicationPackets;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PATEventHandler {
 
@@ -13,7 +14,7 @@ public class PATEventHandler {
         ExecuteCommandEvent event = EmptyEvent.createEmptyExecuteCommandEvent(senderObj, command, blocked);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof ExecuteCommandEvent) {
+            if (patEvent instanceof ExecuteCommandEvent) {
                 ExecuteCommandEvent executeCommandEvent = (ExecuteCommandEvent) patEvent;
                 executeCommandEvent.handle(event);
             }
@@ -26,7 +27,7 @@ public class PATEventHandler {
         FilteredSuggestionEvent event = EmptyEvent.createEmptyFilteredSuggestionEvent(senderObj, suggestions);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof FilteredSuggestionEvent) {
+            if (patEvent instanceof FilteredSuggestionEvent) {
                 FilteredSuggestionEvent filteredSuggestion = (FilteredSuggestionEvent) patEvent;
                 filteredSuggestion.handle(event);
             }
@@ -39,7 +40,7 @@ public class PATEventHandler {
         FilteredTabCompletionEvent event = EmptyEvent.createEmptyFilteredTabCompletion(senderObj, cursor, completion);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof FilteredTabCompletionEvent) {
+            if (patEvent instanceof FilteredTabCompletionEvent) {
                 FilteredTabCompletionEvent filteredTabCompletion = (FilteredTabCompletionEvent) patEvent;
                 filteredTabCompletion.handle(event);
             }
@@ -52,7 +53,7 @@ public class PATEventHandler {
         UpdatePluginEvent event = EmptyEvent.createEmptyUpdatePluginEvent();
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof UpdatePluginEvent) {
+            if (patEvent instanceof UpdatePluginEvent) {
                 UpdatePluginEvent updatePluginEvent = (UpdatePluginEvent) patEvent;
                 updatePluginEvent.handle(event);
             }
@@ -65,7 +66,7 @@ public class PATEventHandler {
         UpdatePlayerCommandsEvent event = EmptyEvent.createEmptyUpdatePlayerCommandsEvent(playerObj, commands, serverBased);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof UpdatePlayerCommandsEvent) {
+            if (patEvent instanceof UpdatePlayerCommandsEvent) {
                 UpdatePlayerCommandsEvent updatePlayerCommandsEvent = (UpdatePlayerCommandsEvent) patEvent;
                 updatePlayerCommandsEvent.handle(event);
             }
@@ -78,7 +79,7 @@ public class PATEventHandler {
         SentSyncEvent event = EmptyEvent.createEmptySentSyncEvent(packetBundle, serverName);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof SentSyncEvent) {
+            if (patEvent instanceof SentSyncEvent) {
                 SentSyncEvent sentSyncEvent = (SentSyncEvent) patEvent;
                 sentSyncEvent.handle(event);
             }
@@ -91,7 +92,7 @@ public class PATEventHandler {
         ReceiveSyncEvent event = EmptyEvent.createEmptyReceiveSyncEvent(packetBundle);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof ReceiveSyncEvent) {
+            if (patEvent instanceof ReceiveSyncEvent) {
                 ReceiveSyncEvent proxySyncEvent = (ReceiveSyncEvent) patEvent;
                 proxySyncEvent.handle(event);
             }

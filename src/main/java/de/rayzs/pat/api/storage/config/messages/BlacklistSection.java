@@ -1,8 +1,8 @@
 package de.rayzs.pat.api.storage.config.messages;
 
-import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class BlacklistSection extends ConfigStorage {
 
@@ -34,7 +34,7 @@ public class BlacklistSection extends ConfigStorage {
 
         REMOVE_SUCCESS = new ConfigSectionHelper<String>(this, "remove.success", "&aSuccessfully removed %command% from the list!").getOrSet();
         REMOVE_FAILED = new ConfigSectionHelper<String>(this, "remove.failed", "&c%command% is not listed!").getOrSet();
-        if(!Reflection.isProxyServer()) return;
+        if (!Reflection.isProxyServer()) return;
 
         CLEAR_SERVER = new ConfigSectionHelper<String>(this, "clear-server", "&aList has been cleared!").getOrSet();
         CLEAR_SERVER_CONFIRM = new ConfigSectionHelper<String>(this, "clear-confirmation-server", "&4Warning! &7This command will &cclear the entire list of this server&7! &7Repeat the &esame command &7to confirm this action.").getOrSet();

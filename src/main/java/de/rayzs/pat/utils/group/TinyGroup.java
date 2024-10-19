@@ -16,7 +16,7 @@ public class TinyGroup implements Serializable {
     }
 
     public void add(String command) {
-        if(this.commands.contains(command)) return;
+        if (this.commands.contains(command)) return;
         this.commands.add(command);
     }
 

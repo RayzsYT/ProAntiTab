@@ -1,10 +1,12 @@
 package de.rayzs.pat.utils;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.group.TinyGroup;
-import de.rayzs.pat.api.storage.Storage;
-import java.util.*;
+
 import java.io.*;
+import java.util.List;
+import java.util.UUID;
 
 public class CommunicationPackets {
 
@@ -14,7 +16,8 @@ public class CommunicationPackets {
             outputStream.writeObject(obj);
             outputStream.flush();
             return arrayOutputStream.toByteArray();
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
 
         return null;
     }
@@ -25,7 +28,8 @@ public class CommunicationPackets {
             Object object = input.readObject();
             if (object.getClass() == null) return null;
             return object;
-        } catch (Throwable ignored) { }
+        } catch (Throwable ignored) {
+        }
 
         return null;
     }
@@ -34,7 +38,8 @@ public class CommunicationPackets {
         return object instanceof CommunicationPacket;
     }
 
-    public interface CommunicationPacket {}
+    public interface CommunicationPacket {
+    }
 
     public static class BackendDataPacket implements CommunicationPacket, Serializable {
         private final String proxyToken, serverName, serverId;
@@ -162,7 +167,9 @@ public class CommunicationPackets {
             return groupsPacket;
         }
 
-        public UnknownCommandPacket getUnknownCommandPacket() { return unknownCommandPacket; }
+        public UnknownCommandPacket getUnknownCommandPacket() {
+            return unknownCommandPacket;
+        }
 
         public NamespaceCommandsPacket getNamespaceCommandsPacket() {
             return namespaceCommandsPacket;
@@ -206,10 +213,6 @@ public class CommunicationPackets {
         private List<String> commands;
         private boolean turnBlacklistToWhitelist;
 
-        public void setCommands(List<String> commands) {
-            this.commands = commands;
-        }
-
         public void setTurnBlacklistToWhitelist(boolean turnBlacklistToWhitelist) {
             this.turnBlacklistToWhitelist = turnBlacklistToWhitelist;
         }
@@ -220,6 +223,10 @@ public class CommunicationPackets {
 
         public List<String> getCommands() {
             return commands;
+        }
+
+        public void setCommands(List<String> commands) {
+            this.commands = commands;
         }
     }
 

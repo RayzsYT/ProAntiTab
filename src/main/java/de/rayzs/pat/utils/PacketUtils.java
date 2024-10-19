@@ -1,7 +1,9 @@
 package de.rayzs.pat.utils;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import java.nio.charset.StandardCharsets;
-import io.netty.buffer.*;
 
 public class PacketUtils {
 
@@ -12,19 +14,19 @@ public class PacketUtils {
      */
 
     public static String readString(ByteBuf buf) throws Exception {
-        return readString( buf, Short.MAX_VALUE );
+        return readString(buf, Short.MAX_VALUE);
     }
 
     public static String readString(ByteBuf byteBuf, int maxLength) throws Exception {
         int len = readVarInt(byteBuf);
-        if ( len > maxLength * 3 )
-            throw new Exception("Cannot receive string longer than " + maxLength * 3 + " (got " + len + " bytes)" );
+        if (len > maxLength * 3)
+            throw new Exception("Cannot receive string longer than " + maxLength * 3 + " (got " + len + " bytes)");
 
         String string = byteBuf.toString(byteBuf.readerIndex(), len, StandardCharsets.UTF_8);
-        byteBuf.readerIndex(byteBuf.readerIndex() + len );
+        byteBuf.readerIndex(byteBuf.readerIndex() + len);
 
         if (string.length() > maxLength)
-            throw new Exception( "Cannot receive string longer than " + maxLength + " (got " + string.length() + " characters)" );
+            throw new Exception("Cannot receive string longer than " + maxLength + " (got " + string.length() + " characters)");
 
         return string;
     }
@@ -46,7 +48,7 @@ public class PacketUtils {
         while (true) {
             in = input.readByte();
             out |= (in & 0x7F) << (bytes++ * 7);
-            if (bytes > maxBytes) throw new Exception( "VarInt too big (max " + maxBytes + ")" );
+            if (bytes > maxBytes) throw new Exception("VarInt too big (max " + maxBytes + ")");
             if ((in & 0x80) != 0x80) break;
         }
 
@@ -65,10 +67,10 @@ public class PacketUtils {
             part = value & 0x7F;
             value >>>= 7;
 
-            if ( value != 0 ) part |= 0x80;
+            if (value != 0) part |= 0x80;
             output.writeByte(part);
 
-            if ( value == 0 ) break;
+            if (value == 0) break;
         }
     }
 
@@ -79,16 +81,16 @@ public class PacketUtils {
      */
 
     public static void writeString(String string, ByteBuf byteBuf) throws Exception {
-        writeString(string, byteBuf, Short.MAX_VALUE );
+        writeString(string, byteBuf, Short.MAX_VALUE);
     }
 
     public static void writeString(String string, ByteBuf byteBuf, int maxLength) throws Exception {
-        if (string.length() > maxLength )
-            throw new Exception( "Cannot send string longer than " + maxLength + " (got " + string.length() + " characters)");
+        if (string.length() > maxLength)
+            throw new Exception("Cannot send string longer than " + maxLength + " (got " + string.length() + " characters)");
 
-        byte[] bytes = string.getBytes( StandardCharsets.UTF_8 );
+        byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
         if (bytes.length > maxLength * 3)
-            throw new Exception( "Cannot send string longer than " + ( maxLength * 3 ) + " (got " + bytes.length + " bytes)");
+            throw new Exception("Cannot send string longer than " + (maxLength * 3) + " (got " + bytes.length + " bytes)");
 
         writeVarInt(bytes.length, byteBuf);
         byteBuf.writeBytes(bytes);
@@ -127,7 +129,7 @@ public class PacketUtils {
             }
 
             byte[] bytes = byteBuf.array();
-            if(release) byteBuf.release();
+            if (release) byteBuf.release();
 
             return bytes;
         }

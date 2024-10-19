@@ -1,14 +1,15 @@
 package de.rayzs.pat.api.communication.impl;
 
-import net.md_5.bungee.api.event.PluginMessageEvent;
+import de.rayzs.pat.api.communication.Client;
+import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.CommunicationPackets;
-import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import de.rayzs.pat.plugin.BungeeLoader;
-import de.rayzs.pat.api.communication.*;
-import net.md_5.bungee.api.ProxyServer;
 
 public class BungeeClient implements Client, Listener {
 
@@ -21,9 +22,12 @@ public class BungeeClient implements Client, Listener {
 
     @Override
     public void send(Object packet) {
-        for(ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
-            try { serverInfo.sendData(CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
-            } catch (Throwable throwable) { throwable.printStackTrace(); }
+        for (ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
+            try {
+                serverInfo.sendData(CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
         }
     }
 
@@ -32,10 +36,12 @@ public class BungeeClient implements Client, Listener {
         if (!event.getTag().equalsIgnoreCase(CHANNEL_NAME)) return;
         try {
             Object packetObj = CommunicationPackets.buildFromBytes(event.getData());
-            if(!CommunicationPackets.isPacket(packetObj)) return;
+            if (!CommunicationPackets.isPacket(packetObj)) return;
 
             Server server = (Server) event.getSender();
             Communicator.receiveInformation(server.getInfo().getName().toLowerCase(), packetObj);
-        } catch (Throwable throwable) { throwable.printStackTrace(); }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 }

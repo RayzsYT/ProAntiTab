@@ -2,7 +2,8 @@ package de.rayzs.pat.plugin.commands;
 
 import de.rayzs.pat.plugin.process.CommandProcess;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.plugin.*;
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
 public class BungeeCommand extends Command implements TabExecutor {
 

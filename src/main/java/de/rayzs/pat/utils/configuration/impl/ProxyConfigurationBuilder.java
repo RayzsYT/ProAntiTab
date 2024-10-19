@@ -1,11 +1,14 @@
 package de.rayzs.pat.utils.configuration.impl;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.configuration.yaml.*;
-import de.rayzs.pat.plugin.logger.Logger;
-import java.util.Collection;
+import de.rayzs.pat.utils.configuration.yaml.Configuration;
+import de.rayzs.pat.utils.configuration.yaml.ConfigurationProvider;
+import de.rayzs.pat.utils.configuration.yaml.YamlConfiguration;
+
 import java.io.File;
+import java.util.Collection;
 
 public class ProxyConfigurationBuilder implements ConfigurationBuilder {
 
@@ -30,12 +33,14 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
         this.fileName = fileName;
 
         try {
-            if(!directory.isDirectory()) directory.mkdirs();
+            if (!directory.isDirectory()) directory.mkdirs();
             file = new File(filePath, fileName + ".yml");
             loadDefault = !file.exists();
-            if(!file.exists()) file.createNewFile();
+            if (!file.exists()) file.createNewFile();
             configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
-        } catch (Exception exception) { exception.printStackTrace(); }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     @Override
@@ -50,7 +55,8 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
 
     @Override
     public void save() {
-        try { ConfigurationProvider.getProvider(YamlConfiguration.class).save(configuration, file);
+        try {
+            ConfigurationProvider.getProvider(YamlConfiguration.class).save(configuration, file);
         } catch (Exception exception) {
             Logger.warning("Could not save configuration file! [file=" + fileName + ", message=" + exception.getMessage() + "]");
         }
@@ -88,8 +94,8 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate()) {
+        if (fileName.equals("config")) {
+            if (ConfigUpdater.canUpdate()) {
                 String section = ConfigUpdater.getSection(path + "." + target, true);
                 if (configuration.getSection(section).getKeys().size() == 0) {
                     ConfigUpdater.updateConfigFile(this, path + "." + target, true);
@@ -118,8 +124,8 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate()) {
+        if (fileName.equals("config")) {
+            if (ConfigUpdater.canUpdate()) {
                 String section = ConfigUpdater.getSection(target, true);
                 if (configuration.getSection(section).getKeys().size() == 0) {
                     ConfigUpdater.updateConfigFile(this, target, true);

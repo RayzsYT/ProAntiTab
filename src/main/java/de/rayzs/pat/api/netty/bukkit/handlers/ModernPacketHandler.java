@@ -1,19 +1,23 @@
 package de.rayzs.pat.api.netty.bukkit.handlers;
 
-import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
+import com.mojang.brigadier.suggestion.Suggestion;
+import com.mojang.brigadier.suggestion.Suggestions;
 import de.rayzs.pat.api.event.PATEventHandler;
-import com.mojang.brigadier.suggestion.*;
-import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.api.netty.bukkit.*;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import de.rayzs.pat.utils.*;
-import java.lang.reflect.*;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +27,13 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     public boolean handleIncomingPacket(Player player, Object packetObj) throws Exception {
         Field stringField = Reflection.getFirstFieldByType(packetObj.getClass(), "String", Reflection.SearchOption.ENDS);
 
-        if(stringField == null) {
+        if (stringField == null) {
             Logger.warning("Failed PacketAnalyze process! (#1)");
             return false;
         }
 
         String text = (String) stringField.get(packetObj);
-        if(Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
+        if (Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
             MessageTranslator.send(Bukkit.getConsoleSender(), Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getName()));
             PATScheduler.createScheduler(() -> player.kickPlayer(ChatColor.translateAlternateColorCodes('&', Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get())));
             return false;
@@ -43,30 +47,30 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         Object suggestionObj;
         String rawInput = BukkitPacketAnalyzer.getPlayerInput(player), input = rawInput;
-        if(input == null) return false;
+        if (input == null) return false;
 
 
         boolean is121Packet = packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket"),
                 cancelsBeforeHand = false;
 
         int spaces = 0;
-        if(input.startsWith("/") || is121Packet) {
+        if (input.startsWith("/") || is121Packet) {
             input = input.replace("/", "");
-            if(input.contains(" ")) {
+            if (input.contains(" ")) {
                 String[] split = input.split(" ");
                 spaces = split.length;
-                if(spaces > 0) input = split[0];
+                if (spaces > 0) input = split[0];
             }
 
             cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-            if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input);
+            if (!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input);
         }
 
-        if(is121Packet) {
+        if (is121Packet) {
             try {
                 Field suggestionsField = Reflection.getFieldsByTypeNormal(packetObj.getClass(), "List", Reflection.SearchOption.ENDS).get(0);
                 List<?> suggestionsTmp = (List<?>) suggestionsField.get(packetObj),
-                suggestions = new ArrayList<>(suggestionsTmp);
+                        suggestions = new ArrayList<>(suggestionsTmp);
 
                 List<Field> intFields = Reflection.getFieldsByTypeNormal(packetObj.getClass(), "int", Reflection.SearchOption.ENDS);
                 int id = (int) intFields.get(0).get(packetObj),
@@ -112,7 +116,9 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), clientboundCommandSuggestionsPacketObj);
                 return false;
 
-            } catch (Throwable throwable) { throwable.printStackTrace(); }
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
             return !cancelsBeforeHand;
         }
 
@@ -128,13 +134,13 @@ public class ModernPacketHandler implements BukkitPacketHandler {
 
         Suggestions suggestions = (Suggestions) suggestionObj;
 
-        if((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird()) return false;
-        if(spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
+        if ((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird()) return false;
+        if (spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
             suggestions.getList().clear();
             return true;
         }
 
-        if(spaces == 0) {
+        if (spaces == 0) {
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
                 return Storage.Blacklist.isBlocked(player, command);
@@ -146,7 +152,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 suggestionsAsString.add(suggestion.getText());
 
             FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.call(player.getUniqueId(), rawInput, suggestionsAsString);
-            if(filteredTabCompletionEvent.isCancelled()) suggestions.getList().clear();
+            if (filteredTabCompletionEvent.isCancelled()) suggestions.getList().clear();
             suggestions.getList().removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(suggestion.getText()));
         }
 
@@ -156,7 +162,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     private String getSuggestionFromEntry(Object suggestionObj) {
         try {
             List<Field> fields = Reflection.getFieldsByTypeNormal(suggestionObj.getClass(), "String", Reflection.SearchOption.ENDS);
-            if(fields.isEmpty()) return "";
+            if (fields.isEmpty()) return "";
 
             Field field = fields.get(0);
             String result = (String) field.get(suggestionObj);

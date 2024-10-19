@@ -1,7 +1,9 @@
 package de.rayzs.pat.utils.adapter;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.ViaAPI;
 import de.rayzs.pat.plugin.logger.Logger;
-import com.viaversion.viaversion.api.*;
+
 import java.util.UUID;
 
 public class ViaVersionAdapter {

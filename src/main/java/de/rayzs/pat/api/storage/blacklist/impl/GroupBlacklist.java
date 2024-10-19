@@ -1,12 +1,15 @@
 package de.rayzs.pat.api.storage.blacklist.impl;
 
-import de.rayzs.pat.api.storage.storages.BlacklistStorage;
 import de.rayzs.pat.api.storage.StorageTemplate;
+import de.rayzs.pat.api.storage.storages.BlacklistStorage;
+
 import java.util.List;
 
 public class GroupBlacklist extends BlacklistStorage {
 
-    public GroupBlacklist(String group, String navigatePath) { super("groups." + group + "." + navigatePath); }
+    public GroupBlacklist(String group, String navigatePath) {
+        super("groups." + group + "." + navigatePath);
+    }
 
     @Override
     public List<String> getCommands() {
@@ -19,7 +22,9 @@ public class GroupBlacklist extends BlacklistStorage {
     }
 
     @Override
-    public BlacklistStorage remove(String command) { return super.remove(command); }
+    public BlacklistStorage remove(String command) {
+        return super.remove(command);
+    }
 
     @Override
     public BlacklistStorage clear() {

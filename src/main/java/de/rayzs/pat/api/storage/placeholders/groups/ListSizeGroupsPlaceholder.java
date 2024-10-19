@@ -6,7 +6,9 @@ import org.bukkit.entity.Player;
 
 public class ListSizeGroupsPlaceholder extends PlaceholderStorage {
 
-    public ListSizeGroupsPlaceholder() { super("list_size_groups"); }
+    public ListSizeGroupsPlaceholder() {
+        super("list_size_groups");
+    }
 
     @Override
     public String onRequest(Player player, String param) {

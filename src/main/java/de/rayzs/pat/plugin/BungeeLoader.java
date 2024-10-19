@@ -1,32 +1,72 @@
 package de.rayzs.pat.plugin;
 
-import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
-import de.rayzs.pat.utils.configuration.Configurator;
-import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
-import de.rayzs.pat.api.communication.Communicator;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
-import de.rayzs.pat.plugin.commands.BungeeCommand;
 import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.plugin.listeners.bungee.*;
-import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.plugin.metrics.bStats;
-import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.commands.BungeeCommand;
+import de.rayzs.pat.plugin.listeners.bungee.*;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.metrics.bStats;
+import de.rayzs.pat.utils.ConnectionBuilder;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.VersionComparer;
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.utils.configuration.Configurator;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
+import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginManager;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import net.md_5.bungee.api.plugin.*;
-import de.rayzs.pat.utils.*;
-import java.util.*;
 
 public class BungeeLoader extends Plugin {
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
-    private ScheduledTask updaterTask;
     private static boolean checkUpdate = false;
+    private ScheduledTask updaterTask;
+
+    private static void registerCommand(String... commands) {
+        for (String commandName : commands) {
+            BungeeCommand command = new BungeeCommand(commandName);
+            ProxyServer.getInstance().getPluginManager().registerCommand(plugin, command);
+        }
+    }
+
+    public static List<String> getPlayerNames() {
+        List<String> result = new LinkedList<>();
+        ProxyServer.getInstance().getPlayers().forEach(player -> result.add(player.getName()));
+        return result;
+    }
+
+    public static UUID getUUIDByName(String playerName) {
+        ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(playerName);
+        return proxiedPlayer != null ? proxiedPlayer.getUniqueId() : null;
+    }
+
+    public static Plugin getPlugin() {
+        return plugin;
+    }
+
+    public static java.util.logging.Logger getPluginLogger() {
+        return logger;
+    }
+
+    public static List<String> getServerNames() {
+        List<String> servers = new LinkedList<>();
+        for (String serverName : ProxyServer.getInstance().getServers().keySet())
+            servers.add(serverName.toLowerCase());
+
+        return servers;
+    }
 
     @Override
     public void onLoad() {
@@ -62,7 +102,7 @@ public class BungeeLoader extends Plugin {
         manager.registerListener(this, new BungeeBlockCommandListener());
         manager.registerListener(this, new BungeePingListener());
 
-        if(Reflection.isPaper())
+        if (Reflection.isPaper())
             manager.registerListener(this, new WaterfallAntiTabListener());
 
         startUpdaterTask();
@@ -73,12 +113,12 @@ public class BungeeLoader extends Plugin {
         if (manager.getPlugin("LuckPerms") != null)
             LuckPermsAdapter.initialize();
 
-        if(manager.getPlugin("PAPIProxyBridge") != null) {
+        if (manager.getPlugin("PAPIProxyBridge") != null) {
             Storage.USE_PAPIPROXYBRIDGE = true;
             Logger.info("Successfully hooked into PAPIProxyBridge!");
         }
 
-        if(Storage.USE_SIMPLECLOUD)
+        if (Storage.USE_SIMPLECLOUD)
             Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
         BungeePacketAnalyzer.injectAll();
@@ -91,24 +131,6 @@ public class BungeeLoader extends Plugin {
         MessageTranslator.closeAudiences();
     }
 
-    private static void registerCommand(String... commands) {
-        for (String commandName : commands) {
-            BungeeCommand command = new BungeeCommand(commandName);
-            ProxyServer.getInstance().getPluginManager().registerCommand(plugin, command);
-        }
-    }
-
-    public static List<String> getPlayerNames() {
-        List<String> result = new LinkedList<>();
-        ProxyServer.getInstance().getPlayers().forEach(player -> result.add(player.getName()));
-        return result;
-    }
-
-    public static UUID getUUIDByName(String playerName) {
-        ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(playerName);
-        return proxiedPlayer != null ? proxiedPlayer.getUniqueId() : null;
-    }
-
     public void startUpdaterTask() {
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
         updaterTask = getProxy().getScheduler().schedule(this, () -> {
@@ -117,15 +139,15 @@ public class BungeeLoader extends Plugin {
             Storage.NEWER_VERSION = result;
             VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
 
-            if(VersionComparer.isDeveloperVersion()) {
+            if (VersionComparer.isDeveloperVersion()) {
                 getProxy().getScheduler().cancel(updaterTask);
                 Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
 
-            } else if(!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
+            } else if (!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
                 getProxy().getScheduler().cancel(updaterTask);
                 checkUpdate = true;
 
-                if(VersionComparer.isUnreleased()) {
+                if (VersionComparer.isUnreleased()) {
                     Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using an §eunreleased §7version of ProAntiTab.");
                     return;
                 }
@@ -133,11 +155,11 @@ public class BungeeLoader extends Plugin {
                 checkUpdate = true;
                 Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
 
-            } else if(VersionComparer.isOutdated()) {
+            } else if (VersionComparer.isOutdated()) {
                 Storage.OUTDATED = true;
                 Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
 
-            } else if(!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
+            } else if (!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
                 getProxy().getScheduler().cancel(updaterTask);
                 switch (result) {
                     case "internet":
@@ -152,21 +174,5 @@ public class BungeeLoader extends Plugin {
                 }
             }
         }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);
-    }
-
-    public static Plugin getPlugin() {
-        return plugin;
-    }
-
-    public static java.util.logging.Logger getPluginLogger() {
-        return logger;
-    }
-
-    public static List<String> getServerNames() {
-        List<String> servers = new LinkedList<>();
-        for (String serverName : ProxyServer.getInstance().getServers().keySet())
-            servers.add(serverName.toLowerCase());
-
-        return servers;
     }
 }

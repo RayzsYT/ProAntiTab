@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.storage.storages;
 
-import de.rayzs.pat.api.storage.*;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.StorageTemplate;
 
 public class ConfigStorage extends StorageTemplate {
 
@@ -10,8 +11,12 @@ public class ConfigStorage extends StorageTemplate {
     }
 
     @Override
-    public void save() { getConfig().save(); }
+    public void save() {
+        getConfig().save();
+    }
 
     @Override
-    public void load() { getConfig().reload(); }
+    public void load() {
+        getConfig().reload();
+    }
 }

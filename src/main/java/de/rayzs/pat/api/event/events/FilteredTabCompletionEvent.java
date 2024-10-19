@@ -1,7 +1,8 @@
 package de.rayzs.pat.api.event.events;
 
 import de.rayzs.pat.api.event.PATEvent;
-import java.util.*;
+
+import java.util.List;
 
 public abstract class FilteredTabCompletionEvent extends PATEvent<FilteredTabCompletionEvent> {
 

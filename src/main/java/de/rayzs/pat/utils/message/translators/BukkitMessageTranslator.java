@@ -1,18 +1,19 @@
 package de.rayzs.pat.utils.message.translators;
 
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.Translator;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.audience.Audience;
-import de.rayzs.pat.plugin.BukkitLoader;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.command.CommandSender;
-import de.rayzs.pat.utils.message.*;
 import org.bukkit.entity.Player;
 
 public class BukkitMessageTranslator implements Translator {
 
-    private BukkitAudiences audiences;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
+    private BukkitAudiences audiences;
 
     public BukkitMessageTranslator() {
         audiences = BukkitAudiences.create(BukkitLoader.getPlugin());
@@ -27,7 +28,7 @@ public class BukkitMessageTranslator implements Translator {
     public void send(Object target, String text) {
         Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
         text = this.miniMessage.serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(text.replace("§", "&")));
-        if(text.contains("\\")) text = text.replace("\\", "");
+        if (text.contains("\\")) text = text.replace("\\", "");
         audience.sendMessage(this.miniMessage.deserialize(text));
     }
 

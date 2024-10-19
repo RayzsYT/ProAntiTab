@@ -1,10 +1,14 @@
 package de.rayzs.pat.utils;
 
-import net.md_5.bungee.api.ProxyServer;
 import io.netty.channel.Channel;
-import org.bukkit.entity.Player;
-import java.lang.reflect.*;
+import net.md_5.bungee.api.ProxyServer;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class Reflection {
@@ -23,9 +27,11 @@ public class Reflection {
             legacy = minor <= 16;
             weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() > 20;
             proxy = false;
-        } catch (Throwable ignored) { proxy = true; }
+        } catch (Throwable ignored) {
+            proxy = true;
+        }
 
-        if(!proxy) {
+        if (!proxy) {
             try {
                 Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
                 folia = true;
@@ -46,23 +52,45 @@ public class Reflection {
             }
         }
 
-        if(proxy) {
+        if (proxy) {
             try {
                 Class.forName("com.velocitypowered.api.proxy.ProxyServer");
                 velocity = true;
-            } catch (ClassNotFoundException ignored) { velocity = false; }
+            } catch (ClassNotFoundException ignored) {
+                velocity = false;
+            }
         }
 
         if (proxy) version = Version.UNKNOWN;
     }
 
-    public static int[] getAges() { return new int[]{major, minor, release}; }
-    public static String getVersionName() { return versionName; }
-    public static String getRawVersionName() { return rawVersionName; }
-    public static Version getVersion() { return version; }
-    public static boolean isModern() { return !legacy; }
-    public static boolean isLegacy() { return legacy; }
-    public static boolean isWeird() { return weird; }
+    public static int[] getAges() {
+        return new int[]{major, minor, release};
+    }
+
+    public static String getVersionName() {
+        return versionName;
+    }
+
+    public static String getRawVersionName() {
+        return rawVersionName;
+    }
+
+    public static Version getVersion() {
+        return version;
+    }
+
+    public static boolean isModern() {
+        return !legacy;
+    }
+
+    public static boolean isLegacy() {
+        return legacy;
+    }
+
+    public static boolean isWeird() {
+        return weird;
+    }
 
     public static boolean isFoliaServer() {
         return folia;
@@ -71,10 +99,14 @@ public class Reflection {
     public static boolean isProxyServer() {
         return proxy;
     }
+
     public static boolean isVelocityServer() {
         return velocity;
     }
-    public static boolean isPaper() { return paper; }
+
+    public static boolean isPaper() {
+        return paper;
+    }
 
     public static Class<?> getClass(String clazzPath) {
         Class<?> clazz = null;
@@ -106,7 +138,7 @@ public class Reflection {
     }
 
     public static boolean openAccess(Field field, boolean ignore) {
-        if(!ignore && (Modifier.isFinal(field.getModifiers()) || field.isAccessible())) {
+        if (!ignore && (Modifier.isFinal(field.getModifiers()) || field.isAccessible())) {
             return false;
         }
         field.setAccessible(true);
@@ -114,7 +146,7 @@ public class Reflection {
     }
 
     public static boolean closeAccess(Field field, boolean ignore) {
-        if(!ignore && Modifier.isFinal(field.getModifiers()) || !field.isAccessible()) return false;
+        if (!ignore && Modifier.isFinal(field.getModifiers()) || !field.isAccessible()) return false;
         field.setAccessible(false);
         return true;
     }
@@ -132,7 +164,7 @@ public class Reflection {
         List<Field[]> fieldLists = Arrays.asList(clazz.getFields(), clazz.getDeclaredFields());
 
         for (Field[] fields : fieldLists)
-            for(Field field : fields)
+            for (Field field : fields)
                 result.addAll(Collections.singletonList(field));
         return result;
     }
@@ -146,7 +178,7 @@ public class Reflection {
         List<Method[]> fieldLists = Arrays.asList(clazz.getMethods(), clazz.getDeclaredMethods());
 
         for (Method[] methods : fieldLists)
-            for(Method method : methods)
+            for (Method method : methods)
                 result.addAll(Collections.singletonList(method));
         return result;
     }
@@ -163,15 +195,19 @@ public class Reflection {
 
     public static Method getMethodByName(Object obj, String name) {
         Method method = null;
-        try { method = obj.getClass().getDeclaredMethod(name);
-        } catch (Exception ignored) { }
+        try {
+            method = obj.getClass().getDeclaredMethod(name);
+        } catch (Exception ignored) {
+        }
         return method;
     }
 
     public static Method getMethodByName(Class<?> clazz, String name) {
         Method method = null;
-        try { method = clazz.getDeclaredMethod(name);
-        } catch (Exception ignored) { }
+        try {
+            method = clazz.getDeclaredMethod(name);
+        } catch (Exception ignored) {
+        }
         return method;
     }
 
@@ -205,7 +241,7 @@ public class Reflection {
 
         for (Field field : fieldLists) {
             String typeName = field.getAnnotatedType().getType().getTypeName();
-            if(type == SearchOption.CONTAINS && typeName.contains(target)
+            if (type == SearchOption.CONTAINS && typeName.contains(target)
                     || type == SearchOption.STARTS && typeName.startsWith(target)
                     || type == SearchOption.ENDS && typeName.endsWith(target)
                     || type == SearchOption.EQUALS && typeName.equals(target)) {
@@ -221,7 +257,7 @@ public class Reflection {
 
         for (Field field : fieldLists) {
             String typeName = field.getType().getTypeName();
-            if(type == SearchOption.CONTAINS && typeName.contains(target)
+            if (type == SearchOption.CONTAINS && typeName.contains(target)
                     || type == SearchOption.STARTS && typeName.startsWith(target)
                     || type == SearchOption.ENDS && typeName.endsWith(target)
                     || type == SearchOption.EQUALS && typeName.equals(target)) {
@@ -241,7 +277,7 @@ public class Reflection {
 
         for (Method method : methodLists) {
             String typeName = method.getReturnType().getTypeName();
-            if(type == SearchOption.CONTAINS && typeName.contains(target)
+            if (type == SearchOption.CONTAINS && typeName.contains(target)
                     || type == SearchOption.STARTS && typeName.startsWith(target)
                     || type == SearchOption.ENDS && typeName.endsWith(target)
                     || type == SearchOption.EQUALS && typeName.equals(target)) {
@@ -274,7 +310,7 @@ public class Reflection {
 
     public static Channel getPlayerChannel(Player player) throws Exception {
         Object channelObject;
-        if(paper && Reflection.isWeird()) {
+        if (paper && Reflection.isWeird()) {
             Object serverPlayerObj = getMethodsByReturnTypeAndName(player.getClass(), "ServerPlayer", SearchOption.ENDS, "getHandle").get(0).invoke(player),
                     serverGamePacketListenerImplObj = getFieldByName(serverPlayerObj.getClass(), "connection").get(serverPlayerObj),
                     connectionObj = getFieldByName(serverGamePacketListenerImplObj.getClass().getSuperclass(), "connection").get(serverGamePacketListenerImplObj);
@@ -291,13 +327,13 @@ public class Reflection {
 
     public static Object getPlayerNetworkManager(Object playerConnection) throws Exception {
         Optional<Field> optional = getFieldsByType(Reflection.getMinor() == 20 && Reflection.getRelease() > 2 || Reflection.getMinor() > 20 ? playerConnection.getClass().getSuperclass() : playerConnection.getClass(), "NetworkManager", SearchOption.ENDS).stream().findFirst();
-        if(!optional.isPresent()) return null;
+        if (!optional.isPresent()) return null;
         return optional.get().get(playerConnection);
     }
 
     public static void setFieldValue(Field field, Object clazzObj, Object value, boolean closeAccessibility) throws IllegalAccessException {
         field.set(clazzObj, value);
-        if(closeAccessibility) field.setAccessible(false);
+        if (closeAccessibility) field.setAccessible(false);
     }
 
     public static Constructor<?> getConstructor(Object obj) throws NoSuchMethodException {
@@ -305,7 +341,7 @@ public class Reflection {
     }
 
     public static Constructor<?> getConstructor(Class<?> clazz) throws NoSuchMethodException {
-        return clazz.getDeclaredConstructor(new Class[] { null });
+        return clazz.getDeclaredConstructor(new Class[]{null});
     }
 
     public static Constructor<?> getConstructor(Object obj, Class<?>... parameters) throws NoSuchMethodException {
@@ -334,7 +370,7 @@ public class Reflection {
         try {
             Class.forName(className);
             return true;
-        }catch (ClassNotFoundException classNotFoundException) {
+        } catch (ClassNotFoundException classNotFoundException) {
             return false;
         }
     }
@@ -369,9 +405,17 @@ public class Reflection {
         release = versionArgs.length > 2 ? Integer.parseInt(versionArgs[2]) : 0;
     }
 
-    public static int getMajor() { return major; }
-    public static int getMinor() { return minor; }
-    public static int getRelease() { return release; }
+    public static int getMajor() {
+        return major;
+    }
+
+    public static int getMinor() {
+        return minor;
+    }
+
+    public static int getRelease() {
+        return release;
+    }
 
     public enum Version {
         UNKNOWN, UNSUPPORTED,
@@ -391,5 +435,5 @@ public class Reflection {
         v_1_21, v_1_21_1, v_1_21_2,
     }
 
-    public enum SearchOption { CONTAINS, EQUALS, ENDS, STARTS }
+    public enum SearchOption {CONTAINS, EQUALS, ENDS, STARTS}
 }

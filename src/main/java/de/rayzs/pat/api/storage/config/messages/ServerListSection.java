@@ -1,8 +1,8 @@
 package de.rayzs.pat.api.storage.config.messages;
 
-import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class ServerListSection extends ConfigStorage {
 
@@ -16,7 +16,7 @@ public class ServerListSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
-        if(!Reflection.isProxyServer()) return;
+        if (!Reflection.isProxyServer()) return;
 
         SERVER_DOES_NOT_EXIST = new ConfigSectionHelper<String>(this, "server-not-found", "&cThe server %server% does not have any commands!").getOrSet();
         GROUP_DOES_NOT_EXIST = new ConfigSectionHelper<String>(this, "group-does-not-exist", "&cGroup %group% does not exist for %server%!").getOrSet();

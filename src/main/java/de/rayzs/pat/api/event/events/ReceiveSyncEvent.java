@@ -1,7 +1,7 @@
 package de.rayzs.pat.api.event.events;
 
-import de.rayzs.pat.utils.CommunicationPackets;
 import de.rayzs.pat.api.event.PATEvent;
+import de.rayzs.pat.utils.CommunicationPackets;
 
 public abstract class ReceiveSyncEvent extends PATEvent<ReceiveSyncEvent> {
 

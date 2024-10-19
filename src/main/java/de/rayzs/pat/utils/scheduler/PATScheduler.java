@@ -1,7 +1,8 @@
 package de.rayzs.pat.utils.scheduler;
 
-import de.rayzs.pat.utils.scheduler.impl.*;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.scheduler.impl.BukkitScheduler;
+import de.rayzs.pat.utils.scheduler.impl.FoliaScheduler;
 
 public class PATScheduler {
 

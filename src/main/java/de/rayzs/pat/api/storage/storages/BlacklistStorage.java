@@ -1,10 +1,13 @@
 package de.rayzs.pat.api.storage.storages;
 
-import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.StorageTemplate;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.api.storage.*;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlacklistStorage extends StorageTemplate implements Serializable {
 
@@ -27,21 +30,21 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public String convertCommand(String command, boolean intensive, boolean lowerCase, boolean slash) {
-        if(isConverted(command, intensive)) return command;
-        if(lowerCase) command = command.toLowerCase();
+        if (isConverted(command, intensive)) return command;
+        if (lowerCase) command = command.toLowerCase();
 
-        if(slash)
-            if(command.startsWith("/")) command = command.replaceFirst("/", "");
+        if (slash)
+            if (command.startsWith("/")) command = command.replaceFirst("/", "");
 
         String[] split;
-        if(command.contains(" ")) {
+        if (command.contains(" ")) {
             split = command.split(" ");
-            if(split.length > 0) command = split[0];
+            if (split.length > 0) command = split[0];
         }
 
-        if(intensive && command.contains(":")) {
+        if (intensive && command.contains(":")) {
             split = command.split(":");
-            if(split.length > 0)
+            if (split.length > 0)
                 command = command.replaceFirst(split[0] + ":", "");
         }
 
@@ -49,15 +52,15 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public boolean isListed(String command, boolean intensive) {
-        if(commands == null) {
+        if (commands == null) {
             Logger.warning("&cFailed to check command \"" + command + "\"! PAT couldn't read the commands from the storage.yml at section &4" + getNavigatePath() + "&c! Please ensure that your storage.yml isn't corrupt or contains any spaces or empty commands. If this problem still remains, please join my Discord server to ask for help there. &8(&erayzs.de/discord&8)");
             return false;
         }
 
-        if(!isConverted(command, intensive)) command = convertCommand(command, intensive, true);
+        if (!isConverted(command, intensive)) command = convertCommand(command, intensive, true);
 
         for (String commands : commands) {
-            if(commands == null) continue;
+            if (commands == null) continue;
             if (commands.equals(command)) return true;
         }
 
@@ -65,16 +68,16 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public boolean isListed(String command, boolean intensive, boolean convert, boolean slash) {
-        if(commands == null) {
+        if (commands == null) {
             Logger.warning("&cFailed to check command \"" + command + "\"! PAT couldn't read the commands from the storage.yml at section &4" + getNavigatePath() + "&c! Please ensure that your storage.yml isn't corrupt or contains any spaces or empty commands. If this problem still remains, please join my Discord server to ask for help there. &8(&erayzs.de/discord&8)");
             return false;
         }
 
-        if(convert)
-            if(!isConverted(command, intensive)) command = convertCommand(command, intensive, true, slash);
+        if (convert)
+            if (!isConverted(command, intensive)) command = convertCommand(command, intensive, true, slash);
 
         for (String commands : commands) {
-            if(commands == null) continue;
+            if (commands == null) continue;
             if (commands.equals(command)) return true;
         }
 
@@ -82,16 +85,16 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public boolean isListed(String command, boolean intensive, boolean convert) {
-        if(commands == null) {
+        if (commands == null) {
             Logger.warning("&cFailed to check command \"" + command + "\"! PAT couldn't read the commands from the storage.yml at section &4" + getNavigatePath() + "&c! Please ensure that your storage.yml isn't corrupt or contains any spaces or empty commands. If this problem still remains, please join my Discord server to ask for help there. &8(&erayzs.de/discord&8)");
             return false;
         }
 
-        if(convert)
-            if(!isConverted(command, intensive)) command = convertCommand(command, intensive, true);
+        if (convert)
+            if (!isConverted(command, intensive)) command = convertCommand(command, intensive, true);
 
         for (String commands : commands) {
-            if(commands == null) continue;
+            if (commands == null) continue;
             if (commands.equals(command)) return true;
         }
         return false;
@@ -102,49 +105,49 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public boolean isBlocked(Object targetObj, String command, boolean intensive) {
-        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return !isListed(command, intensive) && !PermissionUtil.hasBypassPermission(targetObj, command);
         else
             return isListed(command, intensive) && !PermissionUtil.hasBypassPermission(targetObj, command);
     }
 
     public boolean isBlockedIgnorePermission(String command, boolean intensive) {
-        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return !isListed(command, intensive);
         else
             return isListed(command, intensive);
     }
 
     public boolean isBlocked(Object targetObj, String command, boolean intensive, boolean convert) {
-        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return !isListed(command, intensive, convert) && !PermissionUtil.hasBypassPermission(targetObj, command);
         else
             return isListed(command, intensive, convert) && !PermissionUtil.hasBypassPermission(targetObj, command);
     }
 
     public boolean isBlocked(Object targetObj, String command, boolean intensive, boolean convert, boolean slash) {
-        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return !isListed(command, intensive, convert, slash) && !PermissionUtil.hasBypassPermission(targetObj, command);
         else
             return isListed(command, intensive, convert, slash) && !PermissionUtil.hasBypassPermission(targetObj, command);
     }
 
     public boolean isBlocked(String command, boolean intensive) {
-        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return !isListed(command, intensive);
         else
             return isListed(command, intensive);
     }
 
     public boolean isBlocked(String command, boolean intensive, boolean convert) {
-        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return !isListed(command, intensive, convert);
         else
             return isListed(command, intensive, convert);
     }
 
     public boolean isBlocked(String command, boolean intensive, boolean convert, boolean slash) {
-        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return !isListed(command, intensive, convert, slash);
         else
             return isListed(command, intensive, convert, slash);
@@ -156,7 +159,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
 
     public BlacklistStorage add(String command) {
         command = command.toLowerCase();
-        if(!commands.contains(command))
+        if (!commands.contains(command))
             commands.add(command);
         return this;
     }

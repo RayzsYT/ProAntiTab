@@ -1,7 +1,7 @@
 package de.rayzs.pat.api.communication.client.impl;
 
-import de.rayzs.pat.api.communication.impl.VelocityClient;
 import de.rayzs.pat.api.communication.client.ClientInfo;
+import de.rayzs.pat.api.communication.impl.VelocityClient;
 import de.rayzs.pat.plugin.VelocityLoader;
 
 public class VelocityClientInfo extends ClientInfo {
@@ -25,8 +25,18 @@ public class VelocityClientInfo extends ClientInfo {
     }
 
     @Override
+    public void setId(String serverId) {
+        super.setId(serverId);
+    }
+
+    @Override
     public String getName() {
         return super.getName();
+    }
+
+    @Override
+    public void setName(String name) {
+        super.setName(name);
     }
 
     @Override
@@ -37,15 +47,5 @@ public class VelocityClientInfo extends ClientInfo {
     @Override
     public void setFeedback(boolean state) {
         super.setFeedback(state);
-    }
-
-    @Override
-    public void setId(String serverId) {
-        super.setId(serverId);
-    }
-
-    @Override
-    public void setName(String name) {
-        super.setName(name);
     }
 }

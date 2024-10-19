@@ -1,7 +1,9 @@
 package de.rayzs.pat.utils;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import java.util.concurrent.TimeUnit;
-import com.google.common.cache.*;
 
 public class ExpireList<T> {
 
@@ -16,7 +18,7 @@ public class ExpireList<T> {
     }
 
     public boolean add(T t) {
-        if(contains(t)) return false;
+        if (contains(t)) return false;
         cache.put(t, (byte) 0);
         return true;
     }

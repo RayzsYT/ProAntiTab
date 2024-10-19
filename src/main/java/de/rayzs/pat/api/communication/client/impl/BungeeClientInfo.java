@@ -1,7 +1,7 @@
 package de.rayzs.pat.api.communication.client.impl;
 
-import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.communication.Client;
+import de.rayzs.pat.api.communication.client.ClientInfo;
 import net.md_5.bungee.api.ProxyServer;
 
 public class BungeeClientInfo extends ClientInfo {
@@ -25,8 +25,18 @@ public class BungeeClientInfo extends ClientInfo {
     }
 
     @Override
+    public void setId(String serverId) {
+        super.setId(serverId);
+    }
+
+    @Override
     public String getName() {
         return super.getName();
+    }
+
+    @Override
+    public void setName(String name) {
+        super.setName(name);
     }
 
     @Override
@@ -37,16 +47,6 @@ public class BungeeClientInfo extends ClientInfo {
     @Override
     public void setFeedback(boolean state) {
         super.setFeedback(state);
-    }
-
-    @Override
-    public void setId(String serverId) {
-        super.setId(serverId);
-    }
-
-    @Override
-    public void setName(String name) {
-        super.setName(name);
     }
 }
 

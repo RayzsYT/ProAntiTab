@@ -1,18 +1,25 @@
 package de.rayzs.pat.plugin.logger;
 
-import de.rayzs.pat.utils.message.MessageTranslator;
-import java.nio.charset.StandardCharsets;
 import de.rayzs.pat.api.storage.Storage;
-import javax.net.ssl.HttpsURLConnection;
-import net.md_5.bungee.api.ProxyServer;
+import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.Reflection;
-import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import de.rayzs.pat.plugin.*;
+import de.rayzs.pat.utils.message.MessageTranslator;
+import net.md_5.bungee.api.ProxyServer;
 import org.bukkit.Bukkit;
+
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.*;
-import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
 
 public class Logger {
 
@@ -25,28 +32,42 @@ public class Logger {
                     ? BungeeLoader.getPluginLogger()
                     : BukkitLoader.getPluginLogger();
 
-    public static void info(List<String> texts) { texts.forEach(text -> send(Priority.INFO, text)); }
-    public static void warning(List<String> texts) { texts.forEach(text -> send(Priority.WARNING, text)); }
-    public static void info(String text) { send(Priority.INFO, text); }
-    public static void warning(String text) { send(Priority.WARNING, text); }
-    public static void debug(String text) { send(Priority.DEBUG, text); }
+    public static void info(List<String> texts) {
+        texts.forEach(text -> send(Priority.INFO, text));
+    }
+
+    public static void warning(List<String> texts) {
+        texts.forEach(text -> send(Priority.WARNING, text));
+    }
+
+    public static void info(String text) {
+        send(Priority.INFO, text);
+    }
+
+    public static void warning(String text) {
+        send(Priority.WARNING, text);
+    }
+
+    public static void debug(String text) {
+        send(Priority.DEBUG, text);
+    }
 
     protected static void send(Priority priority, String text) {
         text = MessageTranslator.replaceMessage(text);
 
         String time = TIME_FORMAT.format(new Date(System.currentTimeMillis()));
-        if(time.length() != 12) time = time.substring(0, 9) + 0 + time.split(":")[3];
+        if (time.length() != 12) time = time.substring(0, 9) + 0 + time.split(":")[3];
         LOGS.add("[" + priority.name() + " |" + time + "] " + MessageTranslator.colorless(text));
 
-        if(priority == Priority.DEBUG) return;
+        if (priority == Priority.DEBUG) return;
 
-        if(LOGGER == null) {
+        if (LOGGER == null) {
             System.out.println(text);
             return;
         }
 
         boolean hasColors = text.contains("§");
-        if(hasColors) {
+        if (hasColors) {
             if (Reflection.isProxyServer()) MessageTranslator.send(ProxyServer.getInstance().getConsole(), text);
             else MessageTranslator.send(Bukkit.getServer().getConsoleSender(), text);
             return;
@@ -61,7 +82,7 @@ public class Logger {
         int startIndex = clonedLogs.size() > 980 ? clonedLogs.size() - 980 : 0;
         StringBuilder textBuilder = new StringBuilder("[ProAntiTab " + Storage.CURRENT_VERSION + " | " + (Reflection.isProxyServer() ? Reflection.isVelocityServer() ? "Velocity" : "Proxy" : Reflection.isPaper() ? "Paper" : "Bukkit") + "]" + (Reflection.getRawVersionName() != null ? " Server version: " + Reflection.getVersionName() + " " + Reflection.getRawVersionName().replace("_", ".") : "") + "\n" + (startIndex != 0 ? "... another part is split!\n\n" : ""));
 
-        for(int i = startIndex; i < clonedLogs.size(); i++) {
+        for (int i = startIndex; i < clonedLogs.size(); i++) {
             if (clonedLogs.get(i) == null) continue;
             String line = clonedLogs.get(i);
             textBuilder.append("\n");
@@ -92,5 +113,5 @@ public class Logger {
         return "https://haste.rayzs.de/" + response + ".txt";
     }
 
-    protected enum Priority { INFO, WARNING, DEBUG }
+    protected enum Priority {INFO, WARNING, DEBUG}
 }

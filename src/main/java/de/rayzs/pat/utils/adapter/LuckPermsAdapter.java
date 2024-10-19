@@ -1,21 +1,25 @@
 package de.rayzs.pat.utils.adapter;
 
-import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
-import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
-import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
-import net.luckperms.api.event.sync.PreNetworkSyncEvent;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.plugin.VelocityLoader;
-import net.luckperms.api.model.user.User;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import net.luckperms.api.event.EventBus;
-import net.luckperms.api.event.node.*;
+import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
+import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
-import net.luckperms.api.node.*;
-import net.luckperms.api.*;
-import java.util.*;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.event.EventBus;
+import net.luckperms.api.event.node.NodeMutateEvent;
+import net.luckperms.api.event.sync.PreNetworkSyncEvent;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
+import net.luckperms.api.node.NodeType;
+
+import java.util.Map;
+import java.util.UUID;
 
 public class LuckPermsAdapter {
 
@@ -30,15 +34,14 @@ public class LuckPermsAdapter {
 
         eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeMutateEvent.class, LuckPermsAdapter::onNoteMutate);
 
-        if(!Reflection.isProxyServer()) {
+        if (!Reflection.isProxyServer()) {
             if (BukkitLoader.useSuggestions())
                 eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitAntiTabListener.luckpermsNetworkSync());
         } else {
-            if(Reflection.isVelocityServer()) {
+            if (Reflection.isVelocityServer()) {
                 eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> VelocityLoader.delayedPermissionsReload());
                 VelocityAntiTabListener.updateCommands();
-            }
-            else WaterfallAntiTabListener.updateCommands();
+            } else WaterfallAntiTabListener.updateCommands();
         }
     }
 
@@ -56,50 +59,49 @@ public class LuckPermsAdapter {
 
     public static boolean hasAnyPermissions(UUID uuid) {
         Map<String, Boolean> permissions = getPermissions(uuid);
-        if(permissions == null) return false;
+        if (permissions == null) return false;
 
         return permissions.size() > 0;
     }
 
     public static void setPermissions(UUID uuid) {
         Map<String, Boolean> permissions = getPermissions(uuid);
-        if(permissions == null) return;
+        if (permissions == null) return;
 
 
         permissions.forEach((permission, permitted) -> {
-                    if(permission.startsWith("proantitab.") || permission.equals("*")) PermissionUtil.setPermission(uuid, permission, permitted);
+                    if (permission.startsWith("proantitab.") || permission.equals("*")) PermissionUtil.setPermission(uuid, permission, permitted);
                 }
         );
 
-        if(Reflection.isProxyServer()) {
-            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
-            else if(Reflection.isPaper()) WaterfallAntiTabListener.updateCommands();
+        if (Reflection.isProxyServer()) {
+            if (Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+            else if (Reflection.isPaper()) WaterfallAntiTabListener.updateCommands();
             return;
         }
 
-        if(Reflection.getMinor() >= 16) BukkitAntiTabListener.handleTabCompletion(uuid);
+        if (Reflection.getMinor() >= 16) BukkitAntiTabListener.handleTabCompletion(uuid);
     }
 
     private static void onNoteMutate(NodeMutateEvent event) {
         boolean relevant = false, inheritance = false;
-        if(event.isUser()) for(Node node : event.getDataAfter()) {
+        if (event.isUser()) for (Node node : event.getDataAfter()) {
 
-            if(!inheritance) inheritance = node.getType() == NodeType.INHERITANCE;
-            if(node.getType() != NodeType.PERMISSION && (node.getKey().startsWith("proantitab.") || !node.getKey().equals("*"))) {
+            if (!inheritance) inheritance = node.getType() == NodeType.INHERITANCE;
+            if (node.getType() != NodeType.PERMISSION && (node.getKey().startsWith("proantitab.") || !node.getKey().equals("*"))) {
                 relevant = true;
                 break;
             }
         }
 
-        if(!relevant && !inheritance) return;
+        if (!relevant && !inheritance) return;
 
         if (event.isUser() && event.getTarget() instanceof User) {
             User user = (User) event.getTarget();
             if (Reflection.isProxyServer()) {
-                if(Reflection.isVelocityServer())
-                PermissionUtil.reloadPermissions(user.getUniqueId());
-            }
-            else BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
+                if (Reflection.isVelocityServer())
+                    PermissionUtil.reloadPermissions(user.getUniqueId());
+            } else BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
         }
     }
 }
