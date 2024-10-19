@@ -92,7 +92,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                     for (Object suggestion : suggestions)
                         suggestionsAsString.add(getSuggestionFromEntry(suggestion));
 
-                    FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.call(player.getUniqueId(), rawInput, suggestionsAsString);
+                    FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawInput, suggestionsAsString);
                     if (filteredTabCompletionEvent.isCancelled()) suggestions.clear();
 
                     for (int i = 0; i < suggestions.size(); i++) {
@@ -145,7 +145,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             for (Suggestion suggestion : suggestions.getList())
                 suggestionsAsString.add(suggestion.getText());
 
-            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.call(player.getUniqueId(), rawInput, suggestionsAsString);
+            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawInput, suggestionsAsString);
             if(filteredTabCompletionEvent.isCancelled()) suggestions.getList().clear();
             suggestions.getList().removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(suggestion.getText()));
         }

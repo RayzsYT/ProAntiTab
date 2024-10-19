@@ -111,7 +111,7 @@ public class CommandsCache {
         else
             Logger.debug("Created list of commands for player with uuid " + uuidSubstring + " with a total of " + playerCommands.size() + " commands!");
 
-        PATEventHandler.call(targetObj, playerCommands, serverName != null);
+        PATEventHandler.callUpdatePlayerCommandsEvents(targetObj, playerCommands, serverName != null);
         return playerCommands;
     }
 

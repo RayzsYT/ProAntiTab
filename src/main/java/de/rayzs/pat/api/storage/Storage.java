@@ -35,7 +35,7 @@ public class Storage {
         loadToken();
         if(loadBlacklist) Blacklist.loadAll();
 
-        PATEventHandler.call();
+        PATEventHandler.callUpdatePluginEvents();
     }
 
     public static void loadToken() {

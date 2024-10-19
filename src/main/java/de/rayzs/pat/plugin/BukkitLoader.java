@@ -219,7 +219,7 @@ public class BukkitLoader extends JavaPlugin {
             BukkitAntiTabListener.handleTabCompletion(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? Storage.Blacklist.getBlacklist().getCommands() : getNotBlockedCommands());
         }
 
-        PATEventHandler.call(packetBundle);
+        PATEventHandler.callReceiveSyncEvents(packetBundle);
     }
 
     public static boolean doesCommandExist(String command, boolean replace) {

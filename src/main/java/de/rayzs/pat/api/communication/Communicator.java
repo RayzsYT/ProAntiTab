@@ -151,7 +151,7 @@ public class Communicator {
         bundle = new CommunicationPackets.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
         clientInfo.sendBytes(CommunicationPackets.convertToBytes(bundle));
 
-        PATEventHandler.call(bundle, serverName);
+        PATEventHandler.callSentSyncEvents(bundle, serverName);
     }
 
     public static void sendRequest() {
