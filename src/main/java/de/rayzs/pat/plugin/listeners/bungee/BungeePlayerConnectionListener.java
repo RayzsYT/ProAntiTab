@@ -22,13 +22,10 @@ public class BungeePlayerConnectionListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
-        if(CustomServerBrand.isEnabled() && Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
-
+        if(CustomServerBrand.isEnabled())
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
                 if (player.isConnected()) CustomServerBrand.sendBrandToPlayer(player);
             }, 500, TimeUnit.MILLISECONDS);
-
-        }
 
         PermissionUtil.setPlayerPermissions(player.getUniqueId());
 

@@ -1,5 +1,7 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
+import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.brand.impl.BukkitServerBrand;
 import de.rayzs.pat.api.communication.BackendUpdater;
@@ -18,13 +20,16 @@ public class BukkitPlayerConnectionListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
         if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             BackendUpdater.handle();
 
         PermissionUtil.setPlayerPermissions(player.getUniqueId());
         CustomServerBrand.preparePlayer(player);
-        CustomServerBrand.sendBrandToPlayer(player);
+
+        if(CustomServerBrand.isEnabled())
+            CustomServerBrand.sendBrandToPlayer(player);
 
         if(!BukkitPacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
 
@@ -40,6 +45,8 @@ public class BukkitPlayerConnectionListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.LEFT);
+
         BukkitPacketAnalyzer.uninject(player.getUniqueId());
         PermissionUtil.resetPermissions(player.getUniqueId());
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;

@@ -1,6 +1,8 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.proxy.VelocityPacketAnalyzer;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -25,14 +27,12 @@ public class VelocityConnectionListener {
     @Subscribe
     public void onServerPreConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
+        PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
-        if(CustomServerBrand.isEnabled() && Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
-
+        if(CustomServerBrand.isEnabled())
             server.getScheduler().buildTask(loader, () -> {
                 if (player.isActive()) CustomServerBrand.sendBrandToPlayer(player);
             }).delay(500, TimeUnit.MILLISECONDS).schedule();
-
-        }
 
         PermissionUtil.setPlayerPermissions(player.getUniqueId());
 
@@ -58,8 +58,9 @@ public class VelocityConnectionListener {
     @Subscribe
     public void onDisconnect(DisconnectEvent event) {
         Player player = event.getPlayer();
+        PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.LEFT);
+
         PermissionUtil.resetPermissions(player.getUniqueId());
         VelocityPacketAnalyzer.uninject(player);
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
     }
 }
