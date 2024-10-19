@@ -1,6 +1,9 @@
 package de.rayzs.pat.utils.permission;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class PermissionMap {
 
@@ -40,7 +43,7 @@ public class PermissionMap {
     }
 
     public PermissionState getPermissionState(String permission) {
-        if(!hasPermissionState(permission)) return PermissionState.EMPTY;
+        if (!hasPermissionState(permission)) return PermissionState.EMPTY;
         return permissionMap.get(permission) ? PermissionState.PERMITTED : PermissionState.DENIED;
     }
 
@@ -52,5 +55,5 @@ public class PermissionMap {
         return uuid;
     }
 
-    enum PermissionState { PERMITTED, DENIED, EMPTY }
+    enum PermissionState {PERMITTED, DENIED, EMPTY}
 }

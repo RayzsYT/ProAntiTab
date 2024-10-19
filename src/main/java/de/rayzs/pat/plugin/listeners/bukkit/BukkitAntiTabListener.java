@@ -1,75 +1,36 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
-import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
-import org.bukkit.event.player.PlayerCommandSendEvent;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import org.bukkit.entity.Player;
-import de.rayzs.pat.utils.*;
-import org.bukkit.event.*;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.CommandsCache;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
-import java.util.*;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandSendEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class BukkitAntiTabListener implements Listener {
 
     private static final CommandsCache COMMANDS_CACHE = new CommandsCache();
 
-    @EventHandler (priority = EventPriority.LOWEST)
-    public void onPlayerCommandSend(PlayerCommandSendEvent event) {
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-        String uuidSubstring = uuid.toString().substring(uuid.toString().length() - 5);
-
-        if(Storage.USE_VELOCITY || player.isOp()) {
-            Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (Veloctiy? " + Storage.USE_VELOCITY + ". OP? " + player.isOp() + ")");
-            return;
-        }
-
-        if(!BukkitLoader.isLoaded()) {
-            event.getCommands().clear();
-            Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (not loaded)");
-            return;
-        }
-
-        if(event.getCommands().size() == 0) {
-            Logger.debug("No available commands to filter! Ignoring rest of the code until at least one command is listed in there.");
-            return;
-        }
-        List<String> allCommands = getCommands();
-
-        COMMANDS_CACHE.handleCommands(allCommands);
-
-        if (PermissionUtil.hasBypassPermission(player)) {
-            Logger.debug("Player with uuid " + uuidSubstring + " skipped the commands-list creation due to its permissions.");
-            return;
-        }
-
-        if(Storage.USE_VIAVERSION)
-            if(Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754)
-                event.getCommands().clear();
-
-        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(event.getCommands(), player, player.getUniqueId());
-        event.getCommands().clear();
-
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(player, playerCommands);
-        if(filteredSuggestionEvent.isCancelled()) return;
-
-        event.getCommands().addAll(filteredSuggestionEvent.getSuggestions());
-
-        Logger.debug("Player with uuid " + uuidSubstring + " has a total of " + playerCommands.size() + " commands.");
-    }
-
     public static void updateCommands(Player player) {
-        if(notUpdatablePlayer(player.getUniqueId())) return;
-        if(Reflection.getMinor() >= 16) player.updateCommands();
+        if (notUpdatablePlayer(player.getUniqueId())) return;
+        if (Reflection.getMinor() >= 16) player.updateCommands();
     }
 
     public static void updateCommands() {
-        if(Reflection.getMinor() >= 16) Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::updateCommands);
+        if (Reflection.getMinor() >= 16) Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::updateCommands);
     }
 
     public static void setChangeStatus() {
@@ -77,7 +38,7 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     public static void handleTabCompletion(List<String> commands) {
-        if(Storage.USE_VELOCITY) return;
+        if (Storage.USE_VELOCITY) return;
         COMMANDS_CACHE.reset();
         Bukkit.getOnlinePlayers().forEach(player -> handleTabCompletion(player, commands));
     }
@@ -97,18 +58,18 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     public static void handleTabCompletion(UUID uuid) {
-        if(notUpdatablePlayer(uuid)) return;
+        if (notUpdatablePlayer(uuid)) return;
 
         Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
+        if (player == null) return;
         handleTabCompletion(player);
     }
 
     public static void handleTabCompletion(UUID uuid, List<String> commands) {
-        if(notUpdatablePlayer(uuid)) return;
+        if (notUpdatablePlayer(uuid)) return;
 
         Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
+        if (player == null) return;
         handleTabCompletion(player, commands);
     }
 
@@ -121,8 +82,8 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     public static void handleTabCompletion(Player player, List<String> commands) {
-        if(Storage.USE_VELOCITY) return;
-        if(notUpdatablePlayer(player.getUniqueId())) return;
+        if (Storage.USE_VELOCITY) return;
+        if (notUpdatablePlayer(player.getUniqueId())) return;
 
         List<String> dummy = new ArrayList<>(commands);
         PlayerCommandSendEvent event = new PlayerCommandSendEvent(player, dummy);
@@ -131,10 +92,55 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     private static boolean notUpdatablePlayer(UUID uuid) {
-        if(Storage.USE_VIAVERSION)
+        if (Storage.USE_VIAVERSION)
             return Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754;
 
         return false;
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerCommandSend(PlayerCommandSendEvent event) {
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+        String uuidSubstring = uuid.toString().substring(uuid.toString().length() - 5);
+
+        if (Storage.USE_VELOCITY || player.isOp()) {
+            Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (Veloctiy? " + Storage.USE_VELOCITY + ". OP? " + player.isOp() + ")");
+            return;
+        }
+
+        if (!BukkitLoader.isLoaded()) {
+            event.getCommands().clear();
+            Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (not loaded)");
+            return;
+        }
+
+        if (event.getCommands().size() == 0) {
+            Logger.debug("No available commands to filter! Ignoring rest of the code until at least one command is listed in there.");
+            return;
+        }
+        List<String> allCommands = getCommands();
+
+        COMMANDS_CACHE.handleCommands(allCommands);
+
+        if (PermissionUtil.hasBypassPermission(player)) {
+            Logger.debug("Player with uuid " + uuidSubstring + " skipped the commands-list creation due to its permissions.");
+            return;
+        }
+
+        if (Storage.USE_VIAVERSION)
+            if (Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754)
+                event.getCommands().clear();
+
+        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(event.getCommands(), player, player.getUniqueId());
+        event.getCommands().clear();
+
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(player, playerCommands);
+        if (filteredSuggestionEvent.isCancelled()) return;
+
+        event.getCommands().addAll(filteredSuggestionEvent.getSuggestions());
+
+        Logger.debug("Player with uuid " + uuidSubstring + " has a total of " + playerCommands.size() + " commands.");
     }
 
 }

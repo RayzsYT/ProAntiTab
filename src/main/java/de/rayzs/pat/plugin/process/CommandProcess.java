@@ -1,23 +1,26 @@
 package de.rayzs.pat.plugin.process;
 
-import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
-import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
-import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
-import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
-import de.rayzs.pat.api.communication.client.ClientInfo;
-import de.rayzs.pat.api.communication.BackendUpdater;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.communication.BackendUpdater;
+import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.plugin.BukkitLoader;
-import java.util.concurrent.TimeUnit;
-import de.rayzs.pat.utils.group.*;
-import de.rayzs.pat.plugin.*;
+import de.rayzs.pat.plugin.BungeeLoader;
+import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
+import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class CommandProcess {
 
@@ -34,9 +37,9 @@ public class CommandProcess {
         Group group;
         boolean bool, backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
 
-        if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
+        if (!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
 
-        for (String arg : args) if(arg.contains(".") || arg.contains("\"") || arg.contains("'")) return;
+        for (String arg : args) if (arg.contains(".") || arg.contains("\"") || arg.contains("'")) return;
 
         try {
             switch (length) {
@@ -46,7 +49,7 @@ public class CommandProcess {
                     switch (task) {
 
                         case "postdebug":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "postdebug")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "postdebug")) return;
 
                             try {
                                 sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.SUCCESS.replace("%link%", Objects.requireNonNull(Logger.post())));
@@ -58,9 +61,9 @@ public class CommandProcess {
                             return;
 
                         case "stats":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "stats")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "stats")) return;
 
-                            if(backend) {
+                            if (backend) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                 return;
                             }
@@ -70,7 +73,7 @@ public class CommandProcess {
                             for (int i = 0; i < Communicator.CLIENTS.size(); i++) {
                                 bool = (i >= Communicator.CLIENTS.size() - 1);
                                 ClientInfo client = Communicator.CLIENTS.get(i);
-                                if(!client.hasSentFeedback()) continue;
+                                if (!client.hasSentFeedback()) continue;
                                 found++;
 
                                 statsBuilder.append(Storage.ConfigSections.Messages.STATS.SERVER.replace("%updated%", client.getSyncTime()).replace("%servername%", client.getName()));
@@ -90,7 +93,7 @@ public class CommandProcess {
 
                         case "reload":
                         case "rl":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "reload")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "reload")) return;
                             sender.sendMessage(Storage.ConfigSections.Messages.RELOAD.LOADING);
 
                             Storage.loadAll(!backend);
@@ -99,12 +102,12 @@ public class CommandProcess {
                             GroupManager.initialize();
                             handleReload();
 
-                            if(!backend) handleChange();
+                            if (!backend) handleChange();
                             sender.sendMessage(Storage.ConfigSections.Messages.RELOAD.DONE);
                             return;
 
                         case "info":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "info")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "info")) return;
 
                             sender.sendMessage(
                                     StringUtils.buildStringList(Storage.ConfigSections.Messages.INFO.MESSAGE.getLines())
@@ -115,16 +118,16 @@ public class CommandProcess {
                             return;
 
                         case "clear":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
 
-                            if(backend) {
+                            if (backend) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                 return;
                             }
 
                             confirmationString = "clear";
 
-                            if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                            if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
                                 Storage.Blacklist.getBlacklist().clear().save();
                                 handleChange();
                                 sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR);
@@ -135,19 +138,19 @@ public class CommandProcess {
                             return;
 
                         case "notify":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "notify")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "notify")) return;
 
-                            if(backend) {
+                            if (backend) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                 return;
                             }
 
-                            if(sender.isConsole()) {
+                            if (sender.isConsole()) {
                                 bool = Storage.SEND_CONSOLE_NOTIFICATION;
                                 Storage.SEND_CONSOLE_NOTIFICATION = !Storage.SEND_CONSOLE_NOTIFICATION;
                             } else {
                                 bool = Storage.NOTIFY_PLAYERS.contains(sender.getUniqueId());
-                                if(bool) Storage.NOTIFY_PLAYERS.remove(sender.getUniqueId());
+                                if (bool) Storage.NOTIFY_PLAYERS.remove(sender.getUniqueId());
                                 else Storage.NOTIFY_PLAYERS.add(sender.getUniqueId());
                             }
 
@@ -156,7 +159,7 @@ public class CommandProcess {
 
                         case "ls":
                         case "list":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
 
                             stringList = StringUtils.buildStringList(
                                     Storage.Blacklist.getBlacklist().getCommands(),
@@ -171,7 +174,7 @@ public class CommandProcess {
                         case "listgroups":
                         case "lg":
 
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "listgroups")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "listgroups")) return;
 
                             stringList = StringUtils.buildStringList(
                                     GroupManager.getGroupNames(),
@@ -185,7 +188,7 @@ public class CommandProcess {
                         case "listpriorities":
                         case "lp":
 
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "listpriorities")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "listpriorities")) return;
 
                             stringList = StringUtils.buildGroupStringList(
                                     GroupManager.getGroups(),
@@ -197,7 +200,7 @@ public class CommandProcess {
 
                         case "update":
 
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "update")) return;
 
                             PermissionUtil.reloadPermissions();
                             sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_ALL);
@@ -215,10 +218,10 @@ public class CommandProcess {
                     switch (task) {
                         case "ls":
                         case "list":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
                             group = GroupManager.getGroupByName(sub.toLowerCase());
 
-                            if(group == null) {
+                            if (group == null) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", sub));
                                 return;
                             }
@@ -234,9 +237,9 @@ public class CommandProcess {
                         case "listgroups":
                         case "lg":
 
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "listgroups")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "listgroups")) return;
 
-                            if(!Reflection.isProxyServer()) {
+                            if (!Reflection.isProxyServer()) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                 return;
                             }
@@ -253,25 +256,25 @@ public class CommandProcess {
 
                         case "creategroup":
                         case "cg":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "creategroup")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "creategroup")) return;
 
-                            if(backend) {
+                            if (backend) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                 return;
                             }
 
-                            if(sub.equalsIgnoreCase("commands")) return;
+                            if (sub.equalsIgnoreCase("commands")) return;
                             bool = GroupManager.isGroupRegistered(sub.toLowerCase());
 
-                            if(!bool) GroupManager.registerGroup(sub.toLowerCase());
+                            if (!bool) GroupManager.registerGroup(sub.toLowerCase());
                             sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.ALREADY_EXIST : Storage.ConfigSections.Messages.GROUP.CREATE).replace("%group%", sub.toLowerCase()));
                             return;
 
                         case "deletegroup":
                         case "dg":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "deletegroup")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "deletegroup")) return;
 
-                            if(backend) {
+                            if (backend) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                 return;
                             }
@@ -279,7 +282,7 @@ public class CommandProcess {
                             bool = GroupManager.isGroupRegistered(sub.toLowerCase());
                             confirmationString = "deletegroup " + sub.toLowerCase();
 
-                            if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                            if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
                                 if (bool) GroupManager.unregisterGroup(sub.toLowerCase());
                                 sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.DELETE : Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST).replace("%group%", sub.toLowerCase()));
                             } else {
@@ -289,22 +292,22 @@ public class CommandProcess {
                             return;
 
                         case "clear":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
 
-                            if(backend) {
+                            if (backend) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                 return;
                             }
 
                             group = GroupManager.getGroupByName(sub);
 
-                            if(group == null) {
+                            if (group == null) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", sub));
                                 return;
                             }
                             confirmationString = "clear " + group.getGroupName();
 
-                            if(CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
+                            if (CONFIRMATION.getOrDefault(sender.getUniqueId(), "").equals(confirmationString)) {
                                 group.clear();
                                 handleChange();
 
@@ -316,9 +319,9 @@ public class CommandProcess {
                             return;
 
                         case "add":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
 
-                            if(backend) {
+                            if (backend) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                 return;
                             }
@@ -334,9 +337,9 @@ public class CommandProcess {
                         case "remove":
                         case "rem":
                         case "rm":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
 
-                            if(backend) {
+                            if (backend) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                 return;
                             }
@@ -349,32 +352,32 @@ public class CommandProcess {
                             return;
 
                         case "update":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "update")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "update")) return;
                             uuid = !Reflection.isProxyServer() ? BukkitLoader.getUUIDByName(sub) : Reflection.isVelocityServer() ? VelocityLoader.getUUIDByName(sub) : BungeeLoader.getUUIDByName(sub);
 
-                            if(uuid != null) {
+                            if (uuid != null) {
                                 PermissionUtil.reloadPermissions(uuid);
                                 sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_SPECIFIC.replace("%target%", sub));
                             } else sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.PLAYER_NOT_ONLINE.replace("%target%", sub));
                             return;
 
                         case "perms":
-                            if(!PermissionUtil.hasPermissionWithResponse(sender, "perms")) return;
+                            if (!PermissionUtil.hasPermissionWithResponse(sender, "perms")) return;
                             uuid = !Reflection.isProxyServer() ? BukkitLoader.getUUIDByName(sub) : Reflection.isVelocityServer() ? VelocityLoader.getUUIDByName(sub) : BungeeLoader.getUUIDByName(sub);
 
                             sender.sendMessage((uuid != null
-                                    ? Storage.ConfigSections.Messages.PERMS_CHECK.MESSAGE.replace("%permissions%", PermissionUtil.getPermissionsAsString(uuid))
-                                    : Storage.ConfigSections.Messages.PERMS_CHECK.PLAYER_NOT_ONLINE
+                                            ? Storage.ConfigSections.Messages.PERMS_CHECK.MESSAGE.replace("%permissions%", PermissionUtil.getPermissionsAsString(uuid))
+                                            : Storage.ConfigSections.Messages.PERMS_CHECK.PLAYER_NOT_ONLINE
                                     ).replace("%player%", sub)
-                                    );
+                            );
                             return;
                     }
 
                 case 3:
 
-                    if(args[0].equals("serv") || args[0].equals("server")) {
+                    if (args[0].equals("serv") || args[0].equals("server")) {
 
-                        if(!Reflection.isProxyServer()) {
+                        if (!Reflection.isProxyServer()) {
                             sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                             return;
                         }
@@ -385,14 +388,14 @@ public class CommandProcess {
                         switch (task) {
                             case "clear":
 
-                                if(!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
+                                if (!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
 
                                 if (!Reflection.isProxyServer()) {
                                     sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                     return;
                                 }
 
-                                if(!BlacklistCreator.exist(sub)) {
+                                if (!BlacklistCreator.exist(sub)) {
                                     sender.sendMessage(Storage.ConfigSections.Messages.BLACKLIST.CLEAR_SERVER_NOT_FOUND.replace("%server%", sub));
                                     return;
                                 }
@@ -409,16 +412,17 @@ public class CommandProcess {
                                 }
                                 return;
 
-                            case "ls": case "list":
+                            case "ls":
+                            case "list":
 
-                                if(!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
+                                if (!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
 
                                 if (!Reflection.isProxyServer()) {
                                     sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                                     return;
                                 }
 
-                                if(!BlacklistCreator.exist(sub)) {
+                                if (!BlacklistCreator.exist(sub)) {
                                     sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.SERVER_DOES_NOT_EXIST.replace("%server%", sub));
                                     return;
                                 }
@@ -441,16 +445,16 @@ public class CommandProcess {
                     extra = args[2].toLowerCase();
                     group = GroupManager.getGroupByName(sub);
 
-                    if(task.equals("setpriority") || task.equals("sp")) {
+                    if (task.equals("setpriority") || task.equals("sp")) {
 
                         if (!PermissionUtil.hasPermissionWithResponse(sender, "setpriority")) return;
 
-                        if(backend) {
+                        if (backend) {
                             sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                             return;
                         }
 
-                        if(group == null) {
+                        if (group == null) {
                             sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", sub));
                             return;
                         }
@@ -459,7 +463,7 @@ public class CommandProcess {
 
                         try {
                             int priority = Integer.parseInt(extra);
-                            if(priority < 1) {
+                            if (priority < 1) {
                                 sender.sendMessage(Storage.ConfigSections.Messages.GROUP.PRIORITY_FAILED.replace("%group%", sub).replace("%priority%", extra));
                                 return;
                             }
@@ -480,7 +484,7 @@ public class CommandProcess {
                     sub = args[1].toLowerCase();
                     extra = args[2].toLowerCase();
                     group = GroupManager.getGroupByName(extra);
-                    if(group == null) {
+                    if (group == null) {
                         sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", extra));
                         return;
                     }
@@ -513,7 +517,7 @@ public class CommandProcess {
                     }
 
                 case 4:
-                    if(backend) {
+                    if (backend) {
                         sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                         return;
                     }
@@ -522,7 +526,7 @@ public class CommandProcess {
                     sub = args[2].toLowerCase();
                     extra = args[3].toLowerCase();
 
-                    if(args[0].equals("serv") || args[0].equals("server")) {
+                    if (args[0].equals("serv") || args[0].equals("server")) {
 
                         if (!Reflection.isProxyServer()) {
                             sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
@@ -558,7 +562,7 @@ public class CommandProcess {
 
                             case "clear":
 
-                                if(!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
+                                if (!PermissionUtil.hasPermissionWithResponse(sender, "clear")) return;
 
                                 confirmationString = "clear-server-group " + sub + " " + extra;
 
@@ -574,17 +578,18 @@ public class CommandProcess {
                                 }
                                 return;
 
-                            case "ls": case "list":
+                            case "ls":
+                            case "list":
 
-                                if(!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
+                                if (!PermissionUtil.hasPermissionWithResponse(sender, "list")) return;
 
-                                if(!BlacklistCreator.exist(sub)) {
+                                if (!BlacklistCreator.exist(sub)) {
                                     sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.SERVER_DOES_NOT_EXIST.replace("%group%", extra).replace("%server%", sub));
                                     return;
                                 }
 
                                 group = GroupManager.getGroupByName(extra);
-                                if(!BlacklistCreator.exist(extra, sub) || group == null) {
+                                if (!BlacklistCreator.exist(extra, sub) || group == null) {
                                     sender.sendMessage(Storage.ConfigSections.Messages.SERV_LIST.GROUP_DOES_NOT_EXIST.replace("%group%", extra).replace("%server%", sub));
                                     return;
                                 }
@@ -602,7 +607,7 @@ public class CommandProcess {
                     }
 
                 case 5:
-                    if(backend) {
+                    if (backend) {
                         sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                         return;
                     }
@@ -612,9 +617,9 @@ public class CommandProcess {
                     extra = args[3].toLowerCase();
                     subExtra = args[4].toLowerCase();
 
-                    if(args[0].equals("serv") || args[0].equals("server")) {
+                    if (args[0].equals("serv") || args[0].equals("server")) {
 
-                        if(!Reflection.isProxyServer()) {
+                        if (!Reflection.isProxyServer()) {
                             sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
                             return;
                         }
@@ -624,7 +629,7 @@ public class CommandProcess {
                                 if (!PermissionUtil.hasPermissionWithResponse(sender, "add")) return;
 
                                 group = GroupManager.getGroupByName(subExtra);
-                                if(group == null) {
+                                if (group == null) {
                                     sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", extra));
                                     return;
                                 }
@@ -639,11 +644,13 @@ public class CommandProcess {
                                 sender.sendMessage((bool ? Storage.ConfigSections.Messages.GROUP.ADD_SERVER_FAILED : Storage.ConfigSections.Messages.GROUP.ADD_SERVER_SUCCESS).replace("%server%", sub).replace("%command%", extra).replace("%group%", subExtra));
                                 return;
 
-                            case "remove": case "rem": case "rm":
+                            case "remove":
+                            case "rem":
+                            case "rm":
                                 if (!PermissionUtil.hasPermissionWithResponse(sender, "remove")) return;
 
                                 group = GroupManager.getGroupByName(subExtra);
-                                if(group == null) {
+                                if (group == null) {
                                     sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST.replace("%group%", extra));
                                     return;
                                 }
@@ -676,11 +683,11 @@ public class CommandProcess {
 
         switch (args.length) {
             case 1:
-                if(PermissionUtil.hasPermission(senderObj, "postdebug"))
+                if (PermissionUtil.hasPermission(senderObj, "postdebug"))
                     suggestions.add("postdebug");
-                if(PermissionUtil.hasPermission(sender, "update"))
+                if (PermissionUtil.hasPermission(sender, "update"))
                     suggestions.add("update");
-                if(PermissionUtil.hasPermission(sender, "perms"))
+                if (PermissionUtil.hasPermission(sender, "perms"))
                     suggestions.add("perms");
                 if (!backend && PermissionUtil.hasPermission(sender, "stats") && Reflection.isProxyServer())
                     suggestions.add("stats");
@@ -773,7 +780,7 @@ public class CommandProcess {
                 break;
         }
 
-        suggestions.stream().filter(suggestion -> suggestion.startsWith(args[args.length-1].toLowerCase())).forEach(result::add);
+        suggestions.stream().filter(suggestion -> suggestion.startsWith(args[args.length - 1].toLowerCase())).forEach(result::add);
         return result;
     }
 
@@ -782,19 +789,19 @@ public class CommandProcess {
         GroupManager.clearServerGroupBlacklists();
         Communicator.syncData();
 
-        if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+        if (Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
         else WaterfallAntiTabListener.updateCommands();
 
         Communicator.sendPermissionReset();
     }
 
     private static void handleChange() {
-        if(Reflection.isProxyServer()) {
+        if (Reflection.isProxyServer()) {
 
             GroupManager.clearServerGroupBlacklists();
             Communicator.syncData();
 
-            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
+            if (Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
             else WaterfallAntiTabListener.updateCommands();
 
             Communicator.sendPermissionReset();
@@ -809,7 +816,7 @@ public class CommandProcess {
     }
 
     private static void handleReload() {
-        if(!Reflection.isProxyServer()) {
+        if (!Reflection.isProxyServer()) {
             BackendUpdater.stop();
             BackendUpdater.start();
         }

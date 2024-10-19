@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.storage;
 
-import de.rayzs.pat.utils.configuration.*;
+import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
+
 import java.io.Serializable;
 
 public abstract class StorageTemplate implements Serializable {
@@ -32,8 +33,12 @@ public abstract class StorageTemplate implements Serializable {
     public ConfigurationBuilder getConfig() {
         return configuration;
     }
-    public String getNavigatePath() { return navigatePath; }
+
+    public String getNavigatePath() {
+        return navigatePath;
+    }
 
     public abstract void save();
+
     public abstract void load();
 }

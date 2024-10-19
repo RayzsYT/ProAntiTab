@@ -1,14 +1,17 @@
 package de.rayzs.pat.utils.group;
 
-import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
-import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
-import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
-import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.ExpireCache;
-import java.util.concurrent.TimeUnit;
+import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Group implements Serializable {
 
@@ -81,15 +84,6 @@ public class Group implements Serializable {
         Storage.Files.STORAGE.reload();
     }
 
-    public void setCommands(List<String> commands) {
-        this.generalGroupBlacklist.setList(commands);
-    }
-
-    public void setPriority(int priority) {
-        Storage.Files.STORAGE.setAndSave("groups." + groupName + ".priority", priority);
-        this.priority = priority;
-    }
-
     public boolean hasPermission(Object targetObj) {
         return PermissionUtil.hasPermission(targetObj, "group." + this.groupName);
     }
@@ -147,6 +141,11 @@ public class Group implements Serializable {
         return priority;
     }
 
+    public void setPriority(int priority) {
+        Storage.Files.STORAGE.setAndSave("groups." + groupName + ".priority", priority);
+        this.priority = priority;
+    }
+
     public void clearServerGroupBlacklistsCache() {
         cachedServerGroupBlacklists.clear();
     }
@@ -155,36 +154,40 @@ public class Group implements Serializable {
         return getAllServerGroupBlacklist(server, false);
     }
 
-    /*
-    CHECK IF GROUP COMMANDS PER SERVER WORK OR NOT
-     */
-
     public List<GroupBlacklist> getAllServerGroupBlacklist(String server, boolean useDefault) {
         server = server.toLowerCase();
 
         if (cachedServerGroupBlacklists.contains(server)) {
-            if(cachedServerGroupBlacklists.get(server).size() > (useDefault ? 1 : 0))
+            if (cachedServerGroupBlacklists.get(server).size() > (useDefault ? 1 : 0))
                 return cachedServerGroupBlacklists.get(server);
         }
 
         List<GroupBlacklist> groupBlacklists = new ArrayList<>();
-        if(useDefault) groupBlacklists.add(generalGroupBlacklist);
+        if (useDefault) groupBlacklists.add(generalGroupBlacklist);
 
         GroupBlacklist groupBlacklist;
 
         for (String key : groupServerBlacklist.keySet()) {
-             if(!Storage.isServer(key, server)) continue;
-             groupBlacklist = groupServerBlacklist.get(key);
+            if (!Storage.isServer(key, server)) continue;
+            groupBlacklist = groupServerBlacklist.get(key);
 
-             if(groupBlacklist == null) continue;
-             groupBlacklists.add(groupBlacklist);
+            if (groupBlacklist == null) continue;
+            groupBlacklists.add(groupBlacklist);
         }
 
         return cachedServerGroupBlacklists.putAndGet(server, groupBlacklists);
     }
 
+    /*
+    CHECK IF GROUP COMMANDS PER SERVER WORK OR NOT
+     */
+
     public List<String> getCommands() {
         return this.generalGroupBlacklist.getCommands();
+    }
+
+    public void setCommands(List<String> commands) {
+        this.generalGroupBlacklist.setList(commands);
     }
 
     public List<String> getCommands(String server) {

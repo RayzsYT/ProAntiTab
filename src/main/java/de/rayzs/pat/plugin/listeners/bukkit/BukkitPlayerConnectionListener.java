@@ -1,17 +1,21 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
-import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.brand.impl.BukkitServerBrand;
 import de.rayzs.pat.api.communication.BackendUpdater;
-import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import org.bukkit.event.player.*;
-import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class BukkitPlayerConnectionListener implements Listener {
 
@@ -19,37 +23,37 @@ public class BukkitPlayerConnectionListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             BackendUpdater.handle();
 
         PermissionUtil.setPlayerPermissions(player.getUniqueId());
         CustomServerBrand.preparePlayer(player);
         CustomServerBrand.sendBrandToPlayer(player);
 
-        if(!BukkitPacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
+        if (!BukkitPacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
 
-        if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
+        if (Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
             Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
-                if(player.isOnline()) {
+                if (player.isOnline()) {
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
                 }
             }, 20);
         }
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         BukkitPacketAnalyzer.uninject(player.getUniqueId());
         PermissionUtil.resetPermissions(player.getUniqueId());
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
         BukkitServerBrand.removeFromModified(player);
     }
 
-    @EventHandler (priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
         BukkitServerBrand.removeFromModified(player);
         CustomServerBrand.sendBrandToPlayer(player);
     }

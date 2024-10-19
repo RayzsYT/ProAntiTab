@@ -1,8 +1,9 @@
 package de.rayzs.pat.utils.scheduler.impl;
 
-import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
-import io.papermc.paper.threadedregions.scheduler.*;
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
+import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 
 public class FoliaScheduler implements PATSchedulerTask {
@@ -36,7 +37,7 @@ public class FoliaScheduler implements PATSchedulerTask {
 
     @Override
     public void setTaskId(int taskId) {
-        if(taskId == -1 || taskId == -5) {
+        if (taskId == -1 || taskId == -5) {
             cancelTask();
         }
     }

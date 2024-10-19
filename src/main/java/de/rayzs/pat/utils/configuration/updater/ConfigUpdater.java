@@ -1,11 +1,14 @@
 package de.rayzs.pat.utils.configuration.updater;
 
-import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.ConnectionBuilder;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
+
+import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
-import java.io.*;
 
 public class ConfigUpdater {
 
@@ -32,8 +35,8 @@ public class ConfigUpdater {
 
     public static void broadcastMissingParts() {
         File outdatedConfig = new File("./plugins/ProAntiTab/comparable-config.yml");
-        if(MISSING_PARTS.isEmpty()) {
-            if(outdatedConfig.delete())
+        if (MISSING_PARTS.isEmpty()) {
+            if (outdatedConfig.delete())
                 Logger.info("Deleted 'comparable-config.yml' because it's not needed anymore.");
             return;
         }
@@ -64,7 +67,7 @@ public class ConfigUpdater {
             part = getVariable(missingPart);
 
             list = map.getOrDefault(section, new ArrayList<>());
-            if(!list.contains(part)) list.add(part);
+            if (!list.contains(part)) list.add(part);
 
             map.putIfAbsent(section, list);
         }
@@ -84,25 +87,25 @@ public class ConfigUpdater {
 
         try {
             Files.write(file.toPath(), configSection.createAndGetNewFileInput(atLine, from, to));
-        }catch (Exception exception) {
+        } catch (Exception exception) {
             Logger.warning("Failed to read file input! (#2)");
             exception.printStackTrace();
         }
     }
 
     public static String getVariable(String target) {
-        if(target.contains(".")) {
+        if (target.contains(".")) {
             String[] pathSplit = target.split("\\.");
-            target = pathSplit[pathSplit.length-1];
+            target = pathSplit[pathSplit.length - 1];
         }
 
         return target;
     }
 
     public static String getSection(String target, boolean first) {
-        if(target.contains(".")) {
+        if (target.contains(".")) {
             String[] pathSplit = target.split("\\.");
-            if(first) return pathSplit.length > 0 ? pathSplit[0] : target;
+            if (first) return pathSplit.length > 0 ? pathSplit[0] : target;
 
             LinkedList<String> pathList = new LinkedList<>(Arrays.asList(pathSplit));
             pathList.remove(pathList.size() - 1);
@@ -121,11 +124,11 @@ public class ConfigUpdater {
         int sections = 0;
 
         String target = targetPath;
-        if(target.contains(".")) {
+        if (target.contains(".")) {
             String[] pathSplit = target.split("\\.");
-            sections = (pathSplit.length-1) * 2;
+            sections = (pathSplit.length - 1) * 2;
 
-            target = pathSplit[pathSplit.length-1];
+            target = pathSplit[pathSplit.length - 1];
         }
 
         String line;
@@ -133,11 +136,11 @@ public class ConfigUpdater {
         for (i = 0; i < lines.size(); i++) {
             line = lines.get(i);
 
-            if(line.isEmpty() || line.startsWith("#") || !line.contains(":")) continue;
+            if (line.isEmpty() || line.startsWith("#") || !line.contains(":")) continue;
             line = line.split(":")[0];
 
-            if(!StringUtils.remove(line, " ").equals(target)) continue;
-            if(StringUtils.countLetters(line, ' ', true) != sections) continue;
+            if (!StringUtils.remove(line, " ").equals(target)) continue;
+            if (StringUtils.countLetters(line, ' ', true) != sections) continue;
             hash.put(i, line);
         }
 
@@ -157,43 +160,43 @@ public class ConfigUpdater {
                 line = StringUtils.getLineText(lines, position);
                 spaces = StringUtils.countLetters(line, ' ', true);
 
-                if(spaces == sections) {
+                if (spaces == sections) {
                     sections -= removeSpaces;
                     line = StringUtils.remove((line != null && line.contains(":") ? line.split(":")[0] : line), " ");
                     finalStartPos = position;
                     sectionPath.insert(0, line + ".");
                 }
 
-                if(position < 0) break;
+                if (position < 0) break;
                 position--;
             } while (spaces != 0);
 
-            if(sectionPath.toString().equals(targetPath)) {
+            if (sectionPath.toString().equals(targetPath)) {
                 finalStartPos = targetPath.contains(".") ? finalStartPos : finalEndPos;
 
-                if(comments) {
-                    int start = finalStartPos-1;
-                    for(i = start; i > 0; i--) {
+                if (comments) {
+                    int start = finalStartPos - 1;
+                    for (i = start; i > 0; i--) {
                         line = StringUtils.getLineText(lines, i);
-                        if(line != null && !line.startsWith("#")) {
-                            finalStartPos = i+1;
+                        if (line != null && !line.startsWith("#")) {
+                            finalStartPos = i + 1;
                             break;
                         }
                     }
                 }
 
-                return new int[] { finalStartPos, finalEndPos };
+                return new int[]{finalStartPos, finalEndPos};
             }
         }
 
-        return new int[] {0, 0};
+        return new int[]{0, 0};
     }
 
     public static int[] getPositionBySection(List<String> lines, String target, boolean comments) {
         int start = getSectionPositionByTarget(lines, target, comments)[0], end = start, i;
         String line;
 
-        if(target.contains(".")) {
+        if (target.contains(".")) {
             String[] pathSplit = target.split("\\.");
             target = pathSplit[0];
         }
@@ -203,27 +206,27 @@ public class ConfigUpdater {
         for (i = start; i < lines.size(); i++) {
             line = lines.get(i);
 
-            if(line.contains(":")) line = line.split(":")[0];
-            if(!reachedSection && target.equals(StringUtils.remove(line, " ")))
+            if (line.contains(":")) line = line.split(":")[0];
+            if (!reachedSection && target.equals(StringUtils.remove(line, " ")))
                 reachedSection = true;
 
-            if(line == null) continue;
+            if (line == null) continue;
 
-            if(line.startsWith("#")) {
-                if(!reachedSection) continue;
-                end = i-1;
+            if (line.startsWith("#")) {
+                if (!reachedSection) continue;
+                end = i - 1;
                 break;
             }
 
-            if(StringUtils.countLetters(line, ' ', true) == 0 && !target.equals(StringUtils.remove(line, " "))) {
-                end = i-1;
+            if (StringUtils.countLetters(line, ' ', true) == 0 && !target.equals(StringUtils.remove(line, " "))) {
+                end = i - 1;
                 break;
             }
 
             end = i;
         }
 
-        return new int[] {start, end + 1};
+        return new int[]{start, end + 1};
     }
 
     public static List<String> getNewestConfigInput() {

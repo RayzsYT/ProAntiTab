@@ -1,11 +1,13 @@
 package de.rayzs.pat.api.communication.impl;
 
-import org.bukkit.plugin.messaging.PluginMessageListener;
-import de.rayzs.pat.utils.CommunicationPackets;
+import de.rayzs.pat.api.communication.Client;
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.api.communication.*;
+import de.rayzs.pat.utils.CommunicationPackets;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
-import org.bukkit.*;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 
 public class BukkitClient implements Client, PluginMessageListener {
 
@@ -18,18 +20,23 @@ public class BukkitClient implements Client, PluginMessageListener {
 
     @Override
     public void send(Object packet) {
-        try { SERVER.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
-        } catch (Throwable throwable) { throwable.printStackTrace(); }
+        try {
+            SERVER.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] bytes) {
-        if(!channel.equals(CHANNEL_NAME)) return;
+        if (!channel.equals(CHANNEL_NAME)) return;
         try {
             Object packetObj = CommunicationPackets.buildFromBytes(bytes);
-            if(!CommunicationPackets.isPacket(packetObj)) return;
+            if (!CommunicationPackets.isPacket(packetObj)) return;
 
             Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> Communicator.receiveInformation("proxy", packetObj));
-        } catch (Throwable throwable) { throwable.printStackTrace(); }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 }

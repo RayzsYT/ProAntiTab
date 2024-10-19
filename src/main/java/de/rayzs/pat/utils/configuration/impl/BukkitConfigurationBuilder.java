@@ -1,12 +1,13 @@
 package de.rayzs.pat.utils.configuration.impl;
 
-import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
-import org.bukkit.configuration.file.YamlConfiguration;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import org.bukkit.ChatColor;
-import java.util.Collection;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.File;
+import java.util.Collection;
 
 public class BukkitConfigurationBuilder implements ConfigurationBuilder {
 
@@ -43,7 +44,8 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
 
     @Override
     public void save() {
-        try { this.configuration.save(this.file);
+        try {
+            this.configuration.save(this.file);
         } catch (Exception exception) {
             Logger.info("Could not save configuration file! [file=" + this.fileName + ", message=" + exception.getMessage() + "]");
         }
@@ -81,8 +83,8 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate()) {
+        if (fileName.equals("config")) {
+            if (ConfigUpdater.canUpdate()) {
                 String section = ConfigUpdater.getSection(path + "." + target, true);
                 if (configuration.getConfigurationSection(section) == null) {
                     ConfigUpdater.updateConfigFile(this, path + "." + target, true);
@@ -111,8 +113,8 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate()) {
+        if (fileName.equals("config")) {
+            if (ConfigUpdater.canUpdate()) {
                 String section = ConfigUpdater.getSection(target, true);
                 if (configuration.getConfigurationSection(section) == null) {
                     ConfigUpdater.updateConfigFile(this, target, true);

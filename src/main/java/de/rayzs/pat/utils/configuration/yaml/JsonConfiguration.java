@@ -1,10 +1,12 @@
 package de.rayzs.pat.utils.configuration.yaml;
 
 import com.google.common.base.Charsets;
-import java.lang.reflect.Type;
 import com.google.gson.*;
-import java.util.*;
+
 import java.io.*;
+import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class JsonConfiguration extends ConfigurationProvider {
 
@@ -31,7 +33,7 @@ public class JsonConfiguration extends ConfigurationProvider {
     }
 
     public Configuration load(File file) throws IOException {
-        return load(file, (Configuration)null);
+        return load(file, (Configuration) null);
     }
 
     public Configuration load(File file, Configuration defaults) throws IOException {
@@ -41,18 +43,18 @@ public class JsonConfiguration extends ConfigurationProvider {
     }
 
     public Configuration load(Reader reader) {
-        return load(reader, (Configuration)null);
+        return load(reader, (Configuration) null);
     }
 
     public Configuration load(Reader reader, Configuration defaults) {
-        Map<String, Object> map = (Map<String, Object>)this.json.fromJson(reader, LinkedHashMap.class);
+        Map<String, Object> map = (Map<String, Object>) this.json.fromJson(reader, LinkedHashMap.class);
         if (map == null)
             map = new LinkedHashMap<>();
         return new Configuration(map, defaults);
     }
 
     public Configuration load(InputStream is) {
-        return load(is, (Configuration)null);
+        return load(is, (Configuration) null);
     }
 
     public Configuration load(InputStream is, Configuration defaults) {
@@ -60,11 +62,11 @@ public class JsonConfiguration extends ConfigurationProvider {
     }
 
     public Configuration load(String string) {
-        return load(string, (Configuration)null);
+        return load(string, (Configuration) null);
     }
 
     public Configuration load(String string, Configuration defaults) {
-        Map<String, Object> map = (Map<String, Object>)this.json.fromJson(string, LinkedHashMap.class);
+        Map<String, Object> map = (Map<String, Object>) this.json.fromJson(string, LinkedHashMap.class);
         if (map == null)
             map = new LinkedHashMap<>();
         return new Configuration(map, defaults);

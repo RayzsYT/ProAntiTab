@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.storage.storages;
 
-import de.rayzs.pat.api.storage.*;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.StorageTemplate;
 import org.bukkit.entity.Player;
 
 public abstract class PlaceholderStorage extends StorageTemplate {
@@ -14,10 +15,14 @@ public abstract class PlaceholderStorage extends StorageTemplate {
     }
 
     @Override
-    public void save() { getConfig().save(); }
+    public void save() {
+        getConfig().save();
+    }
 
     @Override
-    public void load() { getConfig().reload(); }
+    public void load() {
+        getConfig().reload();
+    }
 
     public String getRequest() {
         return request;

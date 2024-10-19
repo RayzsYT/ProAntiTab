@@ -17,4 +17,4 @@ softdepend:
 
 commands:
   proantitab:
-    aliases: [pat]
+    aliases: [ pat ]

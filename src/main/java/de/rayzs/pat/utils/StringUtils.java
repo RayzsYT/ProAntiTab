@@ -1,7 +1,11 @@
 package de.rayzs.pat.utils;
 
 import de.rayzs.pat.utils.group.Group;
-import java.util.*;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StringUtils {
 
@@ -20,7 +24,7 @@ public class StringUtils {
     public static int countMatches(Character character, String string) {
         int count = 0;
         for (char c : string.toCharArray()) {
-            if(character == c) count++;
+            if (character == c) count++;
         }
 
         return count;
@@ -28,7 +32,7 @@ public class StringUtils {
 
     public static String replaceTriggers(String input, String replacement, String... triggers) {
         for (String trigger : triggers) {
-            if(!input.contains(trigger)) continue;
+            if (!input.contains(trigger)) continue;
             input = input.replace(trigger, replacement);
         }
 
@@ -36,24 +40,24 @@ public class StringUtils {
     }
 
     public static String getFirstArg(String input) {
-        if(input.contains(" ")) {
+        if (input.contains(" ")) {
             String[] split = input.split(" ");
-            if(split.length > 0) input = split[0];
+            if (split.length > 0) input = split[0];
         }
 
         return input;
     }
 
     public static String getLineText(List<String> lines, int line) {
-        if(line >= lines.size() || line < 1) return null;
+        if (line >= lines.size() || line < 1) return null;
         return lines.get(line);
     }
 
     public static int countLetters(String input, char trigger, boolean breakup) {
-        if(input == null || input.isEmpty()) return -1;
+        if (input == null || input.isEmpty()) return -1;
         int count = 0;
         for (char c : input.toCharArray()) {
-            if(c != trigger && breakup) break;
+            if (c != trigger && breakup) break;
             count++;
         }
 
@@ -67,7 +71,7 @@ public class StringUtils {
     public static String replace(String input, String... replacements) {
         final HashMap<String, String> REPLACEMENTS = new HashMap<>();
 
-        if(replacements != null) {
+        if (replacements != null) {
             String firstReplacementInput = null, secondReplacementInput = null;
             for (String replacement : replacements) {
                 if (firstReplacementInput == null) firstReplacementInput = replacement;
@@ -82,7 +86,7 @@ public class StringUtils {
         }
 
         String text = input;
-        if(replacements != null)
+        if (replacements != null)
             for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
                 text = text.replace(entry.getKey(), entry.getValue());
 
@@ -91,7 +95,7 @@ public class StringUtils {
 
     public static String buildSortedStringList(List<String> list, String splitter, String format, String placeholder, boolean reversed) {
         Collections.sort(list);
-        if(reversed) Collections.reverse(list);
+        if (reversed) Collections.reverse(list);
         return buildStringList(list, splitter, format, placeholder);
     }
 
@@ -151,7 +155,7 @@ public class StringUtils {
 
     public static String buildStringListWithoutColors(List<String> list, String splitter, boolean reversed) {
         Collections.sort(list);
-        if(reversed) Collections.reverse(list);
+        if (reversed) Collections.reverse(list);
 
         StringBuilder builder = new StringBuilder();
         boolean end;

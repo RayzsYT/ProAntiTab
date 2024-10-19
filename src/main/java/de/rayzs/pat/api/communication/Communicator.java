@@ -1,23 +1,34 @@
 package de.rayzs.pat.api.communication;
 
 import de.rayzs.pat.api.communication.client.ClientInfo;
-import de.rayzs.pat.api.communication.client.impl.*;
+import de.rayzs.pat.api.communication.client.impl.BungeeClientInfo;
+import de.rayzs.pat.api.communication.client.impl.VelocityClientInfo;
+import de.rayzs.pat.api.communication.impl.BukkitClient;
+import de.rayzs.pat.api.communication.impl.BungeeClient;
+import de.rayzs.pat.api.communication.impl.VelocityClient;
 import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.storage.blacklist.impl.*;
-import de.rayzs.pat.api.communication.impl.*;
-import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.CommunicationPackets;
+import de.rayzs.pat.utils.ExpireCache;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.group.TinyGroup;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import de.rayzs.pat.utils.group.*;
-import de.rayzs.pat.utils.*;
-import java.util.*;
 
 public class Communicator {
 
+    public static final List<ClientInfo> CLIENTS = new ArrayList<>();
     private static final Client CLIENT = Reflection.isVelocityServer() ? new VelocityClient() : Reflection.isProxyServer() ? new BungeeClient() : new BukkitClient();
     private static final UUID SERVER_ID = UUID.randomUUID();
-    public static final List<ClientInfo> CLIENTS = new ArrayList<>();
     private static final ExpireCache<String, ClientInfo> QUEUE_CLIENTS = new ExpireCache<>(15, TimeUnit.SECONDS);
     public static long LAST_DATA_UPDATE = System.currentTimeMillis(), LAST_SENT_REQUEST = 0, LAST_BUKKIT_SYNC = System.currentTimeMillis();
     public static int SERVER_DATA_SYNC_COUNT = 0;
@@ -31,7 +42,7 @@ public class Communicator {
     }
 
     public static void receiveInformation(String serverName, Object packet) {
-        if(packet instanceof CommunicationPackets.RequestPacket) {
+        if (packet instanceof CommunicationPackets.RequestPacket) {
             CommunicationPackets.RequestPacket requestPacket = (CommunicationPackets.RequestPacket) packet;
             if (!requestPacket.isToken(Storage.TOKEN)) return;
 
@@ -47,24 +58,24 @@ public class Communicator {
             return;
         }
 
-        if(packet instanceof CommunicationPackets.ForcePermissionResetPacket) {
-            if(Reflection.isProxyServer()) return;
+        if (packet instanceof CommunicationPackets.ForcePermissionResetPacket) {
+            if (Reflection.isProxyServer()) return;
             CommunicationPackets.ForcePermissionResetPacket permissionResetPacket = (CommunicationPackets.ForcePermissionResetPacket) packet;
-            if(!permissionResetPacket.isToken(Storage.TOKEN)) return;
+            if (!permissionResetPacket.isToken(Storage.TOKEN)) return;
 
-            if(permissionResetPacket.hasTarget()) PermissionUtil.setPlayerPermissions(permissionResetPacket.getTargetUUID());
+            if (permissionResetPacket.hasTarget()) PermissionUtil.setPlayerPermissions(permissionResetPacket.getTargetUUID());
             else PermissionUtil.reloadPermissions();
             return;
         }
 
-        if(packet instanceof CommunicationPackets.BackendDataPacket) {
+        if (packet instanceof CommunicationPackets.BackendDataPacket) {
             CommunicationPackets.BackendDataPacket backendDataPacket = (CommunicationPackets.BackendDataPacket) packet;
             if (!backendDataPacket.isToken(Storage.TOKEN)) return;
             Storage.SERVER_NAME = backendDataPacket.getServerName();
             return;
         }
 
-        if(packet instanceof CommunicationPackets.FeedbackPacket) {
+        if (packet instanceof CommunicationPackets.FeedbackPacket) {
             CommunicationPackets.FeedbackPacket feedbackPacket = (CommunicationPackets.FeedbackPacket) packet;
             if (!feedbackPacket.isToken(Storage.TOKEN)) return;
             String serverId = feedbackPacket.getServerId();
@@ -86,9 +97,9 @@ public class Communicator {
             return;
         }
 
-        if(packet instanceof CommunicationPackets.PacketBundle) {
-            CommunicationPackets.PacketBundle packetBundle =  (CommunicationPackets.PacketBundle) packet;
-            if(!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString())) return;
+        if (packet instanceof CommunicationPackets.PacketBundle) {
+            CommunicationPackets.PacketBundle packetBundle = (CommunicationPackets.PacketBundle) packet;
+            if (!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString())) return;
 
             Storage.USE_VELOCITY = packetBundle.isVelocity();
             LAST_BUKKIT_SYNC = System.currentTimeMillis();
@@ -103,16 +114,16 @@ public class Communicator {
     public static void syncData(String serverId) {
         LAST_DATA_UPDATE = System.currentTimeMillis();
         ClientInfo clientInfo;
-        if(serverId == null) {
+        if (serverId == null) {
             SERVER_DATA_SYNC_COUNT = 0;
             CLIENTS.forEach(currentClient -> syncData(currentClient.getId()));
             return;
         } else {
             clientInfo = getClientById(serverId);
-            if(clientInfo != null) clientInfo.setFeedback(false);
+            if (clientInfo != null) clientInfo.setFeedback(false);
 
-            SERVER_DATA_SYNC_COUNT = SERVER_DATA_SYNC_COUNT -1;
-            if(SERVER_DATA_SYNC_COUNT <= 0) SERVER_DATA_SYNC_COUNT = 0;
+            SERVER_DATA_SYNC_COUNT = SERVER_DATA_SYNC_COUNT - 1;
+            if (SERVER_DATA_SYNC_COUNT <= 0) SERVER_DATA_SYNC_COUNT = 0;
         }
 
         CommunicationPackets.CommandsPacket commandsPacket = new CommunicationPackets.CommandsPacket();
@@ -121,9 +132,9 @@ public class Communicator {
         List<String> commands = new ArrayList<>();
         String tempServerName = "";
 
-        if(clientInfo != null && clientInfo.getName() != null) {
+        if (clientInfo != null && clientInfo.getName() != null) {
             tempServerName = clientInfo.getName().toLowerCase();
-            if(!Storage.Blacklist.isOnIgnoredServer(tempServerName))
+            if (!Storage.Blacklist.isOnIgnoredServer(tempServerName))
                 commands.addAll(Storage.Blacklist.getBlacklist().getCommands());
 
             List<GeneralBlacklist> serverBlacklists = Storage.Blacklist.getBlacklists(clientInfo.getName());
@@ -135,7 +146,7 @@ public class Communicator {
 
         TinyGroup tinyGroup;
         for (Group group : GroupManager.getGroups()) {
-            if(groups.stream().anyMatch(cTG -> cTG.getGroupName().equals(group.getGroupName()))) continue;
+            if (groups.stream().anyMatch(cTG -> cTG.getGroupName().equals(group.getGroupName()))) continue;
 
             tinyGroup = new TinyGroup(group.getGroupName(), group.getPriority(), group.getAllCommands(serverName));
             for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(serverName))
@@ -155,19 +166,19 @@ public class Communicator {
     }
 
     public static void sendRequest() {
-        if(System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
+        if (System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
             LAST_SENT_REQUEST = System.currentTimeMillis();
             sendPacket(new CommunicationPackets.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
         }
     }
 
     public static void sendPermissionReset() {
-        if(Reflection.isProxyServer())
+        if (Reflection.isProxyServer())
             sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN));
     }
 
     public static void sendFeedback(UUID targetUUID) {
-        if(Reflection.isProxyServer())
+        if (Reflection.isProxyServer())
             sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN, targetUUID));
     }
 

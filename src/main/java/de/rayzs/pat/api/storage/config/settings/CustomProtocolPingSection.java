@@ -1,8 +1,8 @@
 package de.rayzs.pat.api.storage.config.settings;
 
-import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class CustomProtocolPingSection extends ConfigStorage {
 
@@ -17,9 +17,9 @@ public class CustomProtocolPingSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
-        if(!Reflection.isProxyServer()) {
-            if(!Reflection.isPaper() || Reflection.getMinor() < 12)
-            return;
+        if (!Reflection.isProxyServer()) {
+            if (!Reflection.isPaper() || Reflection.getMinor() < 12)
+                return;
         }
 
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
@@ -27,7 +27,7 @@ public class CustomProtocolPingSection extends ConfigStorage {
         USE_EXTEND_AS_MAX_COUNT = new ConfigSectionHelper<Boolean>(this, "use-as-maxplayers", false).getOrSet();
         PROTOCOL = new ConfigSectionHelper<String>(this, "protocol", "&f&lProAntiTab &7(&a%online%&7/&c%max%&7)").getOrSet();
         EXTEND_COUNT = new ConfigSectionHelper<Integer>(this, "extend-online-count", 1).getOrSet();
-        if(Reflection.isProxyServer()) return;
+        if (Reflection.isProxyServer()) return;
         HIDE_PLAYERS = new ConfigSectionHelper<Boolean>(this, "hide-players", true).getOrSet();
     }
 }

@@ -1,14 +1,16 @@
 package de.rayzs.pat.api.storage.placeholders.general;
 
-import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
+import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import org.bukkit.entity.Player;
 
 public class GeneralUserPlaceholder extends PlaceholderStorage {
 
-    public GeneralUserPlaceholder() { super("general_user"); }
-
     public String CONSOLE;
+
+    public GeneralUserPlaceholder() {
+        super("general_user");
+    }
 
     @Override
     public String onRequest(Player player, String param) {

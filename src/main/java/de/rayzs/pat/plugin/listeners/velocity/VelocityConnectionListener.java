@@ -1,15 +1,18 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
+import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.netty.proxy.VelocityPacketAnalyzer;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.player.*;
-import de.rayzs.pat.plugin.VelocityLoader;
-import de.rayzs.pat.api.storage.Storage;
-import com.velocitypowered.api.proxy.*;
+
 import java.util.concurrent.TimeUnit;
 
 public class VelocityConnectionListener {
@@ -26,7 +29,7 @@ public class VelocityConnectionListener {
     public void onServerPreConnect(ServerPreConnectEvent event) {
         Player player = event.getPlayer();
 
-        if(CustomServerBrand.isEnabled() && Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+        if (CustomServerBrand.isEnabled() && Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
 
             server.getScheduler().buildTask(loader, () -> {
                 if (player.isActive()) CustomServerBrand.sendBrandToPlayer(player);
@@ -36,7 +39,7 @@ public class VelocityConnectionListener {
 
         PermissionUtil.setPlayerPermissions(player.getUniqueId());
 
-        if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
+        if (Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
             server.getScheduler().buildTask(loader, () -> {
                 if (player.isActive())
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getUsername());
@@ -48,10 +51,10 @@ public class VelocityConnectionListener {
     public void onServerSwitch(ServerConnectedEvent event) {
         Player player = event.getPlayer();
 
-        if(!VelocityPacketAnalyzer.isInjected(player))
+        if (!VelocityPacketAnalyzer.isInjected(player))
             VelocityPacketAnalyzer.inject(player);
 
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
         CustomServerBrand.sendBrandToPlayer(player);
     }
 
@@ -60,6 +63,6 @@ public class VelocityConnectionListener {
         Player player = event.getPlayer();
         PermissionUtil.resetPermissions(player.getUniqueId());
         VelocityPacketAnalyzer.uninject(player);
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
     }
 }

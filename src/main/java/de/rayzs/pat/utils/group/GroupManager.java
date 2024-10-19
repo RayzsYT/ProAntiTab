@@ -1,10 +1,14 @@
 package de.rayzs.pat.utils.group;
 
-import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
-import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.*;
-import java.util.*;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.utils.Reflection;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GroupManager {
 
@@ -12,7 +16,7 @@ public class GroupManager {
 
     public static void initialize() {
         Storage.Files.STORAGE.getKeys("groups", false).forEach(GroupManager::registerGroup);
-        if(!Reflection.isProxyServer()) return;
+        if (!Reflection.isProxyServer()) return;
         getGroups().forEach(group -> {
             Storage.Files.STORAGE.getKeys("groups." + group.getGroupName() + ".servers", false).forEach(key -> {
                 group.getOrCreateGroupBlacklist(key, true);
@@ -26,9 +30,9 @@ public class GroupManager {
         int priority = -1;
         final List<Group> finalList = new ArrayList<>(GROUPS);
 
-        if(finalList.isEmpty()) return false;
+        if (finalList.isEmpty()) return false;
         for (Group group : finalList) {
-            if(group == null) continue;
+            if (group == null) continue;
             if (priority == -1 || group.getPriority() <= priority) {
 
                 if (group.hasPermission(targetObj)) {
@@ -46,9 +50,9 @@ public class GroupManager {
         int priority = -1;
         final List<Group> finalList = new ArrayList<>(GROUPS);
 
-        if(finalList.isEmpty()) return false;
+        if (finalList.isEmpty()) return false;
         for (Group group : finalList) {
-            if(group == null) continue;
+            if (group == null) continue;
             if (priority == -1 || group.getPriority() <= priority) {
 
                 if (group.hasPermission(targetObj)) {
@@ -66,11 +70,11 @@ public class GroupManager {
 
         final List<Group> finalList = new ArrayList<>(GROUPS);
 
-        if(finalList.isEmpty())
+        if (finalList.isEmpty())
             return false;
 
         for (Group group : finalList) {
-            if(group == null) continue;
+            if (group == null) continue;
 
             if (group.contains(command, server))
                 if (group.hasPermission(targetObj)) return true;
@@ -79,16 +83,16 @@ public class GroupManager {
     }
 
     public static boolean canAccessCommand(Object targetObj, String command, boolean slash, String server) {
-        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false,  slash);
+        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false, slash);
         server = server.toLowerCase();
 
         final List<Group> finalList = new ArrayList<>(GROUPS);
 
-        if(finalList.isEmpty())
+        if (finalList.isEmpty())
             return false;
 
         for (Group group : finalList) {
-            if(group == null) continue;
+            if (group == null) continue;
 
             if (group.contains(command, server))
                 if (group.hasPermission(targetObj)) return true;
@@ -101,7 +105,7 @@ public class GroupManager {
     }
 
     public static void setGroup(String groupName, int priority, List<String> commands) {
-        if(groupName.length() < 1) return;
+        if (groupName.length() < 1) return;
         Group group = registerAndGetGroup(groupName, priority);
         group.setCommands(commands);
     }
@@ -112,7 +116,7 @@ public class GroupManager {
 
     public static Group registerAndGetGroup(String groupName, int priority) {
         Group group = getGroupByName(groupName);
-        if(group != null) return group;
+        if (group != null) return group;
         group = new Group(groupName, priority);
         GROUPS.add(group);
         sort();
@@ -124,32 +128,32 @@ public class GroupManager {
     }
 
     public static void registerGroup(String groupName) {
-        if(isGroupRegistered(groupName)) return;
+        if (isGroupRegistered(groupName)) return;
         GROUPS.add(new Group(groupName));
         sort();
     }
 
     public static void addToGroup(String groupName, String command) {
         Group group = getGroupByName(groupName);
-        if(groupName == null) return;
+        if (groupName == null) return;
         group.add(command);
     }
 
     public static void addToGroup(String groupName, String command, String server) {
         Group group = getGroupByName(groupName);
-        if(groupName == null) return;
+        if (groupName == null) return;
         group.add(command, server);
     }
 
     public static void removeFromGroup(String groupName, String command) {
         Group group = getGroupByName(groupName);
-        if(groupName == null) return;
+        if (groupName == null) return;
         group.remove(command);
     }
 
     public static void removeFromGroup(String groupName, String command, String server) {
         Group group = getGroupByName(groupName);
-        if(groupName == null) return;
+        if (groupName == null) return;
         group.remove(command, server);
     }
 
@@ -159,8 +163,8 @@ public class GroupManager {
 
     public static void unregisterGroup(String groupName, String server) {
         Group group = getGroupByName(groupName);
-        if(group == null) return;
-        if(server != null) group.deleteGroup(server);
+        if (group == null) return;
+        if (server != null) group.deleteGroup(server);
         else group.deleteGroup();
         GROUPS.remove(group);
         sort();

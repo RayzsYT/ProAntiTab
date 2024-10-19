@@ -1,12 +1,14 @@
 package de.rayzs.pat.api.storage.placeholders.commands.general;
 
-import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
 import org.bukkit.entity.Player;
 
 public class ListSizeCommandsPlaceholder extends PlaceholderStorage {
 
-    public ListSizeCommandsPlaceholder() { super("list_size_commands"); }
+    public ListSizeCommandsPlaceholder() {
+        super("list_size_commands");
+    }
 
     @Override
     public String onRequest(Player player, String param) {

@@ -1,7 +1,7 @@
 package de.rayzs.pat.utils.scheduler.impl;
 
-import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
 import org.bukkit.Bukkit;
 
 public class BukkitScheduler implements PATSchedulerTask {

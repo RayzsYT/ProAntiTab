@@ -1,7 +1,7 @@
 package de.rayzs.pat.api.storage.config.messages;
 
-import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
+import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class PostDebugSection extends ConfigStorage {
 

@@ -6,43 +6,47 @@ public class VersionComparer {
 
     private static Version CURRENT_VERSION, NEWEST_VERSION;
 
-    public static void setCurrentVersion(String versionName) {
-        if(CURRENT_VERSION != null && CURRENT_VERSION.getVersionName().equals(versionName)) return;
-        CURRENT_VERSION = new Version(versionName);
-    }
-
-    public static void setNewestVersion(String versionName) {
-        if(NEWEST_VERSION != null && NEWEST_VERSION.getVersionName().equals(versionName)) return;
-        NEWEST_VERSION = new Version(versionName);
-    }
-
     public static Version getCurrentVersion() {
         return CURRENT_VERSION;
+    }
+
+    public static void setCurrentVersion(String versionName) {
+        if (CURRENT_VERSION != null && CURRENT_VERSION.getVersionName().equals(versionName)) return;
+        CURRENT_VERSION = new Version(versionName);
     }
 
     public static Version getNewestVersion() {
         return NEWEST_VERSION;
     }
 
+    public static void setNewestVersion(String versionName) {
+        if (NEWEST_VERSION != null && NEWEST_VERSION.getVersionName().equals(versionName)) return;
+        NEWEST_VERSION = new Version(versionName);
+    }
+
     public static boolean isNewest() {
-        if(CURRENT_VERSION == null || NEWEST_VERSION == null) return true;
+        if (CURRENT_VERSION == null || NEWEST_VERSION == null) return true;
 
         return CURRENT_VERSION.isSame(NEWEST_VERSION);
     }
 
     public static boolean isUnreleased() {
-        if(CURRENT_VERSION == null || NEWEST_VERSION == null) return true;
+        if (CURRENT_VERSION == null || NEWEST_VERSION == null) return true;
 
         return CURRENT_VERSION.isNewer(NEWEST_VERSION);
     }
 
     public static boolean isOutdated() {
-        if(CURRENT_VERSION == null || NEWEST_VERSION == null) return false;
+        if (CURRENT_VERSION == null || NEWEST_VERSION == null) return false;
         return CURRENT_VERSION.isOlder(NEWEST_VERSION);
     }
 
     public static boolean isDeveloperVersion() {
         return CURRENT_VERSION.getState() == State.DEV;
+    }
+
+    public enum State {
+        RELEASE, DEV, ALPHA, BETA
     }
 
     public static class Version {
@@ -63,7 +67,7 @@ public class VersionComparer {
 
                 patch = Integer.parseInt(patchAsString);
 
-                if(!version.contains("-")) return;
+                if (!version.contains("-")) return;
                 String stateName = version.split("-")[1].toUpperCase();
                 state = State.valueOf(stateName);
 
@@ -86,8 +90,8 @@ public class VersionComparer {
         }
 
         public boolean isOlder(Version comparedVersion) {
-            if(release < comparedVersion.getRelease()) return true;
-            if(major < comparedVersion.getMajor()) return true;
+            if (release < comparedVersion.getRelease()) return true;
+            if (major < comparedVersion.getMajor()) return true;
 
             return patch < comparedVersion.getPatch();
         }
@@ -111,9 +115,5 @@ public class VersionComparer {
         public boolean isInvalid() {
             return release == -1 || major == -1 || patch == -1;
         }
-    }
-
-    public enum State {
-        RELEASE, DEV, ALPHA, BETA
     }
 }

@@ -1,18 +1,25 @@
 package de.rayzs.pat.api.brand.impl;
 
+import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.brand.ServerBrand;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
-import de.rayzs.pat.utils.message.MessageTranslator;
-import java.util.concurrent.atomic.AtomicInteger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.PacketUtils;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.message.MessageTranslator;
 import io.netty.channel.Channel;
-import de.rayzs.pat.api.brand.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import de.rayzs.pat.utils.*;
-import java.lang.reflect.*;
-import org.bukkit.*;
-import java.util.*;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BukkitServerBrand implements ServerBrand {
 
@@ -23,10 +30,14 @@ public class BukkitServerBrand implements ServerBrand {
     private static boolean INITIALIZED = false;
     private static Class<?> brandPayloadClass, clientBoundCustomPacketPayloadPacketClass, customPacketPayloadPacketClass;
 
+    public static void removeFromModified(Player player) {
+        MODIFIED_BRAND_PLAYERS.remove(player);
+    }
+
     @Override
     public void initializeTask() {
 
-        if(Reflection.isWeird()) {
+        if (Reflection.isWeird()) {
             if (brandPayloadClass == null)
                 brandPayloadClass = Reflection.getClass("net.minecraft.network.protocol.common.custom.BrandPayload");
 
@@ -38,7 +49,7 @@ public class BukkitServerBrand implements ServerBrand {
         }
 
         Bukkit.getOnlinePlayers().forEach(this::preparePlayer);
-        if(!INITIALIZED)
+        if (!INITIALIZED)
             try {
                 Method method = Reflection.getMethodsByParameterAndName(SERVER.getMessenger(), "addToOutgoing", Plugin.class, String.class).get(0);
                 Reflection.invokeMethode(method, SERVER.getMessenger(), BukkitLoader.getPlugin(), CustomServerBrand.CHANNEL_NAME);
@@ -48,15 +59,15 @@ public class BukkitServerBrand implements ServerBrand {
                 exception.printStackTrace();
             }
 
-        if(TASK != -1) {
+        if (TASK != -1) {
             Bukkit.getScheduler().cancelTask(TASK);
             TASK = -1;
             MODIFIED_BRAND_PLAYERS.clear();
         }
 
-        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
+        if (!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
 
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
             BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0) + "§r";
             TASK = Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
                 Bukkit.getOnlinePlayers().forEach(this::send);
@@ -74,7 +85,7 @@ public class BukkitServerBrand implements ServerBrand {
 
     @Override
     public void preparePlayer(Object playerObj) {
-        if(!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
+        if (!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
         Player player = (Player) playerObj;
 
         try {
@@ -82,7 +93,7 @@ public class BukkitServerBrand implements ServerBrand {
             Set<String> channels = (Set<String>) channelsField.get(player);
             channels.add(CustomServerBrand.CHANNEL_NAME);
             Reflection.closeAccess(channelsField);
-            if(!MODIFIED_BRAND_PLAYERS.contains(player)) MODIFIED_BRAND_PLAYERS.add(player);
+            if (!MODIFIED_BRAND_PLAYERS.contains(player)) MODIFIED_BRAND_PLAYERS.add(player);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -91,12 +102,12 @@ public class BukkitServerBrand implements ServerBrand {
 
     @Override
     public void send(Object playerObj) {
-        if(!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
+        if (!(playerObj instanceof Player) || !Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED) return;
         Player player = (Player) playerObj;
         String playerName = player.getName(), displayName = player.getDisplayName(), worldName = player.getWorld().getName(),
                 customBrand = BRAND.replace("%player%", playerName).replace("%displayname%", displayName).replace("%world%", worldName);
 
-        if(!Reflection.isWeird()) {
+        if (!Reflection.isWeird()) {
             PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(MessageTranslator.replaceMessage(player, customBrand));
             player.sendPluginMessage(BukkitLoader.getPlugin(), CustomServerBrand.CHANNEL_NAME, serverBrand.getBytes());
             return;
@@ -104,7 +115,7 @@ public class BukkitServerBrand implements ServerBrand {
 
         try {
             Channel channel = BukkitPacketAnalyzer.INJECTED_PLAYERS.get(player.getUniqueId());
-            if(channel == null) return;
+            if (channel == null) return;
 
             Object brandPayloadObj = brandPayloadClass.getDeclaredConstructor(String.class).newInstance(MessageTranslator.replaceMessage(player, customBrand)),
                     customPacketPayloadPacket = clientBoundCustomPacketPayloadPacketClass.getDeclaredConstructor(customPacketPayloadPacketClass).newInstance(brandPayloadObj);
@@ -121,11 +132,7 @@ public class BukkitServerBrand implements ServerBrand {
     }
 
     private boolean isModified(Player player) {
-        if(!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return false;
+        if (!Storage.ConfigSections.Settings.CUSTOM_BRAND.ENABLED || Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return false;
         return MODIFIED_BRAND_PLAYERS.contains(player);
-    }
-
-    public static void removeFromModified(Player player) {
-        MODIFIED_BRAND_PLAYERS.remove(player);
     }
 }

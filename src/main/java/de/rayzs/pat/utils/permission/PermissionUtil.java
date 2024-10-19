@@ -1,10 +1,14 @@
 package de.rayzs.pat.utils.permission;
 
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
-import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandSender;
-import java.util.*;
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.utils.group.GroupManager;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.UUID;
 
 public class PermissionUtil {
 
@@ -19,7 +23,7 @@ public class PermissionUtil {
     }
 
     public static void reloadPermissions(UUID uuid) {
-        if(!MAP.containsKey(uuid)) return;
+        if (!MAP.containsKey(uuid)) return;
 
         MAP.get(uuid).clear();
         setPlayerPermissions(uuid);
@@ -27,28 +31,28 @@ public class PermissionUtil {
 
     public static String getPermissionsAsString(UUID uuid) {
         PermissionMap permissionMap = MAP.get(uuid);
-        if(permissionMap == null) return "";
+        if (permissionMap == null) return "";
         return Arrays.toString(permissionMap.getHashedPermissions().toArray()).replace("[", "").replace("]", "");
     }
 
     public static Set<String> getPermissions(UUID uuid) {
         PermissionMap permissionMap = MAP.get(uuid);
-        if(permissionMap == null) return null;
+        if (permissionMap == null) return null;
         return permissionMap.getHashedPermissions();
     }
 
     public static void setPlayerPermissions(UUID uuid) {
-        if(Storage.USE_LUCKPERMS) LuckPermsAdapter.setPermissions(uuid);
+        if (Storage.USE_LUCKPERMS) LuckPermsAdapter.setPermissions(uuid);
     }
 
     public static void resetPermissions(UUID uuid) {
-        if(!MAP.containsKey(uuid)) return;
+        if (!MAP.containsKey(uuid)) return;
         MAP.get(uuid).clear();
     }
 
     public static void setPermission(UUID uuid, String permission, boolean permitted) {
         PermissionMap permissionMap;
-        if(!MAP.containsKey(uuid)) {
+        if (!MAP.containsKey(uuid)) {
             permissionMap = new PermissionMap(uuid);
             MAP.put(uuid, permissionMap);
         } else permissionMap = MAP.get(uuid);
@@ -60,19 +64,19 @@ public class PermissionUtil {
         PermissionMap permissionMap;
         UUID uuid;
 
-        if(targetObj instanceof CommandSender) sender = (CommandSender) targetObj;
+        if (targetObj instanceof CommandSender) sender = (CommandSender) targetObj;
         else sender = new CommandSender(targetObj);
-        if(sender.isConsole()) return true;
+        if (sender.isConsole()) return true;
         uuid = sender.getUniqueId();
 
-        if(!MAP.containsKey(uuid)) {
+        if (!MAP.containsKey(uuid)) {
             MAP.put(uuid, new PermissionMap(sender.getUniqueId()));
             return false;
         }
 
         permissionMap = MAP.get(uuid);
 
-        if(!Storage.USE_LUCKPERMS) {
+        if (!Storage.USE_LUCKPERMS) {
             if (permissionMap.hasPermissionState("*"))
                 permissionMap.setState("*", sender.hasPermission("*"));
 
@@ -83,7 +87,7 @@ public class PermissionUtil {
                 permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
         }
 
-        if(sender.isOperator())
+        if (sender.isOperator())
             if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
                 return true;
 
@@ -134,8 +138,8 @@ public class PermissionUtil {
 
     public static boolean hasPermissionWithResponse(Object targetObj, String command) {
         boolean permitted = hasPermission(targetObj, command);
-        if(!permitted) {
-            if(targetObj instanceof CommandSender)
+        if (!permitted) {
+            if (targetObj instanceof CommandSender)
                 ((CommandSender) targetObj).sendMessage(Storage.ConfigSections.Messages.NO_PERMISSION.MESSAGE.replace("%permission%", "proantitab." + command));
         }
         return permitted;

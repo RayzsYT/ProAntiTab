@@ -1,12 +1,19 @@
 package de.rayzs.pat.utils.message;
 
-import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.CommandSender;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
-import de.rayzs.pat.utils.message.translators.*;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.*;
-import java.util.*;
+import de.rayzs.pat.utils.message.translators.BukkitMessageTranslator;
+import de.rayzs.pat.utils.message.translators.BungeeMessageTranslator;
+import de.rayzs.pat.utils.message.translators.VelocityMessageTranslator;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MessageTranslator {
 
@@ -41,7 +48,7 @@ public class MessageTranslator {
 
         support = !Storage.USE_SIMPLECLOUD && (Reflection.getMinor() >= 18 || Reflection.isProxyServer());
 
-        if(support)
+        if (support)
             translator = Reflection.isVelocityServer() ? new VelocityMessageTranslator()
                     : Reflection.isProxyServer() ? new BungeeMessageTranslator()
                     : new BukkitMessageTranslator();
@@ -49,7 +56,7 @@ public class MessageTranslator {
 
     public static String translateLegacy(String text) {
         text = replaceMessage(text);
-        if(!text.contains("§")) return text;
+        if (!text.contains("§")) return text;
 
         for (Map.Entry<Character, String> entry : colors.entrySet())
             text = text.replace("§" + entry.getKey(), entry.getValue());
@@ -59,7 +66,7 @@ public class MessageTranslator {
 
     public static String colorless(String text) {
         text = replaceMessage(text);
-        if(!text.contains("§")) return text;
+        if (!text.contains("§")) return text;
 
         for (Map.Entry<Character, String> entry : colors.entrySet())
             text = text.replace("§" + entry.getKey(), "");
@@ -91,18 +98,18 @@ public class MessageTranslator {
     public static void send(Object target, String text, String... replacements) {
         text = replaceMessageString(target, text, replacements);
 
-        if(text.contains("%no-message%")) return;
+        if (text.contains("%no-message%")) return;
 
-        if(translator == null) {
+        if (translator == null) {
             CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
 
-            if(!PlaceholderReplacer.process(sender, text, sender::sendMessage))
+            if (!PlaceholderReplacer.process(sender, text, sender::sendMessage))
                 sender.sendMessage(text);
 
             return;
         }
 
-        if(PlaceholderReplacer.process(target, text, result -> translator.send(target, result))) return;
+        if (PlaceholderReplacer.process(target, text, result -> translator.send(target, result))) return;
 
         translator.send(target, text);
     }
@@ -133,7 +140,7 @@ public class MessageTranslator {
         final HashMap<String, String> REPLACEMENTS = new HashMap<>();
         List<String> result = new ArrayList<>();
 
-        if(replacements != null) {
+        if (replacements != null) {
             String firstReplacementInput = null, secondReplacementInput = null;
             for (String replacement : replacements) {
                 if (firstReplacementInput == null) firstReplacementInput = replacement;
@@ -148,7 +155,7 @@ public class MessageTranslator {
         }
 
         rawText.forEach(text -> {
-            if(replacements != null)
+            if (replacements != null)
                 for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
                     text = text.replace(entry.getKey(), entry.getValue());
             String resultText = replaceMessage(text);
@@ -163,7 +170,7 @@ public class MessageTranslator {
     }
 
     public static void closeAudiences() {
-        if(translator == null) return;
+        if (translator == null) return;
         translator.close();
     }
 

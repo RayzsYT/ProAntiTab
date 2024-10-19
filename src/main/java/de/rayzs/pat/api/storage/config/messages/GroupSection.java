@@ -1,8 +1,8 @@
 package de.rayzs.pat.api.storage.config.messages;
 
-import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class GroupSection extends ConfigStorage {
 
@@ -57,7 +57,7 @@ public class GroupSection extends ConfigStorage {
 
         REMOVE_SUCCESS = new ConfigSectionHelper<String>(this, "remove.success", "&aSuccessfully removed %command% from the list of group %group%!").getOrSet();
         REMOVE_FAILED = new ConfigSectionHelper<String>(this, "remove.failed", "&c%command% is not listed in the group %group%!").getOrSet();
-        if(!Reflection.isProxyServer()) return;
+        if (!Reflection.isProxyServer()) return;
 
         CREATE_SERVER = new ConfigSectionHelper<String>(this, "create-server", "&aGroup %group% for %server% has been created!").getOrSet();
         ALREADY_SERVER_EXIST = new ConfigSectionHelper<String>(this, "already-exist-server", "&cGroup %group% for %server% already exist!").getOrSet();

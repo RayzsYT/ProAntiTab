@@ -1,7 +1,8 @@
 package de.rayzs.pat.utils.configuration.yaml;
 
-import java.util.*;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ConfigurationProvider {
 
@@ -16,10 +17,16 @@ public abstract class ConfigurationProvider {
     static {
         try {
             providers.put(YamlConfiguration.class, new YamlConfiguration());
-        } catch (NoClassDefFoundError noClassDefFoundError) {}
+        } catch (NoClassDefFoundError noClassDefFoundError) {
+        }
         try {
             providers.put(JsonConfiguration.class, new JsonConfiguration());
-        } catch (NoClassDefFoundError noClassDefFoundError) {}
+        } catch (NoClassDefFoundError noClassDefFoundError) {
+        }
+    }
+
+    public static ConfigurationProvider getProvider(Class<? extends ConfigurationProvider> provider) {
+        return providers.get(provider);
     }
 
     public abstract Configuration load(String paramString, Configuration paramConfiguration);
@@ -41,8 +48,4 @@ public abstract class ConfigurationProvider {
     public abstract void save(Configuration paramConfiguration, Writer paramWriter);
 
     public abstract void save(Configuration paramConfiguration, File paramFile) throws IOException;
-
-    public static ConfigurationProvider getProvider(Class<? extends ConfigurationProvider> provider) {
-        return providers.get(provider);
-    }
 }
