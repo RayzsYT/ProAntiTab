@@ -31,7 +31,7 @@ public class BungeeAntiTabListener implements Listener {
 
         event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName()));
 
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(player, event.getSuggestions());
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, event.getSuggestions());
         if(filteredSuggestionEvent.isCancelled()) event.getSuggestions().clear();
     }
 }

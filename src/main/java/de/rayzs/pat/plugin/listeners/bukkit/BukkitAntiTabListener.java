@@ -55,7 +55,7 @@ public class BukkitAntiTabListener implements Listener {
         final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(event.getCommands(), player, player.getUniqueId());
         event.getCommands().clear();
 
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.call(player, playerCommands);
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, playerCommands);
         if(filteredSuggestionEvent.isCancelled()) return;
 
         event.getCommands().addAll(filteredSuggestionEvent.getSuggestions());

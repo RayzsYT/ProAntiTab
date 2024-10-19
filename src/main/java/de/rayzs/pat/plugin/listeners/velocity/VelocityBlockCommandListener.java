@@ -42,7 +42,7 @@ public class VelocityBlockCommandListener {
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
             if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             if(executeCommandEvent.isCancelled()) return;
 
@@ -55,7 +55,7 @@ public class VelocityBlockCommandListener {
         }
 
         if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
             if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             if(executeCommandEvent.isCancelled()) return;
 
@@ -84,12 +84,12 @@ public class VelocityBlockCommandListener {
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
             if(ignored ? !listed && serverListed : serverListed) {
-                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
                 if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
                 return;
             }
 
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
             if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             if(executeCommandEvent.isCancelled()) return;
 
@@ -98,7 +98,7 @@ public class VelocityBlockCommandListener {
         }
 
         if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
             if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             if(executeCommandEvent.isCancelled()) return;
 
@@ -111,7 +111,7 @@ public class VelocityBlockCommandListener {
         }
 
         if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
             if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
@@ -121,18 +121,18 @@ public class VelocityBlockCommandListener {
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
         if(!listed && !serverListed || listed && serverListed && ignored) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
             if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
 
         if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
             if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
         }
 
-        ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, true);
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
         if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
         if(executeCommandEvent.isCancelled()) return;
 
@@ -157,7 +157,7 @@ public class VelocityBlockCommandListener {
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
             if (executeCommandEvent.isBlocked()) blocked = true;
             if (executeCommandEvent.isCancelled()) return true;
 
@@ -171,7 +171,7 @@ public class VelocityBlockCommandListener {
         }
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
             if (executeCommandEvent.isBlocked()) blocked = true;
             if (executeCommandEvent.isCancelled()) return true;
 
@@ -191,7 +191,7 @@ public class VelocityBlockCommandListener {
 
         if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if (Storage.Blacklist.doesGroupBypass(player, command, false, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
-                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
                 return !executeCommandEvent.isBlocked();
             }
 
@@ -200,11 +200,11 @@ public class VelocityBlockCommandListener {
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
             if (ignored ? !listed && serverListed : serverListed) {
-                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
                 return !executeCommandEvent.isBlocked();
             }
 
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
             if (executeCommandEvent.isBlocked()) blocked = true;
             if (executeCommandEvent.isCancelled()) return true;
 
@@ -213,7 +213,7 @@ public class VelocityBlockCommandListener {
         }
 
         if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
             if (executeCommandEvent.isBlocked()) blocked = true;
             if (executeCommandEvent.isCancelled()) return true;
 
@@ -227,7 +227,7 @@ public class VelocityBlockCommandListener {
         }
 
         if (Storage.Blacklist.doesGroupBypass(player, command, true, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
             return !executeCommandEvent.isBlocked();
         }
 
@@ -236,16 +236,16 @@ public class VelocityBlockCommandListener {
         ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
         if (!listed && !serverListed || listed && serverListed && ignored) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
             return !executeCommandEvent.isBlocked();
         }
 
         if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, false);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
             return !executeCommandEvent.isBlocked();
         }
 
-        ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, commandSource, true);
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
         if (executeCommandEvent.isBlocked()) blocked = true;
         if (executeCommandEvent.isCancelled()) return true;
 
