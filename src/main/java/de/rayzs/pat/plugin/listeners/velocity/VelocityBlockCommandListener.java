@@ -74,7 +74,7 @@ public class VelocityBlockCommandListener {
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             if(Storage.Blacklist.doesGroupBypass(player, command, false, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
-                ExecuteCommandEvent executeCommandEvent = PATEventHandler.call(player, rawCommand, false);
+                ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
                 if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
                 return;
             }
