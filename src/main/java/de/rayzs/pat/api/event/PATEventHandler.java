@@ -9,7 +9,7 @@ public class PATEventHandler {
 
     private static List<PATEvent> EVENTS = new ArrayList<>();
 
-    public static ExecuteCommandEvent call(Object senderObj, String command, boolean blocked) {
+    public static ExecuteCommandEvent callExecuteCommandEvents(Object senderObj, String command, boolean blocked) {
         ExecuteCommandEvent event = EmptyEvent.createEmptyExecuteCommandEvent(senderObj, command, blocked);
 
         for (PATEvent patEvent : EVENTS) {
@@ -22,7 +22,7 @@ public class PATEventHandler {
         return event;
     }
 
-    public static FilteredSuggestionEvent call(Object senderObj, List<String> suggestions) {
+    public static FilteredSuggestionEvent callFilteredSuggestionEvents(Object senderObj, List<String> suggestions) {
         FilteredSuggestionEvent event = EmptyEvent.createEmptyFilteredSuggestionEvent(senderObj, suggestions);
 
         for (PATEvent patEvent : EVENTS) {
@@ -35,7 +35,7 @@ public class PATEventHandler {
         return event;
     }
 
-    public static FilteredTabCompletionEvent call(Object senderObj, String cursor, List<String> completion) {
+    public static FilteredTabCompletionEvent callFilteredTabCompletionEvents(Object senderObj, String cursor, List<String> completion) {
         FilteredTabCompletionEvent event = EmptyEvent.createEmptyFilteredTabCompletion(senderObj, cursor, completion);
 
         for (PATEvent patEvent : EVENTS) {
@@ -48,7 +48,20 @@ public class PATEventHandler {
         return event;
     }
 
-    public static UpdatePluginEvent call() {
+    public static ServerPlayersChangeEvent callServerPlayersChangeEvents(Object senderObj, ServerPlayersChangeEvent.Type type) {
+        ServerPlayersChangeEvent event = EmptyEvent.createEmptyServerPlayersChangeEvent(senderObj, type);
+
+        for (PATEvent patEvent : EVENTS) {
+            if(patEvent instanceof ServerPlayersChangeEvent) {
+                ServerPlayersChangeEvent serverPlayersChangeEvent = (ServerPlayersChangeEvent) patEvent;
+                serverPlayersChangeEvent.handle(event);
+            }
+        }
+
+        return event;
+    }
+
+    public static UpdatePluginEvent callUpdatePluginEvents() {
         UpdatePluginEvent event = EmptyEvent.createEmptyUpdatePluginEvent();
 
         for (PATEvent patEvent : EVENTS) {
@@ -61,7 +74,7 @@ public class PATEventHandler {
         return event;
     }
 
-    public static UpdatePlayerCommandsEvent call(Object playerObj, List<String> commands, boolean serverBased) {
+    public static UpdatePlayerCommandsEvent callUpdatePlayerCommandsEvents(Object playerObj, List<String> commands, boolean serverBased) {
         UpdatePlayerCommandsEvent event = EmptyEvent.createEmptyUpdatePlayerCommandsEvent(playerObj, commands, serverBased);
 
         for (PATEvent patEvent : EVENTS) {
@@ -74,7 +87,7 @@ public class PATEventHandler {
         return event;
     }
 
-    public static SentSyncEvent call(CommunicationPackets.PacketBundle packetBundle, String serverName) {
+    public static SentSyncEvent callSentSyncEvents(CommunicationPackets.PacketBundle packetBundle, String serverName) {
         SentSyncEvent event = EmptyEvent.createEmptySentSyncEvent(packetBundle, serverName);
 
         for (PATEvent patEvent : EVENTS) {
@@ -87,7 +100,7 @@ public class PATEventHandler {
         return event;
     }
 
-    public static ReceiveSyncEvent call(CommunicationPackets.PacketBundle packetBundle) {
+    public static ReceiveSyncEvent callReceiveSyncEvents(CommunicationPackets.PacketBundle packetBundle) {
         ReceiveSyncEvent event = EmptyEvent.createEmptyReceiveSyncEvent(packetBundle);
 
         for (PATEvent patEvent : EVENTS) {
@@ -109,6 +122,15 @@ public class PATEventHandler {
     }
 
     public static class EmptyEvent {
+
+        public static ServerPlayersChangeEvent createEmptyServerPlayersChangeEvent(Object senderObj, ServerPlayersChangeEvent.Type type) {
+            return new ServerPlayersChangeEvent(senderObj, type) {
+                @Override
+                public void handle(ServerPlayersChangeEvent event) {
+
+                }
+            };
+        }
 
         public static SentSyncEvent createEmptySentSyncEvent(CommunicationPackets.PacketBundle packetBundle, String serverName) {
             return new SentSyncEvent(null, packetBundle, serverName) {
