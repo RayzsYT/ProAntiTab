@@ -20,7 +20,7 @@ public class WaterfallAntiTabListener implements Listener {
     private static final HashMap<String, CommandsCache> COMMANDS_CACHE_MAP = new HashMap<>();
 
     public static void updateCommands() {
-        COMMANDS_CACHE_MAP.values().forEach(CommandsCache::reset);
+        new ArrayList<>(COMMANDS_CACHE_MAP.values()).forEach(CommandsCache::reset);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
