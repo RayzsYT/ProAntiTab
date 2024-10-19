@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class UpdateList {
 
-    public static UpdatePluginEvent UPDATE_PLUGIN_EVENT = new UpdatePluginEvent(null) {
+    public static UpdatePluginEvent UPDATE_PLUGIN_EVENT = new UpdatePluginEvent() {
         @Override
         public void handle(UpdatePluginEvent event) {
             SubArgsAddon.updateMessages();
@@ -21,14 +21,21 @@ public class UpdateList {
         }
     };
 
-    public static ReceiveSyncEvent RECEIVE_SYNC_EVENT = new ReceiveSyncEvent(null, null) {
+    public static ServerPlayersChangeEvent SERVER_PLAYERS_CHANGE_EVENT = new ServerPlayersChangeEvent() {
+        @Override
+        public void handle(ServerPlayersChangeEvent event) {
+            SubArgsAddon.updatePlayerNames();
+        }
+    };
+
+    public static ReceiveSyncEvent RECEIVE_SYNC_EVENT = new ReceiveSyncEvent() {
         @Override
         public void handle(ReceiveSyncEvent event) {
             SubArgsAddon.updateList();
         }
     };
 
-    public static UpdatePlayerCommandsEvent UPDATE_PLAYER_COMMANDS_EVENT = new UpdatePlayerCommandsEvent(null, null, false) {
+    public static UpdatePlayerCommandsEvent UPDATE_PLAYER_COMMANDS_EVENT = new UpdatePlayerCommandsEvent() {
         @Override
         public void handle(UpdatePlayerCommandsEvent event) {
             final UUID uuid = event.getSenderObj() instanceof UUID ? (UUID) event.getSenderObj() : new CommandSender(event.getSenderObj()).getUniqueId();
