@@ -1,15 +1,11 @@
 package de.rayzs.pat.addon.events;
 
-import de.rayzs.pat.addon.SubArgsAddon;
 import de.rayzs.pat.addon.utils.Argument;
-import de.rayzs.pat.api.event.events.*;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandSender;
-import de.rayzs.pat.utils.group.GroupManager;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import de.rayzs.pat.api.event.events.*;
+import de.rayzs.pat.addon.SubArgsAddon;
+import java.util.*;
 
 public class UpdateList {
 
@@ -45,6 +41,9 @@ public class UpdateList {
 
             if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
                 for (String command : event.getCommands())
+                    argument.buildArgumentStacks(command);
+
+                for(String command : Argument.getGeneralArgument().getInputs())
                     argument.buildArgumentStacks(command);
 
                 for (String command : SubArgsAddon.getGroupCommands(uuid))

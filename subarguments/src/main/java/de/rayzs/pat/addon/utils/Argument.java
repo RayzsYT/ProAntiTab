@@ -1,6 +1,6 @@
 package de.rayzs.pat.addon.utils;
 
-import de.rayzs.pat.addon.SubArgsAddon;
+import de.rayzs.pat.utils.StringUtils;
 import java.util.*;
 
 public class Argument {
@@ -12,7 +12,9 @@ public class Argument {
     private final HashMap<String, ArgumentStack> ARGUMENT_STACKS = new HashMap<>();
 
     public static Argument getGeneralArgument() {
-        return GENERAL;
+        Argument copiedGeneralArguments = new Argument();
+        GENERAL.getInputs().forEach(copiedGeneralArguments::buildArgumentStacks);
+        return copiedGeneralArguments;
     }
 
     public static List<String> getOptions(String input) {
@@ -86,8 +88,8 @@ public class Argument {
             String current;
             while(input.contains(" ")) {
                 current = input.split(" ")[0];
-                input = input.replaceFirst(current, "");
-                input = input.startsWith(" ") ? input.replaceFirst(" ", "") : input;
+                input = StringUtils.replaceFirst(input, current, "");
+                input = input.startsWith(" ") ? StringUtils.replaceFirst(input, " ", "") : input;
 
                 for (Map.Entry<String, ArgumentStack> entry : argumentStacks.entrySet()) {
                     if(!entry.getKey().startsWith(current)) continue;

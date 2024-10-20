@@ -1,19 +1,14 @@
 package de.rayzs.pat.addon;
 
-import de.rayzs.pat.addon.utils.Argument;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.plugin.BungeeLoader;
-import de.rayzs.pat.plugin.VelocityLoader;
-import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.*;
+import de.rayzs.pat.addon.utils.Argument;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.addon.events.*;
-import de.rayzs.pat.utils.group.Group;
-import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-
+import de.rayzs.pat.utils.group.*;
+import de.rayzs.pat.plugin.*;
+import de.rayzs.pat.utils.*;
 import java.util.*;
 
 public class SubArgsAddon {
@@ -56,6 +51,7 @@ public class SubArgsAddon {
 
         Argument.clearArguments();
         GENERAL_LIST.forEach(Argument::buildArguments);
+        SubArgsAddon.PLAYER_COMMANDS = new HashMap<>();
     }
 
     public static void updateMessages() {

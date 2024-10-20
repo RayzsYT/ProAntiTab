@@ -5,6 +5,8 @@ import de.rayzs.pat.addon.utils.Argument;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.addon.SubArgsAddon;
 import de.rayzs.pat.utils.*;
+import org.bukkit.entity.Player;
+
 import java.util.*;
 
 public class TabCompletion extends FilteredTabCompletionEvent {
@@ -17,6 +19,8 @@ public class TabCompletion extends FilteredTabCompletionEvent {
         UUID uuid = event.getSenderObj() instanceof UUID ? (UUID) event.getSenderObj() : new CommandSender(event.getSenderObj()).getUniqueId();
         Argument argument = SubArgsAddon.PLAYER_COMMANDS.getOrDefault(uuid, Argument.getGeneralArgument());
         List<String> possibilities = event.getCompletion(), result = argument.getResult(cursor);
+
+        System.out.println(Arrays.toString(possibilities.toArray()) + "\n" + Arrays.toString(result.toArray()));
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             possibilities = result;
