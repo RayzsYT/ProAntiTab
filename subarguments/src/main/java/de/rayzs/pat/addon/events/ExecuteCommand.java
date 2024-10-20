@@ -28,9 +28,10 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                 turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
                 blocked = event.isBlocked(),
                 ignored = false,
-                useFilter = false;
+                useFilter = false,
+                tooBig = false;
 
-        String[] split;
+        String[] split,  originCommandSplit, copiedOriginCommandSplit;
         String tmpCommand;
         for (String s : SubArgsAddon.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Argument.getGeneralArgument()).getInputs()) {
             tmpCommand = command;
@@ -38,7 +39,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             if(s.split(" ")[0].equalsIgnoreCase(tmpCommand.split(" ")[0]))
                 useFilter = true;
 
-            String[] originCommandSplit = tmpCommand.split(" ");
+            originCommandSplit = tmpCommand.split(" ");
             split = s.split(" ");
             int i;
 
@@ -55,17 +56,27 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                     break;
                 }
 
-                if(!foundPlayer) return turn;
+                if(!foundPlayer) {
+
+                    copiedOriginCommandSplit = originCommandSplit.clone();
+                    copiedOriginCommandSplit[copiedOriginCommandSplit.length-1] = null;
+                    String c = String.join(" ", copiedOriginCommandSplit);
+
+                    if(s.startsWith(c)) return turn;
+                }
+
                 tmpCommand = String.join(" ", originCommandSplit);
             }
 
-            if (!tmpCommand.toLowerCase().startsWith(s.toLowerCase()))
+            if (!tmpCommand.toLowerCase().startsWith(StringUtils.replaceFirst(s.toLowerCase(), " _-", "")))
                 continue;
 
             if (!listed) listed = true;
             if (s.endsWith(" _-")) ignored = true;
+
+            tooBig = originCommandSplit.length > s.replace(" _-", "").split(" ").length;
         }
 
-        return !(blocked || !useFilter) && turn != listed || ignored;
+        return !(blocked || !useFilter) && turn != listed || ignored && tooBig;
     }
 }
