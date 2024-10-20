@@ -20,8 +20,6 @@ public class TabCompletion extends FilteredTabCompletionEvent {
         Argument argument = SubArgsAddon.PLAYER_COMMANDS.getOrDefault(uuid, Argument.getGeneralArgument());
         List<String> possibilities = event.getCompletion(), result = argument.getResult(cursor);
 
-        System.out.println(Arrays.toString(possibilities.toArray()) + "\n" + Arrays.toString(result.toArray()));
-
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             possibilities = result;
             if(result.contains("%online_players%")) {
