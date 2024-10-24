@@ -89,6 +89,8 @@ public class MessageTranslator {
     }
 
     public static void send(Object target, String text, String... replacements) {
+        if(text.isEmpty()) return;
+
         text = replaceMessageString(target, text, replacements);
 
         if(text.contains("%no-message%")) return;
