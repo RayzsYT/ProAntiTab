@@ -1,7 +1,7 @@
 package de.rayzs.pat.addon.events;
 
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.addon.utils.Argument;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.addon.SubArgsAddon;
@@ -11,14 +11,19 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
     @Override
     public void handle(ExecuteCommandEvent event) {
+        CommandSender sender = new CommandSender(event.getSenderObj());
         String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
         if (!command.contains(" ")) return;
 
         if (shouldCommandBeBlocked(event, command)) {
+            /*
             event.setBlocked(true);
             event.setCancelled(true);
+            */
 
-            MessageTranslator.send(event.getSenderObj(), SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
+            Logger.info("This command would have been blocked for " + sender.getName() + "! (" + command + ")");
+
+            //MessageTranslator.send(event.getSenderObj(), SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
         }
     }
 
@@ -31,7 +36,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                 useFilter = false,
                 tooBig = false;
 
-        String[] split,  originCommandSplit, copiedOriginCommandSplit;
+        String[] split = new String[0], originCommandSplit = new String[0], copiedOriginCommandSplit;
         String tmpCommand;
         for (String s : SubArgsAddon.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Argument.getGeneralArgument()).getInputs()) {
             tmpCommand = command;
@@ -77,6 +82,14 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             tooBig = originCommandSplit.length > s.replace(" _-", "").split(" ").length;
         }
 
-        return !(blocked || !useFilter) && turn != listed || ignored && tooBig;
+        if(!(blocked || !useFilter) && turn != listed || ignored && tooBig) {
+            try {
+                Logger.info("(" + command + "|" + String.join(" ", split) + ") blocked=" + blocked + ", filter=" + useFilter + ", turned=" + turn + ", listed=" + listed + ", ignored=" + ignored + ", huge=" + tooBig);
+            } catch (Exception exception) {
+                Logger.info("(" + command + "| failed this part ;c) blocked=" + blocked + ", filter=" + useFilter + ", turned=" + turn + ", listed=" + listed + ", ignored=" + ignored + ", huge=" + tooBig);
+            }
+            return true;
+        }
+        return false;
     }
 }
