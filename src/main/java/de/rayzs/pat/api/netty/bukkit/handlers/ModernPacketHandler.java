@@ -62,7 +62,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(input);
         }
 
-        if(is121Packet) {
+        if(is121Packet || Reflection.isPaper() && packetObj.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
             try {
                 Field suggestionsField = Reflection.getFieldsByTypeNormal(packetObj.getClass(), "List", Reflection.SearchOption.ENDS).get(0);
                 List<?> suggestionsTmp = (List<?>) suggestionsField.get(packetObj),
@@ -73,7 +73,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                         start = (int) intFields.get(1).get(packetObj),
                         length = (int) intFields.get(2).get(packetObj);
 
-                Class<?> clientboundCommandSuggestionsPacketClass = Class.forName("net.minecraft.network.protocol.game.ClientboundCommandSuggestionsPacket");
+                Class<?> clientboundCommandSuggestionsPacketClass = Class.forName("net.minecraft.network.protocol.game."  + (packetObj.getClass().getSimpleName().equals("PacketPlayOutTabComplete") ? "PacketPlayOutTabComplete" : "ClientboundCommandSuggestionsPacket"));
                 if ((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird()) return false;
                 if (spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
                     suggestions.clear();
@@ -144,6 +144,8 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             List<String> suggestionsAsString = new ArrayList<>();
             for (Suggestion suggestion : suggestions.getList())
                 suggestionsAsString.add(suggestion.getText());
+
+            System.out.println(is121Packet + " hehe " + packetObj.getClass().getSimpleName());
 
             FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawInput, suggestionsAsString);
             if(filteredTabCompletionEvent.isCancelled()) suggestions.getList().clear();

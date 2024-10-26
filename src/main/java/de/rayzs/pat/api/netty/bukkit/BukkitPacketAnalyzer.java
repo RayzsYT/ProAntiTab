@@ -121,7 +121,7 @@ public class BukkitPacketAnalyzer {
 
                             UUID uuid = player.getUniqueId();
 
-                            if(packetName.equals("ClientboundCommandSuggestionsPacket") && SENT_PACKET.contains(player.getUniqueId())) {
+                            if((packetName.equals("ClientboundCommandSuggestionsPacket") || Reflection.isFoliaServer()) && SENT_PACKET.contains(player.getUniqueId())) {
                                 Object newPacketObj = SENT_PACKET.get(uuid);
                                 SENT_PACKET.remove(uuid);
                                 super.write(channel, newPacketObj, promise);

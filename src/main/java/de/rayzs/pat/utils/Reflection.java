@@ -274,7 +274,7 @@ public class Reflection {
 
     public static Channel getPlayerChannel(Player player) throws Exception {
         Object channelObject;
-        if(paper && Reflection.isWeird()) {
+        if(!folia && paper && Reflection.isWeird()) {
             Object serverPlayerObj = getMethodsByReturnTypeAndName(player.getClass(), "ServerPlayer", SearchOption.ENDS, "getHandle").get(0).invoke(player),
                     serverGamePacketListenerImplObj = getFieldByName(serverPlayerObj.getClass(), "connection").get(serverPlayerObj),
                     connectionObj = getFieldByName(serverGamePacketListenerImplObj.getClass().getSuperclass(), "connection").get(serverGamePacketListenerImplObj);
