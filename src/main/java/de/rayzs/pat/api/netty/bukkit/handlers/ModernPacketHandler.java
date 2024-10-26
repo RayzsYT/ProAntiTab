@@ -145,8 +145,6 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             for (Suggestion suggestion : suggestions.getList())
                 suggestionsAsString.add(suggestion.getText());
 
-            System.out.println(is121Packet + " hehe " + packetObj.getClass().getSimpleName());
-
             FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawInput, suggestionsAsString);
             if(filteredTabCompletionEvent.isCancelled()) suggestions.getList().clear();
             suggestions.getList().removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(suggestion.getText()));
