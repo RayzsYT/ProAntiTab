@@ -2,15 +2,15 @@ package de.rayzs.pat.utils;
 
 import net.md_5.bungee.api.ProxyServer;
 import io.netty.channel.Channel;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.*;
-import org.bukkit.Bukkit;
 import java.util.*;
 
 public class Reflection {
 
     private static boolean legacy, proxy, velocity, paper, folia, weird;
-    private static String versionName, rawVersionName, versionPackageName;
+    private static String versionName, fullVersionName, rawVersionName, versionPackageName;
     private static Version version;
     private static int major, minor, release;
 
@@ -27,8 +27,8 @@ public class Reflection {
 
         if(!proxy) {
             try {
-                Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
-                folia = true;
+                Class.forName("com.destroystokyo.paper.proxy.VelocityProxy");
+                folia = versionName.toLowerCase().contains("folia");
             } catch (Throwable throwable) {
                 folia = false;
             }
@@ -274,6 +274,7 @@ public class Reflection {
 
     public static Channel getPlayerChannel(Player player) throws Exception {
         Object channelObject;
+
         if(!folia && paper && Reflection.isWeird()) {
             Object serverPlayerObj = getMethodsByReturnTypeAndName(player.getClass(), "ServerPlayer", SearchOption.ENDS, "getHandle").get(0).invoke(player),
                     serverGamePacketListenerImplObj = getFieldByName(serverPlayerObj.getClass(), "connection").get(serverPlayerObj),
@@ -339,9 +340,11 @@ public class Reflection {
         }
     }
 
+
     private static void loadVersionName(Object serverObject) throws Exception {
         versionName = proxy ? ProxyServer.getInstance().getName() : Bukkit.getName();
         rawVersionName = (String) serverObject.getClass().getMethod("getBukkitVersion").invoke(serverObject);
+        fullVersionName = rawVersionName;
         rawVersionName = rawVersionName.split("-")[0].replace(".", "_");
         versionPackageName = serverObject.getClass().getPackage().getName();
         versionPackageName = versionPackageName.substring(versionPackageName.lastIndexOf('.') + 1);
