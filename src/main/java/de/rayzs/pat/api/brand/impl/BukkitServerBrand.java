@@ -5,6 +5,8 @@ import de.rayzs.pat.utils.message.MessageTranslator;
 import java.util.concurrent.atomic.AtomicInteger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.scheduler.PATScheduler;
+import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
 import io.netty.channel.Channel;
 import de.rayzs.pat.api.brand.*;
 import org.bukkit.entity.Player;
@@ -19,7 +21,7 @@ public class BukkitServerBrand implements ServerBrand {
     private static final List<Player> MODIFIED_BRAND_PLAYERS = new ArrayList<>();
     private static final Server SERVER = Bukkit.getServer();
     private static String BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0);
-    private static int TASK = -1;
+    private static PATSchedulerTask  TASK;
     private static boolean INITIALIZED = false;
     private static Class<?> brandPayloadClass, clientBoundCustomPacketPayloadPacketClass, customPacketPayloadPacketClass;
 
@@ -48,9 +50,9 @@ public class BukkitServerBrand implements ServerBrand {
                 exception.printStackTrace();
             }
 
-        if(TASK != -1) {
-            Bukkit.getScheduler().cancelTask(TASK);
-            TASK = -1;
+        if(TASK != null && TASK.isActive()) {
+            TASK.cancelTask();
+            TASK = null;
             MODIFIED_BRAND_PLAYERS.clear();
         }
 
@@ -58,12 +60,13 @@ public class BukkitServerBrand implements ServerBrand {
 
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
             BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0) + "§r";
-            TASK = Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
+
+            PATScheduler.createAsyncScheduler(() -> {
                 Bukkit.getOnlinePlayers().forEach(this::send);
             }, 1, Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY);
         } else {
             AtomicInteger animationState = new AtomicInteger(0);
-            TASK = Bukkit.getScheduler().scheduleAsyncRepeatingTask(BukkitLoader.getPlugin(), () -> {
+            TASK = PATScheduler.createAsyncScheduler(() -> {
                 if (animationState.getAndIncrement() >= Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().size() - 1)
                     animationState.set(0);
                 BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationState.get()) + "§r";
