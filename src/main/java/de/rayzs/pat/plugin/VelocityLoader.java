@@ -28,7 +28,7 @@ import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "1.8.3",
+version = "1.8.4",
 authors = "Rayzs_YT",
 description = "Hide more than just your plugins. Hide almost everything!",
 dependencies = {
