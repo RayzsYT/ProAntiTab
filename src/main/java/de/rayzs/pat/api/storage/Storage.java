@@ -371,12 +371,15 @@ public class Storage {
             if(focusOnBlock && blockedGlobal) return true;
 
             for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                if(!focusOnBlock) {
-                    blockedServer = blacklist.isBlockedIgnorePermission(command, intensive);
-                    if (blockedServer) break;
-                } else {
-                    if(blacklist.isBlocked(command, intensive)) return true;
+                if(focusOnBlock && blacklist.isBlocked(command, intensive))
+                    return true;
+
+                if (!blacklist.isBlockedIgnorePermission(command, intensive)) {
+                    blockedServer = false;
+                    break;
                 }
+
+                blockedServer = true;
             }
 
             blocked = turn ? blockedGlobal && blockedServer : blockedServer || blockedGlobal;
