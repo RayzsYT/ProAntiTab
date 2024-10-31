@@ -189,7 +189,7 @@ public class Storage {
 
     public static class Blacklist {
 
-        private static HashMap<String, GeneralBlacklist> SERVER_BLACKLISTS = new HashMap<>();
+        private static final HashMap<String, GeneralBlacklist> SERVER_BLACKLISTS = new HashMap<>();
         private static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
         private static final IgnoredServersStorage IGNORED_SERVERS = new GeneralIgnoredServers();
         private static final ExpireCache<String, List<GeneralBlacklist>> CACHED_SERVER_BLACKLIST = new ExpireCache<>(1, TimeUnit.HOURS);
@@ -382,7 +382,7 @@ public class Storage {
             blocked = turn ? blockedGlobal && blockedServer : blockedServer || blockedGlobal;
             if(!blocked
                     && CACHED_SERVER_BLACKLIST.contains(server)
-                    && CACHED_SERVER_BLACKLIST.get(server).size() == 0)
+                    && CACHED_SERVER_BLACKLIST.get(server).isEmpty())
                 if(turn) blocked = true;
 
             return blocked;
