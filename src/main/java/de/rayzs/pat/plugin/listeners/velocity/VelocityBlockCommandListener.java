@@ -196,7 +196,7 @@ public class VelocityBlockCommandListener {
             }
 
             listed = Storage.Blacklist.isListed(command, false, true, false);
-            serverListed = Storage.Blacklist.isListed(player, command, false, listed, false, serverName);
+            serverListed = Storage.Blacklist.isListed(player, command, false, listed, false, serverName, true);
             ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
 
             if (ignored ? !listed && serverListed : serverListed) {

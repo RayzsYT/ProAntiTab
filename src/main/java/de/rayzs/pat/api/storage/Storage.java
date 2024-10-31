@@ -342,13 +342,22 @@ public class Storage {
         }
 
         public static boolean isListed(Object playerObj, String command, boolean intensive, boolean listed, boolean slash, String server) {
+            return isListed(playerObj, command, intensive, listed, slash, server, false);
+        }
+
+        public static boolean isListed(Object playerObj, String command, boolean intensive, boolean listed, boolean slash, String server, boolean instantReturn) {
             if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(playerObj)))
                 return false;
 
-            if(!listed) for (GeneralBlacklist blacklist : getBlacklists(server)) {
+            if(listed) return true;
+
+            for (GeneralBlacklist blacklist : getBlacklists(server)) {
                 listed = blacklist.isListed(command, intensive, true, slash);
+                if(instantReturn) return listed;
+
                 if(listed) break;
             }
+
             return listed;
         }
 
@@ -374,12 +383,17 @@ public class Storage {
                 if(focusOnBlock && blacklist.isBlocked(command, intensive))
                     return true;
 
+                blockedServer = blacklist.isBlockedIgnorePermission(command, intensive);
+                break;
+
+                /* Former code
                 if (!blacklist.isBlockedIgnorePermission(command, intensive)) {
                     blockedServer = false;
                     break;
                 }
 
                 blockedServer = true;
+                 */
             }
 
             blocked = turn ? blockedGlobal && blockedServer : blockedServer || blockedGlobal;
