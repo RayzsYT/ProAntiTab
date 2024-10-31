@@ -62,7 +62,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(input);
         }
 
-        if(is121Packet || Reflection.isPaper() && packetObj.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
+        if(is121Packet || Reflection.isFoliaServer() && packetObj.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
             try {
                 Field suggestionsField = Reflection.getFieldsByTypeNormal(packetObj.getClass(), "List", Reflection.SearchOption.ENDS).get(0);
                 List<?> suggestionsTmp = (List<?>) suggestionsField.get(packetObj),
