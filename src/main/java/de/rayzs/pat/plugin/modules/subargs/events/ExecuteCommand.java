@@ -25,6 +25,10 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         }
 
         if(!event.isBlocked()) return;
+
+        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command))
+            return;
+
         event.setCancelled(true);
         MessageTranslator.send(event.getSenderObj(), Responses.getResponse(event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()), "%command%", event.getCommand());
     }
