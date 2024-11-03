@@ -34,7 +34,7 @@ public class BungeeLoader extends Plugin {
         Configurator.createResourcedFile(getDataFolder(), "files\\proxy-config.yml", "config.yml", false);
         Configurator.createResourcedFile(getDataFolder(), "files\\proxy-storage.yml", "storage.yml", false);
         Configurator.createResourcedFile(getDataFolder(), "files\\proxy-placeholders.yml", "placeholders.yml", false);
-        Configurator.createResourcedFile(getDataFolder(), "files\\bukkit-custom-responses.yml", "custom-responses.yml", false);
+        Configurator.createResourcedFile(getDataFolder(), "files\\proxy-custom-responses.yml", "custom-responses.yml", false);
     }
 
     @Override
