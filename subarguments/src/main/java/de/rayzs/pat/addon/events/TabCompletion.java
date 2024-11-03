@@ -5,8 +5,6 @@ import de.rayzs.pat.addon.utils.Argument;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.addon.SubArgsAddon;
 import de.rayzs.pat.utils.*;
-import org.bukkit.entity.Player;
-
 import java.util.*;
 
 public class TabCompletion extends FilteredTabCompletionEvent {
