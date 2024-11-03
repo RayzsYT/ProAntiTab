@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin;
 
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.utils.configuration.Configurator;
@@ -83,6 +84,7 @@ public class BungeeLoader extends Plugin {
 
         BungeePacketAnalyzer.injectAll();
         ConfigUpdater.broadcastMissingParts();
+        SubArgsModule.initialize();
     }
 
     @Override

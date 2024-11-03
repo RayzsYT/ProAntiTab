@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin;
 
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
@@ -100,6 +101,7 @@ public class BukkitLoader extends JavaPlugin {
             Logger.warning("Detected SimpleCloud. Therefore, MiniMessages are disabled!");
 
         ConfigUpdater.broadcastMissingParts();
+        SubArgsModule.initialize();
     }
 
     @Override

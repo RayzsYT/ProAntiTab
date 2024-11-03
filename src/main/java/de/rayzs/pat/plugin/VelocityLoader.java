@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin;
 
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.proxy.Player;
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.VersionComparer;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
@@ -98,6 +99,7 @@ public class VelocityLoader {
             Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
         ConfigUpdater.broadcastMissingParts();
+        SubArgsModule.initialize();
     }
 
     public static void delayedPermissionsReload() {
