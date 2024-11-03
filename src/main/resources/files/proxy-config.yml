@@ -66,8 +66,10 @@ custom-unknown-command:
 # is being blocked entirely.
 cancel-blocked-commands:
   enabled: true
-  message:
+  base-command-message:
     - '%prefix% &cThis command &8(&4%command%&8) &cis blocked!'
+  sub-command-message:
+    - '&cCommand &8(&4%command%&8) &cwith the provided sub-argument is not allowed!'
 
 # Here you can customize your own fake '/plugins' command.
 custom-plugins:
