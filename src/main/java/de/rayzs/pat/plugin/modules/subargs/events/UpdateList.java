@@ -1,6 +1,6 @@
-package de.rayzs.pat.plugin.subargs.events;
+package de.rayzs.pat.plugin.modules.subargs.events;
 
-import de.rayzs.pat.plugin.subargs.SubArgs;
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.subargs.Argument;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandSender;
@@ -12,22 +12,22 @@ public class UpdateList {
     public static UpdatePluginEvent UPDATE_PLUGIN_EVENT = new UpdatePluginEvent() {
         @Override
         public void handle(UpdatePluginEvent event) {
-            SubArgs.updateMessages();
-            SubArgs.updateList();
+            SubArgsModule.updateMessages();
+            SubArgsModule.updateList();
         }
     };
 
     public static ServerPlayersChangeEvent SERVER_PLAYERS_CHANGE_EVENT = new ServerPlayersChangeEvent() {
         @Override
         public void handle(ServerPlayersChangeEvent event) {
-            SubArgs.updatePlayerNames();
+            SubArgsModule.updatePlayerNames();
         }
     };
 
     public static ReceiveSyncEvent RECEIVE_SYNC_EVENT = new ReceiveSyncEvent() {
         @Override
         public void handle(ReceiveSyncEvent event) {
-            SubArgs.updateList();
+            SubArgsModule.updateList();
         }
     };
 
@@ -35,7 +35,7 @@ public class UpdateList {
         @Override
         public void handle(UpdatePlayerCommandsEvent event) {
             final UUID uuid = event.getSenderObj() instanceof UUID ? (UUID) event.getSenderObj() : new CommandSender(event.getSenderObj()).getUniqueId();
-            final Argument argument = SubArgs.PLAYER_COMMANDS.getOrDefault(uuid, new Argument());
+            final Argument argument = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, new Argument());
 
             argument.clearAllArguments();
 
@@ -46,17 +46,17 @@ public class UpdateList {
                 for(String command : Argument.getGeneralArgument().getInputs())
                     argument.buildArgumentStacks(command);
 
-                for (String command : SubArgs.getGroupCommands(uuid))
+                for (String command : SubArgsModule.getGroupCommands(uuid))
                     argument.buildArgumentStacks(command);
             } else {
-                List<String> groupCommands = SubArgs.getGroupCommands(uuid);
+                List<String> groupCommands = SubArgsModule.getGroupCommands(uuid);
                 for (String command : Argument.getGeneralArgument().getInputs()) {
                     if(groupCommands.contains(command)) continue;
                     argument.buildArgumentStacks(command);
                 }
             }
 
-            SubArgs.PLAYER_COMMANDS.putIfAbsent(uuid, argument);
+            SubArgsModule.PLAYER_COMMANDS.putIfAbsent(uuid, argument);
         }
     };
 }

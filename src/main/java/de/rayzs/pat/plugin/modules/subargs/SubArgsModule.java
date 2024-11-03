@@ -1,9 +1,8 @@
-package de.rayzs.pat.plugin.subargs;
+package de.rayzs.pat.plugin.modules.subargs;
 
-import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.subargs.events.ExecuteCommand;
-import de.rayzs.pat.plugin.subargs.events.TabCompletion;
-import de.rayzs.pat.plugin.subargs.events.UpdateList;
+import de.rayzs.pat.plugin.modules.subargs.events.ExecuteCommand;
+import de.rayzs.pat.plugin.modules.subargs.events.TabCompletion;
+import de.rayzs.pat.plugin.modules.subargs.events.UpdateList;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
@@ -14,12 +13,12 @@ import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 
-public class SubArgs {
+public class SubArgsModule {
 
     public static List<String> GENERAL_LIST, BLOCKED_MESSAGE, PLAYER_NAMES;
     public static HashMap<UUID, Argument> PLAYER_COMMANDS = new HashMap<>();
 
-    public static void onLoad() {
+    public static void initialize() {
         updateList();
         updateMessages();
         updatePlayerNames();
@@ -50,7 +49,7 @@ public class SubArgs {
 
         Argument.clearArguments();
         GENERAL_LIST.forEach(Argument::buildArguments);
-        SubArgs.PLAYER_COMMANDS = new HashMap<>();
+        SubArgsModule.PLAYER_COMMANDS = new HashMap<>();
     }
 
     public static void updateMessages() {

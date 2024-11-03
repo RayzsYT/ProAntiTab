@@ -1,7 +1,7 @@
-package de.rayzs.pat.plugin.subargs.events;
+package de.rayzs.pat.plugin.modules.subargs.events;
 
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
-import de.rayzs.pat.plugin.subargs.SubArgs;
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.api.storage.Storage;
@@ -40,7 +40,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
         String[] split, originCommandSplit, copiedOriginCommandSplit;
         String tmpCommand;
-        for (String s : SubArgs.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Argument.getGeneralArgument()).getInputs()) {
+        for (String s : SubArgsModule.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Argument.getGeneralArgument()).getInputs()) {
             tmpCommand = command;
 
             if(s.split(" ")[0].equalsIgnoreCase(tmpCommand.split(" ")[0]))
@@ -54,7 +54,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                 if(!split[i].equals("%online_players%")) continue;
 
                 boolean foundPlayer = false;
-                for (String playerName : SubArgs.getPlayerNames()) {
+                for (String playerName : SubArgsModule.getPlayerNames()) {
                     if(i >= originCommandSplit.length) continue;
                     if(!playerName.equalsIgnoreCase(originCommandSplit[i])) continue;
 
