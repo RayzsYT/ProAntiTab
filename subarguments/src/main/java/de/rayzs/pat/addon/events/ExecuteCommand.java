@@ -1,5 +1,6 @@
 package de.rayzs.pat.addon.events;
 
+import de.rayzs.pat.addon.utils.Responses;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.addon.utils.Argument;
@@ -18,7 +19,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             event.setBlocked(true);
             event.setCancelled(true);
 
-            MessageTranslator.send(event.getSenderObj(), SubArgsAddon.BLOCKED_MESSAGE, "%command%", event.getCommand());
+            MessageTranslator.send(event.getSenderObj(), Responses.getResponse(event.getCommand()), "%command%", event.getCommand());
         }
     }
 

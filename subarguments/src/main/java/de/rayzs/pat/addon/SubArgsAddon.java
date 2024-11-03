@@ -1,5 +1,6 @@
 package de.rayzs.pat.addon;
 
+import de.rayzs.pat.addon.utils.Responses;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.configuration.*;
@@ -42,6 +43,10 @@ public class SubArgsAddon {
                 : BukkitLoader.getPlayerNames();
     }
 
+    public static ConfigurationBuilder getConfiguration() {
+        return CONFIGURATION;
+    }
+
     public static List<String> getPlayerNames() {
         return PLAYER_NAMES;
     }
@@ -56,10 +61,7 @@ public class SubArgsAddon {
 
     public static void updateMessages() {
         CONFIGURATION.reload();
-
-        ArrayList<String> MESSAGE = new ArrayList<>();
-        MESSAGE.add("&8[&4ProAntiTab&8] &cThis argument is not allowed!");
-        BLOCKED_MESSAGE = (List<String>) CONFIGURATION.getOrSet("blocked-message", MESSAGE);
+        Responses.update();
     }
 
     public static List<String> getGroupCommands(UUID uuid) {
