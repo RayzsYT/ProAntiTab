@@ -60,6 +60,7 @@ public class VelocityLoader {
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-config.yml", "config.yml", false);
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-storage.yml", "storage.yml", false);
         Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-placeholders.yml", "placeholders.yml", false);
+        Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\bukkit-custom-responses.yml", "custom-responses.yml", false);
 
         Reflection.initialize(server);
         ConfigUpdater.initialize();

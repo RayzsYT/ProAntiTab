@@ -42,6 +42,7 @@ public class BukkitLoader extends JavaPlugin {
         Configurator.createResourcedFile(getDataFolder(), "files\\bukkit-config.yml", "config.yml", false);
         Configurator.createResourcedFile(getDataFolder(), "files\\bukkit-storage.yml", "storage.yml", false);
         Configurator.createResourcedFile(getDataFolder(), "files\\bukkit-placeholders.yml", "placeholders.yml", false);
+        Configurator.createResourcedFile(getDataFolder(), "files\\bukkit-custom-responses.yml", "custom-responses.yml", false);
     }
 
     @Override
