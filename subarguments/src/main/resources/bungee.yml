@@ -2,7 +2,7 @@ name: SubArguments-Addon
 version: 1.0.0
 api-version: 1.13
 author: Rayzs_YT
-description: An additional addon to extend the possibilities with ProAntiTab.
+description: An additional plugin to extend the possibilities with ProAntiTab.
 main: de.rayzs.pat.addon.loader.BungeeSubArgsLoader
 
 depends:
