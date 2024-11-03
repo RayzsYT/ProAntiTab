@@ -5,12 +5,12 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
 import org.bukkit.entity.Player;
 
-public class BlockedCommandPlaceholder extends PlaceholderStorage {
+public class BlockedBaseCommandPlaceholder extends PlaceholderStorage {
 
-    public BlockedCommandPlaceholder() { super("message_blocked"); }
+    public BlockedBaseCommandPlaceholder() { super("message_base_blocked"); }
 
     @Override
     public String onRequest(Player player, String param) {
-        return StringUtils.buildStringList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE.getLines());
+        return StringUtils.buildStringList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines());
     }
 }
