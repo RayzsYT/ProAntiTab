@@ -7,7 +7,7 @@ import java.util.Collections;
 public class CancelCommandSection extends ConfigStorage {
 
     public boolean ENABLED;
-    public MultipleMessagesHelper MESSAGE;
+    public MultipleMessagesHelper BASE_COMMAND_RESPONSE, SUB_COMMAND_RESPONSE;
 
     public CancelCommandSection() {
         super("cancel-blocked-commands");
@@ -17,6 +17,7 @@ public class CancelCommandSection extends ConfigStorage {
     public void load() {
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
-        MESSAGE = new MultipleMessagesHelper(this, "message", Collections.singletonList("&cThe command %command% is blocked!"));
+        BASE_COMMAND_RESPONSE = new MultipleMessagesHelper(this, "base-command-message", Collections.singletonList("&cThe command %command% is blocked!"));
+        SUB_COMMAND_RESPONSE = new MultipleMessagesHelper(this, "sub-command-message", Collections.singletonList("&cThis sub-argument is blocked!"));
     }
 }
