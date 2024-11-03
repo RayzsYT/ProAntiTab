@@ -11,7 +11,6 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
     @Override
     public void handle(ExecuteCommandEvent event) {
-        CommandSender sender = new CommandSender(event.getSenderObj());
         String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
         if (!command.contains(" ")) return;
 
@@ -32,7 +31,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                 useFilter = false,
                 tooBig = false;
 
-        String[] split = new String[0], originCommandSplit, copiedOriginCommandSplit;
+        String[] split, originCommandSplit, copiedOriginCommandSplit;
         String tmpCommand;
         for (String s : SubArgsAddon.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Argument.getGeneralArgument()).getInputs()) {
             tmpCommand = command;
