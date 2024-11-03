@@ -1,6 +1,6 @@
 package de.rayzs.pat.utils.subargs;
 
-import de.rayzs.pat.plugin.subargs.SubArgs;
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
 import java.util.*;
@@ -43,7 +43,7 @@ public class Responses {
 
         public Response(final String key) {
             this.triggers = (List<String>) Storage.Files.CUSTOM_RESPONSES.get(key + ".triggers");
-            this.message = (List<String>) Storage.Files.CUSTOM_RESPONSES.getOrSet(key + ".message", SubArgs.BLOCKED_MESSAGE);
+            this.message = (List<String>) Storage.Files.CUSTOM_RESPONSES.getOrSet(key + ".message", SubArgsModule.BLOCKED_MESSAGE);
         }
 
     }
