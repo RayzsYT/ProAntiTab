@@ -73,7 +73,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         if(!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return;
 
-        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", command);
+        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", command);
 
         boolean listed, serverListed, ignored;
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
