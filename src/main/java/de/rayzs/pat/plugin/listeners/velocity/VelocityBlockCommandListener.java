@@ -185,7 +185,7 @@ public class VelocityBlockCommandListener {
         }
 
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return true;
-        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.MESSAGE, "%command%", command.replaceFirst("/", ""));
+        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", command.replaceFirst("/", ""));
 
         boolean listed, serverListed, ignored;
 
