@@ -94,6 +94,7 @@ public class Storage {
                 CONFIGURATION = Configurator.get("config"),
                 STORAGE = Configurator.get("storage"),
                 PLACEHOLDERS = Configurator.get("placeholders"),
+                CUSTOM_RESPONSES = Configurator.get("custom-responses"),
                 TOKEN = Configurator.get("token");
 
         public static void initialize() {}
