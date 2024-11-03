@@ -97,7 +97,7 @@ public class BukkitLoader extends JavaPlugin {
             ViaVersionAdapter.initialize();
 
         if(Storage.USE_SIMPLECLOUD)
-            Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
+            Logger.warning("Detected SimpleCloud. Therefore, MiniMessages are disabled!");
 
         ConfigUpdater.broadcastMissingParts();
     }
