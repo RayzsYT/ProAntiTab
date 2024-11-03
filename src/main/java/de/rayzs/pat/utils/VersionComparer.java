@@ -86,8 +86,8 @@ public class VersionComparer {
         }
 
         public boolean isOlder(Version comparedVersion) {
-            if(release < comparedVersion.getRelease()) return true;
-            if(major < comparedVersion.getMajor()) return true;
+            if(release > comparedVersion.getRelease()) return false;
+            if(major > comparedVersion.getMajor()) return false;
 
             return patch < comparedVersion.getPatch();
         }
