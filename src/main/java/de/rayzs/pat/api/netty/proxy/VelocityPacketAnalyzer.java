@@ -1,9 +1,13 @@
 package de.rayzs.pat.api.netty.proxy;
 
+import com.mojang.brigadier.tree.CommandNode;
+import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.proxy.crypto.SignedChatCommand;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.chat.session.UnsignedPlayerCommandPacket;
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityBlockCommandListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -209,6 +213,12 @@ public class VelocityPacketAnalyzer {
                             });
                         } else {
                             if (cancelsBeforeHand) return;
+                            List<String> suggestionsAsString = new ArrayList<>();
+                            response.getOffers().forEach(offer -> suggestionsAsString.add(offer.getText()));
+
+                            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), cursor, suggestionsAsString);
+                            if(filteredTabCompletionEvent.isCancelled()) return;
+                            response.getOffers().removeIf(offer -> !filteredTabCompletionEvent.getCompletion().contains(offer.getText()));
                         }
                     }
                 }
