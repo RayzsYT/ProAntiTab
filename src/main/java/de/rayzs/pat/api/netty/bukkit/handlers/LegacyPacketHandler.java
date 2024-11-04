@@ -1,5 +1,7 @@
 package de.rayzs.pat.api.netty.bukkit.handlers;
 
+import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -8,6 +10,7 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.Field;
 import de.rayzs.pat.utils.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class LegacyPacketHandler implements BukkitPacketHandler {
 
@@ -69,7 +72,13 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
                         newResultList.add(s);
                 }
             } else {
-                if(!cancelsBeforeHand) newResultList.addAll(Arrays.asList(tR));
+                if(!cancelsBeforeHand) {
+                    FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), input, Arrays.asList(tR));
+                    if(!filteredTabCompletionEvent.isCancelled()) {
+                        List<String> suggestions = Arrays.stream(tR).filter(s -> filteredTabCompletionEvent.getCompletion().contains(s)).collect(Collectors.toList());
+                        newResultList.addAll(suggestions);
+                    }
+                }
             }
 
             field.set(packetObj, newResultList.toArray(new String[0]));
