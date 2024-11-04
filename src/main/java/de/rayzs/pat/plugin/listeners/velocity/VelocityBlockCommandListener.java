@@ -152,14 +152,13 @@ public class VelocityBlockCommandListener {
         command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
-        if (PermissionUtil.hasBypassPermission(player, command, false)) return true;
-
+        if (PermissionUtil.hasBypassPermission(player, command, false)) return false;
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getUsername(), "%command%", command, "%server%", serverName);
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
             if (executeCommandEvent.isBlocked()) blocked = true;
-            if (executeCommandEvent.isCancelled()) return true;
+            if (executeCommandEvent.isCancelled()) return false;
 
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
@@ -167,13 +166,13 @@ public class VelocityBlockCommandListener {
                 MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), notificationMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage));
 
-            return !blocked;
+            return blocked;
         }
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
             if (executeCommandEvent.isBlocked()) blocked = true;
-            if (executeCommandEvent.isCancelled()) return true;
+            if (executeCommandEvent.isCancelled()) return false;
 
             MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", command.replaceFirst("/", ""));
 
@@ -181,18 +180,18 @@ public class VelocityBlockCommandListener {
                 MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), notificationMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage));
 
-            return !blocked;
+            return blocked;
         }
 
-        if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return true;
+        if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return false;
         List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", command.replaceFirst("/", ""));
-
         boolean listed, serverListed, ignored;
 
         if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+
             if (Storage.Blacklist.doesGroupBypass(player, command, false, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
                 ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
-                return !executeCommandEvent.isBlocked();
+                return executeCommandEvent.isBlocked();
             }
 
             listed = Storage.Blacklist.isListed(command, false, true, false);
@@ -201,21 +200,26 @@ public class VelocityBlockCommandListener {
 
             if (ignored ? !listed && serverListed : serverListed) {
                 ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
-                return !executeCommandEvent.isBlocked();
+                return executeCommandEvent.isBlocked();
             }
 
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
+
             if (executeCommandEvent.isBlocked()) blocked = true;
             if (executeCommandEvent.isCancelled()) return true;
 
             MessageTranslator.send(player, cancelCommandMessage);
-            return !blocked;
+            return blocked;
         }
+
+        System.out.println(4);
+
+
 
         if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
             if (executeCommandEvent.isBlocked()) blocked = true;
-            if (executeCommandEvent.isCancelled()) return true;
+            if (executeCommandEvent.isCancelled()) return false;
 
             MessageTranslator.send(player, cancelCommandMessage);
 
@@ -223,12 +227,12 @@ public class VelocityBlockCommandListener {
                 MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), notificationMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage));
 
-            return !blocked;
+            return blocked;
         }
 
         if (Storage.Blacklist.doesGroupBypass(player, command, true, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
-            return !executeCommandEvent.isBlocked();
+            return executeCommandEvent.isBlocked();
         }
 
         listed = Storage.Blacklist.isListed(command, true, true, false);
@@ -237,12 +241,12 @@ public class VelocityBlockCommandListener {
 
         if (!listed && !serverListed || listed && serverListed && ignored) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
-            return !executeCommandEvent.isBlocked();
+            return executeCommandEvent.isBlocked();
         }
 
         if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player.getUniqueId())) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, false);
-            return !executeCommandEvent.isBlocked();
+            return executeCommandEvent.isBlocked();
         }
 
         ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
@@ -254,6 +258,6 @@ public class VelocityBlockCommandListener {
         if (Storage.SEND_CONSOLE_NOTIFICATION)
             MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), notificationMessage);
         Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage));
-        return !blocked;
+        return blocked;
     }
 }
