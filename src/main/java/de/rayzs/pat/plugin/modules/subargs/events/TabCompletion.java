@@ -29,8 +29,8 @@ public class TabCompletion extends FilteredTabCompletionEvent {
             if(result.contains("%rmc_online_players%")) {
                 possibilities.remove("%rmc_online_players%");
                 possibilities.addAll(event.getCompletion().stream().filter(completion -> {
-                    if(result.contains(completion)) return false;
-                    return SubArgsModule.getPlayerNames().contains(completion);
+                    if(SubArgsModule.getPlayerNames().contains(completion)) return false;
+                    return result.contains(completion);
                 }).collect(Collectors.toList()));
 
                 if(possibilities.isEmpty()) possibilities.add("///////////");
