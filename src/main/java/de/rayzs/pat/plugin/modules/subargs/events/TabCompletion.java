@@ -6,6 +6,7 @@ import de.rayzs.pat.utils.subargs.Argument;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TabCompletion extends FilteredTabCompletionEvent {
 
@@ -27,7 +28,12 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
             if(result.contains("%rmc_online_players%")) {
                 possibilities.remove("%rmc_online_players%");
-                possibilities.removeIf(name -> SubArgsModule.getPlayerNames().contains(name));
+                possibilities.addAll(event.getCompletion().stream().filter(completion -> {
+                    if(result.contains(completion)) return false;
+                    return SubArgsModule.getPlayerNames().contains(completion);
+                }).collect(Collectors.toList()));
+
+                if(possibilities.isEmpty()) possibilities.add("///////////");
             }
 
         } else {
