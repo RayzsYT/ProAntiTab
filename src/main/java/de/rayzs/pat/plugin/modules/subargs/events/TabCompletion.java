@@ -25,6 +25,11 @@ public class TabCompletion extends FilteredTabCompletionEvent {
                 possibilities.addAll(SubArgsModule.getPlayerNames());
             }
 
+            if(result.contains("%rmc_online_players%")) {
+                possibilities.remove("%rmc_online_players%");
+                possibilities.removeIf(name -> SubArgsModule.getPlayerNames().contains(name));
+            }
+
         } else {
             if(result.contains("%online_players%"))
                 possibilities.removeIf(possibility -> SubArgsModule.getPlayerNames().contains(possibility));
