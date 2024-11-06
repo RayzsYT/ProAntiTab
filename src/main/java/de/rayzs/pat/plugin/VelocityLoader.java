@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin;
 
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.VersionComparer;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
@@ -166,6 +167,20 @@ public class VelocityLoader {
                 }
             }
         }).delay(1, TimeUnit.SECONDS).repeat(Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.SECONDS).schedule();
+    }
+
+    public static String getServerNameByPlayerUUID(UUID uuid) {
+        Optional<Player> optPlayer = server.getPlayer(uuid);
+        if(!optPlayer.isPresent()) return null;
+
+        Player player = optPlayer.get();
+        Optional<ServerConnection> optServer = player.getCurrentServer();
+        if(!optServer.isPresent()) return null;
+
+        ServerConnection server = optServer.get();
+        if(server.getServerInfo() == null) return null;
+
+        return server.getServerInfo().getName();
     }
 
     public static ProxyServer getServer() {

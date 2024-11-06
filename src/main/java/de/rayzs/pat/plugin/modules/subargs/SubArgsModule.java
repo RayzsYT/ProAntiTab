@@ -1,9 +1,8 @@
 package de.rayzs.pat.plugin.modules.subargs;
 
-import de.rayzs.pat.plugin.modules.subargs.events.ExecuteCommand;
-import de.rayzs.pat.plugin.modules.subargs.events.TabCompletion;
-import de.rayzs.pat.plugin.modules.subargs.events.UpdateList;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.plugin.modules.subargs.events.*;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.subargs.*;
@@ -55,6 +54,20 @@ public class SubArgsModule {
     public static void updateMessages() {
         Storage.Files.CUSTOM_RESPONSES.reload();
         Responses.update();
+    }
+
+    public static List<String> getServerCommands(UUID uuid) {
+        List<String> commands = new ArrayList<>();
+        if(!Reflection.isProxyServer()) return commands;
+
+        String serverName = Reflection.isVelocityServer() ? VelocityLoader.getServerNameByPlayerUUID(uuid) : BungeeLoader.getServerNameByPlayerUUID(uuid);
+        if(serverName == null) return commands;
+
+        List<GeneralBlacklist> blacklists = Storage.Blacklist.getBlacklists(serverName);
+        for (GeneralBlacklist blacklist : blacklists)
+            commands.addAll(blacklist.getCommands());
+
+        return commands;
     }
 
     public static List<String> getGroupCommands(UUID uuid) {

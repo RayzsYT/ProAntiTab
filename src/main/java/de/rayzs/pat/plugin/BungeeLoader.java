@@ -7,7 +7,9 @@ import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.api.communication.Communicator;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.commands.BungeeCommand;
 import de.rayzs.pat.api.brand.CustomServerBrand;
@@ -155,6 +157,19 @@ public class BungeeLoader extends Plugin {
                 }
             }
         }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);
+    }
+
+    public static String getServerNameByPlayerUUID(UUID uuid) {
+        ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
+        if(proxiedPlayer == null) return null;
+
+        Server server = proxiedPlayer.getServer();
+        if(server == null) return null;
+
+        ServerInfo serverInfo = server.getInfo();
+        if(serverInfo == null) return null;
+
+        return serverInfo.getName();
     }
 
     public static Plugin getPlugin() {

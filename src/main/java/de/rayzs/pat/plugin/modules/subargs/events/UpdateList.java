@@ -48,6 +48,9 @@ public class UpdateList {
 
                 for (String command : SubArgsModule.getGroupCommands(uuid))
                     argument.buildArgumentStacks(command);
+
+                for (String command : SubArgsModule.getServerCommands(uuid))
+                    argument.buildArgumentStacks(command);
             } else {
                 List<String> groupCommands = SubArgsModule.getGroupCommands(uuid);
                 for (String command : Argument.getGeneralArgument().getInputs()) {
