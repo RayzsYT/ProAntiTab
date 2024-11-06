@@ -45,7 +45,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         String[] split, originCommandSplit, copiedOriginCommandSplit;
         String tmpCommand;
         for (String s : SubArgsModule.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Argument.getGeneralArgument()).getInputs()) {
-            if(s.contains("%rmc_online_players%")) continue;
+            if(s.contains("%hidden_online_players%")) continue;
             tmpCommand = command;
 
             if(s.split(" ")[0].equalsIgnoreCase(tmpCommand.split(" ")[0]))
