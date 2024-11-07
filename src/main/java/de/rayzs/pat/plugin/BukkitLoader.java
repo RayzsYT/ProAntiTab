@@ -196,7 +196,7 @@ public class BukkitLoader extends JavaPlugin {
                 Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
 
             else if (!ArrayUtils.compareStringArrays(Storage.Blacklist.getBlacklist().getCommands(), commandsPacket.getCommands())) {
-                BukkitAntiTabListener.setChangeStatus();
+                if(Reflection.getMinor() >= 13) BukkitAntiTabListener.setChangeStatus();
                 Storage.Blacklist.getBlacklist().setList(commandsPacket.getCommands());
             }
 
