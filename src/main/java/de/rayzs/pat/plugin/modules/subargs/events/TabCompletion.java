@@ -17,7 +17,7 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
         UUID uuid = event.getSenderObj() instanceof UUID ? (UUID) event.getSenderObj() : new CommandSender(event.getSenderObj()).getUniqueId();
         Argument argument = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, Argument.getGeneralArgument());
-        List<String> possibilities = event.getCompletion(), result = argument.getResult(cursor);
+        List<String> possibilities = event.getCompletion(), result = new ArrayList<>(argument.getResult(cursor));
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             possibilities = result;
