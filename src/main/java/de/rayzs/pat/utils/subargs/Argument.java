@@ -1,12 +1,12 @@
 package de.rayzs.pat.utils.subargs;
 
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.StringUtils;
 import java.util.*;
 
 public class Argument {
 
     private static final Argument GENERAL = new Argument();
-
 
     private final List<String> INPUTS = new ArrayList<>();
     private final HashMap<String, ArgumentStack> ARGUMENT_STACKS = new HashMap<>();
@@ -88,11 +88,23 @@ public class Argument {
             String current;
             while(input.contains(" ")) {
                 current = input.split(" ")[0];
+
+                if(suggestions.contains("%online_players%"))
+                    current = StringUtils.replaceElementsFromString(current, SubArgsModule.getPlayerNames(), "%online_players%");
+                if(suggestions.contains("%hidden_online_players%"))
+                    current = StringUtils.replaceElementsFromString(current, SubArgsModule.getPlayerNames(), "%hidden_online_players%");
+
                 input = StringUtils.replaceFirst(input, current, "");
                 input = input.startsWith(" ") ? StringUtils.replaceFirst(input, " ", "") : input;
 
                 for (Map.Entry<String, ArgumentStack> entry : argumentStacks.entrySet()) {
                     if(!entry.getKey().startsWith(current)) continue;
+
+                    if(entry.getKey().contains("%online_players%"))
+                        input = StringUtils.replaceElementsFromString(input, SubArgsModule.getPlayerNames(), "%online_players%");
+                    if(entry.getKey().contains("%hidden_online_players%"))
+                        input = StringUtils.replaceElementsFromString(input, SubArgsModule.getPlayerNames(), "%hidden_online_players%");
+
                     return entry.getValue().getResult(input);
                 }
             }
