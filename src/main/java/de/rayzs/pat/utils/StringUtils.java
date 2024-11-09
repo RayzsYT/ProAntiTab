@@ -17,6 +17,26 @@ public class StringUtils {
         return input;
     }
 
+    public static String replaceLast(String input, String trigger, String replacement) {
+        if (input.contains(trigger)) {
+            String[] split = input.split(trigger.equals("*") ? "\\*" : trigger);
+            if (split.length >= 1) {
+                StringBuilder result = new StringBuilder();
+                String current;
+                int i;
+                for(i = 0; i < split.length; i++) {
+                    current = split[i];
+                    result.append(current);
+                    if(i < split.length -1) result.append(" ");
+                }
+
+                input = result.toString();
+            } else input = input.replace(trigger, replacement);
+        }
+
+        return input;
+    }
+
     public static int countMatches(Character character, String string) {
         int count = 0;
         for (char c : string.toCharArray()) {
@@ -24,6 +44,27 @@ public class StringUtils {
         }
 
         return count;
+    }
+
+    public static String replaceElementsFromString(String input, List<String> targets, String replacement) {
+        final String[] args = input.split(" ");
+        final StringBuilder result = new StringBuilder();
+        final int max = args.length;
+
+        String part;
+        int i;
+
+        for (i = 0; i < max; i++) {
+            part = args[i];
+
+            if(targets.contains(part))
+                part = replacement;
+
+            result.append(part);
+            if(i < args.length -1) result.append(" ");
+        }
+
+        return result.toString();
     }
 
     public static String replaceTriggers(String input, String replacement, String... triggers) {
