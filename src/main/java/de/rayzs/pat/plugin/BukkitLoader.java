@@ -6,6 +6,7 @@ import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.api.communication.Communicator;
@@ -291,7 +292,9 @@ public class BukkitLoader extends JavaPlugin {
         player.sendTitle(title, subTitle);
     }
 
-    public static void executeConsoleCommand(String command) {
+    public static void executeConsoleCommand(UUID uuid, String command) {
+        Player player = Bukkit.getPlayer(uuid);
+        if(player != null) command = PlaceholderReplacer.replace(player, command);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 
