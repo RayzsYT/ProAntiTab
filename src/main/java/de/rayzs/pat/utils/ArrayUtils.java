@@ -4,6 +4,14 @@ import java.util.*;
 
 public class ArrayUtils {
 
+    public static boolean containsIgnoreCase(List<String> list, String element) {
+        for (String s : list)
+            if(s.equalsIgnoreCase(element))
+                return true;
+
+        return false;
+    }
+
     public static boolean compareStringArrays(List<String> listA, List<String> listB) {
         if(listA == null || listB == null) return false;
 
