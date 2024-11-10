@@ -87,7 +87,7 @@ public class Responses {
                             duration = Integer.parseInt(split[2]);
                         } catch (Exception exception) {
                             Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Duration " + split[2].toUpperCase() + " is not a valid integer! (e.g: 1.)");
+                            Logger.warning("> Duration " + split[2].toUpperCase() + " is not a valid integer! (e.g: 1)");
                             continue;
                         }
 
@@ -103,16 +103,41 @@ public class Responses {
                         continue;
 
                     case "title":
-                        if(split.length != 3) {
+                        if(split.length != 6) {
                             Logger.warning("Could not recognise action: " + action);
                             Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
-                            Logger.warning("> title::My title::My subtitle");
+                            Logger.warning("> title::My title::My subtitle::300::3000:300");
                             continue;
                         }
 
                         String title = StringUtils.replace(split[1], "&", "§"),
                                 subTitle = StringUtils.replace(split[2], "&", "§");
-                        int fadeIn = 300, stay = 3000, fadeOut = 300;
+
+                        int fadeIn, stay, fadeOut;
+
+                        try {
+                            fadeIn = Integer.parseInt(split[3]);
+                        } catch (Exception exception) {
+                            Logger.warning("Could not recognise action: " + action);
+                            Logger.warning("> Fade-In " + split[3].toUpperCase() + " is not a valid integer! (e.g: 300)");
+                            continue;
+                        }
+
+                        try {
+                            stay = Integer.parseInt(split[4]);
+                        } catch (Exception exception) {
+                            Logger.warning("Could not recognise action: " + action);
+                            Logger.warning("> Stay " + split[4].toUpperCase() + " is not a valid integer! (e.g: 3000)");
+                            continue;
+                        }
+
+                        try {
+                            fadeOut = Integer.parseInt(split[5]);
+                        } catch (Exception exception) {
+                            Logger.warning("Could not recognise action: " + action);
+                            Logger.warning("> Fade-Out " + split[5].toUpperCase() + " is not a valid integer! (e.g: 300)");
+                            continue;
+                        }
 
                         if(!Reflection.isProxyServer())
                             BukkitLoader.sendTitle(uuid, title, subTitle, fadeIn, stay, fadeOut);
