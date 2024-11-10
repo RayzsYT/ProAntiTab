@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class ActionHandler {
 
-    private static final Action ACTION = Reflection.isProxyServer() ? Reflection.isVelocityServer() ? new VelocityAction() : new BungeeAction() : Reflection.getMinor() >= 20 ? new OldBukkitAction() : new ModernBukkitAction();
+    private static final Action ACTION = Reflection.isProxyServer() ? Reflection.isVelocityServer() ? new VelocityAction() : new BungeeAction() : Reflection.getMinor() <= 16 ? new OldBukkitAction() : new ModernBukkitAction();
 
     public static void initialize() {}
 
