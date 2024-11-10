@@ -57,7 +57,7 @@ public class StringUtils {
         for (i = 0; i < max; i++) {
             part = args[i];
 
-            if(targets.contains(part))
+            if(ArrayUtils.containsIgnoreCase(targets, part))
                 part = replacement;
 
             result.append(part);
