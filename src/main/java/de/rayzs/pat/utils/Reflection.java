@@ -56,6 +56,8 @@ public class Reflection {
         if (proxy) version = Version.UNKNOWN;
     }
 
+
+    public static String getVersionPackageName() {return versionPackageName;}
     public static int[] getAges() { return new int[]{major, minor, release}; }
     public static String getVersionName() { return versionName; }
     public static String getRawVersionName() { return rawVersionName; }
