@@ -106,7 +106,7 @@ public class Responses {
                         if(split.length != 6) {
                             Logger.warning("Could not recognise action: " + action);
                             Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
-                            Logger.warning("> title::My title::My subtitle::300::3000:300");
+                            Logger.warning("> title::My title::My subtitle::300::3000::300");
                             continue;
                         }
 
