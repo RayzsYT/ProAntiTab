@@ -18,6 +18,8 @@ import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.subargs.Responses;
+import org.bukkit.Sound;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.scheduler.*;
@@ -245,6 +247,29 @@ public class BukkitLoader extends JavaPlugin {
 
         if(commandsMap == null)
             Logger.warning("Failed to get server commands!");
+    }
+
+    public static void playSound(UUID uuid, String soundName, float volume, float pitch) {
+        Player player = Bukkit.getPlayer(uuid);
+        if(player == null) return;
+
+        try {
+            Sound sound = Sound.valueOf(soundName);
+            player.playSound(player.getLocation(), sound, volume, pitch);
+        } catch (Exception exception) {
+            Logger.warning("Failed to recognise action!");
+            Logger.warning("> The sound: " + soundName + " does not exist!");
+        }
+    }
+
+    public static void sendTitle(UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+        Player player = Bukkit.getPlayer(uuid);
+        if(player == null) return;
+        player.sendTitle(title, subTitle);
+    }
+
+    public static void executeConsoleCommand(String command) {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 
     public static List<String> getNotBlockedCommands() {

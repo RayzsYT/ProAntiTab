@@ -7,9 +7,10 @@ import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.api.communication.Communicator;
+import net.md_5.bungee.api.Title;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.connection.*;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.commands.BungeeCommand;
 import de.rayzs.pat.api.brand.CustomServerBrand;
@@ -157,6 +158,22 @@ public class BungeeLoader extends Plugin {
                 }
             }
         }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);
+    }
+
+    public static void sendTitle(UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+        if(player == null) return;
+        Title titleObj = ProxyServer.getInstance().createTitle();
+        titleObj.title(TextComponent.fromLegacyText(StringUtils.replace(title, "&", "§")));
+        titleObj.subTitle(TextComponent.fromLegacyText(StringUtils.replace(subTitle, "&", "§")));
+        titleObj.fadeIn(fadeIn);
+        titleObj.stay(stay);
+        titleObj.fadeOut(fadeOut);
+        player.sendTitle(titleObj);
+    }
+
+    public static void executeConsoleCommand(String command) {
+        ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
     }
 
     public static String getServerNameByPlayerUUID(UUID uuid) {

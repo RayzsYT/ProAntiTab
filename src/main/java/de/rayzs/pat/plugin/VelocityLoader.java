@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.VersionComparer;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
@@ -24,8 +25,12 @@ import com.velocitypowered.api.plugin.*;
 import de.rayzs.pat.api.storage.Storage;
 import com.velocitypowered.api.event.*;
 import de.rayzs.pat.utils.Reflection;
+
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import com.google.inject.Inject;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.title.Title;
 import java.util.*;
 
 @Plugin(name = "ProAntiTab",
@@ -102,6 +107,81 @@ public class VelocityLoader {
 
         ConfigUpdater.broadcastMissingParts();
         SubArgsModule.initialize();
+    }
+
+    public static void sendTitle(UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+        Optional<Player> optPlayer = server.getPlayer(uuid);
+        if(!optPlayer.isPresent()) return;
+
+        Player player = optPlayer.get();
+        Title titleObj = Title.title(
+                MiniMessage.miniMessage().deserialize(StringUtils.replace(title, "&", "§")),
+                MiniMessage.miniMessage().deserialize(StringUtils.replace(subTitle, "&", "§")),
+                Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut))
+        );
+
+        player.showTitle(titleObj);
+    }
+
+    public static void executeConsoleCommand(String command) {
+        server.getCommandManager().executeAsync(server.getConsoleCommandSource(), command);
+    }
+
+    public static void executeActions(UUID uuid, List<String> actions) {
+        Optional<Player> optPlayer = server.getPlayer(uuid);
+        if(!optPlayer.isPresent() || actions == null || actions.isEmpty()) return;
+
+        Player player = optPlayer.get();
+        String[] split;
+
+        for (String action : actions) {
+            if(!action.contains("::")) {
+                Logger.warning("Could not recognise action: " + action);
+                Logger.warning("Syntax does not match at all. Have you used the splitters (::) correctly?");
+                continue;
+            }
+
+            split = action.split("::");
+
+            switch (split[0].toLowerCase()) {
+                case "title":
+                    if(split.length != 3) {
+                        Logger.warning("Could not recognise action: " + action);
+                        Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
+                        Logger.warning("> title::My title::My subtitle");
+                        continue;
+                    }
+
+                    Title title = Title.title(
+                            MiniMessage.miniMessage().deserialize(StringUtils.replace(split[1], "&", "§")),
+                            MiniMessage.miniMessage().deserialize(StringUtils.replace(split[2], "&", "§")),
+                            Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(3000), Duration.ofMillis(500))
+                            );
+
+                    player.showTitle(title);
+                    continue;
+
+                case "sound":
+                    if(split.length != 4) {
+                        Logger.warning("Could not execute action: " + action);
+                        Logger.warning("> Sounds cannot be played on the proxy side!");
+                    }
+
+                    // send sound (split[1].toUpperCase, volume, pitch)
+                    continue;
+
+                case "console":
+                    if(split.length == 1) {
+                        Logger.warning("Could not recognise action: " + action);
+                        Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
+                        Logger.warning("> console::say Hello world!");
+                        continue;
+                    }
+
+                    net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().dispatchCommand(net.md_5.bungee.api.ProxyServer.getInstance().getConsole(), split[1]);
+            }
+
+        }
     }
 
     public static void delayedPermissionsReload() {
