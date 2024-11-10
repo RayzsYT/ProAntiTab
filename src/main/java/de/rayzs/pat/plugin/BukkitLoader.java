@@ -289,6 +289,10 @@ public class BukkitLoader extends JavaPlugin {
     public static void sendTitle(UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         Player player = Bukkit.getPlayer(uuid);
         if(player == null) return;
+
+        title = PlaceholderReplacer.replace(player, title.replace("%player%", player.getName()));
+        subTitle = PlaceholderReplacer.replace(player, subTitle.replace("%player%", player.getName()));
+
         player.sendTitle(title, subTitle);
     }
 

@@ -164,8 +164,8 @@ public class BungeeLoader extends Plugin {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
         if(player == null) return;
         Title titleObj = ProxyServer.getInstance().createTitle();
-        titleObj.title(TextComponent.fromLegacyText(StringUtils.replace(title, "&", "§")));
-        titleObj.subTitle(TextComponent.fromLegacyText(StringUtils.replace(subTitle, "&", "§")));
+        titleObj.title(TextComponent.fromLegacyText(StringUtils.replace(title, "&", "§", "%player%", player.getName())));
+        titleObj.subTitle(TextComponent.fromLegacyText(StringUtils.replace(subTitle, "&", "§", "%player%", player.getName())));
         titleObj.fadeIn(fadeIn);
         titleObj.stay(stay);
         titleObj.fadeOut(fadeOut);
