@@ -1,23 +1,23 @@
 package de.rayzs.pat.plugin;
 
-import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
+
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.api.communication.Communicator;
-import net.md_5.bungee.api.Title;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.*;
+import de.rayzs.pat.utils.response.action.ActionHandler;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.commands.BungeeCommand;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.listeners.bungee.*;
 import de.rayzs.pat.utils.group.GroupManager;
+import net.md_5.bungee.api.config.ServerInfo;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
+import net.md_5.bungee.api.connection.*;
 import de.rayzs.pat.api.storage.Storage;
 import net.md_5.bungee.api.ProxyServer;
 import java.util.concurrent.TimeUnit;
@@ -88,6 +88,7 @@ public class BungeeLoader extends Plugin {
 
         BungeePacketAnalyzer.injectAll();
         ConfigUpdater.broadcastMissingParts();
+        ActionHandler.initialize();
         SubArgsModule.initialize();
     }
 
@@ -158,24 +159,6 @@ public class BungeeLoader extends Plugin {
                 }
             }
         }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);
-    }
-
-    public static void sendTitle(UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-        if(player == null) return;
-        Title titleObj = ProxyServer.getInstance().createTitle();
-        titleObj.title(TextComponent.fromLegacyText(StringUtils.replace(title, "&", "§", "%player%", player.getName())));
-        titleObj.subTitle(TextComponent.fromLegacyText(StringUtils.replace(subTitle, "&", "§", "%player%", player.getName())));
-        titleObj.fadeIn(fadeIn);
-        titleObj.stay(stay);
-        titleObj.fadeOut(fadeOut);
-        player.sendTitle(titleObj);
-    }
-
-    public static void executeConsoleCommand(UUID uuid, String command) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
-        if(player != null) command = command.replace("%player%", player.getName());
-        ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
     }
 
     public static String getServerNameByPlayerUUID(UUID uuid) {

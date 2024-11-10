@@ -5,6 +5,7 @@ import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.subargs.*;
 import de.rayzs.pat.utils.*;
 
@@ -21,7 +22,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         if(command.contains(" ") && shouldCommandBeBlocked(sender, event, command)) {
             event.setBlocked(true);
             event.setCancelled(true);
-            MessageTranslator.send(event.getSenderObj(), Responses.getResponse(sender.getUniqueId(), event.getCommand()), "%command%", event.getCommand());
+            MessageTranslator.send(event.getSenderObj(), ResponseHandler.getResponse(sender.getUniqueId(), event.getCommand()), "%command%", event.getCommand());
             return;
         }
 
@@ -31,7 +32,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             return;
 
         event.setCancelled(true);
-        MessageTranslator.send(event.getSenderObj(), Responses.getResponse(sender.getUniqueId(), event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()), "%command%", event.getCommand());
+        MessageTranslator.send(event.getSenderObj(), ResponseHandler.getResponse(sender.getUniqueId(), event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()), "%command%", event.getCommand());
     }
 
     private boolean shouldCommandBeBlocked(CommandSender sender, ExecuteCommandEvent event, String command) {

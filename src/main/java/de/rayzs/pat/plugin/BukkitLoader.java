@@ -6,7 +6,6 @@ import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.api.communication.Communicator;
@@ -19,7 +18,7 @@ import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
-import org.bukkit.Sound;
+import de.rayzs.pat.utils.response.action.ActionHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.scheduler.*;
@@ -29,7 +28,6 @@ import de.rayzs.pat.utils.*;
 import org.bukkit.command.*;
 import org.bukkit.plugin.*;
 import org.bukkit.Bukkit;
-import org.bukkit.potion.*;
 import java.util.*;
 
 public class BukkitLoader extends JavaPlugin {
@@ -105,6 +103,7 @@ public class BukkitLoader extends JavaPlugin {
             Logger.warning("Detected SimpleCloud. Therefore, MiniMessages are disabled!");
 
         ConfigUpdater.broadcastMissingParts();
+        ActionHandler.initialize();
         SubArgsModule.initialize();
     }
 
@@ -248,54 +247,6 @@ public class BukkitLoader extends JavaPlugin {
 
         if(commandsMap == null)
             Logger.warning("Failed to get server commands!");
-    }
-
-    public static void giveEffect(UUID uuid, String potionTypeName, int duration, int amplifier) {
-        Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
-        PotionEffectType potionEffectType = null;
-        try {
-            potionEffectType = PotionEffectType.getByName(potionTypeName);
-        } catch (Exception ignored) { }
-
-        if(potionEffectType == null) {
-            Logger.warning("Failed to recognise action!");
-            Logger.warning("> The effect: " + potionTypeName + " does not exist! Here's an example to compare with:");
-            Logger.warning("> sound::BLINDNESS::2::1.0");
-            return;
-        }
-
-        player.addPotionEffect(new PotionEffect(potionEffectType, duration, amplifier));
-    }
-
-    public static void playSound(UUID uuid, String soundName, float volume, float pitch) {
-        Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
-
-        try {
-            Sound sound = Sound.valueOf(soundName);
-            player.playSound(player.getLocation(), sound, volume, pitch);
-        } catch (Exception exception) {
-            Logger.warning("Failed to recognise action!");
-            Logger.warning("> The sound: " + soundName + " does not exist! Here's an example to compare with:");
-            Logger.warning("> sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0");
-        }
-    }
-
-    public static void sendTitle(UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-        Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
-
-        title = PlaceholderReplacer.replace(player, title.replace("%player%", player.getName()));
-        subTitle = PlaceholderReplacer.replace(player, subTitle.replace("%player%", player.getName()));
-
-        player.sendTitle(title, subTitle);
-    }
-
-    public static void executeConsoleCommand(UUID uuid, String command) {
-        Player player = Bukkit.getPlayer(uuid);
-        if(player != null) command = command.replace("%player%", player.getName());
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 
     public static List<String> getNotBlockedCommands() {

@@ -4,8 +4,6 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
-import de.rayzs.pat.utils.StringUtils;
-import de.rayzs.pat.utils.VersionComparer;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import com.velocitypowered.api.scheduler.ScheduledTask;
@@ -18,19 +16,20 @@ import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.listeners.velocity.*;
-import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.ConnectionBuilder;
+import de.rayzs.pat.utils.VersionComparer;
 import de.rayzs.pat.plugin.logger.Logger;
 import com.velocitypowered.api.plugin.*;
 import de.rayzs.pat.api.storage.Storage;
 import com.velocitypowered.api.event.*;
 import de.rayzs.pat.utils.Reflection;
-
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+
+
 import com.google.inject.Inject;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.title.Title;
+import de.rayzs.pat.utils.response.action.ActionHandler;
+
 import java.util.*;
 
 @Plugin(name = "ProAntiTab",
@@ -106,27 +105,8 @@ public class VelocityLoader {
             Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
         ConfigUpdater.broadcastMissingParts();
+        ActionHandler.initialize();
         SubArgsModule.initialize();
-    }
-
-    public static void sendTitle(UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-        Optional<Player> optPlayer = server.getPlayer(uuid);
-        if(!optPlayer.isPresent()) return;
-
-        Player player = optPlayer.get();
-        Title titleObj = Title.title(
-                MiniMessage.miniMessage().deserialize(StringUtils.replace(title, "&", "§", "%player%", player.getUsername())),
-                MiniMessage.miniMessage().deserialize(StringUtils.replace(subTitle, "&", "§", "%player%", player.getUsername())),
-                Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut))
-        );
-
-        player.showTitle(titleObj);
-    }
-
-    public static void executeConsoleCommand(UUID uuid, String command) {
-        Optional<Player> optPlayer = server.getPlayer(uuid);
-        if (optPlayer.isPresent()) command = command.replace("%player%", optPlayer.get().getUsername());
-        server.getCommandManager().executeAsync(server.getConsoleCommandSource(), command);
     }
 
     public static void delayedPermissionsReload() {

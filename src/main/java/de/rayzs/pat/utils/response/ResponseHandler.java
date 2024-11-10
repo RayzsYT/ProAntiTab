@@ -1,13 +1,15 @@
-package de.rayzs.pat.utils.subargs;
+package de.rayzs.pat.utils.response;
 
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.response.action.ActionHandler;
+
 import java.util.*;
 
-public class Responses {
+public class ResponseHandler {
 
     private static List<Response> RESPONSES = new ArrayList<>();
 
@@ -59,8 +61,8 @@ public class Responses {
             String[] split;
             for (String action : actions) {
                 if(!action.contains("::")) {
-                    Logger.warning("Could not recognise action: " + action);
-                    Logger.warning("Syntax does not match at all. Have you used the splitters (::) correctly?");
+                    Logger.warning("! Could not recognise action: " + action);
+                    Logger.warning("  > Syntax does not match at all. Have you used the splitters (::) correctly?");
                     continue;
                 }
 
@@ -69,15 +71,16 @@ public class Responses {
                 switch (split[0].toLowerCase()) {
                     case "effect":
                         if(Reflection.isProxyServer()) {
-                            Logger.warning("Could not execute action: " + action);
-                            Logger.warning("> Effect cannot be added on the proxy side!");
+                            Logger.warning("! Could not execute action: " + action);
+                            Logger.warning("  > Effect cannot be added on the proxy side!");
                             continue;
                         }
 
                         if(split.length != 4) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
-                            Logger.warning("> effect::potioneffect::duration::amplifier");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Syntax does not match at all. Here's an example to compare with:");
+                            Logger.warning("  > effect::potionEffect::duration::amplifier");
+                            Logger.warning("  > e.g: effect::BLINDNESS::100::1");
                             continue;
                         }
 
@@ -86,27 +89,28 @@ public class Responses {
                         try {
                             duration = Integer.parseInt(split[2]);
                         } catch (Exception exception) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Duration " + split[2].toUpperCase() + " is not a valid integer! (e.g: 1)");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Duration " + split[2].toUpperCase() + " is not a valid integer! (e.g: 1)");
                             continue;
                         }
 
                         try {
                             amplifier = Integer.parseInt(split[3]);
                         } catch (Exception exception) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Amplifier " + split[3].toUpperCase() + " is not a valid integer! (e.g: 1)");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Amplifier " + split[3].toUpperCase() + " is not a valid integer! (e.g: 1)");
                             continue;
                         }
 
-                        BukkitLoader.giveEffect(uuid, split[1].toUpperCase(), duration, amplifier);
+                        ActionHandler.addPotionEffect(action, uuid, split[1].toUpperCase(), duration, amplifier);
                         continue;
 
                     case "title":
                         if(split.length != 6) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
-                            Logger.warning("> title::My title::My subtitle::300::3000::300");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Syntax does not match at all. Here's an example to compare with:");
+                            Logger.warning("  > title::title::subtitle::fadeIn::stay::fadeOut");
+                            Logger.warning("  > e.g: title::My title::My subtitle::300::3000::300");
                             continue;
                         }
 
@@ -118,50 +122,43 @@ public class Responses {
                         try {
                             fadeIn = Integer.parseInt(split[3]);
                         } catch (Exception exception) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Fade-In " + split[3].toUpperCase() + " is not a valid integer! (e.g: 300)");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Fade-In " + split[3].toUpperCase() + " is not a valid integer! (e.g: 300)");
                             continue;
                         }
 
                         try {
                             stay = Integer.parseInt(split[4]);
                         } catch (Exception exception) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Stay " + split[4].toUpperCase() + " is not a valid integer! (e.g: 3000)");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Stay " + split[4].toUpperCase() + " is not a valid integer! (e.g: 3000)");
                             continue;
                         }
 
                         try {
                             fadeOut = Integer.parseInt(split[5]);
                         } catch (Exception exception) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Fade-Out " + split[5].toUpperCase() + " is not a valid integer! (e.g: 300)");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Fade-Out " + split[5].toUpperCase() + " is not a valid integer! (e.g: 300)");
                             continue;
                         }
 
-                        if(!Reflection.isProxyServer())
-                            BukkitLoader.sendTitle(uuid, title, subTitle, fadeIn, stay, fadeOut);
-                        else {
-                            if(Reflection.isVelocityServer())
-                                VelocityLoader.sendTitle(uuid, title, subTitle, fadeIn, stay, fadeOut);
-                            /*else
-                                BungeeLoader.*/
-
-                        }
+                        ActionHandler.sendTitle(action, uuid, title, subTitle, fadeIn, stay, fadeOut);
                         continue;
 
                     case "sound":
 
                         if(Reflection.isProxyServer()) {
-                            Logger.warning("Could not execute action: " + action);
-                            Logger.warning("> Sounds cannot be played on the proxy side!");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Sounds cannot be played on the proxy side!");
                             continue;
                         }
 
                         if(split.length != 4) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
-                            Logger.warning("> sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Syntax does not match at all. Here's an example to compare with:");
+                            Logger.warning("  > sound::soundName::volume::pitch");
+                            Logger.warning("  > e.g: sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0");
                             continue;
                         }
 
@@ -170,37 +167,31 @@ public class Responses {
                         try {
                             volume = Float.parseFloat(split[2]);
                         } catch (Exception exception) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Volume " + split[2].toUpperCase() + " is not a valid float! (e.g: 1.0f)");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Volume " + split[2].toUpperCase() + " is not a valid float! (e.g: 1.0f)");
                             continue;
                         }
 
                         try {
                             pitch = Float.parseFloat(split[3]);
                         } catch (Exception exception) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Pitch " + split[3].toUpperCase() + " is not a valid float! (e.g: 1.0f)");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Pitch " + split[3].toUpperCase() + " is not a valid float! (e.g: 1.0f)");
                             continue;
                         }
 
-                        BukkitLoader.playSound(uuid, split[1].toUpperCase(), volume, pitch);
+                        ActionHandler.playSound(action, uuid, split[1].toUpperCase(), volume, pitch);
                         continue;
 
                     case "console":
                         if(split.length == 1) {
-                            Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
-                            Logger.warning("> console::say Hello world!");
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Syntax does not match at all. Here's an example to compare with:");
+                            Logger.warning("  > console::command");
+                            Logger.warning("  > e.g: console::say Hello world!");
                         }
 
-                        if(!Reflection.isProxyServer())
-                            BukkitLoader.executeConsoleCommand(uuid, split[1]);
-                        else {
-                            if (Reflection.isVelocityServer())
-                                VelocityLoader.executeConsoleCommand(uuid, split[1]);
-                            /*else
-                                BungeeLoader.*/
-                        }
+                        ActionHandler.executeConsoleCommand(action, uuid, split[1]);
                 }
 
             }
