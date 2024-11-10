@@ -169,10 +169,10 @@ public class Responses {
                         }
 
                         if(!Reflection.isProxyServer())
-                            BukkitLoader.executeConsoleCommand(split[1]);
+                            BukkitLoader.executeConsoleCommand(uuid, split[1]);
                         else {
                             if (Reflection.isVelocityServer())
-                                VelocityLoader.executeConsoleCommand(split[1]);
+                                VelocityLoader.executeConsoleCommand(uuid, split[1]);
                             /*else
                                 BungeeLoader.*/
                         }
