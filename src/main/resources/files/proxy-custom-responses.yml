@@ -37,8 +37,8 @@
 #    - "&cThis kit does not exist!"
 #  actions:
 #    - "console::say That's not nice %player%!"
-#    - "title::&cHey!::&cYou can't do that %player%!::5::20::5"
-#    - "actionbar::&cNop, sorry %player%"
+#    - "title::Hey!::You can't do that %player%!::30::3000::30"
+#    - "actionbar::Nop, sorry %player%"
 
 # Here another example with an auctionhouse plugin.
 # In here we only trigger the given message, if the player would type "/ah plugin".
@@ -52,5 +52,5 @@
 #    - "&cThis sub-command does not exist. Please type: &e/ah help"
 #  actions:
 #    - "console::say That's not nice %player%!"
-#    - "title::&cHey!::&cYou can't do that %player%!::5::20::5"
-#    - "actionbar::&cNop, sorry %player%"
+#    - "title::Hey!::You can't do that %player%!::30::3000::30"
+#    - "actionbar::Nop, sorry %player%"
