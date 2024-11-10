@@ -18,6 +18,8 @@ import java.util.UUID;
 
 public class OldBukkitAction implements Action {
 
+    private String versionPackage = null;
+
     @Override
     public void executeConsoleCommand(String action, UUID uuid, String command) {
         Player player = Bukkit.getPlayer(uuid);
@@ -80,13 +82,15 @@ public class OldBukkitAction implements Action {
         text = PlaceholderReplacer.replace(player, StringUtils.replace(text, "&", "§", "%player%", player.getName()));
 
         try {
+            if(versionPackage == null)
+                versionPackage = Reflection.getVersionPackageName();
 
             Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-            Constructor<?> constructor = (Objects.<Class<?>>requireNonNull(Class.forName("net.minecraft.server." + Reflection.getVersionName() + ".PacketPlayOutChat"))).getConstructor(Class.forName("net.minecraft.server." + Reflection.getVersionName() + ".IChatBaseComponent"), byte.class);
-            Object iChatBaseComponent = (Objects.requireNonNull(Class.forName("net.minecraft.server." + Reflection.getVersionName() + ".IChatBaseComponent"))).getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + text + "\"}");
+            Constructor<?> constructor = (Objects.<Class<?>>requireNonNull(Class.forName("net.minecraft.server." + versionPackage + ".PacketPlayOutChat"))).getConstructor(Class.forName("net.minecraft.server." + versionPackage + ".IChatBaseComponent"), byte.class);
+            Object iChatBaseComponent = (Objects.requireNonNull(Class.forName("net.minecraft.server." + versionPackage + ".IChatBaseComponent"))).getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + text + "\"}");
             Object actionbarPacket = constructor.newInstance(iChatBaseComponent, (byte) 2);
             Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
-            playerConnection.getClass().getMethod("sendPacket", Class.forName("net.minecraft.server." + Reflection.getVersionName() + ".Packet")).invoke(playerConnection, actionbarPacket);
+            playerConnection.getClass().getMethod("sendPacket", Class.forName("net.minecraft.server." + versionPackage + ".Packet")).invoke(playerConnection, actionbarPacket);
 
         } catch (ClassNotFoundException
                 | NoSuchMethodException
@@ -94,8 +98,8 @@ public class OldBukkitAction implements Action {
                 | InvocationTargetException
                 | NoSuchFieldException
                 | InstantiationException exception) {
-            Logger.warning("! Failed to execute action: " + action);
-            Logger.warning("  > Actionbars are not supportive in this version!");
+            Logger.warning("! Failed to run action: " + action);
+            Logger.warning("  > Actionbars are not supported in this server version!");
         }
     }
 }
