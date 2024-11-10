@@ -28,14 +28,14 @@
 # Normally it would print out the "command is blocked" message, because PAT would have blocked it in our case.
 # Therefore, we can also assign a custom response message to it.
 # ---
-# example-with-auctionhouse:
-#   triggers:
-#     - "ah plugin"
-#   message:
-#     - "&cThis sub-command does not exist. Please type: &e/ah help"
-#   actions:
-#     - "console::say That's not nice %player%!"
-#     - "effect::BLINDNESS::100::1"
-#     - "sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0"
-#     - "title::&cHey!::&cYou can't do that %player%!::300:3000:300"
-#     - "actionbar::&cNop, sorry %player%"
+#example-with-auctionhouse:
+#  triggers:
+#    - "ah plugin"
+#  message:
+#    - "&cThis sub-command does not exist. Please type: &e/ah help"
+#  actions:
+#    - "console::say That's not nice %player%!"
+#    - "effect::BLINDNESS::45::1"
+#    - "sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0"
+#    - "title::&cHey!::&cYou can't do that %player%!::5::20::5"
+#    - "actionbar::&cNop, sorry %player%"
