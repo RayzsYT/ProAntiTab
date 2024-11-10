@@ -24,4 +24,8 @@ public class ActionHandler {
     public static void playSound(String action, UUID uuid, String soundName, float volume, float pitch) {
         ACTION.playSound(action, uuid, soundName, volume, pitch);
     }
+
+    public static void sendActionbar(String action, UUID uuid, String text) {
+        ACTION.sendActionbar(action, uuid, text);
+    }
 }

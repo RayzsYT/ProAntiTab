@@ -1,6 +1,8 @@
 package de.rayzs.pat.utils.response.action.impl;
 
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.response.action.Action;
 import org.bukkit.Bukkit;
@@ -9,6 +11,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 import java.util.UUID;
 
 public class OldBukkitAction implements Action {
@@ -64,6 +69,33 @@ public class OldBukkitAction implements Action {
             Logger.warning("  > The sound \"" + soundName + "\" could not be found!");
             Logger.warning("  > Here's an example of an existing sound effect:");
             Logger.warning("  > ENTITY_ENDER_DRAGON_GROWL");
+        }
+    }
+
+    @Override
+    public void sendActionbar(String action, UUID uuid, String text) {
+        Player player = Bukkit.getPlayer(uuid);
+        if(player == null) return;
+
+        text = PlaceholderReplacer.replace(player, StringUtils.replace(text, "%player%", player.getName()));
+
+        try {
+
+            Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+            Constructor<?> constructor = (Objects.<Class<?>>requireNonNull(Class.forName("net.minecraft.server." + Reflection.getVersionName() + ".PacketPlayOutChat"))).getConstructor(Class.forName("net.minecraft.server." + Reflection.getVersionName() + ".IChatBaseComponent"), byte.class);
+            Object iChatBaseComponent = (Objects.requireNonNull(Class.forName("net.minecraft.server." + Reflection.getVersionName() + ".IChatBaseComponent"))).getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + text + "\"}");
+            Object actionbarPacket = constructor.newInstance(iChatBaseComponent, (byte) 2);
+            Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
+            playerConnection.getClass().getMethod("sendPacket", Class.forName("net.minecraft.server." + Reflection.getVersionName() + ".Packet")).invoke(playerConnection, actionbarPacket);
+
+        } catch (ClassNotFoundException
+                | NoSuchMethodException
+                | IllegalAccessException
+                | InvocationTargetException
+                | NoSuchFieldException
+                | InstantiationException exception) {
+            Logger.warning("! Failed to execute action: " + action);
+            Logger.warning("  > Actionbars are not supportive in this version!");
         }
     }
 }

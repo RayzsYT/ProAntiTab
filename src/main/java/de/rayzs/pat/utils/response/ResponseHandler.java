@@ -78,7 +78,8 @@ public class ResponseHandler {
 
                         if(split.length != 4) {
                             Logger.warning("! Failed to read action: " + action);
-                            Logger.warning("  > Syntax does not match at all. Here's an example to compare with:");
+                            Logger.warning("  > Syntax does not match at all.");
+                            Logger.warning("  > Here's an example to compare with:");
                             Logger.warning("  > effect::potionEffect::duration::amplifier");
                             Logger.warning("  > e.g: effect::BLINDNESS::100::1");
                             continue;
@@ -108,7 +109,8 @@ public class ResponseHandler {
                     case "title":
                         if(split.length != 6) {
                             Logger.warning("! Failed to read action: " + action);
-                            Logger.warning("  > Syntax does not match at all. Here's an example to compare with:");
+                            Logger.warning("  > Syntax does not match at all.");
+                            Logger.warning("  > Here's an example to compare with:");
                             Logger.warning("  > title::title::subtitle::fadeIn::stay::fadeOut");
                             Logger.warning("  > e.g: title::My title::My subtitle::300::3000::300");
                             continue;
@@ -156,7 +158,8 @@ public class ResponseHandler {
 
                         if(split.length != 4) {
                             Logger.warning("! Failed to read action: " + action);
-                            Logger.warning("  > Syntax does not match at all. Here's an example to compare with:");
+                            Logger.warning("  > Syntax does not match at all.");
+                            Logger.warning("  > Here's an example to compare with:");
                             Logger.warning("  > sound::soundName::volume::pitch");
                             Logger.warning("  > e.g: sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0");
                             continue;
@@ -186,9 +189,21 @@ public class ResponseHandler {
                     case "console":
                         if(split.length == 1) {
                             Logger.warning("! Failed to read action: " + action);
-                            Logger.warning("  > Syntax does not match at all. Here's an example to compare with:");
+                            Logger.warning("  > Syntax does not match at all.");
+                            Logger.warning("  > Here's an example to compare with:");
                             Logger.warning("  > console::command");
                             Logger.warning("  > e.g: console::say Hello world!");
+                        }
+
+                        ActionHandler.executeConsoleCommand(action, uuid, split[1]);
+
+                    case "actionbar":
+                        if(split.length == 1) {
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Syntax does not match at all.");
+                            Logger.warning("  > Here's an example to compare with:");
+                            Logger.warning("  > actionbar::text");
+                            Logger.warning("  > e.g: actionbar::I like COOKIES");
                         }
 
                         ActionHandler.executeConsoleCommand(action, uuid, split[1]);

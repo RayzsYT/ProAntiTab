@@ -25,8 +25,8 @@ public class VelocityAction implements Action {
 
         Player player = optPlayer.get();
         Title titleObj = Title.title(
-                MiniMessage.miniMessage().deserialize(StringUtils.replace(title, "&", "§", "%player%", player.getUsername())),
-                MiniMessage.miniMessage().deserialize(StringUtils.replace(subTitle, "&", "§", "%player%", player.getUsername())),
+                MiniMessage.miniMessage().deserialize(StringUtils.replace(title,  "%player%", player.getUsername())),
+                MiniMessage.miniMessage().deserialize(StringUtils.replace(subTitle, "%player%", player.getUsername())),
                 Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut))
         );
 
@@ -41,5 +41,14 @@ public class VelocityAction implements Action {
     @Override
     public void playSound(String action, UUID uuid, String soundName, float volume, float pitch) {
 
+    }
+
+    @Override
+    public void sendActionbar(String action, UUID uuid, String text) {
+        Optional<Player> optPlayer = VelocityLoader.getServer().getPlayer(uuid);
+        if(!optPlayer.isPresent()) return;
+
+        Player player = optPlayer.get();
+        player.sendActionBar(MiniMessage.miniMessage().deserialize(StringUtils.replace(text, "%player%", player.getUsername())));
     }
 }
