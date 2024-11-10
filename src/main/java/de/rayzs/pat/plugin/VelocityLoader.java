@@ -115,8 +115,8 @@ public class VelocityLoader {
 
         Player player = optPlayer.get();
         Title titleObj = Title.title(
-                MiniMessage.miniMessage().deserialize(StringUtils.replace(title, "&", "§")),
-                MiniMessage.miniMessage().deserialize(StringUtils.replace(subTitle, "&", "§")),
+                MiniMessage.miniMessage().deserialize(StringUtils.replace(title, "&", "§", "%player%", player.getUsername())),
+                MiniMessage.miniMessage().deserialize(StringUtils.replace(subTitle, "&", "§", "%player%", player.getUsername())),
                 Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut))
         );
 
@@ -125,65 +125,8 @@ public class VelocityLoader {
 
     public static void executeConsoleCommand(UUID uuid, String command) {
         Optional<Player> optPlayer = server.getPlayer(uuid);
-        if(optPlayer.isPresent()) command = command.replace("%player%", optPlayer.get().getUsername());
+        if (optPlayer.isPresent()) command = command.replace("%player%", optPlayer.get().getUsername());
         server.getCommandManager().executeAsync(server.getConsoleCommandSource(), command);
-    }
-
-    public static void executeActions(UUID uuid, List<String> actions) {
-        Optional<Player> optPlayer = server.getPlayer(uuid);
-        if(!optPlayer.isPresent() || actions == null || actions.isEmpty()) return;
-
-        Player player = optPlayer.get();
-        String[] split;
-
-        for (String action : actions) {
-            if(!action.contains("::")) {
-                Logger.warning("Could not recognise action: " + action);
-                Logger.warning("Syntax does not match at all. Have you used the splitters (::) correctly?");
-                continue;
-            }
-
-            split = action.split("::");
-
-            switch (split[0].toLowerCase()) {
-                case "title":
-                    if(split.length != 3) {
-                        Logger.warning("Could not recognise action: " + action);
-                        Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
-                        Logger.warning("> title::My title::My subtitle");
-                        continue;
-                    }
-
-                    Title title = Title.title(
-                            MiniMessage.miniMessage().deserialize(StringUtils.replace(split[1], "&", "§")),
-                            MiniMessage.miniMessage().deserialize(StringUtils.replace(split[2], "&", "§")),
-                            Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(3000), Duration.ofMillis(500))
-                            );
-
-                    player.showTitle(title);
-                    continue;
-
-                case "sound":
-                    if(split.length != 4) {
-                        Logger.warning("Could not execute action: " + action);
-                        Logger.warning("> Sounds cannot be played on the proxy side!");
-                    }
-
-                    // send sound (split[1].toUpperCase, volume, pitch)
-                    continue;
-
-                case "console":
-                    if(split.length == 1) {
-                        Logger.warning("Could not recognise action: " + action);
-                        Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
-                        Logger.warning("> console::say Hello world!");
-                        continue;
-                    }
-
-                    net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().dispatchCommand(net.md_5.bungee.api.ProxyServer.getInstance().getConsole(), split[1]);
-            }
-
-        }
     }
 
     public static void delayedPermissionsReload() {
