@@ -106,10 +106,13 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                     suggestions.removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(getSuggestionFromEntry(suggestion)));
                 }
 
-                Object clientboundCommandSuggestionsPacketObj = clientboundCommandSuggestionsPacketClass
-                        .getConstructor(int.class, int.class, int.class, List.class)
-                        .newInstance(id, start, length, suggestions);
-                BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), clientboundCommandSuggestionsPacketObj);
+                if(!suggestions.isEmpty()) {
+                    Object clientboundCommandSuggestionsPacketObj = clientboundCommandSuggestionsPacketClass
+                            .getConstructor(int.class, int.class, int.class, List.class)
+                            .newInstance(id, start, length, suggestions);
+                    BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), clientboundCommandSuggestionsPacketObj);
+                }
+
                 return false;
 
             } catch (Throwable throwable) { throwable.printStackTrace(); }
@@ -148,9 +151,8 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawInput, suggestionsAsString);
             if(filteredTabCompletionEvent.isCancelled()) suggestions.getList().clear();
             suggestions.getList().removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(suggestion.getText()));
+            return !suggestions.getList().isEmpty();
         }
-
-        return true;
     }
 
     private String getSuggestionFromEntry(Object suggestionObj) {

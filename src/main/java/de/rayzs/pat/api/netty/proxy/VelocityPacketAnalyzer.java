@@ -220,6 +220,8 @@ public class VelocityPacketAnalyzer {
                             FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), cursor, suggestionsAsString);
                             if(filteredTabCompletionEvent.isCancelled()) return;
                             response.getOffers().removeIf(offer -> !filteredTabCompletionEvent.getCompletion().contains(offer.getText()));
+
+                            if(response.getOffers().isEmpty()) return;
                         }
                     }
                 }
