@@ -124,6 +124,8 @@ public class VelocityLoader {
     }
 
     public static void executeConsoleCommand(UUID uuid, String command) {
+        Optional<Player> optPlayer = server.getPlayer(uuid);
+        if(optPlayer.isPresent()) command = command.replace("%player%", optPlayer.get().getUsername());
         server.getCommandManager().executeAsync(server.getConsoleCommandSource(), command);
     }
 

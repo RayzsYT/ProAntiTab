@@ -294,7 +294,7 @@ public class BukkitLoader extends JavaPlugin {
 
     public static void executeConsoleCommand(UUID uuid, String command) {
         Player player = Bukkit.getPlayer(uuid);
-        if(player != null) command = PlaceholderReplacer.replace(player, command);
+        if(player != null) command = command.replace("%player%", player.getName());
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 

@@ -173,6 +173,8 @@ public class BungeeLoader extends Plugin {
     }
 
     public static void executeConsoleCommand(UUID uuid, String command) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+        if(player != null) command = command.replace("%player%", player.getName());
         ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
     }
 
