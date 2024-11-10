@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.response.action.impl;
 
+import de.rayzs.pat.utils.message.MessageTranslator;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import de.rayzs.pat.utils.response.action.Action;
 import com.velocitypowered.api.proxy.Player;
@@ -25,8 +26,8 @@ public class VelocityAction implements Action {
 
         Player player = optPlayer.get();
         Title titleObj = Title.title(
-                MiniMessage.miniMessage().deserialize(StringUtils.replace(title,  "%player%", player.getUsername())),
-                MiniMessage.miniMessage().deserialize(StringUtils.replace(subTitle, "%player%", player.getUsername())),
+                MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(StringUtils.replace(title,  "%player%", player.getUsername()))),
+                MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(StringUtils.replace(subTitle, "%player%", player.getUsername()))),
                 Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut))
         );
 
@@ -49,6 +50,6 @@ public class VelocityAction implements Action {
         if(!optPlayer.isPresent()) return;
 
         Player player = optPlayer.get();
-        player.sendActionBar(MiniMessage.miniMessage().deserialize(StringUtils.replace(text, "%player%", player.getUsername())));
+        player.sendActionBar(MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(StringUtils.replace(text, "%player%", player.getUsername()))));
     }
 }

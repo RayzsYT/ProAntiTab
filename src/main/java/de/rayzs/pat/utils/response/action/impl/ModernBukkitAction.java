@@ -75,7 +75,7 @@ public class ModernBukkitAction implements Action {
         Player player = Bukkit.getPlayer(uuid);
         if(player == null) return;
 
-        text = PlaceholderReplacer.replace(player, StringUtils.replace(text, "%player%", player.getName()));
+        text = PlaceholderReplacer.replace(player, StringUtils.replace(text, "&", "§", "%player%", player.getName()));
 
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(text));
     }

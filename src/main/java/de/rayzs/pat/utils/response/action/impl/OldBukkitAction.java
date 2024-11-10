@@ -77,7 +77,7 @@ public class OldBukkitAction implements Action {
         Player player = Bukkit.getPlayer(uuid);
         if(player == null) return;
 
-        text = PlaceholderReplacer.replace(player, StringUtils.replace(text, "%player%", player.getName()));
+        text = PlaceholderReplacer.replace(player, StringUtils.replace(text, "&", "§", "%player%", player.getName()));
 
         try {
 
