@@ -258,7 +258,8 @@ public class BukkitLoader extends JavaPlugin {
             player.playSound(player.getLocation(), sound, volume, pitch);
         } catch (Exception exception) {
             Logger.warning("Failed to recognise action!");
-            Logger.warning("> The sound: " + soundName + " does not exist!");
+            Logger.warning("> The sound: " + soundName + " does not exist! Here's an example to compare with:");
+            Logger.warning("> sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0");
         }
     }
 
