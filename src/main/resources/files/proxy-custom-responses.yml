@@ -33,3 +33,7 @@
 #     - "ah plugin"
 #   message:
 #     - "&cThis sub-command does not exist. Please type: &e/ah help"
+#   actions:
+#     - "console::send %player% fallback"
+#     - "title::&cHey!::&cYou can't do that %player%!::300:3000:300"
+#     - "actionbar::&cNop, sorry %player%"

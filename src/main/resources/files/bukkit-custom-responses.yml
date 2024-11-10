@@ -33,3 +33,9 @@
 #     - "ah plugin"
 #   message:
 #     - "&cThis sub-command does not exist. Please type: &e/ah help"
+#   actions:
+#     - "console::say That's not nice %player%!"
+#     - "effect::BLINDNESS::100::1"
+#     - "sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0"
+#     - "title::&cHey!::&cYou can't do that %player%!::300:3000:300"
+#     - "actionbar::&cNop, sorry %player%"
