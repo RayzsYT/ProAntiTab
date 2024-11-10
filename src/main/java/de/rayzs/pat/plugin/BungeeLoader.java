@@ -172,7 +172,7 @@ public class BungeeLoader extends Plugin {
         player.sendTitle(titleObj);
     }
 
-    public static void executeConsoleCommand(String command) {
+    public static void executeConsoleCommand(UUID uuid, String command) {
         ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
     }
 

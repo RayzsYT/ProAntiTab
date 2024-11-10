@@ -123,7 +123,7 @@ public class VelocityLoader {
         player.showTitle(titleObj);
     }
 
-    public static void executeConsoleCommand(String command) {
+    public static void executeConsoleCommand(UUID uuid, String command) {
         server.getCommandManager().executeAsync(server.getConsoleCommandSource(), command);
     }
 
