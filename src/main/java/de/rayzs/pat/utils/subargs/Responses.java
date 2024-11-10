@@ -67,6 +67,41 @@ public class Responses {
                 split = action.split("::");
 
                 switch (split[0].toLowerCase()) {
+                    case "effect":
+                        if(Reflection.isProxyServer()) {
+                            Logger.warning("Could not execute action: " + action);
+                            Logger.warning("> Effect cannot be added on the proxy side!");
+                            continue;
+                        }
+
+                        if(split.length != 4) {
+                            Logger.warning("Could not recognise action: " + action);
+                            Logger.warning("> Syntax does not match at all. Here's an example to compare with:");
+                            Logger.warning("> effect::potioneffect::duration::amplifier");
+                            continue;
+                        }
+
+                        int duration, amplifier;
+
+                        try {
+                            duration = Integer.parseInt(split[2]);
+                        } catch (Exception exception) {
+                            Logger.warning("Could not recognise action: " + action);
+                            Logger.warning("> Duration " + split[2].toUpperCase() + " is not a valid integer! (e.g: 1.)");
+                            continue;
+                        }
+
+                        try {
+                            amplifier = Integer.parseInt(split[3]);
+                        } catch (Exception exception) {
+                            Logger.warning("Could not recognise action: " + action);
+                            Logger.warning("> Amplifier " + split[3].toUpperCase() + " is not a valid integer! (e.g: 1)");
+                            continue;
+                        }
+
+                        BukkitLoader.giveEffect(uuid, split[1].toUpperCase(), duration, amplifier);
+                        continue;
+
                     case "title":
                         if(split.length != 3) {
                             Logger.warning("Could not recognise action: " + action);
@@ -119,7 +154,7 @@ public class Responses {
                             pitch = Float.parseFloat(split[3]);
                         } catch (Exception exception) {
                             Logger.warning("Could not recognise action: " + action);
-                            Logger.warning("> Pitch " + split[3].toUpperCase() + " is not a valid float (e.g: 1.0f)!");
+                            Logger.warning("> Pitch " + split[3].toUpperCase() + " is not a valid float! (e.g: 1.0f)");
                             continue;
                         }
 
