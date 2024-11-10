@@ -29,6 +29,10 @@ import de.rayzs.pat.utils.*;
 import org.bukkit.command.*;
 import org.bukkit.plugin.*;
 import org.bukkit.Bukkit;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
+
 import java.util.*;
 
 public class BukkitLoader extends JavaPlugin {
@@ -247,6 +251,24 @@ public class BukkitLoader extends JavaPlugin {
 
         if(commandsMap == null)
             Logger.warning("Failed to get server commands!");
+    }
+
+    public static void giveEffect(UUID uuid, String potionTypeName, int duration, int amplifier) {
+        Player player = Bukkit.getPlayer(uuid);
+        if(player == null) return;
+        PotionEffectType potionEffectType = null;
+        try {
+            potionEffectType = PotionEffectType.getByName(potionTypeName);
+        } catch (Exception ignored) { }
+
+        if(potionEffectType == null) {
+            Logger.warning("Failed to recognise action!");
+            Logger.warning("> The effect: " + potionTypeName + " does not exist! Here's an example to compare with:");
+            Logger.warning("> sound::BLINDNESS::2::1.0");
+            return;
+        }
+
+        player.addPotionEffect(new PotionEffect(potionEffectType, duration, amplifier));
     }
 
     public static void playSound(UUID uuid, String soundName, float volume, float pitch) {
