@@ -13,14 +13,15 @@ public class ExecuteCommand extends ExecuteCommandEvent {
     @Override
     public void handle(ExecuteCommandEvent event) {
         String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
+        CommandSender sender = new CommandSender(event.getSenderObj());
 
         if(PermissionUtil.hasBypassPermission(event.getSenderObj(), command.contains(" ") ? command.split(" ")[0] : command))
             return;
 
-        if(command.contains(" ") && shouldCommandBeBlocked(event, command)) {
+        if(command.contains(" ") && shouldCommandBeBlocked(sender, event, command)) {
             event.setBlocked(true);
             event.setCancelled(true);
-            MessageTranslator.send(event.getSenderObj(), Responses.getResponse(event.getCommand()), "%command%", event.getCommand());
+            MessageTranslator.send(event.getSenderObj(), Responses.getResponse(sender.getUniqueId(), event.getCommand()), "%command%", event.getCommand());
             return;
         }
 
@@ -30,11 +31,10 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             return;
 
         event.setCancelled(true);
-        MessageTranslator.send(event.getSenderObj(), Responses.getResponse(event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()), "%command%", event.getCommand());
+        MessageTranslator.send(event.getSenderObj(), Responses.getResponse(sender.getUniqueId(), event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()), "%command%", event.getCommand());
     }
 
-    private boolean shouldCommandBeBlocked(ExecuteCommandEvent event, String command) {
-        CommandSender sender = new CommandSender(event.getSenderObj());
+    private boolean shouldCommandBeBlocked(CommandSender sender, ExecuteCommandEvent event, String command) {
         boolean listed = false,
                 turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
                 blocked = event.isBlocked(),
