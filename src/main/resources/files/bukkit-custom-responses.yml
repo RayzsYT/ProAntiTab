@@ -6,10 +6,29 @@
 #  custom-responses.yml
 #
 # Here you can configure a few of the blocked commands a bit further.
-# But what exactly is this here? Every command that would normally respond with the typical "command is blocked" message, can be configured in here!
-# But how does it work? It's simple. You just provide the a trigger of the command that would be normally blocked.
-# Commands that would normally work won't send the messages you have set here.
-# This way PAT can offer you full control over certain commands and their normal responses.
+#  But what exactly is this here? Every command that would normally respond with the typical "command is blocked" message, can be configured in here!
+#  And how does it work? It's simple. You just provide the a trigger of the command that would be normally blocked.
+#  Commands that would normally work won't send the messages you have set here.
+#  This way PAT can offer you full control over certain commands and their normal responses.
+# What are these action section at each block?
+#  This is an additional feature to make your responses much more alive.
+#  Example actions that can be used are the following:
+#   Execute console command:
+#        Syntax:  console::command
+#        Example: console::say %player% is an evil player
+#   Send actionbar:
+#        Syntax:  actionbar::text
+#        Example: actionbar::&cThis is not cool %player%!
+#   Send title:
+#        Syntax:  title::title::subtitle::5::20::5
+#        Example: title::&aTest title::&cHello %player%!
+#   Play sound:
+#        Syntax:  sound::soundName::volume::pitch
+#        Example: sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0
+#   Give potion effect:
+#        Syntax:  effect::potionEffect::duration::amplifier
+#        Example: effect::BLINDNESS::45::1
+
 # Here are a few examples:
 
 # Example with kits.
@@ -17,11 +36,17 @@
 # If this command would work through sub-arguments, then the player would only able to execute the command with the
 # listed sub-arguments assigned to it. Everything else will result with the set message in there.
 # --
-# example-with-kits:
-#   triggers:
-#     - "kit *"
-#   message:
-#     - "&cThis kit does not exist!"
+#example-with-kits:
+#  triggers:
+#    - "kit *"
+#  message:
+#    - "&cThis kit does not exist!"
+#  actions:
+#    - "console::say That's not nice %player%!"
+#    - "effect::BLINDNESS::45::1"
+#    - "sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0"
+#    - "title::&cHey!::&cYou can't do that %player%!::5::20::5"
+#    - "actionbar::&cNop, sorry %player%"
 
 # Here another example with an auctionhouse plugin.
 # In here we only trigger the given message, if the player would type "/ah plugin".
