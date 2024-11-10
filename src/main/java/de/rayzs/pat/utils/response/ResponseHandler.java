@@ -116,9 +116,6 @@ public class ResponseHandler {
                             continue;
                         }
 
-                        String title = StringUtils.replace(split[1], "&", "§"),
-                                subTitle = StringUtils.replace(split[2], "&", "§");
-
                         int fadeIn, stay, fadeOut;
 
                         try {
@@ -145,7 +142,7 @@ public class ResponseHandler {
                             continue;
                         }
 
-                        ActionHandler.sendTitle(action, uuid, title, subTitle, fadeIn, stay, fadeOut);
+                        ActionHandler.sendTitle(action, uuid, split[1], split[2], fadeIn, stay, fadeOut);
                         continue;
 
                     case "sound":
