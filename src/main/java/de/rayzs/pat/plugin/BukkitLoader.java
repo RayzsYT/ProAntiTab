@@ -19,7 +19,6 @@ import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.subargs.Responses;
 import org.bukkit.Sound;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.api.storage.Storage;
@@ -30,10 +29,7 @@ import de.rayzs.pat.utils.*;
 import org.bukkit.command.*;
 import org.bukkit.plugin.*;
 import org.bukkit.Bukkit;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
-
+import org.bukkit.potion.*;
 import java.util.*;
 
 public class BukkitLoader extends JavaPlugin {
