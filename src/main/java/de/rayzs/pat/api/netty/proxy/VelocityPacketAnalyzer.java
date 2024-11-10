@@ -183,7 +183,7 @@ public class VelocityPacketAnalyzer {
                     TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
 
                     boolean cancelsBeforeHand = false;
-                    String playerInput = getPlayerInput(player), server = player.getCurrentServer().get().getServerInfo().getName();
+                    String playerInput = getPlayerInput(player), rawPlayerInput = playerInput, server = player.getCurrentServer().get().getServerInfo().getName();
                     int spaces = 0;
 
                     if(playerInput.contains(" ")) {
@@ -217,7 +217,7 @@ public class VelocityPacketAnalyzer {
                             List<String> suggestionsAsString = new ArrayList<>();
                             response.getOffers().forEach(offer -> suggestionsAsString.add(offer.getText()));
 
-                            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), cursor, suggestionsAsString);
+                            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawPlayerInput, suggestionsAsString);
                             if(filteredTabCompletionEvent.isCancelled()) return;
                             response.getOffers().removeIf(offer -> !filteredTabCompletionEvent.getCompletion().contains(offer.getText()));
 
