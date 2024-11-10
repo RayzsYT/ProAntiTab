@@ -174,7 +174,7 @@ public class VelocityBlockCommandListener {
             if (executeCommandEvent.isBlocked()) blocked = true;
             if (executeCommandEvent.isCancelled()) return false;
 
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", command.replaceFirst("/", ""));
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", command);
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
                 MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), notificationMessage);
@@ -211,10 +211,6 @@ public class VelocityBlockCommandListener {
             MessageTranslator.send(player, cancelCommandMessage);
             return blocked;
         }
-
-        System.out.println(4);
-
-
 
         if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, commandSource, true);
