@@ -32,8 +32,8 @@ public class OldBukkitAction implements Action {
         Player player = Bukkit.getPlayer(uuid);
         if(player == null) return;
 
-        title = PlaceholderReplacer.replace(player, title.replace("%player%", player.getName()));
-        subTitle = PlaceholderReplacer.replace(player, subTitle.replace("%player%", player.getName()));
+        title = PlaceholderReplacer.replace(player, StringUtils.replace(title, "&", "§", "%player%", player.getName()));
+        subTitle = PlaceholderReplacer.replace(player, StringUtils.replace(subTitle, "&", "§", "%player%", player.getName()));
 
         player.sendTitle(title, subTitle);
     }
