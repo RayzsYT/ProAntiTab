@@ -8,9 +8,15 @@ public class ConnectionBuilder {
     private String url = null, response = null;
     private List<String> responseList = new ArrayList<>();
     private Object[] parameters = null;
+    private int timeout = -1;
 
     public ConnectionBuilder setUrl(String url) {
         this.url = url;
+        return this;
+    }
+
+    public ConnectionBuilder setTimeout(int timeout) {
+        this.timeout = timeout;
         return this;
     }
 
@@ -24,6 +30,9 @@ public class ConnectionBuilder {
             String rawUrl = url;
             URL url = new URL(rawUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            if(timeout != -1) connection.setConnectTimeout(timeout);
+
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
             connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
             if(parameters != null && parameters.length > 0) {
