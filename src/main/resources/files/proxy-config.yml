@@ -11,6 +11,7 @@
 updater:
   enabled: true
   period: 10000
+  auto-update-config: true
   updated:
     - '&8[&2PAT &7| &2Proxy&8] &aYou are using the newest version! ^^'
   outdated:

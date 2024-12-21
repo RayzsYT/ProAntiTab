@@ -6,7 +6,7 @@ import java.util.*;
 
 public class UpdateSection extends ConfigStorage {
 
-    public boolean ENABLED;
+    public boolean ENABLED, AUTO_UPDATE_CONFIG;
     public int PERIOD;
     public MultipleMessagesHelper OUTDATED, UPDATED;
 
@@ -19,6 +19,7 @@ public class UpdateSection extends ConfigStorage {
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
         PERIOD = new ConfigSectionHelper<Integer>(this, "period", 10000).getOrSet();
+        AUTO_UPDATE_CONFIG = new ConfigSectionHelper<Boolean>(this, "auto-update-config", true).getOrSet();
         UPDATED = new MultipleMessagesHelper(this, "updated", Collections.singletonList("&aYou are using the newest version! ^^"));
         OUTDATED = new MultipleMessagesHelper(this, "outdated", Arrays.asList(
                 "&8[&4ProAntiTab&8] &cThere is a new version available! (%newest_version%)",
