@@ -16,7 +16,7 @@ public class ConfigUpdater {
 
     public static void initialize() {
         try {
-            boolean autoUpdateConfig = (boolean) Configurator.get("config").getOrSet("updater.auto-config-updater", true);
+            boolean autoUpdateConfig = (boolean) Configurator.get("config").getOrSet("updater.auto-update-config", true);
 
             if (autoUpdateConfig) {
                 LOADED = false;
