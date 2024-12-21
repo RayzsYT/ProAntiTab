@@ -3,6 +3,8 @@ package de.rayzs.pat.utils.configuration.updater;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.configuration.Configurator;
+
 import java.nio.file.Files;
 import java.util.*;
 import java.io.*;
@@ -13,7 +15,18 @@ public class ConfigUpdater {
     private static boolean LOADED = false;
 
     public static void initialize() {
-        NEWEST_CONFIG_INPUT = new ConnectionBuilder().setUrl("https://raw.githubusercontent.com/RayzsYT/ProAntiTab/main/src/main/resources/files/"
+        try {
+            boolean autoUpdateConfig = (boolean) Configurator.get("config.yml").getOrSet("updater.auto-config-updater", true);
+
+            if (autoUpdateConfig) {
+                LOADED = false;
+                return;
+            }
+        } catch (Exception exception) {
+            Logger.warning("Failed to find section 'updater.auto-config-updater' in config.yml!");
+        }
+
+        NEWEST_CONFIG_INPUT = new ConnectionBuilder().setTimeout(2000).setUrl("https://raw.githubusercontent.com/RayzsYT/ProAntiTab/main/src/main/resources/files/"
                 + (Reflection.isProxyServer() ? "proxy" : "bukkit")
                 + "-config.yml").connect().getResponseList();
 
@@ -38,7 +51,7 @@ public class ConfigUpdater {
             return;
         }
 
-        List<String> fileInput = new LinkedList<>(Arrays.asList("# WARNING: This file is auto generated with to solely purpose to be used as comparison!", " ", " "));
+        List<String> fileInput = new LinkedList<>(Arrays.asList("# WARNING: This file is auto generated and its solely purpose is to be used as comparison!", " ", " "));
         fileInput.addAll(NEWEST_CONFIG_INPUT);
 
         try {
