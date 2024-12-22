@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.listeners.bukkit;
 
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import org.bukkit.event.*;
 import org.bukkit.Bukkit;
 
@@ -22,6 +23,9 @@ public class PaperServerListPing implements Listener {
         String versionName = Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PROTOCOL.replace("%online_extended%", String.valueOf(onlineExtend)).replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max));
         if(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.HIDE_PLAYERS)
             event.getPlayerSample().clear();
+
+        if(versionName.contains("%"))
+            PlaceholderReplacer.replace(null, versionName);
 
         event.setVersion(versionName);
     }
