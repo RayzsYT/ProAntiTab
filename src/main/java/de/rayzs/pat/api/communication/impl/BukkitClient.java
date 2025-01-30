@@ -1,5 +1,6 @@
 package de.rayzs.pat.api.communication.impl;
 
+import de.rayzs.pat.utils.scheduler.PATScheduler;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import de.rayzs.pat.utils.CommunicationPackets;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -29,7 +30,7 @@ public class BukkitClient implements Client, PluginMessageListener {
             Object packetObj = CommunicationPackets.buildFromBytes(bytes);
             if(!CommunicationPackets.isPacket(packetObj)) return;
 
-            Bukkit.getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> Communicator.receiveInformation("proxy", packetObj));
+            PATScheduler.createScheduler(() -> Communicator.receiveInformation("proxy", packetObj));
         } catch (Throwable throwable) { throwable.printStackTrace(); }
     }
 }
