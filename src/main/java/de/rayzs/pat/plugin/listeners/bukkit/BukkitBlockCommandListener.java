@@ -94,7 +94,6 @@ public class BukkitBlockCommandListener implements Listener {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
             if(executeCommandEvent.isBlocked()) event.setCancelled(true);
             if(executeCommandEvent.isCancelled()) return;
-
             MessageTranslator.send(player, cancelCommandMessage);
             return;
         }

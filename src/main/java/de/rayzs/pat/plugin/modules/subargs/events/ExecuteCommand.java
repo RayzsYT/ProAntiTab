@@ -16,8 +16,10 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
         CommandSender sender = new CommandSender(event.getSenderObj());
 
+        /* Removed due to the fact that it is not required after all.
         if(PermissionUtil.hasBypassPermission(event.getSenderObj(), command.contains(" ") ? command.split(" ")[0] : command))
             return;
+        */
 
         if(command.contains(" ") && shouldCommandBeBlocked(sender, event, command)) {
             event.setBlocked(true);

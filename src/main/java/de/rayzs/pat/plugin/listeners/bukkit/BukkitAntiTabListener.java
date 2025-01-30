@@ -35,7 +35,7 @@ public class BukkitAntiTabListener implements Listener {
             return;
         }
 
-        if(event.getCommands().size() == 0) {
+        if(event.getCommands().isEmpty()) {
             Logger.debug("No available commands to filter! Ignoring rest of the code until at least one command is listed in there.");
             return;
         }
