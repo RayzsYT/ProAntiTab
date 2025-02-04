@@ -48,10 +48,12 @@ public class PermissionUtil {
 
     public static void setPermission(UUID uuid, String permission, boolean permitted) {
         PermissionMap permissionMap;
+
         if(!MAP.containsKey(uuid)) {
             permissionMap = new PermissionMap(uuid);
             MAP.put(uuid, permissionMap);
         } else permissionMap = MAP.get(uuid);
+
         permissionMap.setState(permission, permitted);
     }
 
@@ -62,7 +64,9 @@ public class PermissionUtil {
 
         if(targetObj instanceof CommandSender) sender = (CommandSender) targetObj;
         else sender = new CommandSender(targetObj);
+
         if(sender.isConsole()) return true;
+
         uuid = sender.getUniqueId();
 
         if(!MAP.containsKey(uuid)) {

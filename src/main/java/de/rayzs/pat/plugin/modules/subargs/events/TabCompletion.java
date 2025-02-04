@@ -4,9 +4,9 @@ import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.subargs.Argument;
 import de.rayzs.pat.api.storage.Storage;
+import java.util.stream.Collectors;
 import de.rayzs.pat.utils.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class TabCompletion extends FilteredTabCompletionEvent {
 

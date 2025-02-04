@@ -58,7 +58,7 @@ public class LuckPermsAdapter {
         Map<String, Boolean> permissions = getPermissions(uuid);
         if(permissions == null) return false;
 
-        return permissions.size() > 0;
+        return !permissions.isEmpty();
     }
 
     public static void setPermissions(UUID uuid) {
@@ -67,9 +67,10 @@ public class LuckPermsAdapter {
 
 
         permissions.forEach((permission, permitted) -> {
-                    if(permission.startsWith("proantitab.") || permission.equals("*")) PermissionUtil.setPermission(uuid, permission, permitted);
-                }
-        );
+            if(permission.startsWith("proantitab.") || permission.equals("*"))
+                PermissionUtil.setPermission(uuid, permission, permitted);
+
+        });
 
         if(Reflection.isProxyServer()) {
             if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
@@ -95,11 +96,14 @@ public class LuckPermsAdapter {
 
         if (event.isUser() && event.getTarget() instanceof User) {
             User user = (User) event.getTarget();
+
             if (Reflection.isProxyServer()) {
+
                 if(Reflection.isVelocityServer())
-                PermissionUtil.reloadPermissions(user.getUniqueId());
-            }
-            else BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
+                    PermissionUtil.reloadPermissions(user.getUniqueId());
+
+            } else BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
+
         }
     }
 }
