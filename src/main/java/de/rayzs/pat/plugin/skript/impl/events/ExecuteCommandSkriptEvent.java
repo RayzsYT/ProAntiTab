@@ -1,17 +1,16 @@
 package de.rayzs.pat.plugin.skript.impl.events;
 
+import ch.njol.skript.doc.*;
+import ch.njol.skript.lang.*;
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.lang.Literal;
-import ch.njol.skript.lang.SkriptEvent;
-import ch.njol.skript.lang.SkriptParser;
-import de.rayzs.pat.api.event.events.bukkit.ExecuteCommandEvent;
 import org.bukkit.event.Event;
+import de.rayzs.pat.api.event.events.bukkit.ExecuteCommandEvent;
 
 @Name("PAT Command Execution")
 @Description("Fires after a command has been checked by PAT.")
 public class ExecuteCommandSkriptEvent extends SkriptEvent {
+
+    private boolean triggerOnBlocked;
 
     static {
         Skript.registerEvent("PAT Command Execution",
@@ -20,25 +19,26 @@ public class ExecuteCommandSkriptEvent extends SkriptEvent {
     }
 
     @Override
-    public boolean init(Literal<?>[] literals, int i, SkriptParser.ParseResult parseResult) {
+    public boolean init(Literal<?>[] literals, int matchedPattern, SkriptParser.ParseResult parseResult) {
 
-        return false;
+        //  0 = blocked/cancelled
+        //  1 = not blocked/cancelled
+        triggerOnBlocked = matchedPattern == 0;
+
+        return true;
     }
 
     @Override
-    public String toString(Event event, boolean b) {
-
-        return null;
+    public String toString(Event event, boolean debug) {
+        return "PAT command execution event " + (triggerOnBlocked ? "(if blocked)" : "(if not blocked)");
     }
 
     @Override
     public boolean check(Event event) {
-
         if (event instanceof ExecuteCommandEvent) {
             ExecuteCommandEvent executeCommandEvent = (ExecuteCommandEvent) event;
-            return executeCommandEvent.isBlocked();
+            return executeCommandEvent.isBlocked() == triggerOnBlocked;
         }
-
         return false;
     }
 }
