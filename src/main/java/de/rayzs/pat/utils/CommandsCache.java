@@ -77,7 +77,9 @@ public class CommandsCache {
         if(filteredCommands == null)
             return useList ? playerCommands : new LinkedList<>(unfilteredCommands);
 
-        if(useList && !Storage.Blacklist.isOnIgnoredServer(serverName)) playerCommands = new LinkedList<>(filteredCommands);
+        if(useList && !Storage.Blacklist.isOnIgnoredServer(serverName)) {
+            playerCommands = new LinkedList<>(filteredCommands);
+        }
 
         boolean permitted, bypassNamespace = true, turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
 

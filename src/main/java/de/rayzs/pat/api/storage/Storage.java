@@ -252,7 +252,9 @@ public class Storage {
 
         public static List<GeneralBlacklist> getBlacklists(String server) {
             final String finalServer = server.toLowerCase();
-            if(CACHED_SERVER_BLACKLIST.contains(finalServer)) return CACHED_SERVER_BLACKLIST.get(finalServer);
+
+            if (CACHED_SERVER_BLACKLIST.contains(finalServer))
+                return CACHED_SERVER_BLACKLIST.get(finalServer);
 
             List<GeneralBlacklist> blacklists = new ArrayList<>();
             SERVER_BLACKLISTS.entrySet()
@@ -386,22 +388,16 @@ public class Storage {
 
                 blockedServer = blacklist.isBlockedIgnorePermission(command, intensive);
                 break;
-
-                /* Former code
-                if (!blacklist.isBlockedIgnorePermission(command, intensive)) {
-                    blockedServer = false;
-                    break;
-                }
-
-                blockedServer = true;
-                 */
             }
 
             blocked = turn ? blockedGlobal && blockedServer : blockedServer || blockedGlobal;
-            if(!blocked
+
+            // The reason which there's no tab-completion and also why every server-based list needs to exist to avoid this issue.
+
+            if (turn && !blocked
                     && CACHED_SERVER_BLACKLIST.contains(server)
                     && CACHED_SERVER_BLACKLIST.get(server).isEmpty())
-                if(turn) blocked = true;
+                blocked = true;
 
             return blocked;
         }
