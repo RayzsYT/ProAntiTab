@@ -90,6 +90,7 @@ cancel-blocked-commands:
     - '&cCommand &8(&4%command%&8) &cwith the provided sub-argument is not allowed!'
 
 #>> HTP (Overwritten)
+# Here you can customize your own fake '/plugins' command.
 custom-plugins:
   enabled: true
 
