@@ -91,6 +91,7 @@ cancel-blocked-commands:
 
 #>> HTP (Overwritten)
 # Here you can customize your own fake '/plugins' command.
+# WARNING: Commands in there are always tab-completable, if it's enabled.
 custom-plugins:
   enabled: true
   commands:
@@ -103,6 +104,7 @@ custom-plugins:
 
 #>> HTP (Overwritten)
 # Here you can customize your own fake '/version' command.
+# WARNING: Commands in there are always tab-completable, if it's enabled.
 custom-version:
   enabled: true
   commands:
