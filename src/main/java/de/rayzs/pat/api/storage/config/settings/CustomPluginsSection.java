@@ -39,7 +39,7 @@ public class CustomPluginsSection extends ConfigStorage {
             command = command.split(" ")[0];
         }
         for (String currentCommand : COMMANDS.getLines()) {
-            if (currentCommand.equals(command.toLowerCase()))
+            if (currentCommand.equalsIgnoreCase(command))
                 return true;
         }
         return false;

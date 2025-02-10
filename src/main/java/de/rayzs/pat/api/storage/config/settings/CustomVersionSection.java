@@ -35,7 +35,7 @@ public class CustomVersionSection extends ConfigStorage {
         command = StringUtils.getFirstArg(command);
 
         for (String currentCommand : COMMANDS.getLines()) {
-            if (currentCommand.equals(command.toLowerCase()))
+            if (currentCommand.equalsIgnoreCase(command))
                 return true;
         }
         return false;
