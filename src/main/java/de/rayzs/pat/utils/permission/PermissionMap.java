@@ -1,6 +1,7 @@
 package de.rayzs.pat.utils.permission;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PermissionMap {
 
@@ -20,7 +21,7 @@ public class PermissionMap {
     }
 
     public Set<String> getHashedPermissions() {
-        return permissionMap.keySet();
+        return permissionMap.keySet().stream().filter(permissionMap::get).collect(Collectors.toSet());
     }
 
     public void clear() {
