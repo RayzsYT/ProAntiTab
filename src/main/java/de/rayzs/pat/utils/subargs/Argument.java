@@ -42,6 +42,11 @@ public class Argument {
         String firstInputArg = input.contains(" ") ? input.split(" ")[0] : input;
 
         for (Map.Entry<String, ArgumentStack> entry : ARGUMENT_STACKS.entrySet()) {
+            if(!entry.getKey().equals(firstInputArg)) continue;
+            return ARGUMENT_STACKS.get(entry.getKey()).getResult(input);
+        }
+
+        for (Map.Entry<String, ArgumentStack> entry : ARGUMENT_STACKS.entrySet()) {
             if(!entry.getKey().startsWith(firstInputArg)) continue;
             return ARGUMENT_STACKS.get(entry.getKey()).getResult(input);
         }

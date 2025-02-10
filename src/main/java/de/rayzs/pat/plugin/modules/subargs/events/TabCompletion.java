@@ -21,12 +21,15 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             possibilities = result;
+
             if(result.contains("%online_players%")) {
+                System.out.println("All players");
                 possibilities.remove("%online_players%");
                 possibilities.addAll(SubArgsModule.getPlayerNames());
             }
 
             if(result.contains("%hidden_online_players%")) {
+                System.out.println("All players but hidden ;c");
                 possibilities.remove("%hidden_online_players%");
                 possibilities.addAll(event.getCompletion().stream().filter(completion -> {
                     if(SubArgsModule.getPlayerNames().contains(completion)) return false;
