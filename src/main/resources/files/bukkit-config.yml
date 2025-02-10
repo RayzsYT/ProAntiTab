@@ -100,8 +100,6 @@ custom-plugins:
   commands:
     - pl
     - plugins
-    - bukkit:pl
-    - bukkit:plugins
   message:
     - '&fPlugins (0):'
 
@@ -115,11 +113,9 @@ custom-version:
   always-tab-completable: false
 
   commands:
+    - icanhasbukkit
     - version
     - ver
-    - icanhasbukkit
-    - bukkit:ver
-    - bukkit:version
   message:
     - '&fThis server is running CraftBukkit version git-NasaSpigot-294 (MC: X)'
 

@@ -96,6 +96,16 @@ public class CommandsCache {
 
                 if (playerCommands.contains(command)) continue;
 
+                if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+
+                    if (useList)
+                        playerCommands.add(command);
+                    else
+                        playerCommands.remove(command);
+
+                    continue;
+                }
+
                 permitted = Reflection.isProxyServer() && serverName != null
                         ? !Storage.Blacklist.isBlocked(targetObj, command, !turn, serverName)
                         : !Storage.Blacklist.isBlocked(targetObj, command, !turn, false, false);
