@@ -63,7 +63,8 @@ public class BukkitServerBrand implements ServerBrand {
 
             PATScheduler.createAsyncScheduler(() -> {
                 Bukkit.getOnlinePlayers().forEach(this::send);
-            }, 1, Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY);
+            }, 1, 1);
+
         } else {
             AtomicInteger animationState = new AtomicInteger(0);
             TASK = PATScheduler.createAsyncScheduler(() -> {
