@@ -132,7 +132,10 @@ public class CommandsCache {
     }
 
     public void reset() {
-        if(change) return;
+        // Removed to reset the change state. Experimental change though
+        //if(change) return;
+        // Prob. gonna change it to: if (CONNECTED_TO_BUNGEE && change) return;
+        updateChangeState();
         filteredCommands = null;
     }
 
