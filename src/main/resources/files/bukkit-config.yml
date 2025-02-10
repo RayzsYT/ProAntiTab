@@ -90,10 +90,13 @@ cancel-blocked-commands:
     - '&cCommand &8(&4%command%&8) &cwith the provided sub-argument is not allowed!'
 
 #>> HTP (Overwritten)
-# Here you can customize your own fake '/plugins' command.
-# WARNING: Commands in there are always tab-completable, if it's enabled.
 custom-plugins:
   enabled: true
+
+  # If this is set to true, the command will always be tab-completable,
+  # even if the command is supposed to be blocked
+  always-tab-completable: false
+  
   commands:
     - pl
     - plugins
@@ -104,9 +107,13 @@ custom-plugins:
 
 #>> HTP (Overwritten)
 # Here you can customize your own fake '/version' command.
-# WARNING: Commands in there are always tab-completable, if it's enabled.
 custom-version:
   enabled: true
+
+  # If this is set to true, the command will always be tab-completable,
+  # even if the command is supposed to be blocked
+  always-tab-completable: false
+
   commands:
     - version
     - ver

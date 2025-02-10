@@ -45,7 +45,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
             }
 
             cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-            if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(input);
+            if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
         } else return true;
 
         for (Field field : Reflection.getFields(packetObj)) {
