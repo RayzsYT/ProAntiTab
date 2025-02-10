@@ -18,7 +18,7 @@ public class CustomPluginsSection extends ConfigStorage {
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
         ALWAYS_TAB_COMPLETABLE = new ConfigSectionHelper<Boolean>(this, "always-tab-completable", false).getOrSet();
-        COMMANDS = new MultipleMessagesHelper(this, "commands", Arrays.asList("pl", "plugins", "bukkit:pl", "bukkit:plugins"));
+        COMMANDS = new MultipleMessagesHelper(this, "commands", Arrays.asList("pl", "plugins"));
         MESSAGE = new MultipleMessagesHelper(this, "message", Collections.singletonList("&fPlugins (0):"));
     }
 
