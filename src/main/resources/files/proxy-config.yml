@@ -20,6 +20,10 @@ updater:
     - '&8[&4PAT &7| &4Proxy&8] &cGet the newest version here:'
     - '&8[&4PAT &7| &4Proxy&8] &ehttps://www.rayzs.de/products/proantitab/page'
 
+# If this value is set to true, the proxy won't communicate with the backend servers anymore.
+# Not recommended to change this value until you know what you are doing.
+disable-sync: false
+
 # This is a very necessary feature if you have way too many commands to block and instead decide
 # to whitelist specific commands.
 # Enabling this will disable ALL commands except for those that are in the (group-)list.

@@ -89,7 +89,9 @@ public class VelocityLoader {
         server.getEventManager().register(this, new VelocityPingListener(server));
 
         startUpdaterTask();
-        server.getScheduler().buildTask(this, Communicator::syncData).delay(5, TimeUnit.SECONDS).schedule();
+
+        if (!Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
+            server.getScheduler().buildTask(this, Communicator::syncData).delay(5, TimeUnit.SECONDS).schedule();
 
         Storage.PLUGIN_OBJECT = this;
 

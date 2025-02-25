@@ -114,6 +114,7 @@ public class Storage {
             public static CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
             public static CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
             public static CustomVersionSection CUSTOM_VERSION = new CustomVersionSection();
+            public static DisableSyncSection DISABLE_SYNC = new DisableSyncSection();
             public static CustomProtocolPingSection CUSTOM_PROTOCOL_PING = new CustomProtocolPingSection();
             public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
             public static TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
