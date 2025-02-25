@@ -101,6 +101,8 @@ public class Communicator {
     }
 
     public static void syncData(String serverId) {
+        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) return;
+
         LAST_DATA_UPDATE = System.currentTimeMillis();
         ClientInfo clientInfo;
         if(serverId == null) {
