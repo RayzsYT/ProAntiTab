@@ -115,6 +115,7 @@ custom-version:
 
   commands:
     - icanhasbukkit
+    - about
     - version
     - ver
   message:

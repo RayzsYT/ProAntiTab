@@ -19,7 +19,7 @@ public class CustomVersionSection extends ConfigStorage {
         super.load();
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
         ALWAYS_TAB_COMPLETABLE = new ConfigSectionHelper<Boolean>(this, "always-tab-completable", false).getOrSet();
-        COMMANDS = new MultipleMessagesHelper(this, "commands", Arrays.asList("icanhasbukkit", "ver", "version"));
+        COMMANDS = new MultipleMessagesHelper(this, "commands", Arrays.asList("icanhasbukkit", "about", "ver", "version"));
         MESSAGE = new MultipleMessagesHelper(this, "message", Collections.singletonList("&fThis server is running CraftBukkit version git-NasaSpigot-294 (MC: X)"));
     }
 
