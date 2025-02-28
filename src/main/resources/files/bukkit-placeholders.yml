@@ -18,8 +18,8 @@
 
 # Placeholders of some of the messages in the config.yml:
 #   %pat_message_unknowncommand%            = Get the "unknown command"-message from the config.yml of PAT. [cancel-blocked-command]
-#   %pat_message_base_blocked%                   = Get the "command blocked"-message from the config.yml of PAT. [custom-unknown-command]
-#   %pat_message_sub_blocked%                   = Get the "sub-command blocked"-message from the config.yml of PAT. [custom-unknown-command]
+#   %pat_message_base_blocked%              = Get the "command blocked"-message from the config.yml of PAT. [custom-unknown-command]
+#   %pat_message_sub_blocked%               = Get the "sub-command blocked"-message from the config.yml of PAT. [custom-unknown-command]
 
 # Placeholders to list all commands:
 #   %pat_list_size_commands%                = Get the amount of all listed commands.

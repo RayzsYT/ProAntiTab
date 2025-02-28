@@ -9,6 +9,7 @@ public abstract class PlaceholderStorage extends StorageTemplate {
 
     public PlaceholderStorage(String request) {
         super(Storage.Files.PLACEHOLDERS, request);
+
         this.request = request;
         Storage.ConfigSections.PLACEHOLDERS.add(this);
     }

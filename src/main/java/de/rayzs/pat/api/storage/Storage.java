@@ -4,6 +4,9 @@ import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.placeholders.commands.general.*;
 import de.rayzs.pat.api.storage.placeholders.commands.group.*;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.placeholders.messages.BlockedBaseCommandPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.messages.BlockedSubCommandPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.messages.UnknownCommandPlaceholder;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.placeholders.general.*;
 import de.rayzs.pat.api.storage.placeholders.groups.*;
@@ -150,6 +153,10 @@ public class Storage {
             public static GeneralCurrentVersionPlaceholder CURRENT_VERSION = new GeneralCurrentVersionPlaceholder();
             public static GeneralNewestVersionPlaceholder NEWEST_VERSION = new GeneralNewestVersionPlaceholder();
 
+            public static BlockedBaseCommandPlaceholder BLOCKED_BASE_COMMAND = new BlockedBaseCommandPlaceholder();
+            public static BlockedSubCommandPlaceholder BLOCKED_SUB_COMMAND = new BlockedSubCommandPlaceholder();
+            public static UnknownCommandPlaceholder UNKNOWN_COMMAND = new UnknownCommandPlaceholder();
+
             public static ListGroupsPlaceholder LIST_GROUP = new ListGroupsPlaceholder();
             public static ListGroupsReversedPlaceholder LIST_GROUP_REVERSED = new ListGroupsReversedPlaceholder();
             public static ListGroupsSortedPlaceholder LIST_GROUP_SORTED = new ListGroupsSortedPlaceholder();
@@ -184,6 +191,7 @@ public class Storage {
                         break;
                     }
 
+                System.out.println("Result: " + result);
                 return result;
             }
         }

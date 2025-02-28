@@ -14,9 +14,6 @@ public class ListGroupsPlaceholder extends PlaceholderStorage {
 
     @Override
     public String onRequest(Player player, String param) {
-        Group group = GroupManager.getGroupByName(param);
-        if(group == null) return null;
-
         return StringUtils.buildStringList(
                 GroupManager.getGroupNames(),
                 SPLITTER,

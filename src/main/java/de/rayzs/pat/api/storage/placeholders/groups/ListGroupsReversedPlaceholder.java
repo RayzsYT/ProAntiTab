@@ -14,9 +14,6 @@ public class ListGroupsReversedPlaceholder extends PlaceholderStorage {
 
     @Override
     public String onRequest(Player player, String param) {
-        Group group = GroupManager.getGroupByName(param);
-        if(group == null) return null;
-
         return StringUtils.buildSortedStringList(
                 GroupManager.getGroupNames(),
                 SPLITTER,
