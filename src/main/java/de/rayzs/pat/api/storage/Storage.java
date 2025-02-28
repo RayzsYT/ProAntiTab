@@ -191,7 +191,6 @@ public class Storage {
                         break;
                     }
 
-                System.out.println("Result: " + result);
                 return result;
             }
         }
