@@ -11,6 +11,7 @@
 # Here's a small overview of all placeholders:
 
 # Some general Placeholders to work with:
+#   %pat_general_prefix%                    = Get the PAT prefix set in the config.yml.
 #   %pat_general_user%                      = Get the name of the user who receives this message.
 #   %pat_general_version_current%           = Get current version name of PAT.
 #   %pat_general_version_newest%            = Get newest version name of PAT.
