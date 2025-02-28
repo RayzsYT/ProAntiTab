@@ -125,6 +125,7 @@ public class CommunicationPackets {
         private final GroupsPacket groupsPacket;
         private final UnknownCommandPacket unknownCommandPacket;
         private final NamespaceCommandsPacket namespaceCommandsPacket;
+        private final BlockedMessagePacket blockedMessagePacket;
         private final String proxyToken, serverId;
         private final boolean velocity;
 
@@ -135,6 +136,7 @@ public class CommunicationPackets {
             this.groupsPacket = groupsPacket;
             this.unknownCommandPacket = new UnknownCommandPacket();
             this.namespaceCommandsPacket = new NamespaceCommandsPacket();
+            this.blockedMessagePacket = new BlockedMessagePacket();
             this.velocity = Reflection.isVelocityServer();
         }
 
@@ -164,9 +166,32 @@ public class CommunicationPackets {
 
         public UnknownCommandPacket getUnknownCommandPacket() { return unknownCommandPacket; }
 
+        public BlockedMessagePacket getBlockedMessagePacket() {
+            return blockedMessagePacket;
+        }
+
         public NamespaceCommandsPacket getNamespaceCommandsPacket() {
             return namespaceCommandsPacket;
         }
+    }
+
+    public static class BlockedMessagePacket implements Serializable {
+
+        private final MultipleMessagesHelper baseBlockedMessage, subBlockedMessage;
+
+        public BlockedMessagePacket() {
+            baseBlockedMessage = Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE;
+            subBlockedMessage = Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE;
+        }
+
+        public MultipleMessagesHelper getBaseBlockedMessage() {
+            return baseBlockedMessage;
+        }
+
+        public MultipleMessagesHelper getSubBlockedMessage() {
+            return subBlockedMessage;
+        }
+
     }
 
     public static class NamespaceCommandsPacket implements Serializable {

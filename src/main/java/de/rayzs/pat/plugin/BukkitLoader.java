@@ -184,30 +184,35 @@ public class BukkitLoader extends JavaPlugin {
     public static void synchronize(CommunicationPackets.PacketBundle packetBundle) {
         Storage.LAST_SYNC = System.currentTimeMillis();
         Communicator.sendFeedback();
+
         CommunicationPackets.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
+        CommunicationPackets.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
+        CommunicationPackets.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
+        CommunicationPackets.NamespaceCommandsPacket namespaceCommandsPacket = packetBundle.getNamespaceCommandsPacket();
+        CommunicationPackets.BlockedMessagePacket blockedMessagePacket = packetBundle.getBlockedMessagePacket();
 
-        if(!Storage.USE_VELOCITY) {
-            CommunicationPackets.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
-            CommunicationPackets.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
-            CommunicationPackets.NamespaceCommandsPacket namespaceCommandsPacket = packetBundle.getNamespaceCommandsPacket();
+        if(!blockedMessagePacket.getBaseBlockedMessage().getLines().isEmpty())
+            Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE = blockedMessagePacket.getBaseBlockedMessage();
 
-            if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED != namespaceCommandsPacket.isEnabled())
-                Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED = namespaceCommandsPacket.isEnabled();
+        if(!blockedMessagePacket.getSubBlockedMessage().getLines().isEmpty())
+            Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE = blockedMessagePacket.getSubBlockedMessage();
 
-            if (commandsPacket.getCommands() == null || commandsPacket.getCommands().isEmpty())
-                Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
+        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED != namespaceCommandsPacket.isEnabled())
+            Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED = namespaceCommandsPacket.isEnabled();
 
-            else if (!ArrayUtils.compareStringArrays(Storage.Blacklist.getBlacklist().getCommands(), commandsPacket.getCommands())) {
-                if(Reflection.getMinor() >= 13) BukkitAntiTabListener.setChangeStatus();
-                Storage.Blacklist.getBlacklist().setList(commandsPacket.getCommands());
-            }
+        if (commandsPacket.getCommands() == null || commandsPacket.getCommands().isEmpty())
+            Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
 
-            if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != commandsPacket.turnBlacklistToWhitelistEnabled())
-                Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = commandsPacket.turnBlacklistToWhitelistEnabled();
-
-            GroupManager.clearAllGroups();
-            groupsPacket.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getPriority(), group.getCommands()));
+        else if (!ArrayUtils.compareStringArrays(Storage.Blacklist.getBlacklist().getCommands(), commandsPacket.getCommands())) {
+            if (!Storage.USE_VELOCITY && Reflection.getMinor() >= 13) BukkitAntiTabListener.setChangeStatus();
+            Storage.Blacklist.getBlacklist().setList(commandsPacket.getCommands());
         }
+
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != commandsPacket.turnBlacklistToWhitelistEnabled())
+            Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = commandsPacket.turnBlacklistToWhitelistEnabled();
+
+        GroupManager.clearAllGroups();
+        groupsPacket.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getPriority(), group.getCommands()));
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
         if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
