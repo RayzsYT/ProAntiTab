@@ -264,16 +264,18 @@ public class BukkitLoader extends JavaPlugin {
         for (String command : commandsMap.keySet()) if(!result.contains(command)) result.add(command);
 
         if(Reflection.getMinor() == 20 && Reflection.getRelease() >= 5 || Reflection.getMinor() >= 21)
-            for (String s : commandsMap.keySet())
-                    if (commandsMap.containsKey(s)) {
-                        if(!commandsMap.get(s).getAliases().isEmpty()) {
-                            for (String alias : commandsMap.get(s).getAliases())
-                                if (!result.contains(alias)) result.add(alias);
+            for (String s : commandsMap.keySet()) {
+                if (commandsMap.containsKey(s)) {
+                    if (!commandsMap.get(s).getAliases().isEmpty()) {
+                        for (String alias : commandsMap.get(s).getAliases()) {
+                            if (!result.contains(alias)) result.add(alias);
+                        }
 
-                        } else if(Bukkit.getServer().getCommandAliases().get(s) != null)
-                            for (String alias : Bukkit.getServer().getCommandAliases().get(s))
-                                if (!result.contains(alias)) result.add(alias);
-                    }
+                    } else if (Bukkit.getServer().getCommandAliases().get(s) != null)
+                        for (String alias : Bukkit.getServer().getCommandAliases().get(s))
+                            if (!result.contains(alias)) result.add(alias);
+                }
+            }
 
         return result;
     }

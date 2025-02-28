@@ -23,8 +23,11 @@ public class BukkitBlockCommandListener implements Listener {
         String rawCommand = StringUtils.getFirstArg(event.getMessage()), command =  StringUtils.replaceFirst(rawCommand, "/", "");
 
         if(!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled()) return;
-        if(BukkitLoader.doesCommandExist(command, false)) return;
-        if(Bukkit.getHelpMap().getHelpTopic(rawCommand) != null) return;
+
+        if (Bukkit.getCommandMap().getCommand(command) != null) return;
+        if (BukkitLoader.doesCommandExist(command, false)) return;
+
+        if (Bukkit.getHelpMap().getHelpTopic(rawCommand) != null) return;
 
         event.setCancelled(true);
         MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE, "%command%", command, "%world%", world.getName());
