@@ -1,11 +1,6 @@
 global:
   commands:
     - hub
-    - pl
-    - plugins
-    - ver
-    - version
-    - icanhasbukkit
   ignored-servers:
     - auth-*
   servers:

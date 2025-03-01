@@ -1,10 +1,6 @@
 global:
   commands:
-    - pl
-    - plugins
-    - ver
-    - version
-    - icanhasbukkit
+    - spawn
 groups:
   examplegroup:
     priority: 1
