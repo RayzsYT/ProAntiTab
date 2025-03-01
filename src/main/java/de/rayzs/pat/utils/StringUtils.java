@@ -166,6 +166,9 @@ public class StringUtils {
     }
 
     public static String buildStringList(List<String> list) {
+
+        if (list == null) return null;
+
         StringBuilder builder = new StringBuilder();
         boolean end;
 
