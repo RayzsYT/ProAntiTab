@@ -11,6 +11,7 @@ public class UnknownCommandPlaceholder extends PlaceholderStorage {
 
     @Override
     public String onRequest(Player player, String param) {
+        if (Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE == null) return null;
         return StringUtils.buildStringList(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE.getLines());
     }
 }

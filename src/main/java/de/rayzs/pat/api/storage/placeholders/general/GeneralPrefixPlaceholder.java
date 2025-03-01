@@ -10,6 +10,7 @@ public class GeneralPrefixPlaceholder extends PlaceholderStorage {
 
     @Override
     public String onRequest(Player player, String param) {
+        if (Storage.ConfigSections.Messages.PREFIX == null) return null;
         return Storage.ConfigSections.Messages.PREFIX.PREFIX;
     }
 }
