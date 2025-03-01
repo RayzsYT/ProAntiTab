@@ -37,6 +37,7 @@ id = "proantitab",
 version = "1.9.2",
 authors = "Rayzs_YT",
 description = "Hide more than just your plugins. Hide almost everything!",
+url = "https://www.rayzs.de/products/proantitab/page",
 dependencies = {
         @Dependency(id = "luckperms", optional = true),
         @Dependency(id = "papiproxybridge", optional = true)

@@ -1,10 +1,10 @@
 name: ProAntiTab
 description: Hide more than just your plugins. Hide almost everything!
+website: https://www.rayzs.de/products/proantitab/page
+wiki: https://wiki.rayzs.de/proantitab
 
 author: Rayzs_YT
 version: 1.9.2
 main: de.rayzs.pat.plugin.BungeeLoader
 
-softDepends:
-  - LuckPerms
-  - PAPIProxyBridge
+softDepends: [LuckPerms, PAPIProxyBridge]
