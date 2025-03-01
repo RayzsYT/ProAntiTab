@@ -11,6 +11,7 @@ import de.rayzs.pat.api.storage.placeholders.messages.UnknownCommandPlaceholder;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.placeholders.general.*;
 import de.rayzs.pat.api.storage.placeholders.groups.*;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
@@ -179,19 +180,25 @@ public class Storage {
             public static String findAndReplace(Player player, String request) {
                 String result = null, param = "";
 
-                if(USE_PLACEHOLDERAPI)
+                if(USE_PLACEHOLDERAPI) {
                     for (PlaceholderStorage storage : PLACEHOLDERS) {
-                        if(!storage.getRequest().startsWith(request)) continue;
+                        if (!storage.getRequest().startsWith(request)) continue;
 
-                        if(storage.getRequest().endsWith("group_") && request.contains("group_"))
+                        if (storage.getRequest().endsWith("group_") && request.contains("group_"))
                             param = request.split("group_")[1];
 
                         result = storage.onRequest(player, param);
-                        if(result == null) continue;
+                        if (result == null) continue;
                         else result = result.replace("\\n", "\n");
 
                         break;
                     }
+
+                    // Second times because of nested placeholders
+                    if (result != null && result.contains("%")) {
+                        result = PlaceholderReplacer.replace(player, result);
+                    }
+                }
 
                 return result;
             }
