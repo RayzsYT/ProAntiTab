@@ -118,7 +118,7 @@ public class MessageTranslator {
         text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "")
                 .replace("&", "§")
                 .replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX)
-                .replace("%pat_prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX)
+                .replace("%pat_general_prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX)
                 .replace("%token%", Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || Reflection.isProxyServer() ? Storage.TOKEN : "/")
                 .replace("%sync_server_name%", Storage.SERVER_NAME == null ? "/" : Storage.SERVER_NAME)
                 .replace("%current_version%", Storage.CURRENT_VERSION)
