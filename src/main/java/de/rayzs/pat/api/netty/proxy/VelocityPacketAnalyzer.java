@@ -10,6 +10,7 @@ import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityBlockCommandListener;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.node.CommandNodeHelper;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.proxy.protocol.packet.*;
@@ -179,6 +180,7 @@ public class VelocityPacketAnalyzer {
                 }
 
             } else if(packet instanceof TabCompleteResponsePacket) {
+
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
 
@@ -227,6 +229,7 @@ public class VelocityPacketAnalyzer {
                 }
 
             } else if(packet instanceof AvailableCommandsPacket) {
+
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     AvailableCommandsPacket commands = (AvailableCommandsPacket) packet;
 
@@ -254,7 +257,15 @@ public class VelocityPacketAnalyzer {
                             return;
                         }
 
-                        commands.getRootNode().getChildren().removeIf(command -> command == null || command.getName() == null || playerCommands.contains(command.getName()));
+                       commands.getRootNode().getChildren().removeIf(command -> {
+                            if (command == null || command.getName() == null)
+                                return true;
+
+                            if (command.getName().equals("args"))
+                                return false;
+
+                            return playerCommands.contains(command.getName());
+                        });
                     }
                 }
             }

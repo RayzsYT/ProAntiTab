@@ -48,16 +48,26 @@ public class VelocityAntiTabListener {
 
         if(PermissionUtil.hasBypassPermission(player)) return;
 
-        final boolean newer = player.getProtocolVersion().getProtocol() > 340;
+        final boolean newer = player.getProtocolVersion().getProtocol() > 340, argsChildrenExist = event.getRootNode().getChild("args") != null;
         final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
 
         if(event.getRootNode().getChildren().size() == 1 && newer
-                && event.getRootNode().getChild("args") != null
-                && event.getRootNode().getChild("args").getChildren().isEmpty())
+                && argsChildrenExist
+                && event.getRootNode().getChild("args").getChildren().isEmpty()) {
             return;
+        }
 
-        if(event.getRootNode().getChildren().size() == 1 && newer && event.getRootNode().getChild("args") != null) return;
-        event.getRootNode().getChildren().removeIf(command -> command == null || command.getName() == null || playerCommands.contains(command.getName()));
+        if(event.getRootNode().getChildren().size() == 1 && newer && argsChildrenExist) return;
+
+        event.getRootNode().getChildren().removeIf(command -> {
+            if (command == null || command.getName() == null)
+                return true;
+
+            if (command.getName().equals("args"))
+                return false;
+
+            return playerCommands.contains(command.getName());
+        });
     }
 
     public static void updateCommands() {
