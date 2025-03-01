@@ -189,13 +189,16 @@ public class BukkitLoader extends JavaPlugin {
         CommunicationPackets.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
         CommunicationPackets.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
         CommunicationPackets.NamespaceCommandsPacket namespaceCommandsPacket = packetBundle.getNamespaceCommandsPacket();
-        CommunicationPackets.BlockedMessagePacket blockedMessagePacket = packetBundle.getBlockedMessagePacket();
+        CommunicationPackets.MessagePacket messagePacket = packetBundle.getMessagePacket();
 
-        if(!blockedMessagePacket.getBaseBlockedMessage().getLines().isEmpty())
-            Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE = blockedMessagePacket.getBaseBlockedMessage();
+        if(!messagePacket.getBaseBlockedMessage().getLines().isEmpty())
+            Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE = messagePacket.getBaseBlockedMessage();
 
-        if(!blockedMessagePacket.getSubBlockedMessage().getLines().isEmpty())
-            Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE = blockedMessagePacket.getSubBlockedMessage();
+        if(!messagePacket.getSubBlockedMessage().getLines().isEmpty())
+            Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE = messagePacket.getSubBlockedMessage();
+
+        if(!messagePacket.getPrefix().isEmpty())
+            Storage.ConfigSections.Messages.PREFIX.PREFIX = messagePacket.getPrefix();
 
         if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED != namespaceCommandsPacket.isEnabled())
             Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED = namespaceCommandsPacket.isEnabled();
