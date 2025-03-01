@@ -25,7 +25,7 @@ public class ListGroupsPlaceholder extends PlaceholderStorage {
     @Override
     public void load() {
         super.load();
-        SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7-> ").getOrSet();
-        COMMAND = new ConfigSectionHelper<String>(this, "group", "&f%group%\\n").getOrSet();
+        SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7, ").getOrSet();
+        COMMAND = new ConfigSectionHelper<String>(this, "group", "&e%group%").getOrSet();
     }
 }

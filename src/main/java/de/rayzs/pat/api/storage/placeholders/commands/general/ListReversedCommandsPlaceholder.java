@@ -26,7 +26,7 @@ public class ListReversedCommandsPlaceholder extends PlaceholderStorage {
     @Override
     public void load() {
         super.load();
-        SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7-> ").getOrSet();
-        COMMAND = new ConfigSectionHelper<String>(this, "command", "&f%command%\\n").getOrSet();
+        SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7, ").getOrSet();
+        COMMAND = new ConfigSectionHelper<String>(this, "command", "&f%command%").getOrSet();
     }
 }
