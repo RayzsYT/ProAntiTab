@@ -51,8 +51,8 @@ public class VelocityAntiTabListener {
         final boolean newer = player.getProtocolVersion().getProtocol() > 340, argsChildrenExist = event.getRootNode().getChild("args") != null;
         final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
 
-        if(event.getRootNode().getChildren().size() == 1 && newer
-                && argsChildrenExist
+        if(event.getRootNode().getChildren().size() == 1
+                && newer && argsChildrenExist
                 && event.getRootNode().getChild("args").getChildren().isEmpty()) {
             return;
         }
