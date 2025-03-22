@@ -45,7 +45,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
             }
 
             cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-            if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
+            if (!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
         } else return true;
 
         for (Field field : Reflection.getFields(packetObj)) {
@@ -58,6 +58,8 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
 
             String tempName;
 
+            boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player);
+
             if(spaces == 0) {
                 for (String s : tR) {
                     if(!BukkitLoader.isLoaded()) continue;
@@ -67,6 +69,9 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
                     }
 
                     tempName = s.replaceFirst("/", "");
+
+                    if (!doesBypassNamespace && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(tempName))
+                        continue;
 
                     if (!Storage.Blacklist.isBlocked(player, tempName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
                         newResultList.add(s);
