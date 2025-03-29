@@ -1,8 +1,5 @@
 package de.rayzs.pat.api.netty.proxy;
 
-import com.mojang.brigadier.tree.CommandNode;
-import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.proxy.crypto.SignedChatCommand;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.packet.chat.session.UnsignedPlayerCommandPacket;
 import de.rayzs.pat.api.brand.CustomServerBrand;
@@ -10,7 +7,6 @@ import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityBlockCommandListener;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.node.CommandNodeHelper;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.proxy.protocol.packet.*;
@@ -171,7 +167,7 @@ public class VelocityPacketAnalyzer {
 
             MinecraftPacket packet = (MinecraftPacket) msg;
 
-            if(packet instanceof PluginMessagePacket) {
+            if (packet instanceof PluginMessagePacket) {
                 PluginMessagePacket pluginMessagePacket = (PluginMessagePacket) packet;
                 if(CustomServerBrand.isEnabled() && CustomServerBrand.isBrandTag(pluginMessagePacket.getChannel()) && !player.getCurrentServer().isPresent()) {
                     PacketUtils.BrandManipulate brandManipulatePacket = CustomServerBrand.createBrandPacket(player);
@@ -179,7 +175,7 @@ public class VelocityPacketAnalyzer {
                     return;
                 }
 
-            } else if(packet instanceof TabCompleteResponsePacket) {
+            } else if (packet instanceof TabCompleteResponsePacket) {
 
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
@@ -201,12 +197,12 @@ public class VelocityPacketAnalyzer {
 
                     final String cursor = playerInput;
 
-                    if(!cursor.startsWith("/") && spaces < 2 && player.getProtocolVersion().getProtocol() >= 754) {
+                    if (!cursor.startsWith("/") && spaces < 2 && player.getProtocolVersion().getProtocol() >= 754) {
                         Logger.debug("Player won't receive TabCompleteResponsePacket because the client protocol id is " + player.getProtocolVersion().getProtocol() + "! This doesn't makes sense, that's why.");
                         return;
                     }
 
-                    if(cursor.startsWith("/")) {
+                    if (cursor.startsWith("/")) {
                         if (spaces == 0) {
                             response.getOffers().removeIf(offer -> {
                                 String command = offer.getText();
