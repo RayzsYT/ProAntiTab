@@ -4,7 +4,7 @@ import de.rayzs.pat.plugin.logger.Logger;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.BungeeLoader;
+import de.rayzs.pat.plugin.*;
 import net.md_5.bungee.event.*;
 import net.md_5.bungee.api.*;
 
