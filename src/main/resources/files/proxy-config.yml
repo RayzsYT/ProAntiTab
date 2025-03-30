@@ -48,12 +48,28 @@ custom-protocol-ping:
   # false: Use the default max-players count.
   use-as-maxplayers: false
 
+  # Enabling this option hides the list of players on your server,
+  # when you hover over the player count.
+  hide-players: true
+
   # The displayed protocol message
   # Available placeholders:
   # %online%            - current online player count
   # %online_extended%   - manipulated online player count
   # %max%               - max player count
   protocol: '&f&lProAntiTab &7(&a%online%&7/&c%max%&7)'
+
+  # The displayed message when you hover over the player count.
+  custom-playerlist:
+    enabled: false
+
+    # Available placeholders:
+    # %players%           - list of players
+    # %online%            - current online player count
+    # %max%               - max player count
+    list:
+        - '&8> &7Online players: &a%online%&7/&2%max%'
+        - '&8> &7Using &fProAntiTab'
 
 # This feature allows you to create your own 'Unknown command.' message.
 # It is very helpful considering the fact you might have to set the same message

@@ -66,7 +66,21 @@ custom-protocol-ping:
   # %online%            - current online player count
   # %online_extended%   - manipulated online player count
   # %max%               - max player count
+  # ... and all the other placeholders from PlaceholderAPI
   protocol: '&f&lProAntiTab &7(&a%online%&7/&c%max%&7)'
+
+  # The displayed message when you hover over the player count.
+  custom-playerlist:
+    enabled: false
+
+    # Available placeholders:
+    # %players%           - list of players
+    # %online%            - current online player count
+    # %max%               - max player count
+    # ... and all the other placeholders from PlaceholderAPI
+    list:
+      - '&8> &7Online players: &a%online%&7/&2%max%'
+      - '&8> &7Using &fProAntiTab'
 
 #>> HTP (Sync)
 # This feature allows you to create your own 'Unknown command.' message.

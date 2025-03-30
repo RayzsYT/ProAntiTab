@@ -5,26 +5,55 @@ import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.event.Subscribe;
 import de.rayzs.pat.api.storage.Storage;
+import java.util.UUID;
 
 public class VelocityPingListener {
 
     private static ProxyServer server;
+    private static final UUID RANDOM_UUID = UUID.randomUUID();
 
     public VelocityPingListener(ProxyServer server) {
         VelocityPingListener.server = server;
     }
 
     @Subscribe
-    public void onProxyPing(ProxyPingEvent event) {
-        if(!Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ENABLED) return;
+    public void onProxyPingS(ProxyPingEvent event) {
+        if (!Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ENABLED) return;
+
+        ServerPing oldPing = event.getPing();
+        ServerPing.Builder builder = oldPing.asBuilder();
 
         int online = server.getPlayerCount(),
-                onlineExtend = online + Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.EXTEND_COUNT,
-                max = server.getConfiguration().getShowMaxPlayers();
-        ServerPing oldServerPing = event.getPing(), newServerPing;
-        ServerPing.Version newVersion = new ServerPing.Version(!Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ALWAYS_SHOW ? oldServerPing.getVersion().getProtocol() : -1, Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PROTOCOL.replace("%online_extended%", String.valueOf(onlineExtend)).replace("%online%", String.valueOf(online)).replace("%max%", String.valueOf(max)));
-        newServerPing = oldServerPing.asBuilder().version(newVersion).build();
+                max = server.getConfiguration().getShowMaxPlayers(),
+                protocol = Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ALWAYS_SHOW ? -1 : oldPing.getVersion().getProtocol(),
+                extend = online + Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.EXTEND_COUNT;
 
-        event.setPing(newServerPing);
+
+        builder.version(new ServerPing.Version(protocol,
+                replaceString(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PROTOCOL, online, extend, max))
+        );
+
+        if (Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_EXTEND_AS_MAX_COUNT)
+            builder.maximumPlayers(extend);
+
+        if (Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.HIDE_PLAYERS)
+            builder.clearSamplePlayers();
+        else if (Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_CUSTOM_PLAYERLIST) {
+            builder.clearSamplePlayers();
+            Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines().forEach(line ->
+                    builder.samplePlayers(new ServerPing.SamplePlayer(replaceString(line, online, extend, max), RANDOM_UUID))
+            );
+        }
+
+        event.setPing(builder.build());
+    }
+
+
+    private String replaceString(String string, int online, int onlineExtend, int max) {
+        return string
+                .replace("&", "§")
+                .replace("%online_extended%", String.valueOf(onlineExtend))
+                .replace("%online%", String.valueOf(online))
+                .replace("%max%", String.valueOf(max));
     }
 }
