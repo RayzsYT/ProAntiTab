@@ -46,10 +46,16 @@ public class Argument {
             return ARGUMENT_STACKS.get(entry.getKey()).getResult(input);
         }
 
+        /* Experimental for removal until proven useless in the end.
+         * Will miss ya good old code ;c
         for (Map.Entry<String, ArgumentStack> entry : ARGUMENT_STACKS.entrySet()) {
+
+            System.out.println("Entry: " + entry.getKey() + " - " + entry.getKey());
+
             if(!entry.getKey().startsWith(firstInputArg)) continue;
             return ARGUMENT_STACKS.get(entry.getKey()).getResult(input);
         }
+         */
 
         return Collections.emptyList();
     }
