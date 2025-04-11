@@ -1,3 +1,5 @@
+disabled-servers:
+  - server-with-no-pat
 global:
   commands:
     - hub
