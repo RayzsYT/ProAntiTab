@@ -24,6 +24,10 @@ public class OldBukkitAction implements Action {
     public void executeConsoleCommand(String action, UUID uuid, String command) {
         Player player = Bukkit.getPlayer(uuid);
         if(player != null) command = command.replace("%player%", player.getName());
+
+        if (command.contains("%"))
+            command = PlaceholderReplacer.replace(player, command);
+
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 
