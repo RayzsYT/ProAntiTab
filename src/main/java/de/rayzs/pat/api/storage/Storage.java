@@ -210,6 +210,7 @@ public class Storage {
         private static final HashMap<String, GeneralBlacklist> SERVER_BLACKLISTS = new HashMap<>();
         private static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
         private static final IgnoredServersStorage IGNORED_SERVERS = new GeneralIgnoredServers();
+        private static final DisabledServersStorage DISABLED_SERVERS = new DisabledServersStorage();
         private static final ExpireCache<String, List<GeneralBlacklist>> CACHED_SERVER_BLACKLIST = new ExpireCache<>(1, TimeUnit.HOURS);
 
         public static void loadAll() {
@@ -218,12 +219,19 @@ public class Storage {
             BLACKLIST.load();
 
             if(!Reflection.isProxyServer()) return;
+
             IGNORED_SERVERS.load();
+            DISABLED_SERVERS.load();
+
             BLACKLIST.getConfig().getKeys("global.servers", true).forEach(key -> {
                 GeneralBlacklist blacklist = BlacklistCreator.createGeneralBlacklist(key);
                 blacklist.load();
                 SERVER_BLACKLISTS.put(key, blacklist);
             });
+        }
+
+        public static boolean isDisabledServer(String server) {
+            return DISABLED_SERVERS.isListed(server);
         }
 
         public static boolean isOnIgnoredServer(String server) {

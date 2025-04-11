@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.listeners.velocity;
 
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
+import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.event.PATEventHandler;
@@ -23,6 +24,20 @@ public class VelocityAntiTabListener {
     @Subscribe (order = PostOrder.LAST)
     public void onTabComplete(TabCompleteEvent event) {
         Player player = event.getPlayer();
+
+        if (player.getCurrentServer().isPresent()) {
+
+            ServerInfo serverInfo = player.getCurrentServer().get().getServerInfo();
+            if (serverInfo != null) {
+                String serverName = serverInfo.getName();
+
+                if (Storage.Blacklist.isDisabledServer(serverName))
+                    return;
+
+            }
+
+        }
+
         if(PermissionUtil.hasBypassPermission(player) || event.getSuggestions().isEmpty() || !player.getCurrentServer().isPresent()) return;
 
         event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName()));

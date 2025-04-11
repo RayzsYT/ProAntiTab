@@ -3,6 +3,7 @@ package de.rayzs.pat.plugin.listeners.bungee;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.md_5.bungee.api.plugin.Listener;
@@ -17,6 +18,13 @@ public class BungeeAntiTabListener implements Listener {
         if(!(event.getSender() instanceof ProxiedPlayer)) return;
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
+
+        ServerInfo serverInfo = player.getServer().getInfo();
+        String serverName = serverInfo.getName();
+
+        if (Storage.Blacklist.isDisabledServer(serverName))
+            return;
+
         if(PermissionUtil.hasBypassPermission(player)) return;
         if(Storage.Blacklist.isBlocked(player, event.getCursor(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName()))
             event.getSuggestions().clear();
@@ -24,9 +32,17 @@ public class BungeeAntiTabListener implements Listener {
 
     @EventHandler
     public void onTabComplete(TabCompleteResponseEvent event) {
-        if (!(event.getSender() instanceof ProxiedPlayer)) return;
+        if (!(event.getSender() instanceof ProxiedPlayer))
+            return;
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
+
+        ServerInfo serverInfo = player.getServer().getInfo();
+        String serverName = serverInfo.getName();
+
+        if (Storage.Blacklist.isDisabledServer(serverName))
+            return;
+
         if(PermissionUtil.hasBypassPermission(player)) return;
 
         event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName()));

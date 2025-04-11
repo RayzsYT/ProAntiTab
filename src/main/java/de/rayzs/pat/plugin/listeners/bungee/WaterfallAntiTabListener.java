@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.listeners.bungee;
 
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
+import de.rayzs.pat.api.storage.Storage;
 import io.github.waterfallmc.waterfall.event.ProxyDefineCommandsEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -23,6 +24,9 @@ public class WaterfallAntiTabListener implements Listener {
 
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
         String serverName = player.getServer().getInfo().getName();
+
+        if (Storage.Blacklist.isDisabledServer(serverName))
+            return;
 
         if(!COMMANDS_CACHE_MAP.containsKey(serverName))
             COMMANDS_CACHE_MAP.put(serverName, new CommandsCache().reverse());

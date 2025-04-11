@@ -37,6 +37,10 @@ public class BungeeBlockCommandListener implements Listener {
         if(rawCommand.equals("/")) return;
         ServerInfo serverInfo = player.getServer().getInfo();
         String serverName = serverInfo != null ? serverInfo.getName() : "unknown";
+
+        if (Storage.Blacklist.isDisabledServer(serverName))
+            return;
+
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%server%", serverName);
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {

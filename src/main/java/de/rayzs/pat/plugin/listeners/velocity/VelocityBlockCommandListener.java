@@ -33,6 +33,9 @@ public class VelocityBlockCommandListener {
         String rawCommand = event.getCommand(), command = rawCommand,
                 serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown";
 
+        if (Storage.Blacklist.isDisabledServer(serverName))
+            return;
+
         command = StringUtils.replaceFirst(command, "/", "");
         command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
