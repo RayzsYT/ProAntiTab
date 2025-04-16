@@ -76,7 +76,7 @@ public class VelocityBlockCommandListener {
         boolean listed, serverListed, ignored;
 
         if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(Storage.Blacklist.doesGroupBypass(player, command, false, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
+            if(Storage.Blacklist.doesGroupBypass(player, command, false, true, false, serverName)) {
                 ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
                 if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
                 return;
@@ -113,7 +113,7 @@ public class VelocityBlockCommandListener {
             return;
         }
 
-        if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, player.getCurrentServer().get().getServerInfo().getName())) {
+        if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
             if(executeCommandEvent.isBlocked()) event.setResult(CommandExecuteEvent.CommandResult.denied());
             return;
@@ -167,7 +167,9 @@ public class VelocityBlockCommandListener {
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
                 MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), notificationMessage);
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage));
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> {
+                MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage);
+            });
 
             return blocked;
         }
@@ -181,7 +183,10 @@ public class VelocityBlockCommandListener {
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
                 MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), notificationMessage);
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage));
+
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> {
+                MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage);
+            });
 
             return blocked;
         }
@@ -224,7 +229,10 @@ public class VelocityBlockCommandListener {
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
                 MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), notificationMessage);
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage));
+
+            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> {
+                MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage);
+            });
 
             return blocked;
         }
@@ -256,7 +264,9 @@ public class VelocityBlockCommandListener {
 
         if (Storage.SEND_CONSOLE_NOTIFICATION)
             MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), notificationMessage);
-        Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage));
+        Storage.NOTIFY_PLAYERS.stream().filter(uuid -> VelocityLoader.getServer().getPlayer(uuid).isPresent()).forEach(uuid -> {
+            MessageTranslator.send(VelocityLoader.getServer().getPlayer(uuid).get(), notificationMessage);
+        });
         return blocked;
     }
 }
