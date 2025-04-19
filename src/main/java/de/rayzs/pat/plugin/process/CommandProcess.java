@@ -34,9 +34,11 @@ public class CommandProcess {
         Group group;
         boolean bool, backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
 
-        if(!PermissionUtil.hasPermissionWithResponse(sender, "use")) return;
+        if(!PermissionUtil.hasPermissionWithResponse(sender, "use"))
+            return;
 
-        for (String arg : args) if(arg.contains(".") || arg.contains("\"") || arg.contains("'")) return;
+        for (String arg : args) if(arg.contains(".") || arg.contains("\"") || arg.contains("'"))
+            return;
 
         try {
             switch (length) {
