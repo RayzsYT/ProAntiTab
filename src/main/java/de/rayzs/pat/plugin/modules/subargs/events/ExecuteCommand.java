@@ -3,6 +3,7 @@ package de.rayzs.pat.plugin.modules.subargs.events;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.subargs.*;
@@ -15,10 +16,8 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
         CommandSender sender = new CommandSender(event.getSenderObj());
 
-        /* Removed due to the fact that it is not required after all.
-        if(PermissionUtil.hasBypassPermission(event.getSenderObj(), command.contains(" ") ? command.split(" ")[0] : command))
+        if(PermissionUtil.hasBypassPermission(event.getSenderObj(), StringUtils.getFirstArg(command)))
             return;
-        */
 
         if(command.contains(" ") && shouldCommandBeBlocked(sender, event, command)) {
             event.setBlocked(true);
@@ -27,7 +26,8 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             return;
         }
 
-        if(!event.isBlocked()) return;
+        if(!event.isBlocked())
+            return;
 
         if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command))
             return;
