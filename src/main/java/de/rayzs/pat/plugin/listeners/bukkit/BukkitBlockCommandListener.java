@@ -25,9 +25,7 @@ public class BukkitBlockCommandListener implements Listener {
         if(!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled()) return;
 
         if (PermissionUtil.hasBypassPermission(player)) return;
-        if (Bukkit.getCommandMap().getCommand(command) != null) return;
         if (BukkitLoader.doesCommandExist(command, false)) return;
-
         if (Bukkit.getHelpMap().getHelpTopic(rawCommand) != null) return;
 
         event.setCancelled(true);
