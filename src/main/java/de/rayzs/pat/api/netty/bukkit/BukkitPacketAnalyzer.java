@@ -114,22 +114,28 @@ public class BukkitPacketAnalyzer {
         @Override
         public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
             try {
+
                 if(packetObj.getClass() != null)
                     if (!PermissionUtil.hasBypassPermission(player)) {
                         String packetName = packetObj.getClass().getSimpleName();
-                        if (packetName.equals("PacketPlayOutTabComplete") || packetName.equals("ClientboundCommandSuggestionsPacket")) {
 
-                            UUID uuid = player.getUniqueId();
+                        if (!packetName.equals("PacketPlayOutTabComplete") && !packetName.equals("ClientboundCommandSuggestionsPacket"))
+                            super.write(channel, packetObj, promise);
 
-                            if((packetName.equals("ClientboundCommandSuggestionsPacket") || Reflection.isFoliaServer()) && SENT_PACKET.contains(player.getUniqueId())) {
-                                Object newPacketObj = SENT_PACKET.get(uuid);
+                        UUID uuid = player.getUniqueId();
+                        Object sentPacketObj = SENT_PACKET.get(uuid);
+
+                        if (sentPacketObj != null) {
+                            if (sentPacketObj == packetObj) {
                                 SENT_PACKET.remove(uuid);
-                                super.write(channel, newPacketObj, promise);
+                                super.write(channel, sentPacketObj, promise);
                                 return;
                             }
-
-                            if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj)) return;
                         }
+
+                        if(!PACKET_HANDLER.handleOutgoingPacket(player, packetObj))
+                            return;
+
                     }
 
                 super.write(channel, packetObj, promise);

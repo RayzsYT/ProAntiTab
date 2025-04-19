@@ -15,9 +15,13 @@ import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ModernPacketHandler implements BukkitPacketHandler {
+
+    private static boolean modifiable = true;
 
     @Override
     public boolean handleIncomingPacket(Player player, Object packetObj) throws Exception {
@@ -43,7 +47,8 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         Object suggestionObj;
         String rawInput = BukkitPacketAnalyzer.getPlayerInput(player), input = rawInput;
-        if(input == null) return false;
+        if(input == null)
+            return false;
 
 
         boolean is121Packet = packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket"),
@@ -59,10 +64,12 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             }
 
             cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-            if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
+
+            if (!cancelsBeforeHand)
+                cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
         }
 
-        if(is121Packet || Reflection.isFoliaServer() && packetObj.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
+        if (is121Packet || Reflection.isFoliaServer() && packetObj.getClass().getSimpleName().equals("PacketPlayOutTabComplete")) {
             try {
                 Field suggestionsField = Reflection.getFieldsByTypeNormal(packetObj.getClass(), "List", Reflection.SearchOption.ENDS).get(0);
                 List<?> suggestionsTmp = (List<?>) suggestionsField.get(packetObj),
@@ -107,52 +114,122 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 }
 
                 if(!suggestions.isEmpty()) {
+
                     Object clientboundCommandSuggestionsPacketObj = clientboundCommandSuggestionsPacketClass
                             .getConstructor(int.class, int.class, int.class, List.class)
                             .newInstance(id, start, length, suggestions);
+
                     BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), clientboundCommandSuggestionsPacketObj);
                 }
 
                 return false;
 
-            } catch (Throwable throwable) { throwable.printStackTrace(); }
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+
             return !cancelsBeforeHand;
         }
+
 
         if (Reflection.getMinor() < 17) {
             Field suggestionsField = Reflection.getFieldsByType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
             if (suggestionsField == null) return false;
             suggestionObj = suggestionsField.get(packetObj);
         } else {
-            Method suggestionsMethod = Reflection.getMethodsByReturnType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
-            if (suggestionsMethod == null) return false;
+            List<Method> methods = Reflection.getMethodsByReturnType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS);
+
+            if (methods.isEmpty()) return false;
+            Method suggestionsMethod = methods.get(0);
+
+            if (suggestionsMethod == null)
+                return false;
+
             suggestionObj = suggestionsMethod.invoke(packetObj);
         }
 
         Suggestions suggestions = (Suggestions) suggestionObj;
 
-        if((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird()) return false;
+        if((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird()) {
+            return false;
+        }
+
         if(spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
             suggestions.getList().clear();
             return true;
         }
 
         if(spaces == 0) {
+
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
                 return Storage.Blacklist.isBlocked(player, command);
             });
+
             return true;
+
         } else {
             List<String> suggestionsAsString = new ArrayList<>();
             for (Suggestion suggestion : suggestions.getList())
                 suggestionsAsString.add(suggestion.getText());
 
             FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawInput, suggestionsAsString);
-            if(filteredTabCompletionEvent.isCancelled()) suggestions.getList().clear();
-            suggestions.getList().removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(suggestion.getText()));
-            return !suggestions.getList().isEmpty();
+
+            if (modifiable) {
+
+                try {
+
+                    if (filteredTabCompletionEvent.isCancelled())
+                        suggestions.getList().clear();
+                    else
+                        suggestions.getList().removeIf(suggestion -> !filteredTabCompletionEvent.getCompletion().contains(suggestion.getText()));
+
+                    return !suggestions.getList().isEmpty();
+
+                } catch (UnsupportedOperationException exception) {
+                    modifiable = false;
+                }
+            }
+
+            return handleUnmodifiableTabCompletion(player, packetObj, suggestions, filteredTabCompletionEvent);
         }
+    }
+
+    private boolean handleUnmodifiableTabCompletion(Player player, Object packetObj, Suggestions suggestions, FilteredTabCompletionEvent filteredTabCompletionEvent) {
+        List<Suggestion> filteredSuggestionsList = new ArrayList<>();
+
+        if (!filteredTabCompletionEvent.isCancelled())
+            for (Suggestion suggestion : suggestions.getList()) {
+                if (filteredTabCompletionEvent.getCompletion().contains(suggestion.getText())) {
+                    filteredSuggestionsList.add(suggestion);
+                }
+            }
+
+        Suggestions filteredSuggestions = new Suggestions(suggestions.getRange(), filteredSuggestionsList);
+
+        try {
+            int val = -1;
+
+            Method method = Reflection.getMethodByName(packetObj.getClass(), "e");
+            if (method != null) {
+                val = (int) method.invoke(packetObj);
+            }
+
+            if (val == -1) {
+                Logger.warning("Failed to read packet input!");
+                return false;
+            }
+
+            Object packet = Reflection.getConstructor(packetObj.getClass(), int.class, Suggestions.class)
+                    .newInstance(val, filteredSuggestions);
+
+            BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), packet);
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        return false;
     }
 
     private String getSuggestionFromEntry(Object suggestionObj) {
