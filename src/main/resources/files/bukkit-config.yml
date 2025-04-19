@@ -59,7 +59,7 @@ custom-protocol-ping:
 
   # Enabling this option hides the list of players on your server,
   # when you hover over the player count.
-  hide-players: true
+  hide-players: false
 
   # The displayed protocol message
   # Available placeholders:
@@ -71,7 +71,7 @@ custom-protocol-ping:
 
   # The displayed message when you hover over the player count.
   custom-playerlist:
-    enabled: false
+    enabled: true
 
     # Available placeholders:
     # %players%           - list of players
