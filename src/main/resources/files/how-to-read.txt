@@ -1,0 +1,44 @@
+Confused about the display of missing parts in the console?
+It's actually quite easy to read and I'll show you how its done! :D
+
+Let's take the for the following missing path:
+--> test-feature.enabled
+
+In the config.yml, this would look like this:
+
+
+test-feature:
+  enabled: true
+
+
+Now another example with something more fitting to your case:
+--> info.version.updated
+
+In the config.yml, this would look like this:
+
+info:
+  version:
+    updated: ...
+
+-----------------------------------------------------------------------
+
+Then what should I copy or how should I transfer the information from the one to the other config.yml?
+Well, it's actually quite easy. Just take a look on what is missing.
+If PAT says, something like this is missing:
+- test-feature.enabled
+- test-feature.message
+- test-feature.failed
+
+Then this basically just means, that the entire section for "test-feature" is missing.
+In other words, check the "comparable-config.yml" and look for the "test-feature" section.
+It would look like this:
+
+test-feature:
+  enabled: true
+  message: "Hello World"
+  failed: "Error ;c"
+
+Just copy the entire thing and paste it somewhere in the config.yml.
+Once you've reloaded the plugin then, using "/(b)pat reload", everything should work fine.
+
+If something went wrong, PAT will let you know! ^^
