@@ -17,6 +17,7 @@ public class ExpireList<T> {
 
     public boolean add(T t) {
         if(contains(t)) return false;
+
         cache.put(t, (byte) 0);
         return true;
     }

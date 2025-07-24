@@ -1,5 +1,7 @@
 package de.rayzs.pat.utils;
 
+import de.rayzs.pat.plugin.logger.Logger;
+
 import java.util.*;
 import java.net.*;
 
@@ -61,8 +63,9 @@ public class ConnectionBuilder {
             response = builder.toString().replace("\\ ", "");
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Could not reach plugin page! More information below. (" + exception + ")");
         }
+
         return this;
     }
 

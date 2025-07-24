@@ -1,7 +1,7 @@
 package de.rayzs.pat.plugin.modules.subargs;
 
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
-import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.node.CommandNodeHelper;
 import de.rayzs.pat.plugin.modules.subargs.events.*;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.api.event.PATEventHandler;
@@ -15,8 +15,8 @@ import java.util.*;
 
 public class SubArgsModule {
 
-    public static List<String> GENERAL_LIST, BLOCKED_MESSAGE, PLAYER_NAMES;
-    public static HashMap<UUID, Argument> PLAYER_COMMANDS = new HashMap<>();
+    public static List<String> GENERAL_LIST, BLOCKED_MESSAGE, PLAYER_NAMES, ONLINE_PLAYERS;
+    public static HashMap<UUID, Arguments> PLAYER_COMMANDS = new HashMap<>();
 
     public static void initialize() {
         updateList();
@@ -33,22 +33,24 @@ public class SubArgsModule {
     }
 
     public static void updatePlayerNames() {
-        PLAYER_NAMES = Reflection.isProxyServer()
-                ? Reflection.isVelocityServer()
-                ? VelocityLoader.getPlayerNames()
-                : BungeeLoader.getPlayerNames()
-                : BukkitLoader.getPlayerNames();
+        PLAYER_NAMES = Storage.getLoader().getPlayerNames();
+        ONLINE_PLAYERS = Storage.getLoader().getOnlinePlayerNames();
     }
 
     public static List<String> getPlayerNames() {
         return PLAYER_NAMES;
     }
 
+    public static List<String> getOnlinePlayerNames() {
+        return ONLINE_PLAYERS;
+    }
+
     public static void updateList() {
         GENERAL_LIST = Storage.Blacklist.getBlacklist().getCommands().stream().filter(command -> command.contains(" ")).collect(Collectors.toList());
 
-        Argument.clearArguments();
-        GENERAL_LIST.forEach(Argument::buildArguments);
+        Arguments.ARGUMENTS.clearArguments();
+
+        GENERAL_LIST.forEach(command -> Arguments.ARGUMENTS.buildArgumentStacks(command));
         SubArgsModule.PLAYER_COMMANDS = new HashMap<>();
     }
 
@@ -57,14 +59,38 @@ public class SubArgsModule {
         ResponseHandler.update();
     }
 
+    public static void handleCommandNode(UUID uuid, CommandNodeHelper helper) {
+        if (!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+            return;
+
+        Arguments arguments = PLAYER_COMMANDS.get(uuid);
+        if (arguments == null) {
+            return;
+        }
+
+        ArgumentSource source = arguments.TAB_ARGUMENTS;
+        if (source == null) return;
+
+        List<String> inputs = source.getAllInputs().stream().filter(str -> !str.contains("%")).toList();
+        List<String> allEntries = inputs.stream().map(StringUtils::getFirstArg).toList();
+
+        helper.removeIf(allEntries::contains);
+        inputs.forEach(helper::add);
+    }
+
     public static List<String> getServerCommands(UUID uuid) {
-        List<String> commands = new ArrayList<>();
-        if(!Reflection.isProxyServer()) return commands;
+        return getServerCommands(Storage.getLoader().getPlayerServerName(uuid));
+    }
 
-        String serverName = Reflection.isVelocityServer() ? VelocityLoader.getServerNameByPlayerUUID(uuid) : BungeeLoader.getServerNameByPlayerUUID(uuid);
-        if(serverName == null) return commands;
+    public static List<String> getServerCommands(String serverName) {
+        List<String> commands = new ArrayList<>(Storage.Blacklist.getBlacklist().getCommands());
+        if (!Reflection.isProxyServer())
+            return commands;
 
-        List<GeneralBlacklist> blacklists = Storage.Blacklist.getBlacklists(serverName);
+        if (serverName == null)
+            return commands;
+
+        List<GeneralBlacklist> blacklists = Storage.Blacklist.getServerBlacklists(serverName);
         for (GeneralBlacklist blacklist : blacklists)
             commands.addAll(blacklist.getCommands());
 
@@ -72,22 +98,19 @@ public class SubArgsModule {
     }
 
     public static List<String> getGroupCommands(UUID uuid) {
+        return getGroupCommands(uuid, null);
+    }
+
+    public static List<String> getGroupCommands(UUID uuid, String serverName) {
         List<String> commands = new ArrayList<>();
-        List<Group> groups = new ArrayList<>();
+        List<Group> groups = GroupManager.getPlayerGroups(uuid);
 
-        Group currentGroup;
-        for (String permission : Objects.requireNonNull(PermissionUtil.getPermissions(uuid))) {
-            if(!permission.startsWith("proantitab.group.")) continue;
-            currentGroup = GroupManager.getGroupByName(StringUtils.replaceFirst(permission, "proantitab.group.", ""));
-            if(currentGroup != null && !groups.contains(currentGroup)) groups.add(currentGroup);
+        if (serverName == null) {
+            groups.forEach(group -> commands.addAll(group.getCommands()));
+            return commands;
         }
 
-        if(!groups.isEmpty()) {
-            int highestPriority = groups.stream().mapToInt(Group::getPriority).filter(group -> group <= 9999).min().orElse(9999);
-            groups.removeIf(group -> group.getPriority() > highestPriority);
-            for (Group group : groups) commands.addAll(group.getCommands().stream().filter(command -> command.contains(" ")).collect(Collectors.toList()));
-        }
-
+        groups.forEach(group -> commands.addAll(group.getAllCommands(serverName)));
         return commands;
     }
 }

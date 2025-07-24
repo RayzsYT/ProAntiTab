@@ -3,7 +3,6 @@ package de.rayzs.pat.plugin.listeners.bungee;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import de.rayzs.pat.plugin.logger.Logger;
@@ -13,44 +12,48 @@ import net.md_5.bungee.api.ProxyServer;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.api.event.*;
 import net.md_5.bungee.event.*;
+
 import java.util.List;
 
 public class BungeeBlockCommandListener implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onChat(ChatEvent event) {
-        if(event.isCancelled()) return;
+        if (event.isCancelled()) return;
 
         Connection connection = event.getSender();
-        if(!(connection instanceof ProxiedPlayer) || !event.getMessage().startsWith("/")) return;
+        if (! (connection instanceof ProxiedPlayer) || !event.getMessage().startsWith("/"))
+            return;
 
         ProxiedPlayer player = (ProxiedPlayer) connection;
+        String serverName = player.getServer().getInfo().getName();
+        String command = event.getMessage();
 
-        String rawCommand = event.getMessage(), command = rawCommand.toLowerCase();
+        boolean bypassPermission = PermissionUtil.hasBypassPermission(player, command);
 
-        command = StringUtils.replaceFirst(command, "/", "");
+        if (bypassPermission)
+            return;
+
+        command = command.replaceFirst("/", "");
         command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
-
-        if(PermissionUtil.hasBypassPermission(player, command, false)) return;
-
-        if(rawCommand.equals("/")) return;
-        ServerInfo serverInfo = player.getServer().getInfo();
-        String serverName = serverInfo != null ? serverInfo.getName() : "unknown";
-
-        if (Storage.Blacklist.isDisabledServer(serverName))
-            return;
+        command = command.toLowerCase();
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%server%", serverName);
 
-        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
-            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
-            if(executeCommandEvent.isCancelled()) return;
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
+            if (executeCommandEvent.isBlocked())
+                event.setCancelled(true);
 
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
+            if (executeCommandEvent.isCancelled())
+                return;
 
-            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", command);
+
+            if(Storage.SEND_CONSOLE_NOTIFICATION)
+                Logger.info(notificationMessage);
+
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
                 ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
                 if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
@@ -59,14 +62,19 @@ public class BungeeBlockCommandListener implements Listener {
             return;
         }
 
-        if(Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command) && !PermissionUtil.hasBypassPermission(player, command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
-            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
-            if(executeCommandEvent.isCancelled()) return;
+        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
+            if (executeCommandEvent.isBlocked())
+                event.setCancelled(true);
 
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE, "%command%", rawCommand.replaceFirst("/", ""));
+            if (executeCommandEvent.isCancelled())
+                return;
 
-            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", command);
+
+            if (Storage.SEND_CONSOLE_NOTIFICATION)
+                Logger.info(notificationMessage);
+
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
                 ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
                 if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
@@ -75,78 +83,33 @@ public class BungeeBlockCommandListener implements Listener {
             return;
         }
 
-        if(!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED) return;
+        if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
+            return;
 
         List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", command);
 
-        boolean listed, serverListed, ignored;
-        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
-            if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) {
-                ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
-                if(executeCommandEvent.isBlocked()) event.setCancelled(true);
+        if (!Storage.Blacklist.canPlayerAccessChat(player, command, serverName)) {
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
+
+            if (executeCommandEvent.isBlocked())
+                event.setCancelled(true);
+
+            if (executeCommandEvent.isCancelled())
                 return;
-            }
-
-            listed = Storage.Blacklist.isListed(command, false, true, false);
-            serverListed = Storage.Blacklist.isListed(player, command, false, listed, false, serverName, true);
-            ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
-
-            if(ignored ? !listed && serverListed : serverListed) {
-                ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
-                if(executeCommandEvent.isBlocked()) event.setCancelled(true);
-                return;
-            }
-
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
-            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
-            if(executeCommandEvent.isCancelled()) return;
-
-            MessageTranslator.send(player, cancelCommandMessage);
-            return;
-        }
-
-        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command) && !Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
-            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
-            if(executeCommandEvent.isCancelled()) return;
 
             MessageTranslator.send(player, cancelCommandMessage);
 
-            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
+            if (Storage.SEND_CONSOLE_NOTIFICATION)
+                Logger.info(notificationMessage);
+
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
                 ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
                 if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
             });
-
-            return;
         }
 
-        if(Storage.Blacklist.doesGroupBypass(player, command, true, true, false, serverName)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
-            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
-            return;
-        }
-
-        listed = Storage.Blacklist.isListed(command, true, true, false);
-        serverListed = Storage.Blacklist.isListed(player, command, true, listed, false, serverName);
-        ignored = Storage.Blacklist.isOnIgnoredServer(serverName);
-
-        if(!listed && !serverListed || listed && serverListed && ignored) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, false);
-            if(executeCommandEvent.isBlocked()) event.setCancelled(true);
-            return;
-        }
-
-        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, rawCommand, true);
-        if(executeCommandEvent.isBlocked()) event.setCancelled(true);
-        if(executeCommandEvent.isCancelled()) return;
-
-        MessageTranslator.send(player, cancelCommandMessage);
-
-        if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
-        Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-            ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
-            if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
-        });
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), false);
+        if (executeCommandEvent.isBlocked())
+            event.setCancelled(true);
     }
 }

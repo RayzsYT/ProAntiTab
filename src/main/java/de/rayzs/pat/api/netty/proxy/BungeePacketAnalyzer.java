@@ -1,28 +1,38 @@
 package de.rayzs.pat.api.netty.proxy;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.client.ClientInfo;
-import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.MessageToMessageDecoder;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import de.rayzs.pat.api.communication.Communicator;
-import net.md_5.bungee.protocol.DefinedPacket;
-import net.md_5.bungee.protocol.PacketWrapper;
-
-import java.nio.ByteBuffer;
-import java.util.concurrent.ConcurrentHashMap;
-import com.mojang.brigadier.tree.CommandNode;
-import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.protocol.packet.*;
-import de.rayzs.pat.api.storage.Storage;
-import net.md_5.bungee.api.ProxyServer;
-import com.mojang.brigadier.builder.*;
 import java.lang.reflect.Field;
-import de.rayzs.pat.utils.*;
-import io.netty.channel.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.tree.CommandNode;
+
+import com.mojang.brigadier.tree.RootCommandNode;
+import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.api.communication.client.ClientInfo;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
+import de.rayzs.pat.utils.CommandsCache;
+import de.rayzs.pat.utils.node.CommandNodeHelper;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.utils.permission.PermissionUtil;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.protocol.PacketWrapper;
+import net.md_5.bungee.protocol.packet.Commands;
+import net.md_5.bungee.protocol.packet.PluginMessage;
+import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 
 public class BungeePacketAnalyzer {
 
@@ -32,7 +42,6 @@ public class BungeePacketAnalyzer {
     private static final HashMap<ProxiedPlayer, Boolean> PLAYER_MODIFIED = new HashMap<>();
     private static final HashMap<ProxiedPlayer, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
-    private static final com.mojang.brigadier.Command DUMMY_COMMAND = (context) -> 0;
     private static final List<String> PLUGIN_COMMANDS = new ArrayList<>();
 
     private static Class<?> channelWrapperClass, serverConnectionClass;
@@ -69,7 +78,7 @@ public class BungeePacketAnalyzer {
             channel = (Channel) Reflection.getFieldsByType(channelWrapperClass, "Channel", Reflection.SearchOption.ENDS).get(0).get(channelWrapperObj);
 
             if(channel == null) {
-                System.err.println("Failed to inject " + player.getName() + "! Channel is null.");
+                Logger.warning("Failed to inject " + player.getName() + "! Channel is null.");
                 return false;
             }
 
@@ -108,50 +117,31 @@ public class BungeePacketAnalyzer {
         return input;
     }
 
-    public static void insertPlayerInput(ProxiedPlayer player, String text) {
-        PLAYER_INPUT_CACHE.put(player, text.toLowerCase());
-    }
+    private static void modifyCommands(ProxiedPlayer player, Commands commands) {
+        ServerInfo serverInfo = player.getServer().getInfo();
+        String serverName = serverInfo.getName();
 
-    private static void modifyCommands(ProxiedPlayer player, Commands commands, List<String> list) {
-        final String serverName = player.getServer().getInfo().getName();
-        final boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
-        list.clear();
+        CommandNodeHelper helper = new CommandNodeHelper<CommandNode>(commands.getRoot());
+        Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
 
-        for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
-            if (!ProxyServer.getInstance().getDisabledCommands().contains(command.getKey()) && commands.getRoot().getChild(command.getKey()) == null && command.getValue().hasPermission(player)) {
+        if(!cache.containsKey(serverName))
+            cache.put(serverName, new CommandsCache());
 
-                List<String> commandsToCheck =
-                        new ArrayList<>(Arrays.asList(command.getValue().getAliases()));
-                if(!commandsToCheck.contains(command.getValue().getName()))
-                    commandsToCheck.add(command.getValue().getName());
-                if(!commandsToCheck.contains(command.getKey()))
-                    commandsToCheck.add(command.getKey());
+        CommandsCache commandsCache = cache.get(serverName);
 
-                commandsToCheck.removeAll(list);
-                commandsToCheck.removeIf(commandName -> commandName.startsWith("/"));
+        List<String> commandsAsString = new ArrayList<String>(helper.getChildrenNames());
+        commandsCache.handleCommands(commandsAsString, serverName);
 
-                for (String commandName : commandsToCheck) {
-                    if (!list.contains(commandName)) {
-                        if (!Storage.Blacklist.isBlocked(player, commandName, !turn, serverName)) {
-                            list.add(commandName);
-                            CommandNode dummy = LiteralArgumentBuilder.literal(commandName)
-                                    .executes(DUMMY_COMMAND)
-                                    .then(RequiredArgumentBuilder.argument("args", StringArgumentType.greedyString())
-                                            .suggests(Commands.SuggestionRegistry.ASK_SERVER).executes(DUMMY_COMMAND))
-                                    .build();
+        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId());
+        helper.removeIf(str -> !playerCommands.contains(str));
 
-                            commands.getRoot().addChild(dummy);
-                        }
-                    }
-                }
-            }
-        }
+        // Disabled temporarily
+        // SubArgsModule.handleCommandNode(player.getUniqueId(), helper);
     }
 
     private static class PacketDecoder extends MessageToMessageDecoder<PacketWrapper> {
 
         private final ProxiedPlayer player;
-        private final List<String> commands = new ArrayList<>();
 
         private PacketDecoder(ProxiedPlayer player) {
             this.player = player;
@@ -171,7 +161,9 @@ public class BungeePacketAnalyzer {
 
             } else if (wrapper.packet instanceof Commands) {
                 Commands response = (Commands) wrapper.packet;
-                modifyCommands(player, response, commands);
+
+                modifyCommands(player, response);
+
                 player.unsafe().sendPacket(response);
                 return;
 
@@ -186,36 +178,39 @@ public class BungeePacketAnalyzer {
                             return;
 
                         boolean cancelsBeforeHand = false;
-                        String playerInput = getPlayerInput(player), server = player.getServer().getInfo().getName();
-                        int spaces = 0;
 
-                        if(playerInput.contains(" ")) {
-                            String[] split = playerInput.split(" ");
-                            spaces = split.length;
-                            if(spaces > 0) playerInput = split[0];
+                        String rawPlayerInput = getPlayerInput(player);
+                        int spaces = rawPlayerInput.contains(" ") ? rawPlayerInput.split(" ").length : 0;
+
+                        String playerInput = StringUtils.getFirstArg(rawPlayerInput),
+                                server = player.getServer().getInfo().getName();
+
+                        if (!playerInput.equals("/")) {
+                            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.replaceFirst(playerInput, "/", ""), server);
+
+                            if (!cancelsBeforeHand)
+                                cancelsBeforeHand = !Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", "")) ||  Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", ""));
                         }
 
-                        if(!playerInput.equals("/")) {
-                            cancelsBeforeHand = Storage.Blacklist.isBlocked(player, StringUtils.replaceFirst(playerInput, "/", ""), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server);
-
-                            if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", "")) ||  Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", ""));
-                        }
                         final String cursor = playerInput;
-                        if(cursor.startsWith("/")) {
-                            if(spaces == 0) {
+
+                        if (cursor.startsWith("/")) {
+                            if (spaces == 0) {
                                 List<String> suggestions = new ArrayList<>(response.getCommands());
 
                                 if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
                                     setPluginCommands();
 
-                                    Storage.Blacklist.getAllBlacklists(server).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !suggestions.contains("/" + command)).forEach(command -> {
+                                    Storage.Blacklist.getServerBlacklists(server).forEach(blacklist -> blacklist.getCommands().stream().filter(command -> !suggestions.contains("/" + command)).forEach(command -> {
                                         if (BungeePacketAnalyzer.PLUGIN_COMMANDS.contains(command))
                                             suggestions.add("/" + command);
                                     }));
 
                                     BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command -> !suggestions.contains(command)).forEach(command -> {
-                                        if(command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
-                                        if(PermissionUtil.hasBypassPermission(player, command, server)) {
+                                        if (command.startsWith("/")) 
+                                            command = StringUtils.replaceFirst(command, "/", "");
+                                        
+                                        if (Storage.Blacklist.canPlayerAccessTab(player, command, server)) {
                                             suggestions.add("/" + command);
                                         }
                                     });
@@ -224,10 +219,12 @@ public class BungeePacketAnalyzer {
 
                                 } else {
                                     BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command -> !suggestions.contains(command)).forEach(suggestions::add);
+
                                     suggestions.removeIf(command -> {
-                                        if(command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
-                                        return Storage.Blacklist.isBlocked(player, command, true, server, true);
+                                        if (command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
+                                        return !Storage.Blacklist.canPlayerAccessTab(player, command, server);
                                     });
+
                                     response.getCommands().clear();
                                     suggestions.forEach(command -> response.getCommands().add(command));
                                 }

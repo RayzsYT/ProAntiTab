@@ -10,23 +10,16 @@ public class ListSortedCommandsPlaceholder extends PlaceholderStorage {
 
     public ListSortedCommandsPlaceholder() { super("list_sorted_commands"); }
 
-    public String COMMAND, SPLITTER;
+    public String SPLITTER;
 
     @Override
     public String onRequest(Player player, String param) {
-        return StringUtils.buildSortedStringList(
-                Storage.Blacklist.getBlacklist().getCommands(),
-                SPLITTER,
-                COMMAND,
-                "%command%",
-                false
-        );
+        return StringUtils.getSortedStringList(Storage.Blacklist.getBlacklist().getCommands(), SPLITTER);
     }
 
     @Override
     public void load() {
         super.load();
-        SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7, ").getOrSet();
-        COMMAND = new ConfigSectionHelper<String>(this, "command", "&f%command%").getOrSet();
+        SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7, &e").getOrSet();
     }
 }

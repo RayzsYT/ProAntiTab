@@ -17,7 +17,7 @@ public class VelocityPingListener {
     }
 
     @Subscribe
-    public void onProxyPingS(ProxyPingEvent event) {
+    public void onProxyPing(ProxyPingEvent event) {
         if (!Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.ENABLED) return;
 
         ServerPing oldPing = event.getPing();

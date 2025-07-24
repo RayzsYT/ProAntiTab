@@ -13,6 +13,11 @@ public class ActionHandler {
     public static void executeConsoleCommand(String action, UUID uuid, String command) {
         ACTION.executeConsoleCommand(action, uuid, command);
     }
+
+    public static void executePlayerCommand(String action, UUID uuid, String command) {
+        ACTION.executePlayerCommand(action, uuid, command);
+    }
+
     public static void sendTitle(String action, UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         ACTION.sendTitle(action, uuid, title, subTitle, fadeIn, stay, fadeOut);
     }

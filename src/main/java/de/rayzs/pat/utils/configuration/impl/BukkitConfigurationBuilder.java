@@ -1,7 +1,7 @@
 package de.rayzs.pat.utils.configuration.impl;
 
-import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import org.bukkit.configuration.file.YamlConfiguration;
 import de.rayzs.pat.plugin.logger.Logger;
 import org.bukkit.ChatColor;
@@ -81,22 +81,14 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate()) {
-                String section = ConfigUpdater.getSection(path + "." + target, true);
-                if (configuration.getConfigurationSection(section) == null) {
-                    ConfigUpdater.updateConfigFile(this, path + "." + target, true);
-                    Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
-
-                    reload();
-                    return get(target);
-                }
-            }
-        }
-
         if (fileName.equals("config")) {
-            ConfigUpdater.addMissingPart(path + "." + target);
-            return object;
+            if (!ConfigUpdater.shouldAutoUpdate()) {
+                ConfigUpdater.addMissingPart(path + "." + target);
+                return object;
+            }
+
+            set(path, target, object);
+            return get(path, target);
         }
 
         set(path, target, object);
@@ -111,22 +103,14 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate()) {
-                String section = ConfigUpdater.getSection(target, true);
-                if (configuration.getConfigurationSection(section) == null) {
-                    ConfigUpdater.updateConfigFile(this, target, true);
-                    Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
-
-                    reload();
-                    return get(target);
-                }
-            }
-        }
-
         if (fileName.equals("config")) {
-            ConfigUpdater.addMissingPart(target);
-            return object;
+            if (!ConfigUpdater.shouldAutoUpdate()) {
+                ConfigUpdater.addMissingPart(target);
+                return object;
+            }
+
+            set(target, object);
+            return get(target);
         }
 
         set(target, object);

@@ -67,24 +67,23 @@ public class MessageTranslator {
     }
 
     public static void send(Object target, MultipleMessagesHelper texts) {
-        String stringList = StringUtils.buildStringList(texts.getLines());
+        String stringList = StringUtils.getStringList(texts.getLines(), "\n");
         send(target, stringList);
     }
 
     public static void send(Object target, MultipleMessagesHelper texts, String... replacements) {
-        String stringList = StringUtils.buildStringList(texts.getLines());
+        String stringList = StringUtils.getStringList(texts.getLines(), "\n");
         send(target, stringList, replacements);
     }
 
     public static void send(Object target, List<String> texts) {
-        String stringList = StringUtils.buildStringList(texts);
+        String stringList = StringUtils.getStringList(texts, "\n");
         send(target, stringList);
     }
 
     public static void send(Object target, List<String> texts, String... replacements) {
         texts = replaceMessageList(texts, replacements);
-        String stringList = StringUtils.buildStringList(texts);
-        send(target, stringList);
+        send(target, texts);
     }
 
     public static void send(Object target, String text, String... replacements) {

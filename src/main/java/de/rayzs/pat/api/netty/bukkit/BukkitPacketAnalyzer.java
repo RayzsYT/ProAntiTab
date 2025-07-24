@@ -1,5 +1,6 @@
 package de.rayzs.pat.api.netty.bukkit;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.netty.bukkit.handlers.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,12 +40,13 @@ public class BukkitPacketAnalyzer {
     }
 
     public static boolean inject(Player player) {
-        if(Storage.USE_VELOCITY) return true;
+        if (Storage.USE_VELOCITY)
+            return true;
 
         try {
             Channel channel = Reflection.getPlayerChannel(player);
-            if(channel == null) {
-                System.err.println("Failed to inject " + player.getName() + "! Channel is null.");
+            if (channel == null) {
+                Logger.warning("Failed to inject " + player.getName() + "! Channel is null.");
                 return false;
             }
 
@@ -56,7 +58,10 @@ public class BukkitPacketAnalyzer {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return false;
-        } return true;
+
+        }
+
+        return true;
     }
 
     public static void uninject(UUID uuid) {
@@ -102,9 +107,13 @@ public class BukkitPacketAnalyzer {
                 if (!PermissionUtil.hasBypassPermission(player) && packetObj.getClass() != null) {
                     String packetName = packetObj.getClass().getSimpleName();
 
-                    if (packetName.equals("PacketPlayInTabComplete") || packetName.equals("ServerboundCommandSuggestionPacket")) {
-                        if (!PACKET_HANDLER.handleIncomingPacket(player, packetObj)) return;
+                    if (!packetName.equals("PacketPlayInTabComplete") && !packetName.equals("ServerboundCommandSuggestionPacket")) {
+                        super.channelRead(channel, packetObj);
+                        return;
                     }
+
+                    if (!PACKET_HANDLER.handleIncomingPacket(player, packetObj))
+                        return;
                 }
 
                 super.channelRead(channel, packetObj);
@@ -119,8 +128,10 @@ public class BukkitPacketAnalyzer {
                     if (!PermissionUtil.hasBypassPermission(player)) {
                         String packetName = packetObj.getClass().getSimpleName();
 
-                        if (!packetName.equals("PacketPlayOutTabComplete") && !packetName.equals("ClientboundCommandSuggestionsPacket"))
+                        if (!packetName.equals("PacketPlayOutTabComplete") && !packetName.equals("ClientboundCommandSuggestionsPacket")) {
                             super.write(channel, packetObj, promise);
+                            return;
+                        }
 
                         UUID uuid = player.getUniqueId();
                         Object sentPacketObj = SENT_PACKET.get(uuid);

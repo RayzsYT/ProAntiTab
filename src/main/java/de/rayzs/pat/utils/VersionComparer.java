@@ -12,7 +12,9 @@ public class VersionComparer {
     }
 
     public static void setNewestVersion(String versionName) {
-        if(NEWEST_VERSION != null && NEWEST_VERSION.getVersionName().equals(versionName)) return;
+        if(NEWEST_VERSION != null && NEWEST_VERSION.getVersionName().equals(versionName))
+            return;
+
         NEWEST_VERSION = new Version(versionName);
     }
 

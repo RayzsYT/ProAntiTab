@@ -9,6 +9,9 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.subargs.*;
 import de.rayzs.pat.utils.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ExecuteCommand extends ExecuteCommandEvent {
 
     @Override
@@ -16,10 +19,10 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
         CommandSender sender = new CommandSender(event.getSenderObj());
 
-        if(PermissionUtil.hasBypassPermission(event.getSenderObj(), StringUtils.getFirstArg(command)))
+        if (PermissionUtil.hasBypassPermission(event.getSenderObj(), StringUtils.getFirstArg(command)))
             return;
 
-        if(command.contains(" ") && shouldCommandBeBlocked(sender, event, command)) {
+        if (command.contains(" ") && !canPlayerExecute(sender, command)) {
             event.setBlocked(true);
             event.setCancelled(true);
             MessageTranslator.send(event.getSenderObj(), ResponseHandler.getResponse(sender.getUniqueId(), event.getCommand()), "%command%", event.getCommand());
@@ -36,61 +39,93 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         MessageTranslator.send(event.getSenderObj(), ResponseHandler.getResponse(sender.getUniqueId(), event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()), "%command%", event.getCommand());
     }
 
-    private boolean shouldCommandBeBlocked(CommandSender sender, ExecuteCommandEvent event, String command) {
-        boolean listed = false,
-                turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
-                blocked = event.isBlocked(),
-                ignored = false,
-                useFilter = false,
-                tooBig = false;
+    private boolean canPlayerExecute(CommandSender sender, String command) {
+        boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+        boolean listed = false;
 
-        String[] split, originCommandSplit, copiedOriginCommandSplit;
-        String tmpCommand;
-        for (String s : SubArgsModule.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Argument.getGeneralArgument()).getInputs()) {
-            if(s.contains("%hidden_online_players%")) continue;
-            tmpCommand = command;
+        Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Arguments.ARGUMENTS);
+        List<String> commands = new ArrayList<>(arguments.CHAT_ARGUMENTS.getGeneralArgument().getInputs());
 
-            if(s.split(" ")[0].equalsIgnoreCase(tmpCommand.split(" ")[0]))
-                useFilter = true;
-
-            originCommandSplit = tmpCommand.split(" ");
-            split = s.split(" ");
-            int i;
-
-            for(i = 0; i < split.length; i++) {
-                if(!split[i].equals("%online_players%")) continue;
-
-                boolean foundPlayer = false;
-                for (String playerName : SubArgsModule.getPlayerNames()) {
-                    if(i >= originCommandSplit.length) continue;
-                    if(!playerName.equalsIgnoreCase(originCommandSplit[i])) continue;
-
-                    foundPlayer = true;
-                    originCommandSplit[i] = "%online_players%";
-                    break;
-                }
-
-                if(!foundPlayer) {
-
-                    copiedOriginCommandSplit = originCommandSplit.clone();
-                    copiedOriginCommandSplit[copiedOriginCommandSplit.length-1] = null;
-                    String c = String.join(" ", copiedOriginCommandSplit);
-
-                    if(s.startsWith(c)) return turn;
-                }
-
-                tmpCommand = String.join(" ", originCommandSplit);
-            }
-
-            if (!tmpCommand.toLowerCase().startsWith(StringUtils.replaceFirst(s.toLowerCase(), " _-", "")))
-                continue;
-
-            if (!listed) listed = true;
-            if (s.endsWith(" _-")) ignored = true;
-
-            tooBig = originCommandSplit.length > s.replace(" _-", "").split(" ").length;
+        final String unmodifiable = command;
+        if (commands.stream().noneMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(StringUtils.getFirstArg(unmodifiable)))) {
+            return true;
         }
 
-        return !(blocked || !useFilter) && turn != listed || ignored && tooBig;
+        commands = commands.stream().map(c -> {
+            if (c.contains("%hidden")) {
+                return c.replace("%hidden_", "%");
+            }
+
+            return c;
+        }).toList();
+
+        List<String> placeholderCommands = commands.stream().filter(s -> s.contains("%")).toList();
+
+        if (!placeholderCommands.isEmpty())
+            command = replacePlaceholders(command, placeholderCommands);
+
+        String cpyCommand;
+        for (String c : commands) {
+            cpyCommand = command;
+
+            if (listed)
+                break;
+
+            if (cpyCommand.contains("%both_players%")) {
+                if (c.contains("%online_players%"))
+                    cpyCommand = StringUtils.replace(command, "%both_players%", "%online_players%");
+                if (c.contains("%players%"))
+                    cpyCommand = StringUtils.replace(command, "%both_players%", "%players%");
+            }
+
+            boolean ends = c.endsWith("_-");
+            if (ends) {
+                c = StringUtils.replace(c, "_-", "");
+
+                if (c.endsWith(" "))
+                    c = StringUtils.replaceLast(c, " ", "");
+            }
+
+            listed = c.equalsIgnoreCase(cpyCommand) || cpyCommand.startsWith(c + " ");
+
+            if (listed && ends && cpyCommand.length() > c.length()) {
+                listed = false;
+                break;
+            }
+        }
+
+        return turn == listed;
+    }
+
+    private String replacePlaceholders(String input, List<String> abnormalCommands) {
+        String[] split = input.split(" ");
+
+        for (int i = 0; i < split.length; i++) {
+            String s = split[i];
+
+            boolean number = NumberUtils.isDigit(split[i]),
+                    online = Storage.getLoader().isPlayerOnline(s),
+                    general = Storage.getLoader().doesPlayerExist(s);
+
+            if (number) {
+                split[i] = "%numbers%";
+                continue;
+            }
+
+            if (online && general) {
+                split[i] = "%both_players%";
+                continue;
+            }
+
+            if (online) {
+                split[i] = "%online_players%";
+                continue;
+            }
+
+            if (general)
+                split[i] = "%players%";
+        }
+
+        return String.join(" ", split);
     }
 }

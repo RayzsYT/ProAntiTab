@@ -88,22 +88,14 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate()) {
-                String section = ConfigUpdater.getSection(path + "." + target, true);
-                if (configuration.getSection(section).getKeys().size() == 0) {
-                    ConfigUpdater.updateConfigFile(this, path + "." + target, true);
-                    Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
-
-                    reload();
-                    return get(path, target);
-                }
-            }
-        }
-
         if (fileName.equals("config")) {
-            ConfigUpdater.addMissingPart(path + "." + target);
-            return object;
+            if (!ConfigUpdater.shouldAutoUpdate()) {
+                ConfigUpdater.addMissingPart(path + "." + target);
+                return object;
+            }
+
+            set(path, target, object);
+            return get(path, target);
         }
 
         set(path, target, object);
@@ -118,22 +110,14 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if(fileName.equals("config")) {
-            if(ConfigUpdater.canUpdate()) {
-                String section = ConfigUpdater.getSection(target, true);
-                if (configuration.getSection(section).getKeys().size() == 0) {
-                    ConfigUpdater.updateConfigFile(this, target, true);
-                    Logger.warning("Section '" + section + "' is missing! Loading default section from online config.yml.");
-
-                    reload();
-                    return get(target);
-                }
-            }
-        }
-
         if (fileName.equals("config")) {
-            ConfigUpdater.addMissingPart(target);
-            return object;
+            if (!ConfigUpdater.shouldAutoUpdate()) {
+                ConfigUpdater.addMissingPart(target);
+                return object;
+            }
+
+            set(target, object);
+            return get(target);
         }
 
         set(target, object);

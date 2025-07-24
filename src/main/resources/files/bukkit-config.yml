@@ -11,7 +11,15 @@
 updater:
   enabled: true
   period: 10000
-  auto-update-config: true
+
+  announce-missing-parts: true
+
+  # (!) Warning:
+  #  Activating this will automatically update the config.yml in case something's missing.
+  #  This will most likely cause the config.yml to look weird, considering that all comments,
+  #  as well as spaces will be missing. Please take this in consideration.
+  auto-update-config: false
+
   updated:
     - '&8[&2PAT &7| &2Bukkit&8] &aYou are using the newest version! ^^'
   outdated:
@@ -32,6 +40,13 @@ updater:
 handle-through-proxy:
   enabled: false
   token: insert-token-of-proxy-here
+
+  # Advanced option:
+  # Loads the token from an ENV variable instead.
+  # (!) Warning: Do NOT enable this option, unless you know what you're doing!
+  load-from-env:
+    enabled: false
+    name: "PAT_TOKEN"
 
 #>> HTP
 # This is a very necessary feature if you have way too many commands to block and instead decide
@@ -101,7 +116,7 @@ cancel-blocked-commands:
   base-command-message:
     - '%prefix% &cThis command &8(&4%command%&8) &cis blocked!'
   sub-command-message:
-    - '&cCommand &8(&4%command%&8) &cwith the provided sub-argument is not allowed!'
+    - '%prefix% &cCommand &8(&4%command%&8) &cwith the provided sub-argument is not allowed!'
 
 #>> HTP (Overwritten)
 # Here you can customize your own fake '/plugins' command.
@@ -140,6 +155,12 @@ custom-version:
 # Namespace commands are commands like plugin:command (e.g: essentials:warp)
 # You can bypass this restriction with the proantitab.namespace permission.
 block-namespace-commands:
+  enabled: false
+
+#>> HTP (Overwritten)
+# Auto lowercase all commands when being executed,
+# such that something like /PAY turns into /pay.
+auto-lowercase-commands:
   enabled: false
 
 # Patches a small exploit which causes the server to lag.
@@ -275,8 +296,7 @@ blacklist:
 
   list:
     message: '&7Listed commands (&f%size%&7)&8: &f%commands%'
-    splitter: '&7, '
-    command: '&f%command%'
+    splitter: '&7, &f'
 
   add:
     success: '&aSuccessfully added %command% to the list!'
@@ -303,8 +323,7 @@ group:
 
   list:
     message: '&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%'
-    splitter: '&7, '
-    command: '&f%command%'
+    splitter: '&7, &f'
 
   list-groups:
     message: '&7All groups (&f%size%&7)&8: &f%groups%'
@@ -314,7 +333,7 @@ group:
   list-priorities:
     message: '&7List of all group priorities (&f%size%&7)&8: \n&f%groups%'
     splitter: '\n'
-    group: '&8- &e%priority%&8: &f%group%'
+    group: '&8- &e%priority%&8: &e%group%'
 
   add:
     success: '&aSuccessfully added %command% to the list of group %group%!'

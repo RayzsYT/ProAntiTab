@@ -19,7 +19,9 @@ public class ModernBukkitAction implements Action {
     @Override
     public void executeConsoleCommand(String action, UUID uuid, String command) {
         Player player = Bukkit.getPlayer(uuid);
-        if(player != null) command = command.replace("%player%", player.getName());
+
+        if (player != null)
+            command = command.replace("%player%", player.getName());
 
         if (command.contains("%"))
             command = PlaceholderReplacer.replace(player, command);
@@ -28,9 +30,25 @@ public class ModernBukkitAction implements Action {
     }
 
     @Override
+    public void executePlayerCommand(String action, UUID uuid, String command) {
+        Player player = Bukkit.getPlayer(uuid);
+
+        if(player != null)
+            command = command.replace("%player%", player.getName());
+
+        if (command.contains("%"))
+            command = PlaceholderReplacer.replace(player, command);
+
+        if (player != null)
+            Bukkit.dispatchCommand(player, command);
+    }
+
+    @Override
     public void sendTitle(String action, UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
+
+        if (player == null)
+            return;
 
         title = PlaceholderReplacer.replace(player, StringUtils.replace(title, "&", "§", "%player%", player.getName()));
         subTitle = PlaceholderReplacer.replace(player, StringUtils.replace(subTitle, "&", "§", "%player%", player.getName()));
@@ -41,7 +59,10 @@ public class ModernBukkitAction implements Action {
     @Override
     public void addPotionEffect(String action, UUID uuid, String potionEffectTypeName, int duration, int amplifier) {
         Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
+
+        if (player == null)
+            return;
+
         PotionEffectType potionEffectType = null;
         try {
             potionEffectType = PotionEffectType.getByName(potionEffectTypeName);
@@ -61,7 +82,9 @@ public class ModernBukkitAction implements Action {
     @Override
     public void playSound(String action, UUID uuid, String soundName, float volume, float pitch) {
         Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
+
+        if (player == null)
+            return;
 
         try {
             Sound sound = Sound.valueOf(soundName);
@@ -77,7 +100,9 @@ public class ModernBukkitAction implements Action {
     @Override
     public void sendActionbar(String action, UUID uuid, String text) {
         Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
+
+        if (player == null)
+            return;
 
         text = PlaceholderReplacer.replace(player, StringUtils.replace(text, "&", "§", "%player%", player.getName()));
 

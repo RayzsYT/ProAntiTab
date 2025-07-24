@@ -1,26 +1,39 @@
 package de.rayzs.pat.api.netty.proxy;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
+import com.velocitypowered.proxy.protocol.packet.AvailableCommandsPacket;
+import com.velocitypowered.proxy.protocol.packet.PluginMessagePacket;
+import com.velocitypowered.proxy.protocol.packet.TabCompleteRequestPacket;
+import com.velocitypowered.proxy.protocol.packet.TabCompleteResponsePacket;
 import com.velocitypowered.proxy.protocol.packet.chat.session.UnsignedPlayerCommandPacket;
+
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityBlockCommandListener;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.CommandsCache;
+import de.rayzs.pat.utils.PacketUtils;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import com.velocitypowered.proxy.protocol.packet.*;
-
-import java.lang.reflect.Field;
-import java.util.concurrent.ConcurrentHashMap;
-import com.velocitypowered.api.proxy.Player;
-import de.rayzs.pat.plugin.VelocityLoader;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.*;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPromise;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-
-import java.util.*;
 
 public class VelocityPacketAnalyzer {
 
@@ -28,7 +41,6 @@ public class VelocityPacketAnalyzer {
 
     private static final String PIPELINE_NAME = "pat-velocity-handler", HANDLER_NAME = "handler";
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
-    private static HashMap<String, CommandsCache> COMMANDS_CACHE_MAP = new HashMap<>();
 
     private static Class<?> minecraftConnectionClass, connectedPlayerConnectionClass, signedChatCommandPacketClass;
 
@@ -62,7 +74,7 @@ public class VelocityPacketAnalyzer {
             channel = (Channel) Reflection.getMethodsByName(minecraftConnectionClass, "getChannel").get(0).invoke(minecraftConnectionObj);
 
             if(channel == null) {
-                System.out.println("Failed to inject " + player.getUsername() + "! Channel is null.");
+                Logger.warning("Failed to inject " + player.getUsername() + "! Channel is null.");
                 return false;
             }
 
@@ -119,16 +131,17 @@ public class VelocityPacketAnalyzer {
 
             MinecraftPacket packet = (MinecraftPacket) msg;
 
-            if(packet.getClass().getSimpleName().equals("SignedChatCommand")) {
+            if (packet.getClass().getSimpleName().equals("SignedChatCommand")) {
+
                 try {
-                    if(signedChatCommandPacketClass == null)
+                    if (signedChatCommandPacketClass == null)
                         signedChatCommandPacketClass = Class.forName("com.velocitypowered.proxy.crypto.SignedChatCommand");
 
                     Object signedChatCommandPacket = signedChatCommandPacketClass.cast(packet);
                     Field commandField = signedChatCommandPacket.getClass().getField("command");
                     String command = (String) commandField.get(signedChatCommandPacket);
 
-                    if(!VelocityBlockCommandListener.handleCommand(player, command))
+                    if (!VelocityBlockCommandListener.handleCommand(player, command).getResult().isAllowed())
                         return;
 
                 } catch (Exception exception) {
@@ -139,15 +152,15 @@ public class VelocityPacketAnalyzer {
             if(packet instanceof UnsignedPlayerCommandPacket) {
 
                 UnsignedPlayerCommandPacket unsignedPlayerCommandPacket = (UnsignedPlayerCommandPacket) packet;
-                if(VelocityBlockCommandListener.handleCommand(player, unsignedPlayerCommandPacket.getCommand()))
+                if (!VelocityBlockCommandListener.handleCommand(player, unsignedPlayerCommandPacket.getCommand()).getResult().isAllowed())
                     return;
             }
 
-            if(packet instanceof TabCompleteRequestPacket) {
+            if (packet instanceof TabCompleteRequestPacket) {
                 TabCompleteRequestPacket request = (TabCompleteRequestPacket) msg;
-                if(request.getCommand() != null) {
+                if (request.getCommand() != null) {
 
-                    if(Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(request.getCommand())) {
+                    if (Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(request.getCommand())) {
                         MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getUsername()));
                         player.disconnect(LegacyComponentSerializer.legacyAmpersand().deserialize(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get()));
                     } else {
@@ -191,8 +204,10 @@ public class VelocityPacketAnalyzer {
                     }
 
                     if(!playerInput.equals("/")) {
-                        cancelsBeforeHand = Storage.Blacklist.isBlocked(player, StringUtils.replaceFirst(playerInput, "/", ""), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server);
-                        if(!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", "")) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", ""));
+                        cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.replaceFirst(playerInput, "/", ""), server);
+
+                        if(!cancelsBeforeHand) 
+                            cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", "")) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", ""));
                     }
 
                     final String cursor = playerInput;
@@ -208,33 +223,39 @@ public class VelocityPacketAnalyzer {
                                 String command = offer.getText();
                                 if (command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
 
-                                return Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+                                return !Storage.Blacklist.canPlayerAccessTab(player, command, player.getCurrentServer().get().getServerInfo().getName());
                             });
                         } else {
                             if (cancelsBeforeHand) return;
+
                             List<String> suggestionsAsString = new ArrayList<>();
+
                             response.getOffers().forEach(offer -> suggestionsAsString.add(offer.getText()));
 
                             FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawPlayerInput, suggestionsAsString);
-                            if(filteredTabCompletionEvent.isCancelled()) return;
-                            response.getOffers().removeIf(offer -> !filteredTabCompletionEvent.getCompletion().contains(offer.getText()));
+                            if (filteredTabCompletionEvent.isCancelled()) {
+                                return;
+                            }
 
-                            if(response.getOffers().isEmpty()) return;
+                            response.getOffers().removeIf(offer -> !filteredTabCompletionEvent.getCompletion().contains(offer.getText()));
+                            if (response.getOffers().isEmpty()) return;
                         }
                     }
                 }
 
-            } else if(packet instanceof AvailableCommandsPacket) {
+            } else if (packet instanceof AvailableCommandsPacket) {
 
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     AvailableCommandsPacket commands = (AvailableCommandsPacket) packet;
 
                     if(!commands.getRootNode().getChildren().isEmpty()) {
                         String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
+                        Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
 
-                        if (!COMMANDS_CACHE_MAP.containsKey(serverName))
-                            COMMANDS_CACHE_MAP.put(serverName, new CommandsCache().reverse());
-                        CommandsCache commandsCache = COMMANDS_CACHE_MAP.get(serverName);
+                        if (!cache.containsKey(serverName))
+                            cache.put(serverName, new CommandsCache());
+
+                        CommandsCache commandsCache = cache.get(serverName);
 
                         List<String> commandsAsString = new ArrayList<>();
                         commands.getRootNode().getChildren().stream().filter(command -> command != null && command.getName() != null).forEach(command -> commandsAsString.add(command.getName()));
@@ -245,7 +266,7 @@ public class VelocityPacketAnalyzer {
                         final boolean newer = player.getProtocolVersion().getProtocol() > 340;
                         final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
 
-                        if(commands.getRootNode().getChildren().size() == 1 && newer
+                        if (commands.getRootNode().getChildren().size() == 1 && newer
                                 && commands.getRootNode().getChild("args") != null
                                 && commands.getRootNode().getChild("args").getChildren().isEmpty()) {
 
@@ -260,7 +281,7 @@ public class VelocityPacketAnalyzer {
                             if (command.getName().equals("args"))
                                 return false;
 
-                            return playerCommands.contains(command.getName());
+                            return !playerCommands.contains(command.getName());
                         });
                     }
                 }

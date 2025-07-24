@@ -11,7 +11,15 @@
 updater:
   enabled: true
   period: 10000
-  auto-update-config: true
+
+  announce-missing-parts: true
+
+  # (!) Warning:
+  #  Activating this will automatically update the config.yml in case something's missing.
+  #  This will most likely cause the config.yml to look weird, considering that all comments,
+  #  as well as spaces will be missing. Please take this in consideration.
+  auto-update-config: false
+
   updated:
     - '&8[&2PAT &7| &2Proxy&8] &aYou are using the newest version! ^^'
   outdated:
@@ -64,7 +72,6 @@ custom-protocol-ping:
     enabled: true
 
     # Available placeholders:
-    # %players%           - list of players
     # %online%            - current online player count
     # %max%               - max player count
     list:
@@ -93,7 +100,7 @@ cancel-blocked-commands:
   base-command-message:
     - '%prefix% &cThis command &8(&4%command%&8) &cis blocked!'
   sub-command-message:
-    - '&cCommand &8(&4%command%&8) &cwith the provided sub-argument is not allowed!'
+    - '%prefix% &cCommand &8(&4%command%&8) &cwith the provided sub-argument is not allowed!'
 
 # Here you can customize your own fake '/plugins' command.
 custom-plugins:
@@ -275,13 +282,10 @@ server-list:
   list:
     server:
       message: '&7Listed commands of %server% (&f%size%&7)&8: &f%commands%'
-      splitter: '&7, '
-      command: '&f%command%'
+      splitter: '&7, &f'
     group:
       message: '&7Listed commands of %group% from %server% (&f%size%&7)&8: &f%commands%'
-      splitter: '&7, '
-      command: '&f%command%'
-
+      splitter: '&7, &f'
 
 blacklist:
   clear: '&aList has been cleared!'
@@ -297,8 +301,7 @@ blacklist:
     command: '&f%command%'
 
     message-server: '&7Listed commands of %server% (&f%size%&7)&8: &f%commands%'
-    splitter-server: '&7, '
-    command-server: '&f%command%'
+    splitter-server: '&7, &f'
 
   add:
     success: '&aSuccessfully added %command% to the list!'
@@ -336,24 +339,20 @@ group:
 
   list:
     message: '&7Listed commands of group %group% (&f%size%&7)&8: &f%commands%'
-    splitter: '&7, '
-    command: '&f%command%'
+    splitter: '&7, &f'
     message-server: '&7Listed commands of group %group% from %server% (&f%size%&7)&8: &f%commands%'
-    splitter-server: '&7, '
-    command-server: '&f%command%'
+    splitter-server: '&7, &f'
 
   list-groups:
     message: '&7All groups (&f%size%&7)&8: &f%groups%'
-    splitter: '&7, '
-    command: '&f%group%'
+    splitter: '&7, &f'
     message-server: '&7All groups from %server% (&f%size%&7)&8: &f%groups%'
-    splitter-server: '&7, '
-    command-server: '&f%group%'
+    splitter-server: '&7, &f'
 
   list-priorities:
     message: '&7List of all group priorities (&f%size%&7)&8: \n&f%groups%'
     splitter: '\n'
-    group: '&8- &e%priority%&8: &f%group%'
+    group: '&8- &e%priority%&8: &e%group%'
 
   add:
     success: '&aSuccessfully added %command% to the list of group %group%!'

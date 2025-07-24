@@ -7,7 +7,7 @@ import de.rayzs.pat.utils.Reflection;
 public class BlacklistSection extends ConfigStorage {
 
     public String CLEAR, CLEAR_CONFIRM, CLEAR_SERVER, CLEAR_SERVER_CONFIRM, CLEAR_SERVER_NOT_FOUND;
-    public String LIST_MESSAGE, LIST_SPLITTER, LIST_COMMAND, LIST_SERVER_MESSAGE, LIST_SERVER_SPLITTER, LIST_SERVER_COMMAND;
+    public String LIST_MESSAGE, LIST_SPLITTER, LIST_SERVER_MESSAGE, LIST_SERVER_SPLITTER;
 
     public String ADD_SUCCESS, ADD_FAILED;
     public String REMOVE_SUCCESS, REMOVE_FAILED;
@@ -26,8 +26,7 @@ public class BlacklistSection extends ConfigStorage {
         CLEAR_CONFIRM = new ConfigSectionHelper<String>(this, "clear-confirmation", "&4Warning! &7This command will &cclear the entire list&7! &7Repeat the &esame command &7to confirm this action.").getOrSet();
 
         LIST_MESSAGE = new ConfigSectionHelper<String>(this, "list.message", "&7Listed commands (&f%size%&7)&8: &f%commands%").getOrSet();
-        LIST_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter", "&7, ").getOrSet();
-        LIST_COMMAND = new ConfigSectionHelper<String>(this, "list.command", "&f%command%").getOrSet();
+        LIST_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter", "&7, &f").getOrSet();
 
         ADD_SUCCESS = new ConfigSectionHelper<String>(this, "add.success", "&aSuccessfully added %command% into the list!").getOrSet();
         ADD_FAILED = new ConfigSectionHelper<String>(this, "add.failed", "&c%command% is already in the list!").getOrSet();
@@ -41,8 +40,7 @@ public class BlacklistSection extends ConfigStorage {
         CLEAR_SERVER_NOT_FOUND = new ConfigSectionHelper<String>(this, "clear-server-not-found", "&cThe server %server% does not have any commands!").getOrSet();
 
         LIST_SERVER_MESSAGE = new ConfigSectionHelper<String>(this, "list.message-server", "&7Listed commands of %server% (&f%size%&7)&8: &f%commands%").getOrSet();
-        LIST_SERVER_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter-server", "&7, ").getOrSet();
-        LIST_SERVER_COMMAND = new ConfigSectionHelper<String>(this, "list.command-server", "&f%command%").getOrSet();
+        LIST_SERVER_SPLITTER = new ConfigSectionHelper<String>(this, "list.splitter-server", "&7, &f").getOrSet();
 
         ADD_SERVER_SUCCESS = new ConfigSectionHelper<String>(this, "add.success-server", "&aSuccessfully added %command% into the list of %server%!").getOrSet();
         ADD_SERVER_FAILED = new ConfigSectionHelper<String>(this, "add.failed-server", "&c%command% is already in the list of %server%!").getOrSet();

@@ -1,12 +1,12 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.proxy.VelocityPacketAnalyzer;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.brand.CustomServerBrand;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.*;
 import de.rayzs.pat.plugin.VelocityLoader;

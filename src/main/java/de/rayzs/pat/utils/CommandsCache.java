@@ -1,67 +1,66 @@
 package de.rayzs.pat.utils;
 
-import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
-import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.api.storage.Storage;
 import java.util.*;
+
+import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 
 public class CommandsCache {
 
     private List<String> filteredCommands = null, allCommands = null;
-    private boolean useList = true;
     private boolean change = false;
 
-    public CommandsCache reverse() {
-        this.useList = !useList;
-        return this;
-    }
-
     public void handleCommands(List<String> commands) {
-        if(change) return;
-        if(!isOutdated(commands)) return;
+        if (change || !isOutdated(commands)) 
+            return;
 
         filteredCommands = new LinkedList<>();
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
-            if (isFilterListAvailable() && filteredCommands.contains(command)) continue;
+            command = StringUtils.getFirstArg(command);
 
-            if (useList) {
-                if (Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))
+            Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
+            if (type != Storage.Blacklist.BlockType.BOTH && type != Storage.Blacklist.BlockType.TAB)
+                continue;
+            
+            if (isFilterListAvailable()) {
+                if (filteredCommands.contains(command)) 
                     continue;
 
-                if(isFilterListAvailable()) filteredCommands.add(command);
-                continue;
+                if (!Storage.Blacklist.isBlockedTab(command)) {
+                    filteredCommands.add(command);
+                }
             }
 
-            if (!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))
-                if(isFilterListAvailable()) filteredCommands.add(command);
         }
 
         change = true;
     }
 
     public void handleCommands(List<String> commands, String server) {
-        if(!isOutdated(commands)) return;
-        server = server.toLowerCase();
+        if(!isOutdated(commands)) 
+            return;
 
         filteredCommands = new LinkedList<>();
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
-            if (isFilterListAvailable(server) && filteredCommands.contains(command)) continue;
+            command = StringUtils.getFirstArg(command);
 
-            if (useList) {
-               if(Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
+            Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
+            if (type != Storage.Blacklist.BlockType.BOTH && type != Storage.Blacklist.BlockType.TAB)
+                continue;
+
+            if (isFilterListAvailable(server)) {
+                if (filteredCommands.contains(command)) 
                     continue;
 
-                if(isFilterListAvailable(server)) filteredCommands.add(command);
-                continue;
+                if (!Storage.Blacklist.isBlockedTab(command, server))
+                    filteredCommands.add(command);
             }
 
-            if(!Storage.Blacklist.isBlocked(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, server))
-                if(isFilterListAvailable(server)) filteredCommands.add(command);
         }
     }
 
@@ -70,52 +69,25 @@ public class CommandsCache {
     }
 
     public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid, String serverName) {
-        if(serverName != null) serverName = serverName.toLowerCase();
+        List<String> playerCommands = new LinkedList(unfilteredCommands);
 
-        List<String> playerCommands = new LinkedList<>();
+        if (filteredCommands == null)
+            return playerCommands;
+        
 
-        if(filteredCommands == null)
-            return useList ? playerCommands : new LinkedList<>(unfilteredCommands);
+        boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(targetObj);
 
-        if(useList && !Storage.Blacklist.isOnIgnoredServer(serverName)) {
-            playerCommands = new LinkedList<>(filteredCommands);
-        }
-
-        boolean permitted, bypassNamespace = true, turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
-
-        if(!turn && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED)
-            bypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(targetObj);
-
-        if (!(Storage.USE_LUCKPERMS && !LuckPermsAdapter.hasAnyPermissions(uuid))) {
-            for (String command : unfilteredCommands) {
-
-                if(useList && !turn && !bypassNamespace && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)) {
-                    playerCommands.remove(command);
-                    continue;
-                }
-
-                if (playerCommands.contains(command)) continue;
-
-                if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
-
-                    if (useList)
-                        playerCommands.add(command);
-                    else
-                        playerCommands.remove(command);
-
-                    continue;
-                }
-
-                permitted = Reflection.isProxyServer() && serverName != null
-                        ? !Storage.Blacklist.isBlocked(targetObj, command, !turn, serverName)
-                        : !Storage.Blacklist.isBlocked(targetObj, command, !turn, false, false);
-
-                    if (useList && !permitted || !useList && permitted)
-                        continue;
-
-                playerCommands.add(command);
+        playerCommands.removeIf(command -> {
+            if (!hasNamespaceBypass && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)) {
+                return true;
             }
-        }
+
+            if (filteredCommands.contains(command)) {
+                return false;
+            }
+
+            return !Storage.Blacklist.canPlayerAccessTab(targetObj, command, serverName);
+        });
 
         String uuidSubstring = uuid.toString().substring(uuid.toString().length() - 5);
         if(playerCommands.isEmpty())
@@ -124,7 +96,17 @@ public class CommandsCache {
             Logger.debug("Created list of commands for player with uuid " + uuidSubstring + " with a total of " + playerCommands.size() + " commands!");
 
         PATEventHandler.callUpdatePlayerCommandsEvents(targetObj, playerCommands, serverName != null);
-        return playerCommands;
+
+        return playerCommands.stream().map(command -> {
+            command = StringUtils.getFirstArg(command);
+
+            Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
+            if (type == null || type == Storage.Blacklist.BlockType.BOTH)
+                return command;
+
+            return Storage.Blacklist.BlockTypeFetcher.modify(command, type);
+        }).toList();
+
     }
 
     public boolean isFilterListAvailable() {
@@ -133,7 +115,9 @@ public class CommandsCache {
 
     public boolean isFilterListAvailable(String server) {
         boolean available = this.filteredCommands != null;
-        if(!available) Logger.debug("FilterList didn't exist during built!" + (server != null ? "(server: " + server + ")" : ""));
+        if(!available) 
+            Logger.debug("FilterList didn't exist during built!" + (server != null ? "(server: " + server + ")" : ""));
+        
         return available;
     }
 

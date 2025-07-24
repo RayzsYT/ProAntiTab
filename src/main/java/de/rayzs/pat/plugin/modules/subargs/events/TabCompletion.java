@@ -2,10 +2,11 @@ package de.rayzs.pat.plugin.modules.subargs.events;
 
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
-import de.rayzs.pat.utils.subargs.Argument;
 import de.rayzs.pat.api.storage.Storage;
-import java.util.stream.Collectors;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.subargs.ArgumentSource;
+import de.rayzs.pat.utils.subargs.Arguments;
+
 import java.util.*;
 
 public class TabCompletion extends FilteredTabCompletionEvent {
@@ -13,33 +14,69 @@ public class TabCompletion extends FilteredTabCompletionEvent {
     @Override
     public void handle(FilteredTabCompletionEvent event) {
         String cursor = StringUtils.replaceFirst(event.getCursor(), "/", "");
+
         if (event.getCompletion().isEmpty()) return;
 
         UUID uuid = event.getSenderObj() instanceof UUID ? (UUID) event.getSenderObj() : new CommandSender(event.getSenderObj()).getUniqueId();
-        Argument argument = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, Argument.getGeneralArgument());
-        List<String> possibilities = event.getCompletion(), result = new ArrayList<>(argument.getResult(cursor));
+        Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, Arguments.ARGUMENTS);
+        List<String> possibilities = event.getCompletion(), result = new ArrayList<>(arguments.getResultTab(cursor));
 
-        if(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             possibilities = result;
 
-            if(result.contains("%online_players%")) {
-                possibilities.remove("%online_players%");
+            if (result.contains("%numbers%")) {
+                possibilities.remove("%numbers%");
+                possibilities.addAll(possibilities.stream().filter(NumberUtils::isDigit).toList());
+            }
+
+            if (result.contains("%players%")) {
+                possibilities.remove("%players%");
                 possibilities.addAll(SubArgsModule.getPlayerNames());
             }
 
-            if(result.contains("%hidden_online_players%")) {
-                possibilities.remove("%hidden_online_players%");
-                possibilities.addAll(event.getCompletion().stream().filter(completion -> {
-                    if(SubArgsModule.getPlayerNames().contains(completion)) return false;
-                    return result.contains(completion);
-                }).collect(Collectors.toList()));
+            if (result.contains("%online_players%")) {
+                possibilities.remove("%online_players%");
+                possibilities.addAll(SubArgsModule.getOnlinePlayerNames());
+            }
 
-                if(possibilities.isEmpty()) possibilities.add("///////////");
+            if (result.contains("%hidden_players%")) {
+                possibilities.remove("%hidden_players%");
+
+                possibilities.addAll(event.getCompletion().stream().filter(completion -> {
+                    if (SubArgsModule.getPlayerNames().contains(completion))
+                        return false;
+
+                    return result.contains(completion);
+                }).toList());
+
+                if (possibilities.isEmpty())
+                    possibilities.add("///////////");
+
+            }
+
+            if (result.contains("%hidden_online_players%")) {
+                possibilities.remove("%hidden_online_players%");
+
+                possibilities.addAll(event.getCompletion().stream().filter(completion -> {
+                    if (SubArgsModule.getOnlinePlayerNames().contains(completion))
+                        return false;
+
+                    return result.contains(completion);
+                }).toList());
+
+                if (possibilities.isEmpty()) possibilities.add("///////////");
             }
 
         } else {
-            if(result.contains("%online_players%"))
+
+            if (result.contains("%numbers%"))
+                possibilities.removeIf(NumberUtils::isDigit);
+
+            if (result.contains("%players%"))
                 possibilities.removeIf(possibility -> SubArgsModule.getPlayerNames().contains(possibility));
+
+            if (result.contains("%online_players%"))
+                possibilities.removeIf(possibility -> SubArgsModule.getOnlinePlayerNames().contains(possibility));
 
             possibilities.removeAll(result);
         }

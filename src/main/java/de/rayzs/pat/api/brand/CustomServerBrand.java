@@ -1,9 +1,9 @@
 package de.rayzs.pat.api.brand;
 
+import de.rayzs.pat.api.brand.impl.*;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.api.brand.impl.*;
 
 public class CustomServerBrand {
 

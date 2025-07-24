@@ -1,23 +1,27 @@
 package de.rayzs.pat.api.netty.bukkit.handlers;
 
-import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import com.mojang.brigadier.suggestion.Suggestion;
+import com.mojang.brigadier.suggestion.Suggestions;
+
 import de.rayzs.pat.api.event.PATEventHandler;
-import com.mojang.brigadier.suggestion.*;
-import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.api.netty.bukkit.*;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import de.rayzs.pat.utils.*;
-import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class ModernPacketHandler implements BukkitPacketHandler {
 
@@ -33,9 +37,18 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         }
 
         String text = (String) stringField.get(packetObj);
-        if(Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
-            MessageTranslator.send(Bukkit.getConsoleSender(), Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getName()));
-            PATScheduler.createScheduler(() -> player.kickPlayer(ChatColor.translateAlternateColorCodes('&', Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get())));
+        if (Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
+            MessageTranslator.send(
+                    Bukkit.getConsoleSender(),
+                    Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getName())
+            );
+
+            PATScheduler.createScheduler(() ->
+                    player.kickPlayer(
+                            StringUtils.replace(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get(), "&", "§")
+                    )
+            );
+
             return false;
         }
 
@@ -47,6 +60,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         Object suggestionObj;
         String rawInput = BukkitPacketAnalyzer.getPlayerInput(player), input = rawInput;
+
         if(input == null)
             return false;
 
@@ -63,7 +77,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 if(spaces > 0) input = split[0];
             }
 
-            cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, input);
 
             if (!cancelsBeforeHand)
                 cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
@@ -81,7 +95,9 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                         length = (int) intFields.get(2).get(packetObj);
 
                 Class<?> clientboundCommandSuggestionsPacketClass = Class.forName("net.minecraft.network.protocol.game."  + (packetObj.getClass().getSimpleName().equals("PacketPlayOutTabComplete") ? "PacketPlayOutTabComplete" : "ClientboundCommandSuggestionsPacket"));
-                if ((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird()) return false;
+                if ((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird())
+                    return false;
+
                 if (spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
                     suggestions.clear();
                     return true;
@@ -90,8 +106,9 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 if (spaces == 0) {
                     suggestions.removeIf(suggestion -> {
                         String command = getSuggestionFromEntry(suggestion);
-                        return Storage.Blacklist.isBlocked(player, command);
+                        return !Storage.Blacklist.canPlayerAccessTab(player, command);
                     });
+
                     return true;
 
                 } else {
@@ -163,7 +180,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
 
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
-                return Storage.Blacklist.isBlocked(player, command);
+                return !Storage.Blacklist.canPlayerAccessTab(player, command);
             });
 
             return true;

@@ -5,33 +5,28 @@ import java.util.*;
 public class ArrayUtils {
 
     public static boolean containsIgnoreCase(List<String> list, String element) {
-        for (String s : list)
-            if(s.equalsIgnoreCase(element))
-                return true;
-
-        return false;
+        return list.stream().anyMatch(element::equalsIgnoreCase);
     }
 
     public static boolean compareStringArrays(List<String> listA, List<String> listB) {
-        if(listA == null || listB == null) return false;
+        if(listA == null || listB == null)
+            return false;
 
-        boolean found = Arrays.equals(listA.toArray(), listB.toArray());
-        if(found) return true;
+        if (listA.size() != listB.size())
+            return false;
 
-        for (String s : listA) {
-            found = listB.contains(s);
-            if(!found) break;
+        if (Arrays.equals(listA.toArray(), listB.toArray()))
+            return true;
+
+        Collections.sort(listA);
+        Collections.sort(listB);
+
+        final int length = listA.size();
+        for (int i = 0; i < length; i++) {
+            if (!listA.get(i).equalsIgnoreCase(listB.get(i)))
+                return false;
         }
 
-        if(found) {
-
-            for (String s : listB) {
-                found = listA.contains(s);
-                if(!found) break;
-            }
-
-        }
-
-        return found;
+        return true;
     }
 }

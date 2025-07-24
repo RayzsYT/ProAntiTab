@@ -1,10 +1,12 @@
 package de.rayzs.pat.utils.group;
 
-import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
-import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.*;
 import java.util.*;
+
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.Storage.Blacklist.BlockType;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.utils.Reflection;
 
 public class GroupManager {
 
@@ -20,80 +22,63 @@ public class GroupManager {
         });
     }
 
-    public static boolean canAccessCommand(Object targetObj, String command) {
-        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false);
+    public static List<Group> getPlayerGroups(Object player) {
+        final int invalidPriority = Integer.MAX_VALUE -1;
 
-        int priority = -1;
-        final List<Group> finalList = new ArrayList<>(GROUPS);
+        List<Group> playerGroups = new ArrayList<>(GroupManager.getGroups().stream().filter(group -> group.hasPermission(player)).toList());
 
-        if(finalList.isEmpty()) return false;
-        for (Group group : finalList) {
-            if(group == null) continue;
-            if (priority == -1 || group.getPriority() <= priority) {
+        int priority = playerGroups.stream()
+                                .mapToInt(Group::getPriority)
+                                .filter(group -> group <= invalidPriority)
+                                .min().orElse(invalidPriority);
+        
+        playerGroups.removeIf(group -> group.getPriority() > priority);
 
-                if (group.hasPermission(targetObj)) {
-                    priority = group.getPriority();
-                    if (group.contains(command)) return true;
-                }
-            }
-        }
-        return false;
+        return playerGroups;
     }
 
-    public static boolean canAccessCommand(Object targetObj, String command, boolean slash) {
-        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false, slash);
+    public static List<Group> getPlayerGroups(UUID uuid) {
+        final int invalidPriority = Integer.MAX_VALUE -1;
 
-        int priority = -1;
-        final List<Group> finalList = new ArrayList<>(GROUPS);
+        List<Group> playerGroups = new ArrayList<>(GroupManager.getGroups().stream().filter(group -> group.hasPermission(uuid)).toList());
 
-        if(finalList.isEmpty()) return false;
-        for (Group group : finalList) {
-            if(group == null) continue;
-            if (priority == -1 || group.getPriority() <= priority) {
+        int priority = playerGroups.stream()
+                .mapToInt(Group::getPriority)
+                .filter(group -> group <= invalidPriority)
+                .min().orElse(invalidPriority);
 
-                if (group.hasPermission(targetObj)) {
-                    priority = group.getPriority();
-                    if (group.contains(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false)) return true;
-                }
-            }
-        }
-        return false;
+        playerGroups.removeIf(group -> group.getPriority() > priority);
+
+        return playerGroups;
     }
 
-    public static boolean canAccessCommand(Object targetObj, String command, String server) {
-        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false);
-        server = server.toLowerCase();
+    public static boolean canAccessCommand(Object targetObj, String unmodifiedCommand, Storage.Blacklist.BlockType type) {
+        return canAccessCommand(targetObj, unmodifiedCommand, type, null);
+    }
 
-        final List<Group> finalList = new ArrayList<>(GROUPS);
+    public static boolean canAccessCommand(Object targetObj, String unmodifiedCommand, Storage.Blacklist.BlockType type, String server) {
+        final List<Group> playerGroups = getPlayerGroups(targetObj);
 
-        if(finalList.isEmpty())
+        if(playerGroups.isEmpty()) {
             return false;
-
-        for (Group group : finalList) {
-            if(group == null) continue;
-
-            if (group.contains(command, server))
-                if (group.hasPermission(targetObj)) return true;
         }
-        return false;
-    }
+        
+        String command = type.toString() + unmodifiedCommand;
 
-    public static boolean canAccessCommand(Object targetObj, String command, boolean slash, String server) {
-        command = Storage.Blacklist.getBlacklist().convertCommand(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false,  slash);
-        server = server.toLowerCase();
+        boolean permitted = playerGroups.stream().anyMatch(group -> {
+            if (group == null)
+                return false;
 
-        final List<Group> finalList = new ArrayList<>(GROUPS);
+            if (server != null && group.contains(command, server))
+                return true;
 
-        if(finalList.isEmpty())
-            return false;
+            return group.contains(command);
+        });
 
-        for (Group group : finalList) {
-            if(group == null) continue;
-
-            if (group.contains(command, server))
-                if (group.hasPermission(targetObj)) return true;
-        }
-        return false;
+        if (!permitted && type != BlockType.BOTH)
+            return canAccessCommand(targetObj, unmodifiedCommand, Storage.Blacklist.BlockType.BOTH, server);
+        
+        return permitted;
     }
 
     public static void setGroup(String groupName, List<String> commands) {
@@ -101,7 +86,9 @@ public class GroupManager {
     }
 
     public static void setGroup(String groupName, int priority, List<String> commands) {
-        if(groupName.length() < 1) return;
+        if(groupName.isEmpty())
+            return;
+
         Group group = registerAndGetGroup(groupName, priority);
         group.setCommands(commands);
     }
@@ -112,10 +99,15 @@ public class GroupManager {
 
     public static Group registerAndGetGroup(String groupName, int priority) {
         Group group = getGroupByName(groupName);
-        if(group != null) return group;
+        
+        if(group != null) 
+            return group;
+        
         group = new Group(groupName, priority);
         GROUPS.add(group);
+        
         sort();
+
         return group;
     }
 
@@ -124,7 +116,9 @@ public class GroupManager {
     }
 
     public static void registerGroup(String groupName) {
-        if(isGroupRegistered(groupName)) return;
+        if(isGroupRegistered(groupName)) 
+            return;
+            
         GROUPS.add(new Group(groupName));
         sort();
     }
@@ -143,13 +137,19 @@ public class GroupManager {
 
     public static void removeFromGroup(String groupName, String command) {
         Group group = getGroupByName(groupName);
-        if(groupName == null) return;
+
+        if(groupName == null) 
+            return;
+        
         group.remove(command);
     }
 
     public static void removeFromGroup(String groupName, String command, String server) {
         Group group = getGroupByName(groupName);
-        if(groupName == null) return;
+
+        if(groupName == null) 
+            return;
+        
         group.remove(command, server);
     }
 
@@ -159,9 +159,15 @@ public class GroupManager {
 
     public static void unregisterGroup(String groupName, String server) {
         Group group = getGroupByName(groupName);
-        if(group == null) return;
-        if(server != null) group.deleteGroup(server);
-        else group.deleteGroup();
+        
+        if(group == null) 
+            return;
+
+        if(server != null) 
+            group.deleteGroup(server);
+        else 
+            group.deleteGroup();
+
         GROUPS.remove(group);
         sort();
     }
@@ -191,48 +197,20 @@ public class GroupManager {
         GROUPS.forEach(Group::clearServerGroupBlacklistsCache);
     }
 
-    public static List<Group> getGroupsByCommandAndServer(String command, String server) {
-        List<Group> result = new ArrayList<>();
-        GROUPS.stream().filter(group -> group.getAllServerGroupBlacklist(server).stream().anyMatch(groupBlacklist -> groupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, false))).forEach(result::add);
-        return result;
-    }
-
     public static List<Group> getGroupsByServer(String server) {
         List<Group> result = new ArrayList<>();
 
         GROUPS.stream().filter(group -> {
+
             if (BlacklistCreator.exist(group.getGroupName(), server)) {
                 GroupBlacklist groupBlacklist = group.getOrCreateGroupBlacklist(server);
-                return (groupBlacklist != null && !groupBlacklist.getCommands().isEmpty() && groupBlacklist.getCommands().size() >= 1);
+                return (groupBlacklist != null && groupBlacklist.getCommands().size() >= 1);
             }
 
             return false;
+
         }).forEach(result::add);
 
-        return result;
-    }
-
-    public static List<String> getGroupsByNameOnlyIncludingCommand(String command) {
-        List<String> result = new ArrayList<>();
-        GROUPS.stream().filter(group -> group.contains(command)).forEach(group -> result.add(group.getGroupName()));
-        return result;
-    }
-
-    public static List<String> getGroupsByNameOnlyIncludingCommand(String command, String server) {
-        List<String> result = new ArrayList<>();
-        GROUPS.stream().filter(group -> group.contains(command, server)).forEach(group -> result.add(group.getGroupName()));
-        return result;
-    }
-
-    public static List<String> getGroupsByNameNotIncludingCommand(String command) {
-        List<String> result = new ArrayList<>();
-        GROUPS.stream().filter(group -> !group.contains(command)).forEach(group -> result.add(group.getGroupName()));
-        return result;
-    }
-
-    public static List<String> getGroupsByNameNotIncludingCommand(String command, String server) {
-        List<String> result = new ArrayList<>();
-        GROUPS.stream().filter(group -> !group.contains(command, server)).forEach(group -> result.add(group.getGroupName()));
         return result;
     }
 

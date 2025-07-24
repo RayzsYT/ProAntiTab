@@ -10,6 +10,8 @@ public class Configurator {
 
     private static final HashMap<String, ConfigurationBuilder> CONFIGURATION_HASHES = new HashMap<>();
 
+    private static final String FILE_PATH = "./plugins/ProAntiTab";
+
     public static ConfigurationBuilder get(String fileName, String filePath) {
         String keyName = filePath + "/" + fileName;
         if(CONFIGURATION_HASHES.containsKey(keyName))
@@ -23,7 +25,7 @@ public class Configurator {
     }
 
     public static ConfigurationBuilder get(String fileName) {
-        String keyName = "./plugins/ProAntiTab/" + fileName;
+        String keyName = FILE_PATH + "/" + fileName;
         if(CONFIGURATION_HASHES.containsKey(keyName))
             return CONFIGURATION_HASHES.get(keyName);
 
@@ -50,14 +52,21 @@ public class Configurator {
         }
     }
 
-    public static void createResourcedFile(File dataFolder, String resourcePath, String exportRessourcePath, boolean replace) {
-        if (resourcePath == null || resourcePath.equals("")) return;
+    public static void createResourcedFile(String resourcePath, String exportResourcePath, boolean replace) {
+        if (resourcePath == null || resourcePath.isEmpty())
+            return;
+
         resourcePath = resourcePath.replace('\\', '/');
         InputStream inputStream = getResource(resourcePath);
-        if (inputStream == null) return;
 
-        File outputFile = new File(dataFolder, exportRessourcePath);
-        if (!dataFolder.exists()) dataFolder.mkdirs();
+        if (inputStream == null)
+            return;
+
+        File dataFolder = new File(FILE_PATH);
+        File outputFile = new File(dataFolder, exportResourcePath);
+
+        if (!dataFolder.exists())
+            dataFolder.mkdirs();
 
         try {
             if (!outputFile.exists() || replace) {
@@ -65,16 +74,14 @@ public class Configurator {
                 byte[] buffer = new byte[1024];
                 int length;
 
-                while((length = inputStream.read(buffer)) > 0) outputStream.write(buffer, 0, length);
+                while((length = inputStream.read(buffer)) > 0)
+                    outputStream.write(buffer, 0, length);
+
                 outputStream.close();
                 inputStream.close();
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-    }
-
-    public static void createResourcedFile(String dataFolder, String resourcePath, String exportRessourcePath, boolean replace) {
-        createResourcedFile(new File(dataFolder), resourcePath, exportRessourcePath, replace);
     }
 }

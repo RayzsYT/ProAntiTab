@@ -194,6 +194,17 @@ public class ResponseHandler {
 
                         ActionHandler.executeConsoleCommand(action, uuid, split[1]);
 
+                    case "execute":
+                        if(split.length == 1) {
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Action requires 1 arguments but only has " + split.length);
+                            Logger.warning("  > Here's an example to compare with:");
+                            Logger.warning("  > execute::command");
+                            Logger.warning("  > e.g: execute::help");
+                        }
+
+                        ActionHandler.executePlayerCommand(action, uuid, split[1]);
+
                     case "actionbar":
                         if(split.length == 1) {
                             Logger.warning("! Failed to read action: " + action);

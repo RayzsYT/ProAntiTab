@@ -12,6 +12,6 @@ public class BlockedSubCommandPlaceholder extends PlaceholderStorage {
     @Override
     public String onRequest(Player player, String param) {
         if (Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE == null) return null;
-        return StringUtils.buildStringList(Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE.getLines());
+        return StringUtils.getStringList(Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE.getLines(), "\n");
     }
 }

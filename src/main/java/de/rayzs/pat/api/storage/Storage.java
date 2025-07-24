@@ -1,31 +1,84 @@
 package de.rayzs.pat.api.storage;
 
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
+import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
+import de.rayzs.pat.utils.ExpireList;
+import org.bukkit.entity.Player;
+
 import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.api.storage.placeholders.commands.general.*;
-import de.rayzs.pat.api.storage.placeholders.commands.group.*;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralIgnoredServers;
+import de.rayzs.pat.api.storage.config.messages.BlacklistSection;
+import de.rayzs.pat.api.storage.config.messages.CommandFailedSection;
+import de.rayzs.pat.api.storage.config.messages.GroupSection;
+import de.rayzs.pat.api.storage.config.messages.HelpSection;
+import de.rayzs.pat.api.storage.config.messages.InfoSection;
+import de.rayzs.pat.api.storage.config.messages.NoPermissionSection;
+import de.rayzs.pat.api.storage.config.messages.NotificationSection;
+import de.rayzs.pat.api.storage.config.messages.OnlyForProxySection;
+import de.rayzs.pat.api.storage.config.messages.PermsCheckSection;
+import de.rayzs.pat.api.storage.config.messages.PostDebugSection;
+import de.rayzs.pat.api.storage.config.messages.PrefixSection;
+import de.rayzs.pat.api.storage.config.messages.ReloadSection;
+import de.rayzs.pat.api.storage.config.messages.ServerListSection;
+import de.rayzs.pat.api.storage.config.messages.StatsSection;
+import de.rayzs.pat.api.storage.config.messages.UpdatePermissionsSection;
+import de.rayzs.pat.api.storage.config.settings.AutoLowercaseCommandsSection;
+import de.rayzs.pat.api.storage.config.settings.BlockNamespaceCommandsSection;
+import de.rayzs.pat.api.storage.config.settings.CancelCommandSection;
+import de.rayzs.pat.api.storage.config.settings.CustomBrandSection;
+import de.rayzs.pat.api.storage.config.settings.CustomPluginsSection;
+import de.rayzs.pat.api.storage.config.settings.CustomProtocolPingSection;
+import de.rayzs.pat.api.storage.config.settings.CustomUnknownCommandSection;
+import de.rayzs.pat.api.storage.config.settings.CustomVersionSection;
+import de.rayzs.pat.api.storage.config.settings.DisableSyncSection;
+import de.rayzs.pat.api.storage.config.settings.HandleThroughProxySection;
+import de.rayzs.pat.api.storage.config.settings.PatchExploitSection;
+import de.rayzs.pat.api.storage.config.settings.TurnBlacklistToWhitelistSection;
+import de.rayzs.pat.api.storage.config.settings.UpdateSection;
+import de.rayzs.pat.api.storage.placeholders.commands.general.ListCommandsPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.commands.general.ListReversedCommandsPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.commands.general.ListSizeCommandsPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.commands.general.ListSortedCommandsPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.commands.group.ListGroupCommandsPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.commands.group.ListGroupReversedCommandsPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.commands.group.ListGroupSizeCommandsPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.commands.group.ListGroupSortedCommandsPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.general.GeneralCurrentVersionPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.general.GeneralNewestVersionPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.general.GeneralPrefixPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.general.GeneralUserPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.groups.ListGroupsPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.groups.ListGroupsReversedPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.groups.ListGroupsSortedPlaceholder;
+import de.rayzs.pat.api.storage.placeholders.groups.ListSizeGroupsPlaceholder;
 import de.rayzs.pat.api.storage.placeholders.messages.BlockedBaseCommandPlaceholder;
 import de.rayzs.pat.api.storage.placeholders.messages.BlockedSubCommandPlaceholder;
-import de.rayzs.pat.api.storage.placeholders.general.GeneralPrefixPlaceholder;
 import de.rayzs.pat.api.storage.placeholders.messages.UnknownCommandPlaceholder;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
-import de.rayzs.pat.api.storage.placeholders.general.*;
-import de.rayzs.pat.api.storage.placeholders.groups.*;
+import de.rayzs.pat.api.storage.storages.DisabledServersStorage;
+import de.rayzs.pat.api.storage.storages.IgnoredServersStorage;
+import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
+import de.rayzs.pat.plugin.PluginLoader;
+import de.rayzs.pat.utils.ExpireCache;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
+import de.rayzs.pat.utils.configuration.Configurator;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.storage.config.messages.*;
-import de.rayzs.pat.api.storage.config.settings.*;
-import de.rayzs.pat.api.storage.blacklist.impl.*;
-import de.rayzs.pat.api.storage.storages.*;
-import de.rayzs.pat.utils.configuration.*;
-import java.util.concurrent.TimeUnit;
-import de.rayzs.pat.utils.group.*;
-import org.bukkit.entity.Player;
-import de.rayzs.pat.plugin.*;
-import de.rayzs.pat.utils.*;
-import java.util.*;
 
 public class Storage {
+
+    private static PluginLoader LOADER;
 
     public static final List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
 
@@ -35,16 +88,71 @@ public class Storage {
     public static boolean USE_LUCKPERMS = false, USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false, USE_VELOCITY = false, USE_SIMPLECLOUD;
     public static long LAST_SYNC = System.currentTimeMillis();
 
+    public static void initialize(PluginLoader loader, String currentVersion) {
+        LOADER = loader;
+        CURRENT_VERSION = currentVersion;
+    }
+
     public static void loadAll(boolean loadBlacklist) {
         loadConfig();
         loadToken();
-        if(loadBlacklist) Blacklist.loadAll();
+
+        if (TOKEN != null && !TOKEN.isEmpty()) {
+            int tokenLength = TOKEN.length(), cutIndex = Math.max(1, tokenLength - 3);
+            String censoredTokenDisplay = "*".repeat(cutIndex) + TOKEN.substring(cutIndex);
+            Logger.info("Token found! (" + censoredTokenDisplay + ")");
+        }
+
+        if (loadBlacklist) Blacklist.loadAll();
 
         PATEventHandler.callUpdatePluginEvents();
     }
 
     public static void loadToken() {
-        TOKEN = Reflection.isProxyServer() ? (String) Files.TOKEN.getOrSet("token", UUID.randomUUID().toString()) : ConfigSections.Settings.HANDLE_THROUGH_PROXY.TOKEN;
+
+        boolean invalidEnv = false;
+
+        if (Reflection.isProxyServer()) {
+            boolean loadFromEnv = (Boolean) Files.TOKEN.getOrSet("load-from-env.enabled", false);
+            String envVariable = (String) Files.TOKEN.getOrSet("load-from-env.name", "PAT_TOKEN");
+
+            if (loadFromEnv) {
+                Logger.info("Looking up token from environment variable: " + envVariable);
+                TOKEN = System.getenv(envVariable);
+
+                if (TOKEN != null) {
+                    return;
+                } else invalidEnv = true;
+            }
+
+            TOKEN = (String) Files.TOKEN.getOrSet("token", UUID.randomUUID().toString());
+
+            if (invalidEnv)
+                Logger.warning("Environment variable not found! Using default Token from the token.yml instead.");
+
+            return;
+        }
+
+        if (!ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+            return;
+        }
+
+        boolean loadFromEnv = ConfigSections.Settings.HANDLE_THROUGH_PROXY.LOAD_FROM_ENV;
+        String envVariable = ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENV_NAME;
+
+        if (loadFromEnv) {
+            TOKEN = System.getenv(envVariable);
+
+            if (TOKEN != null) {
+                return;
+            } else invalidEnv = true;
+
+        }
+
+        TOKEN = ConfigSections.Settings.HANDLE_THROUGH_PROXY.TOKEN;
+
+        if (invalidEnv)
+            Logger.warning("Environment variable not found! Using default Token from the config.yml instead.");
     }
 
     public static void loadConfig() {
@@ -52,34 +160,104 @@ public class Storage {
         ConfigSections.Messages.initialize();
         ConfigSections.SECTIONS.forEach(ConfigStorage::load);
 
-        if(USE_PLACEHOLDERAPI)
+        if (USE_PLACEHOLDERAPI)
             ConfigSections.PLACEHOLDERS.forEach(PlaceholderStorage::load);
+    }
+
+    public static void handleChange() {
+        handleChange(null);
+    }
+
+    public static void handleChange(String server) {
+
+        if (Reflection.isProxyServer()) {
+
+            boolean isVelocity = Reflection.isVelocityServer();
+
+            if (server != null) {
+
+                Storage.Blacklist.clearServerBlacklists(server);
+                Storage.Blacklist.loadCachedServerBlacklists(server);
+
+                List<String> associatedServers = getServers()
+                        .stream()
+                        .filter(s -> !s.equals(server) && isServer(server, s))
+                        .toList();
+
+                associatedServers.forEach(s -> {
+                    Storage.Blacklist.clearServerBlacklists(s);
+                    Storage.Blacklist.loadCachedServerBlacklists(s);
+                });
+
+                if (isVelocity) {
+
+                    associatedServers.forEach(s -> {
+                        List<UUID> playerIds = Storage.getLoader().getPlayerIdsByServer(s);
+                        List<String> commands = new ArrayList<>(SubArgsModule.getServerCommands(s));
+
+                        playerIds.forEach(playerId -> {
+                            List<String> playerCommands = new ArrayList<>(commands);
+                            playerCommands.addAll(SubArgsModule.getGroupCommands(playerId, s));
+
+                            PATEventHandler.callUpdatePlayerCommandsEvents(playerId, playerCommands, true);
+                        });
+
+                    });
+                }
+
+            } else {
+
+                if (isVelocity) {
+                    List<UUID> playerIds = Storage.getLoader().getPlayerIds();
+
+                    playerIds.forEach(playerId -> {
+                        List<String> playerCommands = new ArrayList<>(SubArgsModule.getServerCommands(playerId));
+                        playerCommands.addAll(SubArgsModule.getGroupCommands(playerId));
+
+                        PATEventHandler.callUpdatePlayerCommandsEvents(playerId, playerCommands, false);
+                    });
+                }
+
+            }
+
+            GroupManager.clearServerGroupBlacklists();
+            Communicator.syncData();
+
+            Storage.getLoader().updateCommandCache();
+            Communicator.sendPermissionReset();
+            return;
+        }
+
+        PermissionUtil.reloadPermissions();
+
+        if (Reflection.getMinor() >= 13) {
+            BukkitAntiTabListener.handleTabCompletion();
+        }
+    }
+
+    public static PluginLoader getLoader() {
+        return LOADER;
     }
 
     public static List<String> getServers() {
         return getServers(false);
     }
 
-    public static List<String> getServers(boolean withBlacklist) {
-        List<String> servers = new ArrayList<>();
-        if(Reflection.isVelocityServer())
-            servers.addAll(VelocityLoader.getServerNames());
-        else if(Reflection.isProxyServer())
-            servers.addAll(BungeeLoader.getServerNames());
+    public static List<String> getServers(boolean includingServerSpecifics) {
+        List<String> servers = LOADER.getServerNames();
 
-        if(withBlacklist) Blacklist.getBlacklistServers().stream().filter(server -> !servers.contains(server.toLowerCase())).forEach(server -> servers.add(server.toLowerCase()));
+        if(includingServerSpecifics) {
+            servers.addAll(Blacklist.getBlacklists().stream().map(Map.Entry::getKey).toList());
+        }
+
         return servers;
-    }
-
-    public static boolean isServer(String originServer, Set<String> targetServers) {
-        List<String> list = new ArrayList<>(targetServers);
-        return isServer(originServer, list);
     }
 
     public static boolean isServer(String targetServers, List<String> servers) {
         for (String originServer : servers)
             if(isServer(originServer, targetServers))
                 return true;
+
         return false;
     }
 
@@ -87,10 +265,11 @@ public class Storage {
         originServer = originServer.toLowerCase();
         targetServer = targetServer.toLowerCase();
 
-        if(originServer.endsWith("*")) {
-            originServer = originServer.replace("*", "");
+        if (originServer.endsWith("*")) {
+            originServer = originServer.substring(0, originServer.length() - 2);
             return targetServer.startsWith(originServer);
         }
+
         return originServer.equalsIgnoreCase(targetServer);
     }
 
@@ -112,6 +291,7 @@ public class Storage {
 
         public static class Settings {
 
+            public static AutoLowercaseCommandsSection AUTO_LOWERCASE_COMMANDS = new AutoLowercaseCommandsSection();
             public static BlockNamespaceCommandsSection BLOCK_NAMESPACE_COMMANDS = new BlockNamespaceCommandsSection();
             public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
             public static PatchExploitSection PATCH_EXPLOITS = new PatchExploitSection();
@@ -194,7 +374,7 @@ public class Storage {
                         break;
                     }
 
-                    // Second times because of nested placeholders
+                    // Second time because of nested placeholders
                     if (result != null && result.contains("%")) {
                         result = PlaceholderReplacer.replace(player, result);
                     }
@@ -207,10 +387,34 @@ public class Storage {
 
     public static class Blacklist {
 
-        private static final HashMap<String, GeneralBlacklist> SERVER_BLACKLISTS = new HashMap<>();
+        public enum BlockType {
+            CHAT("[CMD]"),
+            TAB("[TAB]"),
+            NEGATE("!"),
+
+            BOTH("");
+
+            private final String text;
+
+            BlockType(String text) {
+                this.text = text;
+            }
+
+            @Override
+            public String toString() {
+                return this.text;
+            }
+        }
+
+        private static final BlockType[] BLOCK_TYPES = BlockType.values();
+
         private static final GeneralBlacklist BLACKLIST = BlacklistCreator.createGeneralBlacklist();
         private static final IgnoredServersStorage IGNORED_SERVERS = new GeneralIgnoredServers();
         private static final DisabledServersStorage DISABLED_SERVERS = new DisabledServersStorage();
+
+        // General server-specific list (e.g: server-*)
+        private static final HashMap<String, GeneralBlacklist> SERVER_BLACKLISTS = new HashMap<>();
+        // Temporary list for all servers (e.g: server-1)
         private static final ExpireCache<String, List<GeneralBlacklist>> CACHED_SERVER_BLACKLIST = new ExpireCache<>(1, TimeUnit.HOURS);
 
         public static void loadAll() {
@@ -218,7 +422,8 @@ public class Storage {
             SERVER_BLACKLISTS.clear();
             BLACKLIST.load();
 
-            if(!Reflection.isProxyServer()) return;
+            if(!Reflection.isProxyServer())
+                return;
 
             IGNORED_SERVERS.load();
             DISABLED_SERVERS.load();
@@ -226,274 +431,198 @@ public class Storage {
             BLACKLIST.getConfig().getKeys("global.servers", true).forEach(key -> {
                 GeneralBlacklist blacklist = BlacklistCreator.createGeneralBlacklist(key);
                 blacklist.load();
+
                 SERVER_BLACKLISTS.put(key, blacklist);
             });
+
+            loadAllCachedServerBlacklists();
         }
 
-        public static boolean isDisabledServer(String server) {
-            return DISABLED_SERVERS.isListed(server);
+        private static void loadAllCachedServerBlacklists() {
+            getServers().forEach(Blacklist::loadCachedServerBlacklists);
         }
 
-        public static boolean isOnIgnoredServer(String server) {
-            return IGNORED_SERVERS.isListed(server);
+        private static void loadCachedServerBlacklists(String server) {
+            List<GeneralBlacklist> blacklists = SERVER_BLACKLISTS.entrySet().stream()
+                    .filter(entry ->
+                            isServer(entry.getKey(), server)
+                    ).map(entry ->
+                            entry.getValue()
+                    ).toList();
+
+            CACHED_SERVER_BLACKLIST.put(server, blacklists);
         }
 
-        public static boolean isBlockedGloballyOnServer(boolean blocked, String server, boolean turn) {
-            if(isOnIgnoredServer(server)) return turn;
-            else return blocked;
+        public static GeneralBlacklist getServerBlacklist(String server) {
+            GeneralBlacklist blacklist = SERVER_BLACKLISTS.get(server);
+            if(blacklist != null) {
+                return blacklist;
+            }
+
+            blacklist = BlacklistCreator.createGeneralBlacklist(server);
+            blacklist.load();
+
+            SERVER_BLACKLISTS.put(server, blacklist);
+            return blacklist;
         }
 
-        public static List<String> getBlacklistServers() {
-            return new ArrayList<>(SERVER_BLACKLISTS.keySet());
+        public static Set<Map.Entry<String, GeneralBlacklist>> getBlacklists() {
+            return SERVER_BLACKLISTS.entrySet();
         }
 
         public static GeneralBlacklist getBlacklist() {
             return BLACKLIST;
         }
 
-        public static GeneralBlacklist getBlacklist(String server) {
-            GeneralBlacklist blacklist;
+        public static List<GeneralBlacklist> getServerBlacklists(String server) {
+            if (!CACHED_SERVER_BLACKLIST.contains(server)) {
+                loadCachedServerBlacklists(server);
+            }
 
-            if(!SERVER_BLACKLISTS.containsKey(server)) {
-                blacklist = BlacklistCreator.createGeneralBlacklist(server);
-                blacklist.load();
-                SERVER_BLACKLISTS.put(server, blacklist);
-            } else blacklist = SERVER_BLACKLISTS.get(server);
-
-            return SERVER_BLACKLISTS.getOrDefault(server, blacklist);
-        }
-
-        public static List<GeneralBlacklist> getAllBlacklists(String server) {
-            List<GeneralBlacklist> blacklists = getBlacklists(server);
-            if (isOnIgnoredServer(server)) return blacklists;
-
-            blacklists.add(Storage.Blacklist.getBlacklist());
-            return blacklists;
+            return CACHED_SERVER_BLACKLIST.get(server);
         }
 
         public static void clearServerBlacklists(String server) {
-            CACHED_SERVER_BLACKLIST.remove(server.toLowerCase());
+            CACHED_SERVER_BLACKLIST.remove(server);
         }
 
-        public static List<GeneralBlacklist> getBlacklists(String server) {
-            final String finalServer = server.toLowerCase();
-
-            if (CACHED_SERVER_BLACKLIST.contains(finalServer))
-                return CACHED_SERVER_BLACKLIST.get(finalServer);
-
-            List<GeneralBlacklist> blacklists = new ArrayList<>();
-            SERVER_BLACKLISTS.entrySet()
-                    .stream().filter(entry -> entry.getKey().endsWith("*")
-                    ? isServer(entry.getKey(), finalServer)
-                    : entry.getKey().equalsIgnoreCase(finalServer))
-                    .forEach(entry -> blacklists.add(entry.getValue()));
-
-            return CACHED_SERVER_BLACKLIST.putAndGet(finalServer, blacklists);
+        public static boolean isDisabledServer(String server) {
+            return DISABLED_SERVERS.isListed(server);
         }
 
-        public static boolean isListed(String command, String server) {
-            boolean turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
-                    blocked = isBlockedGloballyOnServer(isBlocked(command, server), server, turn);
+        public static boolean isIgnoredServer(String server) {
+            return IGNORED_SERVERS.isListed(server);
+        }
 
-            if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                blocked = blacklist.isBlocked(command, server, !turn);
-                if(blocked) break;
+        public static boolean canPlayerAccess(Object player, String command, BlockType type) {
+            return canPlayerAccess(player, command, type, null);
+        }
+
+        public static boolean canPlayerAccessChat(Object player, String command) {
+            return canPlayerAccess(player, command, BlockType.CHAT, null);
+        }
+
+
+        public static boolean canPlayerAccessChat(Object player, String command, String server) {
+            return canPlayerAccess(player, command, BlockType.CHAT, server);
+        }
+
+        public static boolean canPlayerAccessTab(Object player, String command) {
+            return canPlayerAccess(player, command, BlockType.TAB, null);
+        }
+
+        public static boolean canPlayerAccessTab(Object player, String command, String server) {
+            return canPlayerAccess(player, command, BlockType.TAB, server);
+        }
+
+        public static boolean canPlayerAccess(Object player, String command, BlockType type, String server) {
+            boolean blocked = isBlocked(command, type, server);
+
+            if (!blocked) {
+                return true;
             }
 
-            return blocked;
-        }
-
-        public static boolean isListed(String command, boolean intensive, String server) {
-            boolean turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
-                    blocked = isBlockedGloballyOnServer(isListed(command, intensive), server, turn);
-
-            if(!blocked) for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                blocked = blacklist.isListed(command, intensive);
-                if(blocked) break;
+            if (PermissionUtil.hasBypassPermission(player, command)) {
+                return true;
             }
-            return blocked;
+
+            return GroupManager.canAccessCommand(player, command, type, server);
         }
 
-        public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, String server) {
-            int priority = -1;
-            for (Group group : GroupManager.getGroups()) {
-                for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(server)) {
+        public static boolean isBlockedChat(String command) {
+            return isBlocked(command, BlockType.CHAT, null);
+        }
 
-                    if(priority == -1 || group.getPriority() <= priority)
-                        if(group.hasPermission(playerObj)) {
-                            priority = group.getPriority();
-                            if (groupBlacklist.isListed(command, intensive)) return true;
-                        }
+        public static boolean isBlockedTab(String command) {
+            return isBlocked(command, BlockType.TAB, null);
+        }
+
+        public static boolean isBlockedChat(String command, String server) {
+            return isBlocked(command, BlockType.CHAT, server);
+        }
+
+        public static boolean isBlockedTab(String command, String server) {
+            return isBlocked(command, BlockType.TAB, server);
+        }
+
+        public static boolean isBlocked(String command, BlockType type) {
+            return isBlocked(command, type, null);
+        }
+
+        public static boolean isBlocked(String command, BlockType type, String server) {
+            boolean listed = isListed(command, type, server),
+                    turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+
+            return !(listed && turn);
+        }
+
+        private static boolean isListed(String unmodifiedCommand, BlockType type, String server) {
+            if (server != null && isDisabledServer(server))
+                return false;
+
+            boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+            boolean listed = false;
+
+            if (type == BlockType.NEGATE)
+                turn = !turn;
+
+            String command = type.toString() + unmodifiedCommand;
+
+            if (server == null || !isIgnoredServer(server))
+                listed = BLACKLIST.isListed(command, !turn);
+
+            if (server == null) {
+
+                if (!listed && type != BlockType.BOTH)
+                    return isListed(unmodifiedCommand, BlockType.BOTH, null);
+
+                return listed;
+            }
+
+            List<GeneralBlacklist> blacklists = new ArrayList<>(getServerBlacklists(server));
+            if (blacklists.isEmpty())
+                blacklists.add(BLACKLIST);
+
+            for (GeneralBlacklist blacklist : blacklists) {
+                if (listed && turn) {
+                    break;
                 }
+
+                listed = blacklist.isListed(command, turn);
             }
 
-            return false;
+            if (!listed && type != BlockType.BOTH) {
+                return isListed(unmodifiedCommand, BlockType.BOTH, server);
+            }
+
+            return listed;
         }
 
-        public static boolean doesGroupBypass(Object playerObj, String command, boolean intensive, boolean convert, boolean slash, String server) {
-            int priority = -1;
-            for (Group group : GroupManager.getGroups()) {
-                for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(server, true)) {
-                    if(priority == -1 || group.getPriority() <= priority)
-                        if(group.hasPermission(playerObj)) {
-                            priority = group.getPriority();
-                            if (groupBlacklist.isListed(command, intensive, convert, slash)) return true;
-                        }
+        public static class BlockTypeFetcher {
+
+            public static BlockType getType(String command) {
+                for (BlockType blockType : BLOCK_TYPES) {
+                    if (!command.startsWith(blockType.toString()))
+                        continue;
+
+                    return blockType;
                 }
+
+                return null;
             }
 
-            return false;
-        }
-
-        public static boolean isListed(Object playerObj, String command, boolean intensive, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(playerObj)))
-                return false;
-
-            boolean listed = isListed(command, intensive);
-
-            if(!listed) for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                listed = blacklist.isListed(command, intensive);
-                if(listed) break;
-            }
-            return listed;
-        }
-
-        public static boolean isListed(Object playerObj, String command, boolean intensive, boolean listed, String server) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(playerObj)))
-                return false;
-
-            if(!listed) for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                listed = blacklist.isListed(command, intensive);
-                if(listed) break;
-            }
-            return listed;
-        }
-
-        public static boolean isListed(Object playerObj, String command, boolean intensive, boolean listed, boolean slash, String server) {
-            return isListed(playerObj, command, intensive, listed, slash, server, false);
-        }
-
-        public static boolean isListed(Object playerObj, String command, boolean intensive, boolean listed, boolean slash, String server, boolean instantReturn) {
-            if(GroupManager.getGroupsByServer(server).stream().anyMatch(group -> isInListed(command, group.getAllCommands(server), intensive) && group.hasPermission(playerObj)))
-                return false;
-
-            if(listed) return true;
-
-            for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                listed = blacklist.isListed(command, intensive, true, slash);
-                if(instantReturn) return listed;
-
-                if(listed) break;
+            public static String modify(String command) {
+                BlockType type = getType(command);
+                return modify(command, type);
             }
 
-            return listed;
-        }
+            public static String modify(String command, BlockType type) {
+                if (type == null || type == BlockType.BOTH || command.length() <= type.toString().length() || !command.startsWith(type.toString()))
+                    return command;
 
-        public static boolean isBlocked(String command, boolean intensive, String server) {
-            return isBlocked(command, intensive, server, false);
-        }
-
-        public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server) {
-            return isBlocked(targetObj, command, intensive, server, false);
-        }
-
-        public static boolean isBlocked(String command, boolean intensive, String server, boolean focusOnBlock) {
-            server = server.toLowerCase();
-
-            boolean turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED,
-                    blocked,
-                    blockedGlobal = isBlockedGloballyOnServer(BLACKLIST.isBlockedIgnorePermission(command, intensive), server, turn),
-                    blockedServer = false;
-
-            if(focusOnBlock && blockedGlobal) return true;
-
-            for (GeneralBlacklist blacklist : getBlacklists(server)) {
-                if(focusOnBlock && blacklist.isBlocked(command, intensive))
-                    return true;
-
-                blockedServer = blacklist.isBlockedIgnorePermission(command, intensive);
-                break;
+                return command.substring(type.toString().length());
             }
 
-            blocked = turn ? blockedGlobal && blockedServer : blockedServer || blockedGlobal;
-
-            // The reason which there's no tab-completion and also why every server-based list needs to exist to avoid this issue.
-
-            if (turn && !blocked
-                    && CACHED_SERVER_BLACKLIST.contains(server)
-                    && CACHED_SERVER_BLACKLIST.get(server).isEmpty())
-                blocked = true;
-
-            return blocked;
-        }
-
-        public static boolean isBlocked(Object targetObj, String command, boolean intensive, String server, boolean focusOnBlock) {
-            if(server != null) server = server.toLowerCase();
-
-            if(doesGroupBypass(targetObj, command, intensive, server))
-                return false;
-
-            boolean blocked = isBlocked(command, intensive, server, focusOnBlock);
-
-            if(blocked)
-                if(PermissionUtil.hasBypassPermission(targetObj, command))
-                    blocked = false;
-
-            return blocked;
-        }
-
-        public static boolean isListed(String command) {
-            return BLACKLIST.isListed(command);
-        }
-
-        public static boolean isListed(String command, boolean intensive) {
-            return BLACKLIST.isListed(command, intensive);
-        }
-
-        public static boolean isListed(String command, boolean intensive, boolean convert) {
-            return BLACKLIST.isListed(command, intensive, convert);
-        }
-
-        public static boolean isListed(String command, boolean intensive, boolean convert, boolean slash) {
-            return BLACKLIST.isListed(command, intensive, convert, slash);
-        }
-
-        public static boolean isBlocked(Object targetObj, String command) {
-            return BLACKLIST.isBlocked(targetObj, command);
-        }
-
-        public static boolean isBlocked(Object targetObj, String command, boolean intensive) {
-            return BLACKLIST.isBlocked(targetObj, command, intensive);
-        }
-
-        public static boolean isBlocked(Object targetObj, String command, boolean intensive, boolean convert, boolean slash) {
-            return BLACKLIST.isBlocked(targetObj, command, intensive, convert, slash);
-        }
-
-        public static boolean isBlocked(String command, boolean intensive, boolean convert) {
-            return BLACKLIST.isBlocked(command, intensive, convert);
-        }
-
-        public static boolean isBlocked(String command, boolean intensive, boolean convert, boolean slash) {
-            return BLACKLIST.isBlocked(command, intensive, convert);
-        }
-
-        public static String convertCommand(String command, boolean intensive, boolean lowercase) {
-            return BLACKLIST.convertCommand(command, intensive, lowercase);
-        }
-
-        public static String convertCommand(String command, boolean intensive, boolean lowercase, boolean slash) {
-            return BLACKLIST.convertCommand(command, intensive, lowercase, slash);
-        }
-
-        public static boolean isInListed(String command, List<String> commandList, boolean intensive) {
-            command = StringUtils.replaceFirst(command, "/", "");
-            command = convertCommand(command, intensive, false);
-
-            for (String commands : commandList)
-                if(commands.equals(command)) return true;
-
-            return false;
         }
     }
 }

@@ -30,15 +30,19 @@ public class LuckPermsAdapter {
 
         eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeMutateEvent.class, LuckPermsAdapter::onNoteMutate);
 
-        if(!Reflection.isProxyServer()) {
+        if (!Reflection.isProxyServer()) {
+
             if (BukkitLoader.useSuggestions())
                 eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitAntiTabListener.luckpermsNetworkSync());
+
         } else {
-            if(Reflection.isVelocityServer()) {
+
+            if (Reflection.isVelocityServer()) {
                 eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> VelocityLoader.delayedPermissionsReload());
-                VelocityAntiTabListener.updateCommands();
             }
-            else WaterfallAntiTabListener.updateCommands();
+
+            Storage.getLoader().updateCommandCache();
+
         }
     }
 
@@ -56,54 +60,63 @@ public class LuckPermsAdapter {
 
     public static boolean hasAnyPermissions(UUID uuid) {
         Map<String, Boolean> permissions = getPermissions(uuid);
-        if(permissions == null) return false;
+        if (permissions == null) return false;
 
         return !permissions.isEmpty();
     }
 
     public static void setPermissions(UUID uuid) {
         Map<String, Boolean> permissions = getPermissions(uuid);
-        if(permissions == null) return;
+        if (permissions == null) return;
 
 
         permissions.forEach((permission, permitted) -> {
-            if(permission.startsWith("proantitab.") || permission.equals("*"))
+
+            if (permission.startsWith("proantitab.") || permission.equals("*"))
                 PermissionUtil.setPermission(uuid, permission, permitted);
 
         });
 
-        if(Reflection.isProxyServer()) {
-            if(Reflection.isVelocityServer()) VelocityAntiTabListener.updateCommands();
-            else if(Reflection.isPaper()) WaterfallAntiTabListener.updateCommands();
+        if (Reflection.isProxyServer()) {
+            Storage.getLoader().updateCommandCache();
             return;
         }
 
-        if(Reflection.getMinor() >= 16) BukkitAntiTabListener.handleTabCompletion(uuid);
+        if (Reflection.getMinor() >= 13)
+            BukkitAntiTabListener.handleTabCompletion(uuid);
     }
 
     private static void onNoteMutate(NodeMutateEvent event) {
         boolean relevant = false, inheritance = false;
-        if(event.isUser()) for(Node node : event.getDataAfter()) {
 
-            if(!inheritance) inheritance = node.getType() == NodeType.INHERITANCE;
-            if(node.getType() != NodeType.PERMISSION && (node.getKey().startsWith("proantitab.") || !node.getKey().equals("*"))) {
+        if (event.isUser())
+            for (Node node : event.getDataAfter()) {
+
+            if (!inheritance)
+                inheritance = node.getType() == NodeType.INHERITANCE;
+
+            if (node.getType() != NodeType.PERMISSION && (node.getKey().startsWith("proantitab.") || !node.getKey().equals("*"))) {
                 relevant = true;
                 break;
             }
         }
 
-        if(!relevant && !inheritance) return;
+        if (!relevant && !inheritance)
+            return;
 
         if (event.isUser() && event.getTarget() instanceof User) {
             User user = (User) event.getTarget();
 
-            if (Reflection.isProxyServer()) {
+            if (!Reflection.isProxyServer()) {
 
-                if(Reflection.isVelocityServer())
-                    PermissionUtil.reloadPermissions(user.getUniqueId());
+                if (Reflection.getMinor() >= 13)
+                    BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
 
-            } else BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
+                return;
+            }
 
+            if (Reflection.isVelocityServer())
+                PermissionUtil.reloadPermissions(user.getUniqueId());
         }
     }
 }

@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import org.bukkit.event.*;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import java.util.*;
 
 public class BukkitAntiTabListener implements Listener {
@@ -24,18 +26,21 @@ public class BukkitAntiTabListener implements Listener {
         UUID uuid = player.getUniqueId();
         String uuidSubstring = uuid.toString().substring(uuid.toString().length() - 5);
 
-        if(Storage.USE_VELOCITY || player.isOp()) {
+        if (Storage.USE_VELOCITY || player.isOp()) {
             Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (Veloctiy? " + Storage.USE_VELOCITY + ". OP? " + player.isOp() + ")");
             return;
         }
 
-        if(!BukkitLoader.isLoaded()) {
+        if (!BukkitLoader.isLoaded()) {
             event.getCommands().clear();
             Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (not loaded)");
             return;
         }
 
-        if(event.getCommands().isEmpty()) {
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+            return;
+
+        if (event.getCommands().isEmpty()) {
             Logger.debug("No available commands to filter! Ignoring rest of the code until at least one command is listed in there.");
             return;
         }
@@ -48,47 +53,16 @@ public class BukkitAntiTabListener implements Listener {
             return;
         }
 
-        if(Storage.USE_VIAVERSION)
-            if(Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754)
-                event.getCommands().clear();
+        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), player, player.getUniqueId());
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, playerCommands);
 
-        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(event.getCommands(), player, player.getUniqueId());
         event.getCommands().clear();
 
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, playerCommands);
-        if(filteredSuggestionEvent.isCancelled()) return;
+        if (filteredSuggestionEvent.isCancelled()) 
+            return;
 
         event.getCommands().addAll(filteredSuggestionEvent.getSuggestions());
-
         Logger.debug("Player with uuid " + uuidSubstring + " has a total of " + playerCommands.size() + " commands.");
-    }
-
-    public static void updateCommands(Player player) {
-        if(notUpdatablePlayer(player.getUniqueId())) return;
-        if(Reflection.getMinor() >= 16) player.updateCommands();
-    }
-
-    public static void updateCommands() {
-        if(Reflection.getMinor() >= 16) Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::updateCommands);
-    }
-
-    public static void setChangeStatus() {
-        COMMANDS_CACHE.updateChangeState();
-    }
-
-    public static void handleTabCompletion(List<String> commands) {
-        if(Storage.USE_VELOCITY) return;
-        COMMANDS_CACHE.reset();
-        Bukkit.getOnlinePlayers().forEach(player -> handleTabCompletion(player, commands));
-    }
-
-    public static void handleTabCompletion() {
-        COMMANDS_CACHE.reset();
-        Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::handleTabCompletion);
-    }
-
-    public static void handleTabCompletion(Player player) {
-        handleTabCompletion(player, getCommands());
     }
 
     public static List<String> getCommands() {
@@ -96,21 +70,12 @@ public class BukkitAntiTabListener implements Listener {
                 ? Storage.Blacklist.getBlacklist().getCommands() : BukkitLoader.getAllCommands();
     }
 
-    public static void handleTabCompletion(UUID uuid) {
-        if(notUpdatablePlayer(uuid)) return;
-
-        Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
-        handleTabCompletion(player);
+    private static boolean notUpdatablePlayer(UUID uuid) {
+        return Storage.USE_VIAVERSION && Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754;
     }
 
-    public static void handleTabCompletion(UUID uuid, List<String> commands) {
-        if(notUpdatablePlayer(uuid)) return;
 
-        Player player = Bukkit.getPlayer(uuid);
-        if(player == null) return;
-        handleTabCompletion(player, commands);
-    }
+    // --------------- LUCKPERMS SECTIONS --------------- //
 
     public static void luckpermsNetworkSync() {
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), PermissionUtil::reloadPermissions, 40);
@@ -120,21 +85,43 @@ public class BukkitAntiTabListener implements Listener {
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> PermissionUtil.reloadPermissions(uuid));
     }
 
+    public static void updateCommands() {
+        Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::updateCommands);
+    }
+
+    public static void updateCommands(Player player) {
+        if (Reflection.getMinor() >= 13 && !notUpdatablePlayer(player.getUniqueId()))
+            player.updateCommands();
+    }
+
+
+    // --------------- UPDATE SECTIONS --------------- //
+
+    public static void handleTabCompletion() {
+        COMMANDS_CACHE.reset();
+        Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::handleTabCompletion);
+    }
+
+    public static void handleTabCompletion(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null)
+            return;
+
+        handleTabCompletion(player);
+    }
+
+    public static void handleTabCompletion(Player player) {
+        handleTabCompletion(player, getCommands());
+    }
+
     public static void handleTabCompletion(Player player, List<String> commands) {
-        if(Storage.USE_VELOCITY) return;
-        if(notUpdatablePlayer(player.getUniqueId())) return;
+        if (notUpdatablePlayer(player.getUniqueId()))
+            return;
 
         List<String> dummy = new ArrayList<>(commands);
         PlayerCommandSendEvent event = new PlayerCommandSendEvent(player, dummy);
         Bukkit.getPluginManager().callEvent(event);
         updateCommands(player);
-    }
-
-    private static boolean notUpdatablePlayer(UUID uuid) {
-        if(Storage.USE_VIAVERSION)
-            return Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754;
-
-        return false;
     }
 
 }

@@ -16,7 +16,11 @@ public class BungeeClientInfo extends ClientInfo {
 
     @Override
     public void sendBytes(byte[] bytes) {
-        ProxyServer.getInstance().getServers().entrySet().stream().filter(entry -> entry.getKey().equalsIgnoreCase(getName())).forEach(entry -> entry.getValue().sendData(Client.CHANNEL_NAME, bytes));
+        ProxyServer.getInstance().getServers().entrySet().stream().filter(entry ->
+                entry.getKey().equalsIgnoreCase(getName())
+        ).forEach(entry ->
+                entry.getValue().sendData(Client.CHANNEL_NAME, bytes)
+        );
     }
 
     @Override

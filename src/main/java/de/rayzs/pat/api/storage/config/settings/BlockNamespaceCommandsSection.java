@@ -1,12 +1,10 @@
 package de.rayzs.pat.api.storage.config.settings;
 
-import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
-import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-
-import java.util.UUID;
 
 public class BlockNamespaceCommandsSection extends ConfigStorage {
 

@@ -16,6 +16,9 @@
 #   Execute console command:
 #        Syntax:  console::command
 #        Example: console::say %player% is an evil player
+#   Execute player command:
+#        Syntax:  execute::command
+#        Example: execute::help
 #   Send actionbar:
 #        Syntax:  actionbar::text
 #        Example: actionbar::&cThis is not cool %player%!
@@ -42,11 +45,7 @@
 #  message:
 #    - "&cThis kit does not exist!"
 #  actions:
-#    - "console::say That's not nice %player%!"
-#    - "effect::BLINDNESS::45::1"
-#    - "sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0"
-#    - "title::&cHey!::&cYou can't do that %player%!::5::20::5"
-#    - "actionbar::&cNop, sorry %player%"
+#    - "actionbar::&cSorry %player%, but this kit does not exist!"
 
 # Here another example with an auctionhouse plugin.
 # In here we only trigger the given message, if the player would type "/ah plugin".

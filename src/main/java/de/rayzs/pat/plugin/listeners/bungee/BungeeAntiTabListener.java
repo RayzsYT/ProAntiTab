@@ -1,20 +1,28 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import com.google.gson.JsonPrimitive;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
-import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.CommandsCache;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import de.rayzs.pat.utils.permission.PermissionUtil;
+import net.md_5.bungee.api.event.TabCompleteEvent;
+import net.md_5.bungee.api.event.TabCompleteResponseEvent;
 import net.md_5.bungee.api.plugin.Listener;
-import de.rayzs.pat.api.storage.Storage;
-import net.md_5.bungee.api.event.*;
-import net.md_5.bungee.event.*;
+import net.md_5.bungee.event.EventHandler;
+
+import java.util.HashMap;
 
 public class BungeeAntiTabListener implements Listener {
 
     @EventHandler
     public void onTabComplete(TabCompleteEvent event) {
+
+        // Ignoring this at first, due to transfer to the packet-based solution only. Hehe
+
+        /*
         if(!(event.getSender() instanceof ProxiedPlayer)) return;
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
@@ -25,13 +33,24 @@ public class BungeeAntiTabListener implements Listener {
         if (Storage.Blacklist.isDisabledServer(serverName))
             return;
 
-        if(PermissionUtil.hasBypassPermission(player)) return;
-        if(Storage.Blacklist.isBlocked(player, event.getCursor(), !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName()))
+        if (PermissionUtil.hasBypassPermission(player))
+            return;
+
+        if (!Storage.Blacklist.canPlayerAccessTab(player, event.getCursor(), serverName)) {
             event.getSuggestions().clear();
+            return;
+        }
+
+        event.getSuggestions().removeIf(suggestion -> !Storage.Blacklist.canPlayerAccessTab(player, suggestion, serverName));
+         */
     }
 
     @EventHandler
     public void onTabComplete(TabCompleteResponseEvent event) {
+
+        // Ignoring this at first, due to transfer to the packet-based solution only. Hehe
+
+        /*
         if (!(event.getSender() instanceof ProxiedPlayer))
             return;
 
@@ -43,11 +62,13 @@ public class BungeeAntiTabListener implements Listener {
         if (Storage.Blacklist.isDisabledServer(serverName))
             return;
 
-        if(PermissionUtil.hasBypassPermission(player)) return;
+        if(PermissionUtil.hasBypassPermission(player)) 
+            return;
 
-        event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getServer().getInfo().getName()));
-
+        event.getSuggestions().removeIf(command -> !Storage.Blacklist.canPlayerAccessTab(player, command, serverName));
+        
         FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, event.getSuggestions());
         if (filteredSuggestionEvent.isCancelled()) event.getSuggestions().clear();
+         */
     }
 }

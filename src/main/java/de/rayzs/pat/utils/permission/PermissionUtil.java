@@ -1,10 +1,13 @@
 package de.rayzs.pat.utils.permission;
 
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
-import de.rayzs.pat.utils.group.GroupManager;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.UUID;
+
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandSender;
-import java.util.*;
+import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 
 public class PermissionUtil {
 
@@ -98,50 +101,20 @@ public class PermissionUtil {
         return hasPermission(targetObj, "bypass");
     }
 
-    public static boolean hasBypassPermission(Object targetObj, String command, boolean slash) {
-        command = Storage.Blacklist.convertCommand(command, false, true, slash);
-
-        return hasBypassPermission(targetObj)
-                || hasPermission(targetObj, "bypass." + command.toLowerCase())
-                || GroupManager.canAccessCommand(targetObj, command, slash);
-    }
-
-    public static boolean hasBypassPermission(Object targetObj, String command, boolean slash, String server) {
-        command = Storage.Blacklist.convertCommand(command, false, true, slash);
-
-        return hasBypassPermission(targetObj)
-                || hasPermission(targetObj, "bypass." + command.toLowerCase())
-                || GroupManager.canAccessCommand(targetObj, command, slash, server);
-    }
-
     public static boolean hasBypassPermission(Object targetObj, String command) {
-        command = Storage.Blacklist.convertCommand(command, false, true);
-
-        return hasBypassPermission(targetObj)
-                || hasPermission(targetObj, "bypass." + command.toLowerCase())
-                || GroupManager.canAccessCommand(targetObj, command);
-    }
-
-    public static boolean hasBypassPermission(Object targetObj, String command, String server) {
-        server = server.toLowerCase();
-        if (command.contains(" ")) {
-            String[] split = command.split(" ");
-            if (split.length > 0)
-                command = split[0];
-            command = command.split(" ")[0];
-        }
-
-        return hasBypassPermission(targetObj)
-                || hasPermission(targetObj, "bypass." + command.toLowerCase())
-                || GroupManager.canAccessCommand(targetObj, command, server);
+        return hasBypassPermission(targetObj) || hasPermission(targetObj, "bypass." + command);
     }
 
     public static boolean hasPermissionWithResponse(Object targetObj, String command) {
         boolean permitted = hasPermission(targetObj, command);
+
         if(!permitted) {
+
             if(targetObj instanceof CommandSender)
                 ((CommandSender) targetObj).sendMessage(Storage.ConfigSections.Messages.NO_PERMISSION.MESSAGE.replace("%permission%", "proantitab." + command));
+        
         }
+        
         return permitted;
     }
 }

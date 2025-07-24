@@ -10,22 +10,16 @@ public class ListGroupsPlaceholder extends PlaceholderStorage {
 
     public ListGroupsPlaceholder() { super("list_groups"); }
 
-    public String COMMAND, SPLITTER;
+    public String SPLITTER;
 
     @Override
     public String onRequest(Player player, String param) {
-        return StringUtils.buildStringList(
-                GroupManager.getGroupNames(),
-                SPLITTER,
-                COMMAND,
-                "%group%"
-        );
+        return StringUtils.getStringList(GroupManager.getGroupNames(), SPLITTER);
     }
 
     @Override
     public void load() {
         super.load();
-        SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7, ").getOrSet();
-        COMMAND = new ConfigSectionHelper<String>(this, "group", "&e%group%").getOrSet();
+        SPLITTER = new ConfigSectionHelper<String>(this, "splitter", "&7, &e").getOrSet();
     }
 }

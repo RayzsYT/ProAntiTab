@@ -1,21 +1,26 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.velocitypowered.api.event.PostOrder;
+import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.PlayerAvailableCommandsEvent;
 import com.velocitypowered.api.event.player.TabCompleteEvent;
-import com.velocitypowered.api.proxy.server.ServerInfo;
-import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
-import de.rayzs.pat.utils.permission.PermissionUtil;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
+
 import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommandsCache;
-import com.velocitypowered.api.proxy.*;
-import com.velocitypowered.api.event.*;
-import java.util.*;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class VelocityAntiTabListener {
 
     private static ProxyServer server;
-    private static final HashMap<String, CommandsCache> COMMANDS_CACHE_MAP = new HashMap<>();
 
     public VelocityAntiTabListener(ProxyServer server) {
         VelocityAntiTabListener.server = server;
@@ -24,23 +29,14 @@ public class VelocityAntiTabListener {
     @Subscribe (order = PostOrder.LAST)
     public void onTabComplete(TabCompleteEvent event) {
         Player player = event.getPlayer();
+        String serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown";
 
-        if (player.getCurrentServer().isPresent()) {
+        if (Storage.Blacklist.isDisabledServer(serverName))
+            return;
 
-            ServerInfo serverInfo = player.getCurrentServer().get().getServerInfo();
-            if (serverInfo != null) {
-                String serverName = serverInfo.getName();
+        if (PermissionUtil.hasBypassPermission(player) || event.getSuggestions().isEmpty() || !player.getCurrentServer().isPresent()) return;
 
-                if (Storage.Blacklist.isDisabledServer(serverName))
-                    return;
-
-            }
-
-        }
-
-        if(PermissionUtil.hasBypassPermission(player) || event.getSuggestions().isEmpty() || !player.getCurrentServer().isPresent()) return;
-
-        event.getSuggestions().removeIf(command -> Storage.Blacklist.isBlocked(player, command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, player.getCurrentServer().get().getServerInfo().getName()));
+        event.getSuggestions().removeIf(command -> !Storage.Blacklist.canPlayerAccessTab(player, command, serverName));
         FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, event.getSuggestions());
         if(filteredSuggestionEvent.isCancelled()) event.getSuggestions().clear();
     }
@@ -49,24 +45,29 @@ public class VelocityAntiTabListener {
     public void onPlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
         Player player = event.getPlayer();
 
-        if(event.getRootNode().getChildren().isEmpty() || !player.getCurrentServer().isPresent()) return;
+        if(event.getRootNode().getChildren().isEmpty() || !player.getCurrentServer().isPresent())
+            return;
 
         String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
 
-        if(!COMMANDS_CACHE_MAP.containsKey(serverName))
-            COMMANDS_CACHE_MAP.put(serverName, new CommandsCache().reverse());
-        CommandsCache commandsCache = COMMANDS_CACHE_MAP.get(serverName);
+        Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
+
+        if(!cache.containsKey(serverName))
+            cache.put(serverName, new CommandsCache());
+
+        CommandsCache commandsCache = cache.get(serverName);
 
         List<String> commandsAsString = new ArrayList<>();
         event.getRootNode().getChildren().stream().filter(command -> command != null && command.getName() != null).forEach(command -> commandsAsString.add(command.getName()));
         commandsCache.handleCommands(commandsAsString, serverName);
 
-        if(PermissionUtil.hasBypassPermission(player)) return;
+        if (PermissionUtil.hasBypassPermission(player))
+            return;
 
         final boolean newer = player.getProtocolVersion().getProtocol() > 340, argsChildrenExist = event.getRootNode().getChild("args") != null;
         final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
 
-        if(event.getRootNode().getChildren().size() == 1
+        if (event.getRootNode().getChildren().size() == 1
                 && newer && argsChildrenExist
                 && event.getRootNode().getChild("args").getChildren().isEmpty()) {
             return;
@@ -81,11 +82,7 @@ public class VelocityAntiTabListener {
             if (command.getName().equals("args"))
                 return false;
 
-            return playerCommands.contains(command.getName());
+            return !playerCommands.contains(command.getName());
         });
-    }
-
-    public static void updateCommands() {
-        new ArrayList<>(COMMANDS_CACHE_MAP.values()).forEach(CommandsCache::reset);
     }
 }

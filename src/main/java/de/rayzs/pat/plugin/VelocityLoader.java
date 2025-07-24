@@ -3,18 +3,22 @@ package de.rayzs.pat.plugin;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.proxy.server.ServerInfo;
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
-import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
+import de.rayzs.pat.plugin.process.CommandProcess;
+import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.utils.configuration.Configurator;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.plugin.commands.VelocityCommand;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import com.velocitypowered.api.proxy.ProxyServer;
-import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.listeners.velocity.*;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.ConnectionBuilder;
@@ -34,7 +38,7 @@ import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "1.9.2",
+version = "2.0.1",
 authors = "Rayzs_YT",
 description = "Hide more than just your plugins. Hide almost everything!",
 url = "https://www.rayzs.de/products/proantitab/page",
@@ -42,19 +46,26 @@ dependencies = {
         @Dependency(id = "luckperms", optional = true),
         @Dependency(id = "papiproxybridge", optional = true)
 })
-public class VelocityLoader {
+public class VelocityLoader implements PluginLoader {
 
     private static VelocityLoader instance;
+
     private static ProxyServer server;
+    private static org.slf4j.Logger logger;
+
     private final EventManager manager;
     private final VelocityMetrics.Factory metricsFactory;
     private ScheduledTask updaterTask;
+
+    private static final HashMap<String, CommandsCache> commandsCacheMap = new HashMap<>();
     private static boolean checkUpdate = false;
 
     @Inject
-    public VelocityLoader(ProxyServer server, VelocityMetrics.Factory metricsFactory) {
+    public VelocityLoader(ProxyServer server, org.slf4j.Logger logger, VelocityMetrics.Factory metricsFactory) {
         VelocityLoader.instance = this;
         VelocityLoader.server = server;
+        VelocityLoader.logger = logger;
+
         this.manager = server.getEventManager();
         this.metricsFactory = metricsFactory;
     }
@@ -63,16 +74,17 @@ public class VelocityLoader {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         PluginContainer pluginContainer = server.getPluginManager().getPlugin("proantitab").get();
 
-        Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-config.yml", "config.yml", false);
-        Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-storage.yml", "storage.yml", false);
-        Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-placeholders.yml", "placeholders.yml", false);
-        Configurator.createResourcedFile("./plugins/ProAntiTab", "files\\proxy-custom-responses.yml", "custom-responses.yml", false);
+        Configurator.createResourcedFile("files\\proxy-config.yml", "config.yml", false);
+        Configurator.createResourcedFile("files\\proxy-storage.yml", "storage.yml", false);
+        Configurator.createResourcedFile("files\\proxy-placeholders.yml", "placeholders.yml", false);
+        Configurator.createResourcedFile("files\\proxy-custom-responses.yml", "custom-responses.yml", false);
 
+        CommandProcess.initialize();
         Reflection.initialize(server);
         ConfigUpdater.initialize();
 
         Storage.USE_SIMPLECLOUD = Reflection.doesClassExist("eu.thesimplecloud.plugin.startup.CloudPlugin");
-        Storage.CURRENT_VERSION = pluginContainer.getDescription().getVersion().get();
+        Storage.initialize(this, pluginContainer.getDescription().getVersion().get());
         VersionComparer.setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
@@ -80,11 +92,10 @@ public class VelocityLoader {
         CustomServerBrand.initialize();
         GroupManager.initialize();
 
-
         metricsFactory.make(this, 21638);
 
         server.getCommandManager().register("bpat", new VelocityCommand(), "bungeeproantitab");
-        server.getEventManager().register(this, new VelocityBlockCommandListener(server));
+        //server.getEventManager().register(this, new VelocityBlockCommandListener(server));
         server.getEventManager().register(this, new VelocityAntiTabListener(server));
         server.getEventManager().register(this, new VelocityConnectionListener(server, this));
         server.getEventManager().register(this, new VelocityPingListener(server));
@@ -112,22 +123,122 @@ public class VelocityLoader {
         SubArgsModule.initialize();
     }
 
+    public static org.slf4j.Logger getPluginLogger() {
+        return logger;
+    }
+
     public static void delayedPermissionsReload() {
         server.getScheduler().buildTask(VelocityLoader.instance, () -> {
             PermissionUtil.reloadPermissions();
-            VelocityAntiTabListener.updateCommands();
+            Storage.getLoader().updateCommandCache();
         }).delay(1, TimeUnit.SECONDS).schedule();
     }
 
-    public static List<String> getPlayerNames() {
-        List<String> result = new LinkedList<>();
-        server.getAllPlayers().forEach(player -> result.add(player.getUsername()));
-        return result;
+    @Override
+    public void updateCommandCache() {
+        new ArrayList<>(commandsCacheMap.values()).forEach(CommandsCache::reset);
     }
 
-    public static UUID getUUIDByName(String playerName) {
-        if (!server.getPlayer(playerName).isPresent()) return null;
-        return server.getPlayer(playerName).get().getUniqueId();
+    @Override
+    public HashMap<String, CommandsCache> getCommandsCacheMap() {
+        return commandsCacheMap;
+    }
+
+    @Override
+    public boolean isPlayerOnline(String playerName) {
+        return server.getPlayer(playerName).isPresent();
+    }
+
+    @Override
+    public boolean doesPlayerExist(String playerName) {
+        return isPlayerOnline(playerName);
+    }
+
+    @Override
+    public List<UUID> getPlayerIdsByServer(String serverName) {
+        List<UUID> uuids = new ArrayList<>();
+
+        getServerNames().stream()
+                .filter(originServerName -> Storage.isServer(serverName, originServerName))
+                .forEach(originServerName -> {
+                    Optional<RegisteredServer> optionalRegServerInfo = server.getServer(serverName);
+
+                    if (optionalRegServerInfo.isEmpty())
+                        return;
+
+                    RegisteredServer regServerInfo = optionalRegServerInfo.get();
+                    uuids.addAll(regServerInfo.getPlayersConnected().stream().map(Player::getUniqueId).toList());
+                });
+
+        return uuids;
+    }
+
+    @Override
+    public String getPlayerServerName(UUID uuid) {
+        Optional<Player> optPlayer = server.getPlayer(uuid);
+
+        if (optPlayer.isEmpty())
+            return null;
+
+        Player player = optPlayer.get();
+        Optional<ServerConnection> optConnection = player.getCurrentServer();
+
+        if (optConnection.isEmpty())
+            return null;
+
+        ServerConnection connection = optConnection.get();
+        return connection.getServer().getServerInfo().getName();
+    }
+
+    @Override
+    public List<UUID> getPlayerIds() {
+        return server.getAllPlayers().stream().map(Player::getUniqueId).toList();
+    }
+
+    @Override
+    public List<String> getOnlinePlayerNames(String serverName) {
+        return server.getAllPlayers().stream()
+                .filter(player -> {
+                    Optional<ServerConnection> optConnection = player.getCurrentServer();
+
+                    if (optConnection.isEmpty())
+                        return false;
+
+                    ServerConnection connection = optConnection.get();
+                    return connection.getServer().getServerInfo().getName().equalsIgnoreCase(serverName);
+
+                }).map(Player::getUsername).toList();
+    }
+
+    @Override
+    public List<String> getOnlinePlayerNames() {
+        return server.getAllPlayers().stream().map(Player::getUsername).toList();
+    }
+
+    @Override
+    public List<String> getOfflinePlayerNames() {
+        return server.getAllPlayers().stream().map(Player::getUsername).toList();
+    }
+
+    public List<String> getPlayerNames() {
+        return server.getAllPlayers().stream().map(Player::getUsername).toList();
+    }
+
+    @Override
+    public String getNameByUUID(UUID uuid) {
+        Player player = server.getPlayer(uuid).orElse(null);
+        return player != null ? player.getUsername() : "";
+    }
+
+    @Override
+    public UUID getUUIDByName(String playerName) {
+        Player player = server.getPlayer(playerName).orElse(null);
+        return player != null ? player.getUniqueId() : null;
+    }
+
+    @Override
+    public List<String> getServerNames() {
+        return new ArrayList<>(server.getAllServers().stream().map(registeredServer -> registeredServer.getServerInfo().getName()).toList());
     }
 
     public void startUpdaterTask() {
@@ -137,42 +248,38 @@ public class VelocityLoader {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
 
-            Storage.NEWER_VERSION = result;
-            VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
+            if (result == null)
+                result = "/";
 
-            if(VersionComparer.isDeveloperVersion()) {
-                updaterTask.cancel();
-                MessageTranslator.send(server.getConsoleCommandSource(), "<dark_gray>[</dark_gray><white>PAT | Proxy</white><dark_gray>]</dark_gray> <gray>Please be aware that you are currently using a</gray> <aqua>developer</aqua> <gray>version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.</gray>");
+            if (!result.equals("/")) {
 
-            } else if(!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
-                updaterTask.cancel();
-                checkUpdate = true;
+                Storage.NEWER_VERSION = result;
+                VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
 
-                if(VersionComparer.isUnreleased()) {
-                    MessageTranslator.send(server.getConsoleCommandSource(), "<dark_gray>[</dark_gray><white>PAT | Proxy</white><dark_gray>]</dark_gray> <gray>Please be aware that you are currently using an</gray> <yellow>unreleased</yellow> <gray>version of ProAntiTab.</gray>");
-                    return;
+                if (VersionComparer.isDeveloperVersion()) {
+                    updaterTask.cancel();
+                    MessageTranslator.send(server.getConsoleCommandSource(), "<dark_gray>[</dark_gray><white>PAT | Proxy</white><dark_gray>]</dark_gray> <gray>Please be aware that you are currently using a</gray> <aqua>developer</aqua> <gray>version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.</gray>");
+
+                } else if (!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
+                    updaterTask.cancel();
+                    checkUpdate = true;
+
+                    if (VersionComparer.isUnreleased()) {
+                        MessageTranslator.send(server.getConsoleCommandSource(), "<dark_gray>[</dark_gray><white>PAT | Proxy</white><dark_gray>]</dark_gray> <gray>Please be aware that you are currently using an</gray> <yellow>unreleased</yellow> <gray>version of ProAntiTab.</gray>");
+                        return;
+                    }
+
+                    checkUpdate = true;
+                    MessageTranslator.send(server.getConsoleCommandSource(), Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines());
+
+                } else if (VersionComparer.isOutdated()) {
+                    Storage.OUTDATED = true;
+                    MessageTranslator.send(server.getConsoleCommandSource(), Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
+
                 }
 
-                checkUpdate = true;
-                MessageTranslator.send(server.getConsoleCommandSource(), Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines());
-
-            } else if(VersionComparer.isOutdated()) {
-                Storage.OUTDATED = true;
-                MessageTranslator.send(server.getConsoleCommandSource(), Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
-
-            } else if(!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
-                updaterTask.cancel();
-                switch (result) {
-                    case "internet":
-                        Logger.warning("[PAT | Proxy] Failed to build connection to website! (No internet?)");
-                        break;
-                    case "unknown":
-                        Logger.warning("[PAT | Proxy] Failed to build connection to website! (Firewall enabled or website down?)");
-                        break;
-                    case "exception":
-                        Logger.warning("[PAT | Proxy] Failed to build connection to website! (Outdated java version?)");
-                        break;
-                }
+            } else {
+                Logger.warning("Failed to connect to plugin page! Version comparison cannot be made. (No internet?)");
             }
         }).delay(1, TimeUnit.SECONDS).repeat(Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.SECONDS).schedule();
     }
@@ -197,11 +304,5 @@ public class VelocityLoader {
 
     public static VelocityLoader getInstance() {
         return instance;
-    }
-
-    public static List<String> getServerNames() {
-        List<String> servers = new ArrayList<>();
-        server.getAllServers().forEach(server -> servers.add(server.getServerInfo().getName().toLowerCase()));
-        return servers;
     }
 }

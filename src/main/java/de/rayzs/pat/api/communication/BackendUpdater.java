@@ -21,8 +21,10 @@ public class BackendUpdater {
         if(isRunning()) return;
 
         TASK = PATScheduler.createScheduler(() -> {
-            if (shouldRun()) Communicator.sendRequest();
-            else stop();
+            if (shouldRun())
+                Communicator.sendRequest();
+            else
+                stop();
         }, 5, 20);
     }
 

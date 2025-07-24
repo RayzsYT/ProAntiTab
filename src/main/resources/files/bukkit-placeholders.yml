@@ -47,45 +47,36 @@ general_user:
 
 # Get all groups.
 list_groups:
-  splitter: '&7, '
-  group: '&e%group%'
+  splitter: '&7, &e'
 
 # Get all groups in alphabetic order. (A-Z)
 list_sorted_groups:
-  splitter: '&7, '
-  group: '&e%group%'
+  splitter: '&7, &e'
 
 # Get all groups in reversed alphabetic order. (Z-A)
 list_reversed_groups:
-  splitter: '&7, '
-  group: '&e%group%'
+  splitter: '&7, &e'
 
 # Get all commands of a group.
 list_commands_group_:
-  splitter: '&7, '
-  command: '&f%command%'
+  splitter: '&7, &e'
 
 # Get all commands of a group in alphabetic order. (A-Z)
 list_sorted_commands_group_:
-  splitter: '&7 '
-  command: '&f%command%'
+  splitter: '&7 &e'
 
 # Get all commands of a group in reversed alphabetic order. (Z-A)
 list_reversed_commands_group_:
-  splitter: '&7, '
-  command: '&f%command%'
+  splitter: '&7, &e'
 
 # Get all listed commands.
 list_commands:
-  splitter: '&7, '
-  command: '&f%command%'
+  splitter: '&7, &e'
 
 # Get all listed commands in alphabetic order. (A-Z)
 list_sorted_commands:
-  splitter: '&7, '
-  command: '&f%command%'
+  splitter: '&7, &e'
 
 # Get all listed commands in reversed alphabetic order. (Z-A)
 list_reversed_commands:
-  splitter: '&7-> '
-  command: '&f%command%'
+  splitter: '&7, &e'

@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
@@ -7,7 +8,6 @@ import de.rayzs.pat.api.brand.impl.BukkitServerBrand;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import org.bukkit.event.player.*;
@@ -50,14 +50,13 @@ public class BukkitPlayerConnectionListener implements Listener {
         BukkitPacketAnalyzer.uninject(player.getUniqueId());
         PermissionUtil.resetPermissions(player.getUniqueId());
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
-        BukkitServerBrand.removeFromModified(player);
     }
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
-        BukkitServerBrand.removeFromModified(player);
+
         CustomServerBrand.sendBrandToPlayer(player);
     }
 }

@@ -1,17 +1,28 @@
 package de.rayzs.pat.api.communication;
 
-import de.rayzs.pat.api.communication.client.ClientInfo;
-import de.rayzs.pat.api.communication.client.impl.*;
-import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.storage.blacklist.impl.*;
-import de.rayzs.pat.api.communication.impl.*;
-import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.api.storage.Storage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import de.rayzs.pat.utils.group.*;
-import de.rayzs.pat.utils.*;
-import java.util.*;
+
+import de.rayzs.pat.api.communication.client.ClientInfo;
+import de.rayzs.pat.api.communication.client.impl.BungeeClientInfo;
+import de.rayzs.pat.api.communication.client.impl.VelocityClientInfo;
+import de.rayzs.pat.api.communication.impl.BukkitClient;
+import de.rayzs.pat.api.communication.impl.BungeeClient;
+import de.rayzs.pat.api.communication.impl.VelocityClient;
+import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.CommunicationPackets;
+import de.rayzs.pat.utils.ExpireCache;
+import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.group.TinyGroup;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class Communicator {
 
@@ -31,52 +42,76 @@ public class Communicator {
     }
 
     public static void receiveInformation(String serverName, Object packet) {
-        if(packet instanceof CommunicationPackets.RequestPacket) {
+        if (packet instanceof CommunicationPackets.RequestPacket) {
+
             CommunicationPackets.RequestPacket requestPacket = (CommunicationPackets.RequestPacket) packet;
-            if (!requestPacket.isToken(Storage.TOKEN)) return;
+
+            if (!requestPacket.isToken(Storage.TOKEN))
+                return;
 
             ClientInfo client = getClientByName(serverName);
             if (client == null) {
-                client = Reflection.isVelocityServer() ? new VelocityClientInfo(requestPacket.getServerId(), serverName) : new BungeeClientInfo(requestPacket.getServerId(), serverName);
+                client = Reflection.isVelocityServer()
+                        ? new VelocityClientInfo(requestPacket.getServerId(), serverName)
+                        : new BungeeClientInfo(requestPacket.getServerId(), serverName);
+
                 CLIENTS.add(client);
             }
 
-            if (!client.compareId(requestPacket.getServerId())) client.setId(requestPacket.getServerId());
+            if (!client.compareId(requestPacket.getServerId()))
+                client.setId(requestPacket.getServerId());
 
             syncData(client.getId());
             return;
         }
 
-        if(packet instanceof CommunicationPackets.ForcePermissionResetPacket) {
-            if(Reflection.isProxyServer()) return;
-            CommunicationPackets.ForcePermissionResetPacket permissionResetPacket = (CommunicationPackets.ForcePermissionResetPacket) packet;
-            if(!permissionResetPacket.isToken(Storage.TOKEN)) return;
+        if (packet instanceof CommunicationPackets.ForcePermissionResetPacket) {
+            if (Reflection.isProxyServer())
+                return;
 
-            if(permissionResetPacket.hasTarget()) PermissionUtil.setPlayerPermissions(permissionResetPacket.getTargetUUID());
-            else PermissionUtil.reloadPermissions();
+            CommunicationPackets.ForcePermissionResetPacket permissionResetPacket = (CommunicationPackets.ForcePermissionResetPacket) packet;
+            if (!permissionResetPacket.isToken(Storage.TOKEN))
+                return;
+
+            if (permissionResetPacket.hasTarget())
+                PermissionUtil.setPlayerPermissions(permissionResetPacket.getTargetUUID());
+            else
+                PermissionUtil.reloadPermissions();
+
             return;
         }
 
-        if(packet instanceof CommunicationPackets.BackendDataPacket) {
+        if (packet instanceof CommunicationPackets.BackendDataPacket) {
             CommunicationPackets.BackendDataPacket backendDataPacket = (CommunicationPackets.BackendDataPacket) packet;
-            if (!backendDataPacket.isToken(Storage.TOKEN)) return;
+            if (!backendDataPacket.isToken(Storage.TOKEN))
+                return;
+
             Storage.SERVER_NAME = backendDataPacket.getServerName();
             return;
         }
 
-        if(packet instanceof CommunicationPackets.FeedbackPacket) {
+        if (packet instanceof CommunicationPackets.FeedbackPacket) {
             CommunicationPackets.FeedbackPacket feedbackPacket = (CommunicationPackets.FeedbackPacket) packet;
-            if (!feedbackPacket.isToken(Storage.TOKEN)) return;
-            String serverId = feedbackPacket.getServerId();
+            if (!feedbackPacket.isToken(Storage.TOKEN))
+                return;
 
+            String serverId = feedbackPacket.getServerId();
             ClientInfo client = getClientByName(serverName);
+
             if (client == null) {
-                client = Reflection.isVelocityServer() ? new VelocityClientInfo(feedbackPacket.getServerId(), serverName) : new BungeeClientInfo(feedbackPacket.getServerId(), serverName);
+                client = Reflection.isVelocityServer()
+                        ? new VelocityClientInfo(feedbackPacket.getServerId(), serverName)
+                        : new BungeeClientInfo(feedbackPacket.getServerId(), serverName);
+
                 CLIENTS.add(client);
             }
 
-            if (!client.compareId(feedbackPacket.getServerId())) client.setId(feedbackPacket.getServerId());
-            if (client.hasSentFeedback()) return;
+            if (!client.compareId(feedbackPacket.getServerId()))
+                client.setId(feedbackPacket.getServerId());
+
+            if (client.hasSentFeedback())
+                return;
+
             client.setFeedback(true);
             client.syncTime();
             SERVER_DATA_SYNC_COUNT++;
@@ -100,8 +135,9 @@ public class Communicator {
         syncData(null);
     }
 
-    public static void syncData(String serverId) {
-        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) return;
+    public static void  syncData(String serverId) {
+        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
+            return;
 
         LAST_DATA_UPDATE = System.currentTimeMillis();
         ClientInfo clientInfo;
@@ -109,12 +145,14 @@ public class Communicator {
             SERVER_DATA_SYNC_COUNT = 0;
             CLIENTS.forEach(currentClient -> syncData(currentClient.getId()));
             return;
+
         } else {
             clientInfo = getClientById(serverId);
-            if(clientInfo != null) clientInfo.setFeedback(false);
 
-            SERVER_DATA_SYNC_COUNT = SERVER_DATA_SYNC_COUNT -1;
-            if(SERVER_DATA_SYNC_COUNT <= 0) SERVER_DATA_SYNC_COUNT = 0;
+            if (clientInfo != null)
+                clientInfo.setFeedback(false);
+
+            SERVER_DATA_SYNC_COUNT = Math.max(0, SERVER_DATA_SYNC_COUNT -1);
         }
 
         CommunicationPackets.CommandsPacket commandsPacket = new CommunicationPackets.CommandsPacket();
@@ -123,13 +161,17 @@ public class Communicator {
         List<String> commands = new ArrayList<>();
         String tempServerName = "";
 
-        if(clientInfo != null && clientInfo.getName() != null) {
+        if (clientInfo != null && clientInfo.getName() != null) {
             tempServerName = clientInfo.getName().toLowerCase();
-            if(!Storage.Blacklist.isOnIgnoredServer(tempServerName))
+            if (!Storage.Blacklist.isIgnoredServer(tempServerName))
                 commands.addAll(Storage.Blacklist.getBlacklist().getCommands());
 
-            List<GeneralBlacklist> serverBlacklists = Storage.Blacklist.getBlacklists(clientInfo.getName());
-            serverBlacklists.stream().filter(serverBlacklist -> serverBlacklist != null && serverBlacklist.getCommands() != null).forEach(serverBlacklist -> commands.addAll(serverBlacklist.getCommands()));
+            List<GeneralBlacklist> serverBlacklists = Storage.Blacklist.getServerBlacklists(clientInfo.getName());
+            serverBlacklists.stream().filter(serverBlacklist ->
+                    serverBlacklist != null && serverBlacklist.getCommands() != null
+            ).forEach(serverBlacklist ->
+                    commands.addAll(serverBlacklist.getCommands())
+            );
         }
 
         final String serverName = tempServerName;
@@ -137,7 +179,8 @@ public class Communicator {
 
         TinyGroup tinyGroup;
         for (Group group : GroupManager.getGroups()) {
-            if(groups.stream().anyMatch(cTG -> cTG.getGroupName().equals(group.getGroupName()))) continue;
+            if (groups.stream().anyMatch(cTG -> cTG.getGroupName().equals(group.getGroupName())))
+                continue;
 
             tinyGroup = new TinyGroup(group.getGroupName(), group.getPriority(), group.getAllCommands(serverName));
             for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(serverName))

@@ -42,6 +42,8 @@ public class CustomProtocolPingSection extends ConfigStorage {
                 "&8> &7Using &fProAntiTab"
         ));
 
+
+
         if (HIDE_PLAYERS && USE_CUSTOM_PLAYERLIST) {
             Logger.warning("You can't use both 'hide-players' and 'custom-playerlist' at the same time! (Section: custom-protocol-ping)");
             Logger.warning("You gotta choose what feature from those two you want to use.");

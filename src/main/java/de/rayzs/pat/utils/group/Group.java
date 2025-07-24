@@ -1,14 +1,17 @@
 package de.rayzs.pat.utils.group;
 
-import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
-import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
-import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.ExpireCache;
-import java.util.concurrent.TimeUnit;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.utils.ExpireCache;
+import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class Group implements Serializable {
 
@@ -95,34 +98,24 @@ public class Group implements Serializable {
     }
 
     public boolean contains(String command) {
-        return this.generalGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-    }
-
-    public boolean contains(String command, boolean intensive) {
-        return this.generalGroupBlacklist.isListed(command, intensive);
-    }
-
-    public boolean contains(String command, boolean intensive, boolean convert) {
-        return this.generalGroupBlacklist.isListed(command, intensive, convert);
-    }
-
-    public boolean contains(String command, boolean intensive, boolean convert, boolean slash) {
-        return this.generalGroupBlacklist.isListed(command, intensive, convert, slash);
+        return contains(command, null);
     }
 
     public boolean contains(String command, String server) {
+        if (generalGroupBlacklist.isListed(command)) {
+            return true;
+        }
+
+        if (server == null)
+            return false;
+
         GroupBlacklist groupBlacklist = getOrCreateGroupBlacklist(server);
-        return (this.generalGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) || groupBlacklist != null && getOrCreateGroupBlacklist(server).isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED));
-    }
 
-    public boolean containsOnServer(String command, String server) {
-        GroupBlacklist serverGroupBlacklist = getOrCreateGroupBlacklist(server);
-        return (serverGroupBlacklist != null && serverGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED));
-    }
+        if (groupBlacklist != null) {
+            return groupBlacklist.isListed(command);
+        }
 
-    public boolean containsOnServer(String command, String server, boolean convert) {
-        GroupBlacklist serverGroupBlacklist = getOrCreateGroupBlacklist(server);
-        return (serverGroupBlacklist != null && serverGroupBlacklist.isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED, convert));
+        return false;
     }
 
     public GroupBlacklist getOrCreateGroupBlacklist(String server) {
@@ -130,16 +123,22 @@ public class Group implements Serializable {
     }
 
     public GroupBlacklist getOrCreateGroupBlacklist(String server, boolean ignoreExist) {
+        if (server == null)
+            return null;
+
         GroupBlacklist groupBlacklist;
         server = server.toLowerCase();
+
         if (this.groupServerBlacklist.containsKey(server) && this.groupServerBlacklist.get(server) != null)
             groupBlacklist = this.groupServerBlacklist.get(server);
         else {
             groupBlacklist = BlacklistCreator.createGroupBlacklist(this.groupName, server, ignoreExist);
             this.groupServerBlacklist.put(server, groupBlacklist);
         }
+
         if (groupBlacklist != null)
             groupBlacklist.load();
+
         return groupBlacklist;
     }
 
@@ -190,6 +189,7 @@ public class Group implements Serializable {
     public List<String> getCommands(String server) {
         server = server.toLowerCase();
         List<String> commands = new ArrayList<>(this.generalGroupBlacklist.getCommands());
+
         GroupBlacklist groupBlacklist = getOrCreateGroupBlacklist(server);
         if (groupBlacklist != null)
             commands.addAll(groupBlacklist.getCommands());

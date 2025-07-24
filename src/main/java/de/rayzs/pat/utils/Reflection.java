@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Reflection {
 
-    private static boolean legacy, proxy, velocity, paper, folia, weird;
+    private static boolean legacy, proxy, velocity, paper, folia, weird, oldChannelMethod;
     private static String versionName, fullVersionName, rawVersionName, versionPackageName;
     private static Version version;
     private static int major, minor, release;
@@ -54,6 +54,8 @@ public class Reflection {
         }
 
         if (proxy) version = Version.UNKNOWN;
+
+        oldChannelMethod = folia || paper && Reflection.isWeird();
     }
 
 
@@ -207,7 +209,7 @@ public class Reflection {
 
         for (Field field : fieldLists) {
             String typeName = field.getAnnotatedType().getType().getTypeName();
-            if(type == SearchOption.CONTAINS && typeName.contains(target)
+            if (type == SearchOption.CONTAINS && typeName.contains(target)
                     || type == SearchOption.STARTS && typeName.startsWith(target)
                     || type == SearchOption.ENDS && typeName.endsWith(target)
                     || type == SearchOption.EQUALS && typeName.equals(target)) {
@@ -223,7 +225,7 @@ public class Reflection {
 
         for (Field field : fieldLists) {
             String typeName = field.getType().getTypeName();
-            if(type == SearchOption.CONTAINS && typeName.contains(target)
+            if (type == SearchOption.CONTAINS && typeName.contains(target)
                     || type == SearchOption.STARTS && typeName.startsWith(target)
                     || type == SearchOption.ENDS && typeName.endsWith(target)
                     || type == SearchOption.EQUALS && typeName.equals(target)) {
@@ -243,7 +245,7 @@ public class Reflection {
 
         for (Method method : methodLists) {
             String typeName = method.getReturnType().getTypeName();
-            if(type == SearchOption.CONTAINS && typeName.contains(target)
+            if (type == SearchOption.CONTAINS && typeName.contains(target)
                     || type == SearchOption.STARTS && typeName.startsWith(target)
                     || type == SearchOption.ENDS && typeName.endsWith(target)
                     || type == SearchOption.EQUALS && typeName.equals(target)) {
@@ -277,14 +279,16 @@ public class Reflection {
     public static Channel getPlayerChannel(Player player) throws Exception {
         Object channelObject;
 
-        if(folia && minor == 21 && release == 1 || !folia && paper && Reflection.isWeird()) {
+        if (oldChannelMethod) {
             Object serverPlayerObj = getMethodsByReturnTypeAndName(player.getClass(), "ServerPlayer", SearchOption.ENDS, "getHandle").get(0).invoke(player),
                     serverGamePacketListenerImplObj = getFieldByName(serverPlayerObj.getClass(), "connection").get(serverPlayerObj),
                     connectionObj = getFieldByName(serverGamePacketListenerImplObj.getClass().getSuperclass(), "connection").get(serverGamePacketListenerImplObj);
             channelObject = getFieldsByType(connectionObj.getClass(), "Channel", SearchOption.ENDS).get(0).get(connectionObj);
+
         } else {
             Object playerConnection = getPlayerConnection(player),
                     networkManager = getPlayerNetworkManager(playerConnection);
+
             Optional<Field> optional = getFieldsByType(networkManager.getClass(), "Channel", SearchOption.ENDS).stream().findFirst();
             if (!optional.isPresent()) return null;
             channelObject = optional.get().get(networkManager);
@@ -393,7 +397,7 @@ public class Reflection {
         v_1_18_1, v_1_18_2,
         v_1_19, v_1_19_1, v_1_19_2, v_1_19_3, v_1_19_4,
         v_1_20, v_1_20_1, v_1_20_2, v_1_20_3, v_1_20_4, v_1_20_5, v_1_20_6,
-        v_1_21, v_1_21_1, v_1_21_2, v_1_21_3, v_1_21_4,
+        v_1_21, v_1_21_1, v_1_21_2, v_1_21_3, v_1_21_4, v_1_21_5, v_1_21_6, v_1_21_7, v_1_21_8,
         v_1_22, v_1_22_1, v_1_22_2
     }
 

@@ -1,25 +1,29 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.api.storage.Storage;
-import io.github.waterfallmc.waterfall.event.ProxyDefineCommandsEvent;
+import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import io.github.waterfallmc.waterfall.event.ProxyDefineCommandsEvent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
-import de.rayzs.pat.utils.CommandsCache;
-import net.md_5.bungee.event.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 public class WaterfallAntiTabListener implements Listener {
 
-    private static final HashMap<String, CommandsCache> COMMANDS_CACHE_MAP = new HashMap<>();
-
     @EventHandler(priority = EventPriority.LOWEST)
     public void onProxyDefineCommands(ProxyDefineCommandsEvent event) {
+
+        System.out.println("CALL");
+
         if(!(event.getReceiver() instanceof ProxiedPlayer) || event.getCommands().isEmpty()) return;
 
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
@@ -28,10 +32,12 @@ public class WaterfallAntiTabListener implements Listener {
         if (Storage.Blacklist.isDisabledServer(serverName))
             return;
 
-        if(!COMMANDS_CACHE_MAP.containsKey(serverName))
-            COMMANDS_CACHE_MAP.put(serverName, new CommandsCache().reverse());
+        Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
 
-        CommandsCache commandsCache = COMMANDS_CACHE_MAP.get(serverName);
+        if(!cache.containsKey(serverName))
+            cache.put(serverName, new CommandsCache());
+
+        CommandsCache commandsCache = cache.get(serverName);
         List<String> commandsAsString = new ArrayList<>();
         HashMap<String, Command> commandsMap = new HashMap<>(event.getCommands());
 
@@ -47,13 +53,10 @@ public class WaterfallAntiTabListener implements Listener {
         if(filteredSuggestionEvent.isCancelled()) event.getCommands().clear();
 
         for (String commandName : filteredSuggestionEvent.getSuggestions()) {
-            if(!event.getCommands().containsKey(commandName)) event.getCommands().put(commandName, commandsMap.get(commandName));
+
+            if (!event.getCommands().containsKey(commandName)) 
+                event.getCommands().put(commandName, commandsMap.get(commandName));
+        
         }
-
-        commandsMap = null;
-    }
-
-    public static void updateCommands() {
-        new ArrayList<>(COMMANDS_CACHE_MAP.values()).forEach(CommandsCache::reset);
     }
 }

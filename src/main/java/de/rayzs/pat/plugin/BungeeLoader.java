@@ -1,17 +1,18 @@
 package de.rayzs.pat.plugin;
 
 
-import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
+import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.utils.configuration.Configurator;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.response.action.ActionHandler;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.commands.BungeeCommand;
-import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.listeners.bungee.*;
 import de.rayzs.pat.utils.group.GroupManager;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -25,19 +26,22 @@ import net.md_5.bungee.api.plugin.*;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 
-public class BungeeLoader extends Plugin {
+public class BungeeLoader extends Plugin implements PluginLoader {
+
+    private ScheduledTask updaterTask;
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
-    private ScheduledTask updaterTask;
+
     private static boolean checkUpdate = false;
+    private static final HashMap<String, CommandsCache> commandsCacheMap = new HashMap<>();
 
     @Override
     public void onLoad() {
-        Configurator.createResourcedFile(getDataFolder(), "files\\proxy-config.yml", "config.yml", false);
-        Configurator.createResourcedFile(getDataFolder(), "files\\proxy-storage.yml", "storage.yml", false);
-        Configurator.createResourcedFile(getDataFolder(), "files\\proxy-placeholders.yml", "placeholders.yml", false);
-        Configurator.createResourcedFile(getDataFolder(), "files\\proxy-custom-responses.yml", "custom-responses.yml", false);
+        Configurator.createResourcedFile("files\\proxy-config.yml", "config.yml", false);
+        Configurator.createResourcedFile("files\\proxy-storage.yml", "storage.yml", false);
+        Configurator.createResourcedFile("files\\proxy-placeholders.yml", "placeholders.yml", false);
+        Configurator.createResourcedFile("files\\proxy-custom-responses.yml", "custom-responses.yml", false);
     }
 
     @Override
@@ -45,11 +49,13 @@ public class BungeeLoader extends Plugin {
         plugin = this;
         logger = getLogger();
 
+        CommandProcess.initialize();
         Reflection.initialize(getProxy());
         ConfigUpdater.initialize();
 
         Storage.USE_SIMPLECLOUD = Reflection.doesClassExist("eu.thesimplecloud.plugin.startup.CloudPlugin");
-        Storage.CURRENT_VERSION = getDescription().getVersion();
+
+        Storage.initialize(this, getDescription().getVersion());
         VersionComparer.setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
@@ -107,15 +113,101 @@ public class BungeeLoader extends Plugin {
         }
     }
 
-    public static List<String> getPlayerNames() {
-        List<String> result = new LinkedList<>();
-        ProxyServer.getInstance().getPlayers().forEach(player -> result.add(player.getName()));
-        return result;
+    @Override
+    public HashMap<String, CommandsCache> getCommandsCacheMap() {
+        return commandsCacheMap;
     }
 
-    public static UUID getUUIDByName(String playerName) {
-        ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(playerName);
-        return proxiedPlayer != null ? proxiedPlayer.getUniqueId() : null;
+    @Override
+    public void updateCommandCache() {
+        new ArrayList<>(commandsCacheMap.values()).forEach(CommandsCache::reset);
+    }
+
+    @Override
+    public String getPlayerServerName(UUID uuid) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+
+        if (player == null || player.getServer() == null || player.getServer().getInfo() == null)
+            return null;
+
+        return player.getServer().getInfo().getName();
+    }
+
+    @Override
+    public List<UUID> getPlayerIds() {
+        return new ArrayList<>(ProxyServer.getInstance().getPlayers().stream().map(ProxiedPlayer::getUniqueId).toList());
+    }
+
+    @Override
+    public List<UUID> getPlayerIdsByServer(String server) {
+        List<UUID> uuids = new ArrayList<>();
+
+        getServerNames().stream()
+                .filter(serverName -> Storage.isServer(server, serverName))
+                .forEach(serverName -> {
+                    ServerInfo serverInfo = ProxyServer.getInstance().getServerInfo(serverName);
+
+                    if (serverInfo == null)
+                        return;
+
+                    uuids.addAll(serverInfo.getPlayers().stream().map(ProxiedPlayer::getUniqueId).toList());
+                });
+
+        return uuids;
+    }
+
+    @Override
+    public List<String> getOnlinePlayerNames(String serverName) {
+        return new ArrayList<>(ProxyServer.getInstance().getPlayers().stream()
+                .filter(player -> {
+                    if (player == null || player.getServer() == null || player.getServer().getInfo() == null)
+                        return false;
+
+                    return player.getServer().getInfo().getName().equalsIgnoreCase(serverName);
+
+                }).map(ProxiedPlayer::getName).toList());
+    }
+
+    @Override
+    public boolean isPlayerOnline(String playerName) {
+        return ProxyServer.getInstance().getPlayer(playerName) != null;
+    }
+
+    @Override
+    public boolean doesPlayerExist(String playerName) {
+        return isPlayerOnline(playerName);
+    }
+
+    @Override
+    public List<String> getOnlinePlayerNames() {
+        return new ArrayList<>(ProxyServer.getInstance().getPlayers().stream().map(ProxiedPlayer::getName).toList());
+    }
+
+    @Override
+    public List<String> getOfflinePlayerNames() {
+        return new ArrayList<>(ProxyServer.getInstance().getPlayers().stream().map(ProxiedPlayer::getName).toList());
+    }
+
+    @Override
+    public List<String> getPlayerNames() {
+        return new ArrayList<>(ProxyServer.getInstance().getPlayers().stream().map(ProxiedPlayer::getName).toList());
+    }
+
+    @Override
+    public String getNameByUUID(UUID uuid) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+        return player != null ? player.getName() : "";
+    }
+
+    @Override
+    public UUID getUUIDByName(String playerName) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerName);
+        return player != null ? player.getUniqueId() : null;
+    }
+
+    @Override
+    public List<String> getServerNames() {
+        return new ArrayList<>(ProxyServer.getInstance().getServers().keySet().stream().toList());
     }
 
     public void startUpdaterTask() {
@@ -123,42 +215,38 @@ public class BungeeLoader extends Plugin {
         updaterTask = getProxy().getScheduler().schedule(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
-            Storage.NEWER_VERSION = result;
-            VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
 
-            if(VersionComparer.isDeveloperVersion()) {
-                getProxy().getScheduler().cancel(updaterTask);
-                Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
+            if (result == null)
+                result = "/";
 
-            } else if(!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
-                getProxy().getScheduler().cancel(updaterTask);
-                checkUpdate = true;
+            if (!result.equals("/")) {
+                Storage.NEWER_VERSION = result;
+                VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
 
-                if(VersionComparer.isUnreleased()) {
-                    Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using an §eunreleased §7version of ProAntiTab.");
-                    return;
+                if(VersionComparer.isDeveloperVersion()) {
+                    getProxy().getScheduler().cancel(updaterTask);
+                    Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
+
+                } else if(!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
+                    getProxy().getScheduler().cancel(updaterTask);
+                    checkUpdate = true;
+
+                    if(VersionComparer.isUnreleased()) {
+                        Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using an §eunreleased §7version of ProAntiTab.");
+                        return;
+                    }
+
+                    checkUpdate = true;
+                    Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
+
+                } else if(VersionComparer.isOutdated()) {
+                    Storage.OUTDATED = true;
+                    Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
+
                 }
 
-                checkUpdate = true;
-                Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
-
-            } else if(VersionComparer.isOutdated()) {
-                Storage.OUTDATED = true;
-                Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
-
-            } else if(!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
-                getProxy().getScheduler().cancel(updaterTask);
-                switch (result) {
-                    case "internet":
-                        Logger.warning("Failed to build connection to website! (No internet?)");
-                        break;
-                    case "unknown":
-                        Logger.warning("Failed to build connection to website! (Firewall enabled or website down?)");
-                        break;
-                    case "exception":
-                        Logger.warning("Failed to build connection to website! (Outdated java version?)");
-                        break;
-                }
+            } else {
+                Logger.warning("Failed to connect to plugin page! Version comparison cannot be made. (No internet?)");
             }
         }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);
     }
@@ -182,13 +270,5 @@ public class BungeeLoader extends Plugin {
 
     public static java.util.logging.Logger getPluginLogger() {
         return logger;
-    }
-
-    public static List<String> getServerNames() {
-        List<String> servers = new LinkedList<>();
-        for (String serverName : ProxyServer.getInstance().getServers().keySet())
-            servers.add(serverName.toLowerCase());
-
-        return servers;
     }
 }

@@ -1,17 +1,20 @@
 package de.rayzs.pat.plugin;
 
+import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
-import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
+import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.utils.configuration.Configurator;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.plugin.commands.BukkitCommand;
-import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.utils.hooks.PlaceholderHook;
 import de.rayzs.pat.plugin.listeners.bukkit.*;
 import de.rayzs.pat.api.event.PATEventHandler;
@@ -19,6 +22,7 @@ import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.response.action.ActionHandler;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.scheduler.*;
@@ -30,7 +34,7 @@ import org.bukkit.plugin.*;
 import org.bukkit.Bukkit;
 import java.util.*;
 
-public class BukkitLoader extends JavaPlugin {
+public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
@@ -40,10 +44,10 @@ public class BukkitLoader extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        Configurator.createResourcedFile(getDataFolder(), "files\\bukkit-config.yml", "config.yml", false);
-        Configurator.createResourcedFile(getDataFolder(), "files\\bukkit-storage.yml", "storage.yml", false);
-        Configurator.createResourcedFile(getDataFolder(), "files\\bukkit-placeholders.yml", "placeholders.yml", false);
-        Configurator.createResourcedFile(getDataFolder(), "files\\bukkit-custom-responses.yml", "custom-responses.yml", false);
+        Configurator.createResourcedFile("files\\bukkit-config.yml", "config.yml", false);
+        Configurator.createResourcedFile("files\\bukkit-storage.yml", "storage.yml", false);
+        Configurator.createResourcedFile("files\\bukkit-placeholders.yml", "placeholders.yml", false);
+        Configurator.createResourcedFile("files\\bukkit-custom-responses.yml", "custom-responses.yml", false);
     }
 
     @Override
@@ -53,15 +57,16 @@ public class BukkitLoader extends JavaPlugin {
 
         loadCommandMap();
 
+        CommandProcess.initialize();
         Reflection.initialize(getServer());
         ConfigUpdater.initialize();
 
-        Storage.CURRENT_VERSION = getDescription().getVersion();
+        Storage.initialize(this, getDescription().getVersion());
         VersionComparer.setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
 
-        if(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
+        if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
             new PlaceholderHook().register();
 
         MessageTranslator.initialize();
@@ -70,7 +75,7 @@ public class BukkitLoader extends JavaPlugin {
 
         PluginManager manager = getServer().getPluginManager();
 
-        if(!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             loaded = true;
             GroupManager.initialize();
             BukkitPacketAnalyzer.injectAll();
@@ -78,12 +83,13 @@ public class BukkitLoader extends JavaPlugin {
 
         manager.registerEvents(new BukkitPlayerConnectionListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
-        if(Reflection.getMinor() >= 13) {
+
+        if (Reflection.getMinor() >= 13) {
             suggestions = true;
             manager.registerEvents(new BukkitAntiTabListener(), this);
         }
 
-        if(Reflection.isPaper() && Reflection.getMinor() >= 12)
+        if (Reflection.isPaper() && Reflection.getMinor() >= 12)
             manager.registerEvents(new PaperServerListPing(), this);
 
         registerCommand("proantitab", "pat");
@@ -91,15 +97,15 @@ public class BukkitLoader extends JavaPlugin {
 
         Storage.PLUGIN_OBJECT = this;
 
-        if(getServer().getPluginManager().getPlugin("LuckPerms") != null) {
+        if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
             LuckPermsAdapter.initialize();
             Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
         }
 
-        if(getServer().getPluginManager().getPlugin("ViaVersion") != null)
+        if (getServer().getPluginManager().getPlugin("ViaVersion") != null)
             ViaVersionAdapter.initialize();
 
-        if(Storage.USE_SIMPLECLOUD)
+        if (Storage.USE_SIMPLECLOUD)
             Logger.warning("Detected SimpleCloud. Therefore, MiniMessages are disabled!");
 
         ConfigUpdater.broadcastMissingParts();
@@ -123,15 +129,79 @@ public class BukkitLoader extends JavaPlugin {
         }
     }
 
-    public static List<String> getPlayerNames() {
-        List<String> result = new LinkedList<>();
-        Bukkit.getServer().getOnlinePlayers().forEach(player -> result.add(player.getName()));
-        return result;
+    @Override
+    public void updateCommandCache() {}
+
+    @Override
+    public HashMap<String, CommandsCache> getCommandsCacheMap() {
+        return null;
     }
 
-    public static UUID getUUIDByName(String playerName) {
-        Player player = Bukkit.getServer().getPlayer(playerName);
+    @Override
+    public boolean isPlayerOnline(String playerName) {
+        return Bukkit.getPlayer(playerName) != null;
+    }
+
+    @Override
+    public boolean doesPlayerExist(String playerName) {
+        return getOfflinePlayerNames().contains(playerName);
+    }
+
+    @Override
+    public String getPlayerServerName(UUID uuid) {
+        return null;
+    }
+
+    @Override
+    public List<UUID> getPlayerIdsByServer(String server) {
+        return null;
+    }
+
+    @Override
+    public List<String> getOnlinePlayerNames(String serverName) {
+        return getOnlinePlayerNames();
+    }
+
+    @Override
+    public List<UUID> getPlayerIds() {
+        return null;
+    }
+
+    @Override
+    public List<String> getOnlinePlayerNames() {
+        return new ArrayList<>(Bukkit.getServer().getOnlinePlayers().stream().map(Player::getName).toList());
+    }
+
+    @Override
+    public List<String> getOfflinePlayerNames() {
+        return new ArrayList<>(List.of(Bukkit.getOfflinePlayers())).stream().map(OfflinePlayer::getName).toList();
+    }
+
+    @Override
+    public List<String> getPlayerNames() {
+        List<String> playerNames = new ArrayList<>();
+
+        playerNames.addAll(getOnlinePlayerNames());
+        playerNames.addAll(getOfflinePlayerNames());
+
+        return playerNames;
+    }
+
+    @Override
+    public String getNameByUUID(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        return player != null ? player.getName() : "";
+    }
+
+    @Override
+    public UUID getUUIDByName(String playerName) {
+        Player player = Bukkit.getPlayer(playerName);
         return player != null ? player.getUniqueId() : null;
+    }
+
+    @Override
+    public List<String> getServerNames() {
+        return List.of();
     }
 
     public void startUpdaterTask() {
@@ -140,44 +210,37 @@ public class BukkitLoader extends JavaPlugin {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
 
-            if(result == null) result = "internet";
-            Storage.NEWER_VERSION = result;
-            VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
+            if (result == null)
+                result = "/";
 
-            if(VersionComparer.isDeveloperVersion()) {
-                updaterTask.cancelTask();
-                Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
+            if (!result.equals("/")) {
+                Storage.NEWER_VERSION = result;
+                VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
 
-            } else if(!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
-                updaterTask.cancelTask();
-                checkUpdate = true;
+                if (VersionComparer.isDeveloperVersion()) {
+                    updaterTask.cancelTask();
+                    Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
 
-                if(VersionComparer.isUnreleased()) {
-                    Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using an §eunreleased §7version of ProAntiTab.");
-                    return;
+                } else if (!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
+                    updaterTask.cancelTask();
+                    checkUpdate = true;
+
+                    if (VersionComparer.isUnreleased()) {
+                        Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using an §eunreleased §7version of ProAntiTab.");
+                        return;
+                    }
+
+                    Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
+
+                } else if (VersionComparer.isOutdated()) {
+                    updaterTask.cancelTask();
+                    Storage.OUTDATED = true;
+                    Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
                 }
-
-                Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
-
-            } else if(VersionComparer.isOutdated()) {
-                updaterTask.cancelTask();
-                Storage.OUTDATED = true;
-                Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
-
-            } else if(!Storage.NEWER_VERSION.equals(Storage.CURRENT_VERSION)) {
-                updaterTask.cancelTask();
-                switch (result) {
-                    case "internet":
-                        Logger.warning("Failed to build connection to website! (No internet?)");
-                        break;
-                    case "unknown":
-                        Logger.warning("Failed to build connection to website! (Firewall enabled or website down?)");
-                        break;
-                    case "exception":
-                        Logger.warning("Failed to build connection to website! (Outdated java version?)");
-                        break;
-                }
+            } else {
+                Logger.warning("Failed to connect to plugin page! Version comparison cannot be made. (No internet?)");
             }
+
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
     }
 
@@ -191,23 +254,25 @@ public class BukkitLoader extends JavaPlugin {
         CommunicationPackets.NamespaceCommandsPacket namespaceCommandsPacket = packetBundle.getNamespaceCommandsPacket();
         CommunicationPackets.MessagePacket messagePacket = packetBundle.getMessagePacket();
 
-        if(!messagePacket.getBaseBlockedMessage().getLines().isEmpty())
+        boolean updatedList = false;
+
+        if (!messagePacket.getBaseBlockedMessage().getLines().isEmpty())
             Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE = messagePacket.getBaseBlockedMessage();
 
-        if(!messagePacket.getSubBlockedMessage().getLines().isEmpty())
+        if (!messagePacket.getSubBlockedMessage().getLines().isEmpty())
             Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE = messagePacket.getSubBlockedMessage();
 
-        if(!messagePacket.getPrefix().isEmpty())
+        if (!messagePacket.getPrefix().isEmpty())
             Storage.ConfigSections.Messages.PREFIX.PREFIX = messagePacket.getPrefix();
 
-        if(Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED != namespaceCommandsPacket.isEnabled())
+        if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED != namespaceCommandsPacket.isEnabled())
             Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED = namespaceCommandsPacket.isEnabled();
 
         if (commandsPacket.getCommands() == null || commandsPacket.getCommands().isEmpty())
             Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
 
         else if (!ArrayUtils.compareStringArrays(Storage.Blacklist.getBlacklist().getCommands(), commandsPacket.getCommands())) {
-            if (!Storage.USE_VELOCITY && Reflection.getMinor() >= 13) BukkitAntiTabListener.setChangeStatus();
+            updatedList = true;
             Storage.Blacklist.getBlacklist().setList(commandsPacket.getCommands());
         }
 
@@ -215,29 +280,44 @@ public class BukkitLoader extends JavaPlugin {
             Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = commandsPacket.turnBlacklistToWhitelistEnabled();
 
         GroupManager.clearAllGroups();
+
+        for (TinyGroup group : groupsPacket.getGroups()) {
+            Group currentExistingGroup = GroupManager.getGroupByName(group.getGroupName());
+            if (
+                    !updatedList
+                    && currentExistingGroup != null
+                    && !ArrayUtils.compareStringArrays(currentExistingGroup.getCommands(), commandsPacket.getCommands())
+            ) {
+                updatedList = true;
+            }
+
+            GroupManager.setGroup(group.getGroupName(), group.getPriority(), group.getCommands());
+        }
+
         groupsPacket.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getPriority(), group.getCommands()));
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
-        if(Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
+        if (Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
             Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = unknownCommandPacket.isEnabled();
 
-        if(!loaded) loaded = true;
+        if (!loaded)
+            loaded = true;
 
-        if(Reflection.getMinor() >= 16) {
+        if (Reflection.getMinor() >= 13) {
 
-            if (Storage.USE_VELOCITY)
+            if (updatedList) {
                 BukkitAntiTabListener.updateCommands();
+                Logger.debug("Force server to load all players tab-completion due to received sync!");
+            }
 
-            Logger.debug("Force server to load all players tab-completion due to received sync!");
-            BukkitAntiTabListener.handleTabCompletion(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? Storage.Blacklist.getBlacklist().getCommands() : getNotBlockedCommands());
         }
 
         PATEventHandler.callReceiveSyncEvents(packetBundle);
     }
 
     public static boolean doesCommandExist(String command, boolean replace) {
-        if(commandsMap == null) return false;
-        if(replace) command = StringUtils.replaceFirst(command, "/", "");
+        if (commandsMap == null) return false;
+        if (replace) command = StringUtils.replaceFirst(command, "/", "");
         return getAllCommands().contains(command);
     }
 
@@ -251,7 +331,7 @@ public class BukkitLoader extends JavaPlugin {
                 knownCommandsField.setAccessible(true);
                 commandsMap = (Map<String, Command>)knownCommandsField.get(simpleCommandMap);
             }
-        }catch (Throwable ignored) { }
+        } catch (Throwable ignored) { }
 
         if(commandsMap == null)
             Logger.warning("Failed to get server commands!");
@@ -266,7 +346,7 @@ public class BukkitLoader extends JavaPlugin {
     }
 
     public static List<String> getAllCommands() {
-        if(commandsMap == null) return getNotBlockedCommands();
+        if (commandsMap == null) return getNotBlockedCommands();
 
         List<String> result = new LinkedList<>();
         for (String command : commandsMap.keySet()) if(!result.contains(command)) result.add(command);

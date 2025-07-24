@@ -1,16 +1,21 @@
 package de.rayzs.pat.api.netty.bukkit.handlers;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.bukkit.entity.Player;
+
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
-import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
+import de.rayzs.pat.api.netty.bukkit.BukkitPacketHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.api.netty.bukkit.*;
-import org.bukkit.entity.Player;
-import java.lang.reflect.Field;
-import de.rayzs.pat.utils.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.Reflection;
 
 public class LegacyPacketHandler implements BukkitPacketHandler {
 
@@ -44,8 +49,10 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
                 if(spaces > 0) input = split[0];
             }
 
-            cancelsBeforeHand = Storage.Blacklist.isBlocked(player, input, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-            if (!cancelsBeforeHand) cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
+            cancelsBeforeHand = Storage.Blacklist.canPlayerAccessTab(player, input);
+            
+            if (!cancelsBeforeHand) 
+                cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
         } else return true;
 
         for (Field field : Reflection.getFields(packetObj)) {
@@ -73,7 +80,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
                     if (!doesBypassNamespace && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(tempName))
                         continue;
 
-                    if (!Storage.Blacklist.isBlocked(player, tempName, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED))
+                    if (!Storage.Blacklist.canPlayerAccessTab(player, tempName))
                         newResultList.add(s);
                 }
             } else {

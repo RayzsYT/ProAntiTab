@@ -4,6 +4,8 @@ import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.ExpireCache;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import org.bukkit.event.*;
 import org.bukkit.Bukkit;
@@ -12,15 +14,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.plaf.BorderUIResource;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class PaperServerListPing implements Listener {
 
+    private static final ExpireCache<Integer, List<ProtocolHoverLine>> CACHED_PROTOCOL_NAMES = new ExpireCache<>(1, TimeUnit.SECONDS);
     private static final UUID RANDOM_UUID = UUID.randomUUID();
+    private static final int CACHE_KEY = 0;
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPaperServerListPing(PaperServerListPingEvent event) {
@@ -39,12 +41,54 @@ public class PaperServerListPing implements Listener {
             event.getPlayerSample().clear();
             event.setHidePlayers(true);
         }
+
         else if (Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_CUSTOM_PLAYERLIST) {
+            List<ProtocolHoverLine> cachedPlayerNames = CACHED_PROTOCOL_NAMES.get(CACHE_KEY);
+
             event.getPlayerSample().clear();
 
-            Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines().forEach(line ->
-                    event.getPlayerSample().add(new ProtocolHoverLine(replaceString(line, online, onlineExtend, max), RANDOM_UUID.toString()))
-            );
+            if (cachedPlayerNames != null) {
+
+                event.getPlayerSample().addAll(cachedPlayerNames);
+
+            } else {
+
+                Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines().forEach(line -> {
+
+                    if (line.contains("%players%")) {
+                        List<String> playerNames = Storage.getLoader().getPlayerNames();
+
+                        playerNames = playerNames.size() > 30
+                                ? playerNames.subList(0, 30)
+                                : playerNames;
+
+                        for (String currentPlayerName : playerNames) {
+                            String playerName = StringUtils.replace(line,
+                                    "%players%", currentPlayerName, "&", "§"
+                            );
+
+                            event.getPlayerSample().add(new ProtocolHoverLine(playerName, RANDOM_UUID));
+                        }
+
+                    } else {
+                        String playerName = replaceString(line, online, onlineExtend, max);
+
+                        if (playerName.contains("\n")) {
+                            String[] nameSplit = playerName.split("\n");
+                            nameSplit = nameSplit.length > 30
+                                    ? Arrays.copyOfRange(nameSplit, 0, 30)
+                                    : nameSplit;
+
+                            for (String name : nameSplit) {
+                                event.getPlayerSample().add(new ProtocolHoverLine(name, RANDOM_UUID));
+                            }
+
+                        } else {
+                            event.getPlayerSample().add(new ProtocolHoverLine(playerName, RANDOM_UUID));
+                        }
+                    }
+                });
+            }
         }
 
         event.setVersion(replaceString(versionName, online, onlineExtend, max));
@@ -64,9 +108,9 @@ public class PaperServerListPing implements Listener {
 
         private String name, id;
 
-        public ProtocolHoverLine(String name, String id) {
+        public ProtocolHoverLine(String name, UUID id) {
             this.name = name;
-            this.id = id;
+            this.id = id.toString();
         }
 
         @Override
