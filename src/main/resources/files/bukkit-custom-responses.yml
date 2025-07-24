@@ -34,6 +34,18 @@
 
 # Here are a few examples:
 
+# Example for all blocked commands.
+# In here we only trigger this response in any case.
+# This applies to all commands, as well as sub-commands,
+# unless you have specified another custom response.
+#example-with-everything:
+#  triggers:
+#    - "*"
+#  message:
+#    - "&cI'm blocked"
+#  actions:
+#    - "actionbar::&cSorry %player%, but this command is blocked."
+
 # Example with kits.
 # In here we only trigger the given message, if the player would type "/kit ...".
 # If this command would work through sub-arguments, then the player would only able to execute the command with the
