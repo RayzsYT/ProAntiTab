@@ -56,7 +56,7 @@ public class PaperServerListPing implements Listener {
                 Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines().forEach(line -> {
 
                     if (line.contains("%players%")) {
-                        List<String> playerNames = Storage.getLoader().getPlayerNames();
+                        List<String> playerNames = Storage.getLoader().getOnlinePlayerNames();
 
                         playerNames = playerNames.size() > 30
                                 ? playerNames.subList(0, 30)
