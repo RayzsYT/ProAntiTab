@@ -35,11 +35,18 @@ public class BungeeBlockCommandListener implements Listener {
             return;
 
         command = command.replaceFirst("/", "");
+
+        final String displayCommand = command;
+
         command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
         command = command.toLowerCase();
 
-        List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%server%", serverName);
+        List<String> notificationMessage = MessageTranslator.replaceMessageList(
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
+                "%player%", player.getName(),
+                "%command%", displayCommand,
+                "%server%", serverName);
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
@@ -55,8 +62,11 @@ public class BungeeBlockCommandListener implements Listener {
                 Logger.info(notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
-                if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
+                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
+
+                if (p != null) {
+                    MessageTranslator.send(p, notificationMessage);
+                }
             });
 
             return;
@@ -76,8 +86,11 @@ public class BungeeBlockCommandListener implements Listener {
                 Logger.info(notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
-                if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
+                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
+
+                if (p != null) {
+                    MessageTranslator.send(p, notificationMessage);
+                }
             });
 
             return;
@@ -103,8 +116,11 @@ public class BungeeBlockCommandListener implements Listener {
                 Logger.info(notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
-                if(proxiedPlayer != null) MessageTranslator.send(proxiedPlayer, notificationMessage);
+                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
+
+                if (p != null) {
+                    MessageTranslator.send(p, notificationMessage);
+                }
             });
         }
 

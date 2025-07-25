@@ -130,6 +130,21 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     @Override
+    public Object getConsoleSender() {
+        return Bukkit.getConsoleSender();
+    }
+
+    @Override
+    public Object getPlayerObjByName(String name) {
+        return Bukkit.getPlayer(name);
+    }
+
+    @Override
+    public Object getPlayerObjByUUID(UUID uuid) {
+        return Bukkit.getPlayer(uuid);
+    }
+
+    @Override
     public void updateCommandCache() {}
 
     @Override

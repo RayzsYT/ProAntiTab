@@ -108,10 +108,10 @@ public class VelocityLoader implements PluginLoader {
 
         Storage.PLUGIN_OBJECT = this;
 
-        if(server.getPluginManager().getPlugin("luckperms").isPresent())
+        if (server.getPluginManager().getPlugin("luckperms").isPresent())
             LuckPermsAdapter.initialize();
 
-        if(server.getPluginManager().getPlugin("papiproxybridge").isPresent()) {
+        if (server.getPluginManager().getPlugin("papiproxybridge").isPresent()) {
             Storage.USE_PAPIPROXYBRIDGE = true;
             Logger.info("Successfully hooked into PAPIProxyBridge!");
         }
@@ -144,6 +144,21 @@ public class VelocityLoader implements PluginLoader {
 
             PATEventHandler.callUpdatePlayerCommandsEvents(uuid, commands, true);
         }).delay(1, TimeUnit.SECONDS).schedule();
+    }
+
+    @Override
+    public Object getConsoleSender() {
+        return server.getConsoleCommandSource();
+    }
+
+    @Override
+    public Object getPlayerObjByName(String name) {
+        return server.getPlayer(name).orElse(null);
+    }
+
+    @Override
+    public Object getPlayerObjByUUID(UUID uuid) {
+        return server.getPlayer(uuid).orElse(null);
     }
 
     @Override

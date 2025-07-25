@@ -14,6 +14,11 @@ public interface PluginLoader {
 
     List<String> getServerNames();
 
+    Object getConsoleSender();
+
+    Object getPlayerObjByName(String name);
+    Object getPlayerObjByUUID(UUID uuid);
+
     UUID getUUIDByName(String playerName);
     String getNameByUUID(UUID uuid);
 

@@ -114,6 +114,21 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     @Override
+    public Object getConsoleSender() {
+        return ProxyServer.getInstance().getConsole();
+    }
+
+    @Override
+    public Object getPlayerObjByName(String name) {
+        return plugin.getProxy().getPlayer(name);
+    }
+
+    @Override
+    public Object getPlayerObjByUUID(UUID uuid) {
+        return plugin.getProxy().getPlayer(uuid);
+    }
+
+    @Override
     public HashMap<String, CommandsCache> getCommandsCacheMap() {
         return commandsCacheMap;
     }
