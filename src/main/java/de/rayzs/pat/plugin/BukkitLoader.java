@@ -279,22 +279,25 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != commandsPacket.turnBlacklistToWhitelistEnabled())
             Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = commandsPacket.turnBlacklistToWhitelistEnabled();
 
+        Map<String, List<String>> cpyCache = new HashMap<>();
+        GroupManager.getGroups().forEach(group -> {
+            cpyCache.put(group.getGroupName(), group.getCommands());
+        });
+
         GroupManager.clearAllGroups();
 
         for (TinyGroup group : groupsPacket.getGroups()) {
-            Group currentExistingGroup = GroupManager.getGroupByName(group.getGroupName());
+            List<String> currentExistingList = cpyCache.get(group.getGroupName());
             if (
                     !updatedList
-                    && currentExistingGroup != null
-                    && !ArrayUtils.compareStringArrays(currentExistingGroup.getCommands(), commandsPacket.getCommands())
+                    && currentExistingList != null
+                    && !ArrayUtils.compareStringArrays(currentExistingList, group.getCommands())
             ) {
                 updatedList = true;
             }
 
             GroupManager.setGroup(group.getGroupName(), group.getPriority(), group.getCommands());
         }
-
-        groupsPacket.getGroups().forEach(group -> GroupManager.setGroup(group.getGroupName(), group.getPriority(), group.getCommands()));
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
         if (Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
@@ -316,7 +319,9 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     public static boolean doesCommandExist(String command, boolean replace) {
-        if (commandsMap == null) return false;
+        if (commandsMap == null)
+            return false;
+
         if (replace) command = StringUtils.replaceFirst(command, "/", "");
         return getAllCommands().contains(command);
     }

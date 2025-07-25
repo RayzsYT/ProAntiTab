@@ -61,38 +61,44 @@ public class PermissionUtil {
     }
 
     public static boolean hasPermission(Object targetObj, String permission) {
-        CommandSender sender;
         PermissionMap permissionMap;
-        UUID uuid;
 
-        if(targetObj instanceof CommandSender) sender = (CommandSender) targetObj;
+        CommandSender sender = null;
+        UUID uuid = null;
+
+        if (targetObj instanceof UUID) uuid = (UUID) targetObj;
+        else if (targetObj instanceof CommandSender) sender = (CommandSender) targetObj;
         else sender = new CommandSender(targetObj);
 
-        if(sender.isConsole()) return true;
+        if (uuid == null) {
+            if (sender.isConsole()) return true;
 
-        uuid = sender.getUniqueId();
+            uuid = sender.getUniqueId();
+        }
 
         if(!MAP.containsKey(uuid)) {
-            MAP.put(uuid, new PermissionMap(sender.getUniqueId()));
+            MAP.put(uuid, new PermissionMap(uuid));
             return false;
         }
 
         permissionMap = MAP.get(uuid);
 
-        if(!Storage.USE_LUCKPERMS) {
-            if (permissionMap.hasPermissionState("*"))
-                permissionMap.setState("*", sender.hasPermission("*"));
+        if (sender != null) {
+            if (!Storage.USE_LUCKPERMS) {
+                if (permissionMap.hasPermissionState("*"))
+                    permissionMap.setState("*", sender.hasPermission("*"));
 
-            if (permissionMap.hasPermissionState("proantitab.*"))
-                permissionMap.setState("proantitab.*", sender.hasPermission("proantitab.*"));
+                if (permissionMap.hasPermissionState("proantitab.*"))
+                    permissionMap.setState("proantitab.*", sender.hasPermission("proantitab.*"));
 
-            if (permissionMap.hasPermissionState("proantitab." + permission))
-                permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
+                if (permissionMap.hasPermissionState("proantitab." + permission))
+                    permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
+            }
+
+            if (sender.isOperator())
+                if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+                    return true;
         }
-
-        if(sender.isOperator())
-            if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
-                return true;
 
         return permissionMap.isPermitted("*") || permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
     }

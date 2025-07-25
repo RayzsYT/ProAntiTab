@@ -4,7 +4,7 @@ import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.plugin.logger.LoggerPriority;
 import de.rayzs.pat.plugin.logger.LoggerTemplate;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import org.bukkit.Bukkit;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,7 +67,7 @@ public class BungeeLogger implements LoggerTemplate {
             return;
 
         if (message.contains("§")) {
-            MessageTranslator.send(Bukkit.getServer().getConsoleSender(), message);
+            MessageTranslator.send(ProxyServer.getInstance().getConsole(), message);
             return;
         }
 

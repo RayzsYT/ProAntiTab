@@ -149,7 +149,7 @@ public class VelocityPacketAnalyzer {
                 }
             }
 
-            if(packet instanceof UnsignedPlayerCommandPacket) {
+            if (packet instanceof UnsignedPlayerCommandPacket) {
 
                 UnsignedPlayerCommandPacket unsignedPlayerCommandPacket = (UnsignedPlayerCommandPacket) packet;
                 if (!VelocityBlockCommandListener.handleCommand(player, unsignedPlayerCommandPacket.getCommand()).getResult().isAllowed())

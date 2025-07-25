@@ -21,21 +21,37 @@ public class BungeeClient implements Client, Listener {
 
     @Override
     public void send(Object packet) {
-        for(ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
-            try { serverInfo.sendData(CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
-            } catch (Throwable throwable) { throwable.printStackTrace(); }
+        for (ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
+
+            try {
+
+                serverInfo.sendData(CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
+
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+
         }
     }
 
     @EventHandler
     public void onQueryReceive(PluginMessageEvent event) {
-        if (!event.getTag().equalsIgnoreCase(CHANNEL_NAME)) return;
+        if (!event.getTag().equalsIgnoreCase(CHANNEL_NAME))
+            return;
+
         try {
+
             Object packetObj = CommunicationPackets.buildFromBytes(event.getData());
-            if(!CommunicationPackets.isPacket(packetObj)) return;
+
+            if (!CommunicationPackets.isPacket(packetObj))
+                return;
 
             Server server = (Server) event.getSender();
-            Communicator.receiveInformation(server.getInfo().getName().toLowerCase(), packetObj);
-        } catch (Throwable throwable) { throwable.printStackTrace(); }
+            Communicator.receiveInformation(server.getInfo().getName(), packetObj);
+
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
     }
 }

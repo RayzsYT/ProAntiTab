@@ -22,19 +22,30 @@ public class VelocityClient implements Client {
     @Override
     public void send(Object packet) {
         for (RegisteredServer registeredServer : SERVER.getAllServers()) {
-            try { registeredServer.sendPluginMessage(IDENTIFIER, CommunicationPackets.convertToBytes(packet));
-            } catch (Throwable throwable) { throwable.printStackTrace(); }
+
+            try {
+
+                registeredServer.sendPluginMessage(IDENTIFIER, CommunicationPackets.convertToBytes(packet));
+
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+
         }
     }
 
     @Subscribe
     public void onQueryReceive(PluginMessageEvent event) {
-        if (event.getIdentifier() != IDENTIFIER) return;
+        if (event.getIdentifier() != IDENTIFIER)
+            return;
+
         Object packetObj = CommunicationPackets.buildFromBytes(event.getData());
-        if(!CommunicationPackets.isPacket(packetObj)) return;
+
+        if (!CommunicationPackets.isPacket(packetObj))
+            return;
 
         ServerConnection server = (ServerConnection) event.getSource();
-        Communicator.receiveInformation(server.getServerInfo().getName().toLowerCase(), packetObj);
+        Communicator.receiveInformation(server.getServerInfo().getName(), packetObj);
     }
 
     public static MinecraftChannelIdentifier getIdentifier() {

@@ -3,6 +3,7 @@ package de.rayzs.pat.plugin.process.impl.server;
 import de.rayzs.pat.api.command.ProCommand;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.CommandSender;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
@@ -103,7 +104,8 @@ public class ServRemoveCommand extends ProCommand {
             return true;
         }
 
-        boolean exist = group.contains(command, serverName);
+        GroupBlacklist groupBlacklist = group.getOrCreateGroupBlacklist(serverName);
+        boolean exist = groupBlacklist != null && groupBlacklist.getCommands().contains(command);
 
         if (exist) {
             group.remove(command, serverName);

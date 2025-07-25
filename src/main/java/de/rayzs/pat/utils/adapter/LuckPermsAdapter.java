@@ -1,8 +1,10 @@
 package de.rayzs.pat.utils.adapter;
 
+import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import net.luckperms.api.event.sync.PreNetworkSyncEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.plugin.VelocityLoader;
@@ -106,6 +108,7 @@ public class LuckPermsAdapter {
 
         if (event.isUser() && event.getTarget() instanceof User) {
             User user = (User) event.getTarget();
+            UUID uuid = user.getUniqueId();
 
             if (!Reflection.isProxyServer()) {
 
@@ -115,8 +118,10 @@ public class LuckPermsAdapter {
                 return;
             }
 
-            if (Reflection.isVelocityServer())
+            if (Reflection.isVelocityServer()) {
                 PermissionUtil.reloadPermissions(user.getUniqueId());
+                VelocityLoader.delayedPlayerReload(uuid);
+            }
         }
     }
 }

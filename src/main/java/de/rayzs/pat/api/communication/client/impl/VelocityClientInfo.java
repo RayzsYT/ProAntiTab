@@ -16,36 +16,10 @@ public class VelocityClientInfo extends ClientInfo {
 
     @Override
     public void sendBytes(byte[] bytes) {
-        VelocityLoader.getServer().getAllServers().stream().filter(server -> server.getServerInfo().getName().equalsIgnoreCase(getName())).forEach(server -> server.sendPluginMessage(VelocityClient.getIdentifier(), bytes));
-    }
-
-    @Override
-    public String getId() {
-        return super.getId();
-    }
-
-    @Override
-    public String getName() {
-        return super.getName();
-    }
-
-    @Override
-    public String getSyncTime() {
-        return super.getSyncTime();
-    }
-
-    @Override
-    public void setFeedback(boolean state) {
-        super.setFeedback(state);
-    }
-
-    @Override
-    public void setId(String serverId) {
-        super.setId(serverId);
-    }
-
-    @Override
-    public void setName(String name) {
-        super.setName(name);
+        VelocityLoader.getServer().getAllServers().stream().filter(server ->
+                server.getServerInfo().getName().equalsIgnoreCase(getName())
+        ).forEach(server ->
+                server.sendPluginMessage(VelocityClient.getIdentifier(), bytes)
+        );
     }
 }

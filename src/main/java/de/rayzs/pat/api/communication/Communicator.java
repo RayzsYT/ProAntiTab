@@ -3,7 +3,6 @@ package de.rayzs.pat.api.communication;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.communication.client.impl.BungeeClientInfo;
@@ -17,7 +16,6 @@ import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.utils.CommunicationPackets;
-import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -26,12 +24,19 @@ import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class Communicator {
 
-    private static final Client CLIENT = Reflection.isVelocityServer() ? new VelocityClient() : Reflection.isProxyServer() ? new BungeeClient() : new BukkitClient();
+    private static final Client CLIENT =
+            Reflection.isVelocityServer() ? new VelocityClient()
+            : Reflection.isProxyServer() ? new BungeeClient()
+            : new BukkitClient();
+
     private static final UUID SERVER_ID = UUID.randomUUID();
+
     public static final List<ClientInfo> CLIENTS = new ArrayList<>();
-    private static final ExpireCache<String, ClientInfo> QUEUE_CLIENTS = new ExpireCache<>(15, TimeUnit.SECONDS);
-    public static long LAST_DATA_UPDATE = System.currentTimeMillis(), LAST_SENT_REQUEST = 0, LAST_BUKKIT_SYNC = System.currentTimeMillis();
+
     public static int SERVER_DATA_SYNC_COUNT = 0;
+    public static long LAST_DATA_UPDATE = System.currentTimeMillis(),
+                        LAST_SENT_REQUEST = 0,
+                        LAST_BUKKIT_SYNC = System.currentTimeMillis();
 
     public static void sendPacket(Object packet) {
         CLIENT.send(packet);
@@ -42,6 +47,8 @@ public class Communicator {
     }
 
     public static void receiveInformation(String serverName, Object packet) {
+        ClientInfo client = getClientByName(serverName);
+
         if (packet instanceof CommunicationPackets.RequestPacket) {
 
             CommunicationPackets.RequestPacket requestPacket = (CommunicationPackets.RequestPacket) packet;
@@ -49,7 +56,6 @@ public class Communicator {
             if (!requestPacket.isToken(Storage.TOKEN))
                 return;
 
-            ClientInfo client = getClientByName(serverName);
             if (client == null) {
                 client = Reflection.isVelocityServer()
                         ? new VelocityClientInfo(requestPacket.getServerId(), serverName)
@@ -96,7 +102,6 @@ public class Communicator {
                 return;
 
             String serverId = feedbackPacket.getServerId();
-            ClientInfo client = getClientByName(serverName);
 
             if (client == null) {
                 client = Reflection.isVelocityServer()
@@ -121,9 +126,10 @@ public class Communicator {
             return;
         }
 
-        if(packet instanceof CommunicationPackets.PacketBundle) {
+        if (packet instanceof CommunicationPackets.PacketBundle) {
             CommunicationPackets.PacketBundle packetBundle =  (CommunicationPackets.PacketBundle) packet;
-            if(!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString())) return;
+            if (!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString()))
+                return;
 
             Storage.USE_VELOCITY = packetBundle.isVelocity();
             LAST_BUKKIT_SYNC = System.currentTimeMillis();
@@ -135,12 +141,13 @@ public class Communicator {
         syncData(null);
     }
 
-    public static void  syncData(String serverId) {
+    public static void syncData(String serverId) {
         if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
             return;
 
         LAST_DATA_UPDATE = System.currentTimeMillis();
         ClientInfo clientInfo;
+
         if(serverId == null) {
             SERVER_DATA_SYNC_COUNT = 0;
             CLIENTS.forEach(currentClient -> syncData(currentClient.getId()));
@@ -162,7 +169,8 @@ public class Communicator {
         String tempServerName = "";
 
         if (clientInfo != null && clientInfo.getName() != null) {
-            tempServerName = clientInfo.getName().toLowerCase();
+            tempServerName = clientInfo.getName();
+
             if (!Storage.Blacklist.isIgnoredServer(tempServerName))
                 commands.addAll(Storage.Blacklist.getBlacklist().getCommands());
 
@@ -211,11 +219,6 @@ public class Communicator {
             sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN));
     }
 
-    public static void sendFeedback(UUID targetUUID) {
-        if(Reflection.isProxyServer())
-            sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN, targetUUID));
-    }
-
     public static void sendFeedback() {
         sendPacket(new CommunicationPackets.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString()));
     }
@@ -230,19 +233,5 @@ public class Communicator {
 
     public static ClientInfo getClientByName(String name) {
         return CLIENTS.isEmpty() ? null : CLIENTS.stream().filter(client -> client != null && client.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
-    }
-
-    public static ClientInfo getQueueClientById(String id) {
-        return QUEUE_CLIENTS.get(id);
-    }
-
-    public static void resetAllFeedbacks() {
-        CLIENTS.forEach(client -> client.setFeedback(false));
-    }
-
-    public static List<String> getRegisteredServerNames() {
-        List<String> result = new ArrayList<>();
-        CLIENTS.stream().filter(client -> client != null && client.getName() != null).forEach(client -> result.add(client.getName()));
-        return result;
     }
 }

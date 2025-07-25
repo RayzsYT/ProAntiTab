@@ -69,8 +69,14 @@ public class GroupManager {
             if (group == null)
                 return false;
 
-            if (server != null && group.contains(command, server))
-                return true;
+            if (server != null) {
+                List<String> servers = group.getBlacklistServerNames(server);
+
+                for (String s : servers) {
+                    if (group.contains(command, s))
+                        return true;
+                }
+            }
 
             return group.contains(command);
         });

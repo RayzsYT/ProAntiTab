@@ -19,18 +19,31 @@ public class BukkitClient implements Client, PluginMessageListener {
 
     @Override
     public void send(Object packet) {
-        try { SERVER.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
-        } catch (Throwable throwable) { throwable.printStackTrace(); }
+        try {
+
+            SERVER.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
+
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] bytes) {
-        if(!channel.equals(CHANNEL_NAME)) return;
+
+        if (!channel.equals(CHANNEL_NAME))
+            return;
+
         try {
             Object packetObj = CommunicationPackets.buildFromBytes(bytes);
-            if(!CommunicationPackets.isPacket(packetObj)) return;
+
+            if (!CommunicationPackets.isPacket(packetObj))
+                return;
 
             PATScheduler.createScheduler(() -> Communicator.receiveInformation("proxy", packetObj));
-        } catch (Throwable throwable) { throwable.printStackTrace(); }
+
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 }

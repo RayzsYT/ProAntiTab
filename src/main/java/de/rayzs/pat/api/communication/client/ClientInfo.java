@@ -18,6 +18,8 @@ public abstract class ClientInfo {
         this.name = name;
     }
 
+    public abstract void sendBytes(byte[] bytes);
+
     public void setName(String name) {
         this.name = name;
     }
@@ -25,8 +27,6 @@ public abstract class ClientInfo {
     public void setId(String serverId) {
         this.id = serverId;
     }
-
-    public abstract void sendBytes(byte[] bytes);
 
     public String getName() {
         return name;

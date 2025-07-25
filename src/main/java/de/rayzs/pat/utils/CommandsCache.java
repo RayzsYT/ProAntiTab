@@ -69,9 +69,10 @@ public class CommandsCache {
     }
 
     public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid, String serverName) {
-        List<String> playerCommands = new LinkedList(unfilteredCommands);
+        List<String> playerCommands = new LinkedList<>(unfilteredCommands);
+        List<String> localFilteredCommands = filteredCommands == null ? null : new LinkedList<>(filteredCommands);
 
-        if (filteredCommands == null)
+        if (localFilteredCommands == null)
             return playerCommands;
         
 
@@ -82,7 +83,7 @@ public class CommandsCache {
                 return true;
             }
 
-            if (filteredCommands.contains(command)) {
+            if (localFilteredCommands.contains(command)) {
                 return false;
             }
 

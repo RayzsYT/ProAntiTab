@@ -110,7 +110,17 @@ public class SubArgsModule {
             return commands;
         }
 
-        groups.forEach(group -> commands.addAll(group.getAllCommands(serverName)));
+        groups.forEach(group -> {
+
+            commands.addAll(group.getCommands());
+
+            List<String> associatedServerNames = group.getBlacklistServerNames(serverName);
+
+            associatedServerNames.forEach(s -> {
+                commands.addAll(group.getCommands(s));
+            });
+
+        });
         return commands;
     }
 }

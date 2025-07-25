@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
@@ -26,6 +27,8 @@ public class Group implements Serializable {
         this.priority = (int) Storage.Files.STORAGE.getOrSet("groups." + groupName + ".priority", 1);
         this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
         this.generalGroupBlacklist.load();
+
+        loadServerBlacklist();
     }
 
     public Group(String groupName, int priority) {
@@ -33,6 +36,8 @@ public class Group implements Serializable {
         this.priority = priority;
         this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
         this.generalGroupBlacklist.load();
+
+        loadServerBlacklist();
     }
 
     public Group(String groupName, List<String> commands) {
@@ -40,6 +45,8 @@ public class Group implements Serializable {
         this.priority = (int) Storage.Files.STORAGE.getOrSet("groups." + groupName + ".priority", 1);
         this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
         this.generalGroupBlacklist.setList(commands);
+
+        loadServerBlacklist();
     }
 
     public Group(String groupName, int priority, List<String> commands) {
@@ -47,6 +54,19 @@ public class Group implements Serializable {
         this.priority = priority;
         this.generalGroupBlacklist = BlacklistCreator.createGroupBlacklist(groupName);
         this.generalGroupBlacklist.setList(commands);
+
+        loadServerBlacklist();
+    }
+
+    private void loadServerBlacklist() {
+        String path = "groups." + groupName + ".servers";
+
+        if (Storage.Files.STORAGE.get(path) == null)
+            return;
+
+        Storage.Files.STORAGE
+                .getKeys("groups." + groupName + ".servers", false)
+                .forEach(this::getOrCreateGroupBlacklist);
     }
 
     public String getGroupName() {
@@ -127,7 +147,6 @@ public class Group implements Serializable {
             return null;
 
         GroupBlacklist groupBlacklist;
-        server = server.toLowerCase();
 
         if (this.groupServerBlacklist.containsKey(server) && this.groupServerBlacklist.get(server) != null)
             groupBlacklist = this.groupServerBlacklist.get(server);
@@ -150,6 +169,12 @@ public class Group implements Serializable {
         cachedServerGroupBlacklists.clear();
     }
 
+    public List<String> getBlacklistServerNames(String server) {
+        return groupServerBlacklist.keySet().stream().filter(key ->
+                Storage.isServer(key, server)
+        ).toList();
+    }
+
     public List<GroupBlacklist> getAllServerGroupBlacklist(String server) {
         return getAllServerGroupBlacklist(server, false);
     }
@@ -159,11 +184,12 @@ public class Group implements Serializable {
      */
 
     public List<GroupBlacklist> getAllServerGroupBlacklist(String server, boolean useDefault) {
-        server = server.toLowerCase();
 
         if (cachedServerGroupBlacklists.contains(server)) {
-            if(cachedServerGroupBlacklists.get(server).size() > (useDefault ? 1 : 0))
+
+            if (cachedServerGroupBlacklists.get(server).size() > (useDefault ? 1 : 0))
                 return cachedServerGroupBlacklists.get(server);
+
         }
 
         List<GroupBlacklist> groupBlacklists = new ArrayList<>();
@@ -187,8 +213,7 @@ public class Group implements Serializable {
     }
 
     public List<String> getCommands(String server) {
-        server = server.toLowerCase();
-        List<String> commands = new ArrayList<>(this.generalGroupBlacklist.getCommands());
+        List<String> commands = new ArrayList<>();
 
         GroupBlacklist groupBlacklist = getOrCreateGroupBlacklist(server);
         if (groupBlacklist != null)
@@ -198,9 +223,9 @@ public class Group implements Serializable {
     }
 
     public List<String> getAllCommands(String server) {
-        server = server.toLowerCase();
         List<String> commands = new ArrayList<>(this.generalGroupBlacklist.getCommands());
         GroupBlacklist groupBlacklist = getOrCreateGroupBlacklist(server);
+
         if (groupBlacklist != null)
             commands.addAll(groupBlacklist.getCommands());
 
@@ -212,7 +237,6 @@ public class Group implements Serializable {
     }
 
     public void deleteGroup(String server) {
-        server = (server != null) ? server.toLowerCase() : null;
         String path = "groups." + this.groupName + ((server != null) ? ("." + server) : "");
         Storage.Files.STORAGE.setAndSave(path, null);
         Storage.Files.STORAGE.reload();

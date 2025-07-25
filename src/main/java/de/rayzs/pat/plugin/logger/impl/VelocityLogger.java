@@ -4,7 +4,6 @@ import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.plugin.logger.LoggerPriority;
 import de.rayzs.pat.plugin.logger.LoggerTemplate;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import org.bukkit.Bukkit;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -68,7 +67,7 @@ public class VelocityLogger implements LoggerTemplate {
             return;
 
         if (message.contains("§")) {
-            MessageTranslator.send(Bukkit.getServer().getConsoleSender(), message);
+            MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), message);
             return;
         }
 
