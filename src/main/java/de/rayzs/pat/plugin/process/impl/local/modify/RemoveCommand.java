@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.process.impl.local.modify;
 
 import de.rayzs.pat.api.command.ProCommand;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.group.*;
 import de.rayzs.pat.utils.*;
 import java.util.*;
@@ -82,7 +83,8 @@ public class RemoveCommand extends ProCommand {
             return true;
         }
 
-        boolean exist = group.contains(command);
+        GroupBlacklist blacklist = group.getGeneralGroupBlacklist();
+        boolean exist = blacklist.getCommands().contains(command);
 
         if (exist) {
             group.remove(command);
