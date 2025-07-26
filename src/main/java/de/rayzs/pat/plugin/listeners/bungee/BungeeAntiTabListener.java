@@ -1,10 +1,8 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
-import com.google.gson.JsonPrimitive;
 import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
+import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -12,23 +10,22 @@ import net.md_5.bungee.api.event.TabCompleteEvent;
 import net.md_5.bungee.api.event.TabCompleteResponseEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-
-import java.util.HashMap;
+import java.util.List;
 
 public class BungeeAntiTabListener implements Listener {
 
     @EventHandler
     public void onTabComplete(TabCompleteEvent event) {
-
-        // Ignoring this at first, due to transfer to the packet-based solution only. Hehe
-
-        /*
         if(!(event.getSender() instanceof ProxiedPlayer)) return;
 
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
 
         ServerInfo serverInfo = player.getServer().getInfo();
         String serverName = serverInfo.getName();
+        String cursor = event.getCursor().substring(1);
+
+        if (event.getSuggestions().isEmpty())
+            return;
 
         if (Storage.Blacklist.isDisabledServer(serverName))
             return;
@@ -36,18 +33,14 @@ public class BungeeAntiTabListener implements Listener {
         if (PermissionUtil.hasBypassPermission(player))
             return;
 
-        if (!Storage.Blacklist.canPlayerAccessTab(player, event.getCursor(), serverName)) {
-            event.getSuggestions().clear();
-            return;
-        }
+        FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player, cursor, event.getSuggestions());
+        List<String> suggestions = filteredTabCompletionEvent.getCompletion();
 
-        event.getSuggestions().removeIf(suggestion -> !Storage.Blacklist.canPlayerAccessTab(player, suggestion, serverName));
-         */
+        event.getSuggestions().removeIf(suggestion -> !suggestions.contains(suggestion));
     }
 
     @EventHandler
     public void onTabComplete(TabCompleteResponseEvent event) {
-
         // Ignoring this at first, due to transfer to the packet-based solution only. Hehe
 
         /*
