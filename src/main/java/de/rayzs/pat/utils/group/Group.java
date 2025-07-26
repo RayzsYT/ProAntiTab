@@ -73,6 +73,10 @@ public class Group implements Serializable {
         return groupName;
     }
 
+    public GroupBlacklist getGeneralGroupBlacklist() {
+        return generalGroupBlacklist;
+    }
+
     public void add(String command) {
         this.generalGroupBlacklist.add(command).save();
     }
