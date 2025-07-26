@@ -73,7 +73,7 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         manager.registerListener(this, new BungeeBlockCommandListener());
         manager.registerListener(this, new BungeePingListener());
 
-        if(Reflection.isPaper())
+        if (Reflection.isPaper())
             manager.registerListener(this, new WaterfallAntiTabListener());
 
         startUpdaterTask();
