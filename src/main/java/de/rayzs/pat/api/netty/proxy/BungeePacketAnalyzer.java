@@ -4,18 +4,17 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 
-import com.mojang.brigadier.tree.RootCommandNode;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
 import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.node.CommandNodeHelper;
 import de.rayzs.pat.utils.Reflection;
@@ -42,9 +41,20 @@ public class BungeePacketAnalyzer {
     private static final HashMap<ProxiedPlayer, Boolean> PLAYER_MODIFIED = new HashMap<>();
     private static final HashMap<ProxiedPlayer, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
+    private static final com.mojang.brigadier.Command DUMMY_COMMAND = (context) -> 0;
+
     private static final List<String> PLUGIN_COMMANDS = new ArrayList<>();
 
     private static Class<?> channelWrapperClass, serverConnectionClass;
+
+    private static final List<String> PROXY_COMMANDS;
+
+    static {
+        PROXY_COMMANDS = ProxyServer.getInstance().getPluginManager().getCommands().stream().map(entry -> {
+            String key = entry.getKey();
+            return key.startsWith("/") ? key.substring(1) : key;
+        }).toList();
+    }
 
     public static void injectAll() {
         ProxyServer.getInstance().getPlayers().forEach(BungeePacketAnalyzer::inject);
@@ -84,15 +94,19 @@ public class BungeePacketAnalyzer {
 
             channelField.setAccessible(false);
 
-            if(channel.pipeline().names().contains(BungeePacketAnalyzer.HANDLER_NAME))
+            if (channel.pipeline().names().contains(BungeePacketAnalyzer.HANDLER_NAME))
                 uninject(player);
 
             channel.pipeline().addAfter(BungeePacketAnalyzer.PIPELINE_NAME, BungeePacketAnalyzer.HANDLER_NAME, new PacketDecoder(player));
             BungeePacketAnalyzer.INJECTED_PLAYERS.put(player, channel);
+
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return false;
-        } return true;
+
+        }
+
+        return true;
     }
 
     public static void uninject(ProxiedPlayer player) {
@@ -105,7 +119,9 @@ public class BungeePacketAnalyzer {
                 BungeePacketAnalyzer.INJECTED_PLAYERS.remove(player);
                 channel.eventLoop().submit(() -> {
                     ChannelPipeline pipeline = channel.pipeline();
-                    if (pipeline.names().contains(BungeePacketAnalyzer.HANDLER_NAME)) pipeline.remove(BungeePacketAnalyzer.HANDLER_NAME);
+
+                    if (pipeline.names().contains(BungeePacketAnalyzer.HANDLER_NAME))
+                        pipeline.remove(BungeePacketAnalyzer.HANDLER_NAME);
                 });
             }
         }
@@ -122,21 +138,57 @@ public class BungeePacketAnalyzer {
         String serverName = serverInfo.getName();
 
         CommandNodeHelper helper = new CommandNodeHelper<CommandNode>(commands.getRoot());
+
         Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
 
-        if(!cache.containsKey(serverName))
+        if (!cache.containsKey(serverName))
             cache.put(serverName, new CommandsCache());
 
         CommandsCache commandsCache = cache.get(serverName);
 
-        List<String> commandsAsString = new ArrayList<String>(helper.getChildrenNames());
+        List<String> commandsAsString = new ArrayList<String>(PROXY_COMMANDS);
+        commandsAsString.addAll(helper.getChildrenNames());
+
         commandsCache.handleCommands(commandsAsString, serverName);
 
         List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId());
         helper.removeIf(str -> !playerCommands.contains(str));
 
+        for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
+
+            if (ProxyServer.getInstance().getDisabledCommands().contains(command.getKey()))
+                continue;
+
+            if (commands.getRoot().getChild(command.getKey()) != null)
+                continue;
+
+            if (!command.getValue().hasPermission(player))
+                continue;
+
+            String commandName = command.getKey();
+            commandName = commandName.startsWith("/") ? commandName.substring(1) : commandName;
+
+            if (!playerCommands.contains(commandName))
+                continue;
+
+            CommandNode dummy = createDummyCommandNode(command.getKey());
+            commands.getRoot().addChild(dummy);
+        }
+
         // Disabled temporarily
+        // PROXY_COMMANDS.stream().filter(playerCommands::contains).forEach(helper::add);
         // SubArgsModule.handleCommandNode(player.getUniqueId(), helper);
+    }
+
+    private static CommandNode createDummyCommandNode(String command) {
+        return LiteralArgumentBuilder
+                .literal(command)
+                .executes(DUMMY_COMMAND)
+                .then(RequiredArgumentBuilder
+                        .argument("args", (ArgumentType) StringArgumentType.greedyString())
+                        .suggests(Commands.SuggestionRegistry.ASK_SERVER)
+                        .executes(DUMMY_COMMAND))
+                .build();
     }
 
     private static class PacketDecoder extends MessageToMessageDecoder<PacketWrapper> {
@@ -161,7 +213,6 @@ public class BungeePacketAnalyzer {
 
             } else if (wrapper.packet instanceof Commands) {
                 Commands response = (Commands) wrapper.packet;
-
                 modifyCommands(player, response);
 
                 player.unsafe().sendPacket(response);
@@ -221,7 +272,9 @@ public class BungeePacketAnalyzer {
                                     BungeePacketAnalyzer.PLUGIN_COMMANDS.stream().filter(command -> !suggestions.contains(command)).forEach(suggestions::add);
 
                                     suggestions.removeIf(command -> {
-                                        if (command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
+                                        if (command.startsWith("/"))
+                                            command = StringUtils.replaceFirst(command, "/", "");
+
                                         return !Storage.Blacklist.canPlayerAccessTab(player, command, server);
                                     });
 
@@ -229,9 +282,12 @@ public class BungeePacketAnalyzer {
                                     suggestions.forEach(command -> response.getCommands().add(command));
                                 }
 
-                                if (response.getCommands().isEmpty()) return;
+                                if (response.getCommands().isEmpty())
+                                    return;
+
                             } else {
-                                if(cancelsBeforeHand) return;
+                                if (cancelsBeforeHand)
+                                    return;
                             }
 
                             player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
