@@ -43,7 +43,10 @@ public class BungeePlayerConnectionListener implements Listener {
         ProxiedPlayer player = event.getPlayer();
 
         BungeePacketAnalyzer.inject(player);
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1)
+            return;
+
         CustomServerBrand.sendBrandToPlayer(player);
     }
 
@@ -54,7 +57,10 @@ public class BungeePlayerConnectionListener implements Listener {
 
         PermissionUtil.resetPermissions(player.getUniqueId());
         BungeePacketAnalyzer.uninject(player);
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1)
+            return;
+
         CustomServerBrand.sendBrandToPlayer(player);
     }
 }
