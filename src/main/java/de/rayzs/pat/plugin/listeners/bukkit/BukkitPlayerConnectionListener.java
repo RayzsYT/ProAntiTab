@@ -4,7 +4,6 @@ import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
-import de.rayzs.pat.api.brand.impl.BukkitServerBrand;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -35,7 +34,7 @@ public class BukkitPlayerConnectionListener implements Listener {
 
         if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
             Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
-                if(player.isOnline()) {
+                if (player.isOnline()) {
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
                 }
             }, 20);
