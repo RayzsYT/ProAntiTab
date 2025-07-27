@@ -151,7 +151,8 @@ public class BungeePacketAnalyzer {
 
         commandsCache.handleCommands(commandsAsString, serverName);
 
-        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId());
+        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
+
         helper.removeIf(str -> !playerCommands.contains(str));
 
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
