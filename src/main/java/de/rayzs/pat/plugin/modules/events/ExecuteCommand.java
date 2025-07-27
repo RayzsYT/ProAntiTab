@@ -1,42 +1,85 @@
-package de.rayzs.pat.plugin.modules.subargs.events;
+package de.rayzs.pat.plugin.modules.events;
 
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
-import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
+import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import de.rayzs.pat.utils.subargs.*;
 import de.rayzs.pat.utils.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ExecuteCommand extends ExecuteCommandEvent {
 
     @Override
     public void handle(ExecuteCommandEvent event) {
-        String command = StringUtils.replaceFirst(event.getCommand(), "/", "");
-        CommandSender sender = new CommandSender(event.getSenderObj());
+        String command = event.getCommand();
+        command = command.startsWith("/")
+                ? command.substring(1)
+                : command;
 
-        if (PermissionUtil.hasBypassPermission(event.getSenderObj(), StringUtils.getFirstArg(command)))
+        final String displayCommand = StringUtils.getFirstArg(command);
+
+        CommandSender sender = CommandSenderHandler.from(event.getSenderObj());
+
+        if (sender == null)
             return;
+
+        UUID uuid = sender.getUniqueId();
+
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
+
+            MessageTranslator.send(
+                    event.getSenderObj(),
+                    Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
+                    "%command%", displayCommand
+            );
+
+            event.setBlocked(true);
+            event.setCancelled(true);
+            return;
+        }
+
+        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+
+            MessageTranslator.send(
+                    event.getSenderObj(),
+                    Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
+                    "%command%", displayCommand
+            );
+
+            event.setBlocked(true);
+            event.setCancelled(true);
+            return;
+        }
 
         if (command.contains(" ") && !canPlayerExecute(sender, command)) {
             event.setBlocked(true);
             event.setCancelled(true);
-            MessageTranslator.send(event.getSenderObj(), ResponseHandler.getResponse(sender.getUniqueId(), event.getCommand()), "%command%", event.getCommand());
+
+            MessageTranslator.send(event.getSenderObj(),
+                    ResponseHandler.getResponse(uuid, event.getCommand()),
+                    "%command%", command);
+
             return;
         }
 
-        if(!event.isBlocked())
-            return;
-
-        if(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command))
+        if (!event.isBlocked())
             return;
 
         event.setCancelled(true);
-        MessageTranslator.send(event.getSenderObj(), ResponseHandler.getResponse(sender.getUniqueId(), event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()), "%command%", event.getCommand());
+
+        MessageTranslator.send(
+                event.getSenderObj(),
+                ResponseHandler.getResponse(uuid, event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()),
+                "%command%", displayCommand
+        );
+
     }
 
     private boolean canPlayerExecute(CommandSender sender, String command) {

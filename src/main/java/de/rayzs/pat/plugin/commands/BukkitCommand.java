@@ -11,6 +11,7 @@ public class BukkitCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] strings) {
         if(commandSender instanceof Player) {
             Player player = (Player) commandSender;
+
             CommandProcess.handleCommand(player, strings, label);
             return true;
         }

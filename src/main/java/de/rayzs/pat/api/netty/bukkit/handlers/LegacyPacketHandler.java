@@ -36,17 +36,20 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         String input = BukkitPacketAnalyzer.getPlayerInput(player);
 
-        if(input == null) return false;
+        if(input == null)
+            return false;
 
         boolean cancelsBeforeHand;
         int spaces = 0;
 
-        if(input.startsWith("/")) {
+        if (input.startsWith("/")) {
             input = input.replace("/", "");
-            if(input.contains(" ")) {
+
+            if (input.contains(" ")) {
                 String[] split = input.split(" ");
                 spaces = split.length;
-                if(spaces > 0) input = split[0];
+                if (spaces > 0)
+                    input = split[0];
             }
 
             cancelsBeforeHand = Storage.Blacklist.canPlayerAccessTab(player, input);
@@ -59,7 +62,9 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
             field.setAccessible(true);
             Object result = field.get(packetObj);
 
-            if (!(result instanceof String[])) continue;
+            if (!(result instanceof String[]))
+                continue;
+
             List<String> newResultList = new ArrayList<>();
             String[] tR = (String[]) result;
 
@@ -67,10 +72,12 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
 
             boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player);
 
-            if(spaces == 0) {
+            if (spaces == 0) {
                 for (String s : tR) {
-                    if(!BukkitLoader.isLoaded()) continue;
-                    if(!s.startsWith("/")) {
+                    if (!BukkitLoader.isLoaded())
+                        continue;
+
+                    if (!s.startsWith("/")) {
                         newResultList.add(s);
                         continue;
                     }
@@ -84,12 +91,14 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
                         newResultList.add(s);
                 }
             } else {
-                if(!cancelsBeforeHand) {
+                if (!cancelsBeforeHand) {
                     FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), input, Arrays.asList(tR));
-                    if(!filteredTabCompletionEvent.isCancelled()) {
+
+                    if (!filteredTabCompletionEvent.isCancelled()) {
                         List<String> suggestions = Arrays.stream(tR).filter(s -> filteredTabCompletionEvent.getCompletion().contains(s)).collect(Collectors.toList());
                         newResultList.addAll(suggestions);
                     }
+
                 }
             }
 

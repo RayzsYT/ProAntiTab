@@ -1,9 +1,8 @@
 package de.rayzs.pat.utils.response;
 
-import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
+import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.response.action.ActionHandler;
 
@@ -17,7 +16,7 @@ public class ResponseHandler {
         RESPONSES = new ArrayList<>();
 
         Storage.Files.CUSTOM_RESPONSES.getKeys(true).stream().filter(key -> !key.equals("default-message")).forEach(key -> {
-            if(!key.contains(".")) {
+            if (!key.contains(".")) {
                 Response response = new Response(key);
                 RESPONSES.add(response);
             }
@@ -33,13 +32,13 @@ public class ResponseHandler {
 
         final Optional<Response> optionalResponse = RESPONSES.stream().filter(response -> {
             for (String trigger : response.triggers)
-                if(trigger.endsWith("*") ? finalInput.startsWith(StringUtils.replace(trigger, "*", "")) : finalInput.equals(trigger))
+                if (trigger.endsWith("*") ? finalInput.startsWith(StringUtils.replace(trigger, "*", "")) : finalInput.equals(trigger))
                     return true;
 
             return false;
         }).findFirst();
 
-        if(uuid != null && optionalResponse.isPresent()) {
+        if (uuid != null && optionalResponse.isPresent()) {
             optionalResponse.get().executeAction(uuid);
             return optionalResponse.get().message;
         }
@@ -59,8 +58,9 @@ public class ResponseHandler {
 
         public void executeAction(UUID uuid) {
             String[] split;
+
             for (String action : actions) {
-                if(!action.contains("::")) {
+                if (!action.contains("::")) {
                     Logger.warning("! Could not recognise action: " + action);
                     Logger.warning("  > Syntax does not match at all. Have you used the splitters (::) correctly?");
                     continue;
@@ -70,13 +70,13 @@ public class ResponseHandler {
 
                 switch (split[0].toLowerCase()) {
                     case "effect":
-                        if(Reflection.isProxyServer()) {
+                        if (Reflection.isProxyServer()) {
                             Logger.warning("! Could not execute action: " + action);
                             Logger.warning("  > Effect cannot be added on the proxy side!");
                             continue;
                         }
 
-                        if(split.length != 4) {
+                        if (split.length != 4) {
                             Logger.warning("! Failed to read action: " + action);
                             Logger.warning("  > Action requires 4 arguments but only has " + split.length);
                             Logger.warning("  > Here's an example to compare with:");
@@ -107,7 +107,7 @@ public class ResponseHandler {
                         continue;
 
                     case "title":
-                        if(split.length != 6) {
+                        if (split.length != 6) {
                             Logger.warning("! Failed to read action: " + action);
                             Logger.warning("  > Action requires 6 arguments but only has " + split.length);
                             Logger.warning("  > Here's an example to compare with:");
@@ -147,13 +147,13 @@ public class ResponseHandler {
 
                     case "sound":
 
-                        if(Reflection.isProxyServer()) {
+                        if (Reflection.isProxyServer()) {
                             Logger.warning("! Failed to read action: " + action);
                             Logger.warning("  > Sounds cannot be played on the proxy side!");
                             continue;
                         }
 
-                        if(split.length != 4) {
+                        if (split.length != 4) {
                             Logger.warning("! Failed to read action: " + action);
                             Logger.warning("  > Action requires 4 arguments but only has " + split.length);
                             Logger.warning("  > Here's an example to compare with:");
@@ -184,7 +184,7 @@ public class ResponseHandler {
                         continue;
 
                     case "console":
-                        if(split.length == 1) {
+                        if (split.length == 1) {
                             Logger.warning("! Failed to read action: " + action);
                             Logger.warning("  > Action requires 1 arguments but only has " + split.length);
                             Logger.warning("  > Here's an example to compare with:");
@@ -195,7 +195,7 @@ public class ResponseHandler {
                         ActionHandler.executeConsoleCommand(action, uuid, split[1]);
 
                     case "execute":
-                        if(split.length == 1) {
+                        if (split.length == 1) {
                             Logger.warning("! Failed to read action: " + action);
                             Logger.warning("  > Action requires 1 arguments but only has " + split.length);
                             Logger.warning("  > Here's an example to compare with:");
@@ -206,7 +206,7 @@ public class ResponseHandler {
                         ActionHandler.executePlayerCommand(action, uuid, split[1]);
 
                     case "actionbar":
-                        if(split.length == 1) {
+                        if (split.length == 1) {
                             Logger.warning("! Failed to read action: " + action);
                             Logger.warning("  > Action requires 1 arguments but only has " + split.length);
                             Logger.warning("  > Here's an example to compare with:");

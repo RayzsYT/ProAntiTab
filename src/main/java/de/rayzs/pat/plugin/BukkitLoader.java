@@ -1,13 +1,12 @@
 package de.rayzs.pat.plugin;
 
 import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
+import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;

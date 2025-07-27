@@ -1,10 +1,9 @@
-package de.rayzs.pat.plugin.modules.subargs.events;
+package de.rayzs.pat.plugin.modules.events;
 
-import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
+import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import de.rayzs.pat.api.event.events.*;
-import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.subargs.Arguments;
 
 import java.util.*;
@@ -38,7 +37,7 @@ public class UpdateList {
         public void handle(UpdatePlayerCommandsEvent event) {
             final UUID uuid = event.getSenderObj() instanceof UUID
                     ? (UUID) event.getSenderObj()
-                    : new CommandSender(event.getSenderObj()).getUniqueId();
+                    : CommandSenderHandler.from(event.getSenderObj()).getUniqueId();
 
             final Arguments argument = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, new Arguments());
             final String serverName = Storage.getLoader().getPlayerServerName(uuid);

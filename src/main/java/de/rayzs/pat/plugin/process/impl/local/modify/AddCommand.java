@@ -6,6 +6,8 @@ import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.utils.group.*;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.sender.CommandSender;
+
 import java.util.*;
 
 public class AddCommand extends ProCommand {

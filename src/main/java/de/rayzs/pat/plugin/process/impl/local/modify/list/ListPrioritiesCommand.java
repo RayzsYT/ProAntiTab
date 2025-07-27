@@ -2,7 +2,7 @@ package de.rayzs.pat.plugin.process.impl.local.modify.list;
 
 import de.rayzs.pat.api.command.ProCommand;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;

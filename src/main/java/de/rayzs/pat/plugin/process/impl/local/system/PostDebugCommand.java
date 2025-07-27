@@ -2,7 +2,7 @@ package de.rayzs.pat.plugin.process.impl.local.system;
 
 import de.rayzs.pat.api.command.ProCommand;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.utils.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.api.storage.Storage;
 import java.util.*;
 

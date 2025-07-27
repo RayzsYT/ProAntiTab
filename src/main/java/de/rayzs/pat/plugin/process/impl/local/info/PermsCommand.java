@@ -3,7 +3,7 @@ package de.rayzs.pat.plugin.process.impl.local.info;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.command.ProCommand;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSender;
 import java.util.*;
 
 public class PermsCommand extends ProCommand {

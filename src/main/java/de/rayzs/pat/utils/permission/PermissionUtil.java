@@ -6,7 +6,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 
 public class PermissionUtil {
@@ -22,7 +23,8 @@ public class PermissionUtil {
     }
 
     public static void reloadPermissions(UUID uuid) {
-        if(!MAP.containsKey(uuid)) return;
+        if (!MAP.containsKey(uuid))
+            return;
 
         MAP.get(uuid).clear();
         setPlayerPermissions(uuid);
@@ -30,7 +32,10 @@ public class PermissionUtil {
 
     public static String getPermissionsAsString(UUID uuid) {
         PermissionMap permissionMap = MAP.get(uuid);
-        if(permissionMap == null) return "";
+
+        if (permissionMap == null)
+            return "";
+
         return Arrays.toString(permissionMap.getHashedPermissions().toArray()).replace("[", "").replace("]", "");
     }
 
@@ -41,7 +46,8 @@ public class PermissionUtil {
     }
 
     public static void setPlayerPermissions(UUID uuid) {
-        if(Storage.USE_LUCKPERMS) LuckPermsAdapter.setPermissions(uuid);
+        if (Storage.USE_LUCKPERMS)
+            LuckPermsAdapter.setPermissions(uuid);
     }
 
     public static void resetPermissions(UUID uuid) {
@@ -66,12 +72,16 @@ public class PermissionUtil {
         CommandSender sender = null;
         UUID uuid = null;
 
-        if (targetObj instanceof UUID) uuid = (UUID) targetObj;
-        else if (targetObj instanceof CommandSender) sender = (CommandSender) targetObj;
-        else sender = new CommandSender(targetObj);
+        if (targetObj instanceof UUID)
+            uuid = (UUID) targetObj;
+        else if (targetObj instanceof CommandSender)
+            sender = (CommandSender) targetObj;
+        else
+            sender = CommandSenderHandler.from(targetObj);
 
         if (uuid == null) {
-            if (sender.isConsole()) return true;
+            if (sender == null || sender.isConsole())
+                return true;
 
             uuid = sender.getUniqueId();
         }
@@ -114,12 +124,13 @@ public class PermissionUtil {
     public static boolean hasPermissionWithResponse(Object targetObj, String command) {
         boolean permitted = hasPermission(targetObj, command);
 
-        if(!permitted) {
-
-            if(targetObj instanceof CommandSender)
-                ((CommandSender) targetObj).sendMessage(Storage.ConfigSections.Messages.NO_PERMISSION.MESSAGE.replace("%permission%", "proantitab." + command));
-        
+        if (!permitted && targetObj instanceof CommandSender) {
+            ((CommandSender) targetObj).sendMessage(
+                    Storage.ConfigSections.Messages.NO_PERMISSION.MESSAGE
+                            .replace("%permission%", "proantitab." + command)
+            );
         }
+
         
         return permitted;
     }

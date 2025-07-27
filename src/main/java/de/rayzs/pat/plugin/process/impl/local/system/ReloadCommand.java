@@ -6,7 +6,7 @@ import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.api.command.ProCommand;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.Reflection;
 import java.util.List;
 

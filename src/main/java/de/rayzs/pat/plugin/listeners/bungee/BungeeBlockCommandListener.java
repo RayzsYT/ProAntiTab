@@ -8,7 +8,6 @@ import net.md_5.bungee.api.plugin.Listener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import net.md_5.bungee.api.connection.*;
-import net.md_5.bungee.api.ProxyServer;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.api.event.*;
 import net.md_5.bungee.event.*;
@@ -34,7 +33,7 @@ public class BungeeBlockCommandListener implements Listener {
         if (bypassPermission)
             return;
 
-        command = command.replaceFirst("/", "");
+        command = command.startsWith("/") ? command.substring(1) : command;
         command = StringUtils.getFirstArg(command);
 
         final String displayCommand = command;
@@ -48,80 +47,30 @@ public class BungeeBlockCommandListener implements Listener {
                 "%command%", displayCommand,
                 "%server%", serverName);
 
-        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
-            if (executeCommandEvent.isBlocked())
-                event.setCancelled(true);
-
-            if (executeCommandEvent.isCancelled())
-                return;
-
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", displayCommand);
-
-            if(Storage.SEND_CONSOLE_NOTIFICATION)
-                Logger.info(notificationMessage);
-
-            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
-
-                if (p != null) {
-                    MessageTranslator.send(p, notificationMessage);
-                }
-            });
-
-            return;
-        }
-
-        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
-            if (executeCommandEvent.isBlocked())
-                event.setCancelled(true);
-
-            if (executeCommandEvent.isCancelled())
-                return;
-
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", displayCommand);
-
-            if (Storage.SEND_CONSOLE_NOTIFICATION)
-                Logger.info(notificationMessage);
-
-            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
-
-                if (p != null) {
-                    MessageTranslator.send(p, notificationMessage);
-                }
-            });
-
-            return;
-        }
-
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
             return;
-
-        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", displayCommand);
 
         if (!Storage.Blacklist.canPlayerAccessChat(player, command, serverName)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
 
-            if (executeCommandEvent.isBlocked())
+            if (executeCommandEvent.isBlocked()) {
                 event.setCancelled(true);
+
+                if (Storage.SEND_CONSOLE_NOTIFICATION)
+                    Logger.info(notificationMessage);
+
+                Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+                    Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
+
+                    if (p != null) {
+                        MessageTranslator.send(p, notificationMessage);
+                    }
+                });
+
+            }
 
             if (executeCommandEvent.isCancelled())
                 return;
-
-            MessageTranslator.send(player, cancelCommandMessage);
-
-            if (Storage.SEND_CONSOLE_NOTIFICATION)
-                Logger.info(notificationMessage);
-
-            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
-
-                if (p != null) {
-                    MessageTranslator.send(p, notificationMessage);
-                }
-            });
         }
 
         ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), false);

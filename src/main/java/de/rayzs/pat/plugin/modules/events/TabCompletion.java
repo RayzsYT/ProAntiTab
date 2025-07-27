@@ -1,10 +1,10 @@
-package de.rayzs.pat.plugin.modules.subargs.events;
+package de.rayzs.pat.plugin.modules.events;
 
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
-import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
+import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
-import de.rayzs.pat.utils.subargs.ArgumentSource;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import de.rayzs.pat.utils.subargs.Arguments;
 
 import java.util.*;
@@ -17,7 +17,10 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
         if (event.getCompletion().isEmpty()) return;
 
-        UUID uuid = event.getSenderObj() instanceof UUID ? (UUID) event.getSenderObj() : new CommandSender(event.getSenderObj()).getUniqueId();
+        UUID uuid = event.getSenderObj() instanceof UUID
+                ? (UUID) event.getSenderObj()
+                : CommandSenderHandler.from(event.getSenderObj()).getUniqueId();
+
         Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, Arguments.ARGUMENTS);
         List<String> possibilities = event.getCompletion(), result = new ArrayList<>(arguments.getResultTab(cursor));
 

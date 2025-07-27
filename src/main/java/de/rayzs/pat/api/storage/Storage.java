@@ -5,11 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
-import de.rayzs.pat.plugin.listeners.bungee.WaterfallAntiTabListener;
-import de.rayzs.pat.plugin.listeners.velocity.VelocityAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.modules.subargs.SubArgsModule;
-import de.rayzs.pat.utils.ExpireList;
+import de.rayzs.pat.plugin.modules.SubArgsModule;
 import org.bukkit.entity.Player;
 
 import de.rayzs.pat.api.event.PATEventHandler;

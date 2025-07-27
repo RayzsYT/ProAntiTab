@@ -25,7 +25,8 @@ public class BukkitBlockCommandListener implements Listener {
     public void onUnknownCommandRecognition(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
-        String rawCommand = StringUtils.getFirstArg(event.getMessage()), command =  rawCommand.substring(1);
+        String rawCommand = StringUtils.getFirstArg(event.getMessage()),
+                command =  rawCommand.substring(1);
 
         if (!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled()) return;
 
@@ -69,50 +70,14 @@ public class BukkitBlockCommandListener implements Listener {
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
         command = command.toLowerCase();
 
-        List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", displayName, "%world%", worldName);
+        List<String> notificationMessage = MessageTranslator.replaceMessageList(
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
+                "%player%", player.getName(),
+                "%command%", displayName,
+                "%world%", worldName);
 
         if (bypassPermission)
             return;
-        
-        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
-            if (executeCommandEvent.isBlocked()) 
-                event.setCancelled(true);
-            
-            if (executeCommandEvent.isCancelled()) 
-                return;
-
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", displayName);
-
-            if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-                Player target = Bukkit.getServer().getPlayer(uuid);
-                MessageTranslator.send(target, notificationMessage);
-            });
-
-            return;
-        }
-
-        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
-            if (executeCommandEvent.isBlocked()) 
-                event.setCancelled(true);
-
-            if (executeCommandEvent.isCancelled()) 
-                return;
-
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", displayName);
-
-            if (Storage.SEND_CONSOLE_NOTIFICATION) 
-                Logger.info(notificationMessage);
-            
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-                Player target = Bukkit.getServer().getPlayer(uuid);
-                MessageTranslator.send(target, notificationMessage);
-            });
-
-            return;
-        }
 
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
             return;
@@ -120,31 +85,24 @@ public class BukkitBlockCommandListener implements Listener {
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             return;
 
-        /*
-        if (command.isEmpty())
-            return;
-         */
-
-        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", displayName);
-
         if (!Storage.Blacklist.canPlayerAccessChat(player, command)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
 
-            if (executeCommandEvent.isBlocked())
+            if (executeCommandEvent.isBlocked()) {
                 event.setCancelled(true);
+
+                if (Storage.SEND_CONSOLE_NOTIFICATION)
+                    Logger.info(notificationMessage);
+
+                Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
+                    Player target = Bukkit.getServer().getPlayer(uuid);
+                    MessageTranslator.send(target, notificationMessage);
+                });
+
+            }
 
             if (executeCommandEvent.isCancelled())
                 return;
-
-            MessageTranslator.send(player, cancelCommandMessage);
-
-            if (Storage.SEND_CONSOLE_NOTIFICATION) 
-                Logger.info(notificationMessage);
-            
-            Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-                Player target = Bukkit.getServer().getPlayer(uuid);
-                MessageTranslator.send(target, notificationMessage);
-            });
         }
 
         ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), false);

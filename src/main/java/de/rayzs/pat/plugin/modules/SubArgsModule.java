@@ -1,15 +1,16 @@
-package de.rayzs.pat.plugin.modules.subargs;
+package de.rayzs.pat.plugin.modules;
 
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
+import de.rayzs.pat.plugin.modules.events.ExecuteCommand;
+import de.rayzs.pat.plugin.modules.events.TabCompletion;
+import de.rayzs.pat.plugin.modules.events.UpdateList;
 import de.rayzs.pat.utils.node.CommandNodeHelper;
-import de.rayzs.pat.plugin.modules.subargs.events.*;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.subargs.*;
 import java.util.stream.Collectors;
 import de.rayzs.pat.utils.group.*;
-import de.rayzs.pat.plugin.*;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 

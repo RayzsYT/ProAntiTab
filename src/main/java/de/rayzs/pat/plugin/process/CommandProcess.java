@@ -17,6 +17,9 @@ import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.Storage;
 
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
+
 import java.util.*;
 
 public class CommandProcess {
@@ -55,7 +58,7 @@ public class CommandProcess {
     }
 
     public static void handleCommand(Object senderObj, String[] args, String label) {
-        CommandSender sender = new CommandSender(senderObj);
+        CommandSender sender = CommandSenderHandler.from(senderObj);
 
         if (!PermissionUtil.hasPermissionWithResponse(sender, "use"))
             return;
@@ -136,7 +139,7 @@ public class CommandProcess {
     }
 
     public static List<String> handleTabComplete(Object senderObj, String[] args) {
-        CommandSender sender = new CommandSender(senderObj);
+        CommandSender sender = CommandSenderHandler.from(senderObj);
         List<String> result = new ArrayList<>();
 
         if (!PermissionUtil.hasPermission(sender, "use"))

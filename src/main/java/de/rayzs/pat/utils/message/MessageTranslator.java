@@ -5,6 +5,9 @@ import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.message.translators.*;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
+
 import java.util.*;
 
 public class MessageTranslator {
@@ -87,22 +90,25 @@ public class MessageTranslator {
     }
 
     public static void send(Object target, String text, String... replacements) {
-        if(text.isEmpty()) return;
+        if (text.isEmpty()) return;
 
         text = replaceMessageString(target, text, replacements);
 
-        if(text.contains("%no-message%")) return;
+        if (text.contains("%no-message%")) return;
 
         if(translator == null) {
-            CommandSender sender = target instanceof CommandSender ? (CommandSender) target : new CommandSender(target);
 
-            if(!PlaceholderReplacer.process(sender, text, sender::sendMessage))
+            CommandSender sender = target instanceof CommandSender
+                    ? (CommandSender) target
+                    : CommandSenderHandler.from(target);
+
+            if (!PlaceholderReplacer.process(sender, text, sender::sendMessage))
                 sender.sendMessage(text);
 
             return;
         }
 
-        if(PlaceholderReplacer.process(target, text, result -> translator.send(target, result))) return;
+        if (PlaceholderReplacer.process(target, text, result -> translator.send(target, result))) return;
 
         translator.send(target, text);
     }
@@ -112,16 +118,33 @@ public class MessageTranslator {
     }
 
     public static String replaceMessage(Object targetObj, String text) {
-        CommandSender sender = targetObj instanceof CommandSender ? (CommandSender) targetObj : new CommandSender(targetObj);
-        text = text.replace("%executor%", sender.isPlayer() ? sender.getName() : "")
-                .replace("&", "§")
-                .replace("%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX)
-                .replace("%pat_general_prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX)
-                .replace("%token%", Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || Reflection.isProxyServer() ? Storage.TOKEN : "/")
-                .replace("%sync_server_name%", Storage.SERVER_NAME == null ? "/" : Storage.SERVER_NAME)
-                .replace("%current_version%", Storage.CURRENT_VERSION)
-                .replace("%newest_version%", Storage.NEWER_VERSION)
-                .replace("\\n", "\n");
+        CommandSender sender = targetObj == null ? null
+                : targetObj instanceof CommandSender
+                ? (CommandSender) targetObj
+                : CommandSenderHandler.from(targetObj);
+
+        String executorName = (sender == null || sender.isConsole())
+                ? ""
+                : sender.getName();
+
+        String token = (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || Reflection.isProxyServer())
+                ? Storage.TOKEN
+                : "/";
+
+        String serverName = Storage.SERVER_NAME == null ? "/" : Storage.SERVER_NAME;
+
+        text = StringUtils.replace(text,
+                "&", "§",
+                "\\n", "\n",
+                "%executor%", executorName,
+                "%prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX,
+                "%pat_general_prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX,
+                "%token%", token,
+                "%sync_server_name%", serverName,
+                "%current_version%", Storage.CURRENT_VERSION,
+                "%newest_version%", Storage.NEWER_VERSION
+        );
+
         return PlaceholderReplacer.replace(targetObj, text);
     }
 

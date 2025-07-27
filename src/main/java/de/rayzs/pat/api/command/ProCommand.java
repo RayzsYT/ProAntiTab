@@ -1,6 +1,8 @@
 package de.rayzs.pat.api.command;
 
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.sender.CommandSender;
+
 import java.util.*;
 
 public abstract class ProCommand {

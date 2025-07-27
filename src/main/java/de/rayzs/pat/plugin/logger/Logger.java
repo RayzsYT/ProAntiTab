@@ -45,8 +45,10 @@ public class Logger {
         int startIndex = clonedLogs.size() > 980 ? clonedLogs.size() - 980 : 0;
         StringBuilder textBuilder = new StringBuilder("[ProAntiTab " + Storage.CURRENT_VERSION + " | " + (Reflection.isProxyServer() ? Reflection.isVelocityServer() ? "Velocity" : "Proxy" : Reflection.isPaper() ? "Paper" : "Bukkit") + "]" + (Reflection.getRawVersionName() != null ? " Server version: " + Reflection.getVersionName() + " " + Reflection.getRawVersionName().replace("_", ".") : "") + "\n" + (startIndex != 0 ? "... another part is split!\n\n" : ""));
 
-        for(int i = startIndex; i < clonedLogs.size(); i++) {
-            if (clonedLogs.get(i) == null) continue;
+        for (int i = startIndex; i < clonedLogs.size(); i++) {
+            if (clonedLogs.get(i) == null)
+                continue;
+
             String line = clonedLogs.get(i);
             textBuilder.append("\n");
             textBuilder.append(line);

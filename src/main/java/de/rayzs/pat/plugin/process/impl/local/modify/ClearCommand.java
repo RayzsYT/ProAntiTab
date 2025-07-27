@@ -5,6 +5,8 @@ import de.rayzs.pat.api.storage.Storage;
 import java.util.concurrent.TimeUnit;
 import de.rayzs.pat.utils.group.*;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.sender.CommandSender;
+
 import java.util.*;
 
 public class ClearCommand extends ProCommand {
