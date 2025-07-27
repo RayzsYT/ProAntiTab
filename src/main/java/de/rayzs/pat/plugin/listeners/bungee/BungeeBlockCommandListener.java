@@ -56,7 +56,7 @@ public class BungeeBlockCommandListener implements Listener {
             if (executeCommandEvent.isCancelled())
                 return;
 
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", command);
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", displayCommand);
 
             if(Storage.SEND_CONSOLE_NOTIFICATION)
                 Logger.info(notificationMessage);
@@ -80,7 +80,7 @@ public class BungeeBlockCommandListener implements Listener {
             if (executeCommandEvent.isCancelled())
                 return;
 
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", command);
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", displayCommand);
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
                 Logger.info(notificationMessage);
@@ -99,7 +99,7 @@ public class BungeeBlockCommandListener implements Listener {
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
             return;
 
-        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", command);
+        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", displayCommand);
 
         if (!Storage.Blacklist.canPlayerAccessChat(player, command, serverName)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);

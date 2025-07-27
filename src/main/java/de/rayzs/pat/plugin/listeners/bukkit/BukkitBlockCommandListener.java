@@ -25,7 +25,7 @@ public class BukkitBlockCommandListener implements Listener {
     public void onUnknownCommandRecognition(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
-        String rawCommand = StringUtils.getFirstArg(event.getMessage()), command =  StringUtils.replaceFirst(rawCommand, "/", "");
+        String rawCommand = StringUtils.getFirstArg(event.getMessage()), command =  rawCommand.substring(1);
 
         if (!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled()) return;
 
@@ -61,7 +61,7 @@ public class BukkitBlockCommandListener implements Listener {
 
         boolean bypassPermission = PermissionUtil.hasBypassPermission(player, command);
 
-        command = command.replaceFirst("/", "");
+        command = command.substring(1);
         command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
         command = command.toLowerCase();
