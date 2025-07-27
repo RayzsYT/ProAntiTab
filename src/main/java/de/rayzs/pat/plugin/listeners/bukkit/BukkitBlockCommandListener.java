@@ -63,10 +63,13 @@ public class BukkitBlockCommandListener implements Listener {
 
         command = command.substring(1);
         command = StringUtils.getFirstArg(command);
+
+        final String displayName = command;
+
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
         command = command.toLowerCase();
 
-        List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", command, "%world%", worldName);
+        List<String> notificationMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Messages.NOTIFICATION.ALERT, "%player%", player.getName(), "%command%", displayName, "%world%", worldName);
 
         if (bypassPermission)
             return;
@@ -79,7 +82,7 @@ public class BukkitBlockCommandListener implements Listener {
             if (executeCommandEvent.isCancelled()) 
                 return;
 
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", command);
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,  "%command%", displayName);
 
             if(Storage.SEND_CONSOLE_NOTIFICATION) Logger.info(notificationMessage);
             Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
@@ -98,7 +101,7 @@ public class BukkitBlockCommandListener implements Listener {
             if (executeCommandEvent.isCancelled()) 
                 return;
 
-            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", command);
+            MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,  "%command%", displayName);
 
             if (Storage.SEND_CONSOLE_NOTIFICATION) 
                 Logger.info(notificationMessage);
@@ -122,7 +125,7 @@ public class BukkitBlockCommandListener implements Listener {
             return;
          */
 
-        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", command);
+        List<String> cancelCommandMessage = MessageTranslator.replaceMessageList(Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE, "%command%", displayName);
 
         if (!Storage.Blacklist.canPlayerAccessChat(player, command)) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);

@@ -35,10 +35,10 @@ public class BungeeBlockCommandListener implements Listener {
             return;
 
         command = command.replaceFirst("/", "");
+        command = StringUtils.getFirstArg(command);
 
         final String displayCommand = command;
 
-        command = StringUtils.getFirstArg(command);
         command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
         command = command.toLowerCase();
 
