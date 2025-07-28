@@ -29,7 +29,10 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
             if (result.contains("%numbers%")) {
                 possibilities.remove("%numbers%");
-                possibilities.addAll(possibilities.stream().filter(NumberUtils::isDigit).toList());
+                possibilities.addAll(event.getCompletion().stream().filter(NumberUtils::isDigit).toList());
+
+                if (possibilities.isEmpty())
+                    possibilities.add("///////////");
             }
 
             if (result.contains("%players%")) {
@@ -67,7 +70,8 @@ public class TabCompletion extends FilteredTabCompletionEvent {
                     return result.contains(completion);
                 }).toList());
 
-                if (possibilities.isEmpty()) possibilities.add("///////////");
+                if (possibilities.isEmpty())
+                    possibilities.add("///////////");
             }
 
         } else {
@@ -85,7 +89,9 @@ public class TabCompletion extends FilteredTabCompletionEvent {
         }
 
         cursor = StringUtils.getFirstArg(cursor.toLowerCase());
-        if(possibilities.isEmpty() && !SubArgsModule.GENERAL_LIST.contains(cursor)) return;
+        if (possibilities.isEmpty() && !SubArgsModule.GENERAL_LIST.contains(cursor)) {
+            return;
+        }
 
         event.setCompletion(possibilities);
     }
