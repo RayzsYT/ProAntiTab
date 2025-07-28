@@ -90,7 +90,8 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         List<String> commands = new ArrayList<>(arguments.CHAT_ARGUMENTS.getGeneralArgument().getInputs());
 
         final String unmodifiable = command;
-        if (commands.stream().noneMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(StringUtils.getFirstArg(unmodifiable)))) {
+        final String firstArgUnmodifiable = StringUtils.getFirstArg(unmodifiable);
+        if (commands.stream().noneMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(firstArgUnmodifiable))) {
             return true;
         }
 
@@ -102,10 +103,12 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             return c;
         }).toList();
 
-        List<String> placeholderCommands = commands.stream().filter(s -> s.contains("%")).toList();
+        List<String> placeholderCommands = commands.stream().filter(s ->
+                StringUtils.getFirstArg(s).equalsIgnoreCase(firstArgUnmodifiable) && s.contains("%")
+        ).toList();
 
         if (!placeholderCommands.isEmpty())
-            command = replacePlaceholders(command, placeholderCommands);
+            command = SubArgsModule.replacePlaceholders(command);
 
         String cpyCommand;
         for (String c : commands) {
@@ -138,37 +141,5 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         }
 
         return turn == listed;
-    }
-
-    private String replacePlaceholders(String input, List<String> abnormalCommands) {
-        String[] split = input.split(" ");
-
-        for (int i = 0; i < split.length; i++) {
-            String s = split[i];
-
-            boolean number = NumberUtils.isDigit(split[i]),
-                    online = Storage.getLoader().isPlayerOnline(s),
-                    general = Storage.getLoader().doesPlayerExist(s);
-
-            if (number) {
-                split[i] = "%numbers%";
-                continue;
-            }
-
-            if (online && general) {
-                split[i] = "%both_players%";
-                continue;
-            }
-
-            if (online) {
-                split[i] = "%online_players%";
-                continue;
-            }
-
-            if (general)
-                split[i] = "%players%";
-        }
-
-        return String.join(" ", split);
     }
 }
