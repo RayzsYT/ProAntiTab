@@ -124,4 +124,36 @@ public class SubArgsModule {
         });
         return commands;
     }
+
+    public static String replacePlaceholders(String input) {
+        String[] split = input.split(" ");
+
+        for (int i = 0; i < split.length; i++) {
+            String s = split[i];
+
+            boolean number = NumberUtils.isDigit(split[i]),
+                    online = Storage.getLoader().isPlayerOnline(s),
+                    general = Storage.getLoader().doesPlayerExist(s);
+
+            if (number) {
+                split[i] = "%numbers%";
+                continue;
+            }
+
+            if (online && general) {
+                split[i] = "%both_players%";
+                continue;
+            }
+
+            if (online) {
+                split[i] = "%online_players%";
+                continue;
+            }
+
+            if (general)
+                split[i] = "%players%";
+        }
+
+        return String.join(" ", split);
+    }
 }
