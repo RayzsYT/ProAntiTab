@@ -56,6 +56,9 @@ public class BungeeBlockCommandListener implements Listener {
             if (executeCommandEvent.isBlocked()) {
                 event.setCancelled(true);
 
+                if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+                    return;
+
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
                     Logger.info(notificationMessage);
 

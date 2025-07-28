@@ -61,6 +61,9 @@ public class VelocityBlockCommandListener {
             if (executeCommandEvent.isBlocked()) {
                 event.setResult(CommandExecuteEvent.CommandResult.denied());
 
+                if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+                    return event;
+
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
                     MessageTranslator.send(consoleSender, notificationMessage);
 
