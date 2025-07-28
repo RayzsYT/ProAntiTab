@@ -18,7 +18,9 @@ public class ArgumentBuilder {
         String firstInputArg = input.contains(" ") ? input.split(" ")[0] : input;
 
         for (Map.Entry<String, ArgumentStack> entry : source.ARGUMENT_STACKS.entrySet()) {
-            if(!entry.getKey().equals(firstInputArg)) continue;
+            if (!entry.getKey().equals(firstInputArg))
+                continue;
+
             return source.ARGUMENT_STACKS.get(entry.getKey()).getResult(input);
         }
 
@@ -31,7 +33,8 @@ public class ArgumentBuilder {
     }
 
     public void buildArgumentStacks(String input) {
-        if(!input.contains(" ")) return;
+        if (!input.contains(" "))
+            return;
 
         if(!source.INPUTS.contains(input))
             source.INPUTS.add(input);
@@ -40,7 +43,7 @@ public class ArgumentBuilder {
         ArgumentStack argumentStack = null;
 
         for (String s : input.split(" ")) {
-            if(!first) {
+            if (!first) {
                 argumentStack = argumentStack.createAndGetArgumentStack(s);
                 continue;
             }
