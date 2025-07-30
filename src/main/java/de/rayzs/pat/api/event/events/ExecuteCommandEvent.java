@@ -21,6 +21,10 @@ public abstract class ExecuteCommandEvent extends PATEvent<ExecuteCommandEvent> 
         this.notify = notify;
     }
 
+    public void setDoesNotify(boolean notify) {
+        this.notify = notify;
+    }
+
     public String getCommand() {
         return command;
     }
