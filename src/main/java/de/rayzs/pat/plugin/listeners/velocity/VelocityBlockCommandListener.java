@@ -56,12 +56,16 @@ public class VelocityBlockCommandListener {
             return event;
 
         if (!Storage.Blacklist.canPlayerAccessChat(player, command, serverName)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getCommand(), true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
+                    player,
+                    event.getCommand(),
+                    true,
+                    !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
 
             if (executeCommandEvent.isBlocked()) {
                 event.setResult(CommandExecuteEvent.CommandResult.denied());
 
-                if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+                if (!executeCommandEvent.doesNotify())
                     return event;
 
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
@@ -79,7 +83,7 @@ public class VelocityBlockCommandListener {
                 return event;
         }
 
-        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getCommand(), false);
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getCommand(), false, false);
         if (executeCommandEvent.isBlocked())
             event.setResult(CommandExecuteEvent.CommandResult.denied());
 

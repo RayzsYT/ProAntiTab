@@ -10,8 +10,8 @@ public class PATEventHandler {
 
     private static List<PATEvent> EVENTS = new ArrayList<>();
 
-    public static ExecuteCommandEvent callExecuteCommandEvents(Object senderObj, String command, boolean blocked) {
-        ExecuteCommandEvent event = EmptyEvent.createEmptyExecuteCommandEvent(senderObj, command, blocked);
+    public static ExecuteCommandEvent callExecuteCommandEvents(Object senderObj, String command, boolean blocked, boolean notify) {
+        ExecuteCommandEvent event = EmptyEvent.createEmptyExecuteCommandEvent(senderObj, command, blocked, notify);
 
         for (PATEvent patEvent : EVENTS) {
             if(patEvent instanceof ExecuteCommandEvent) {
@@ -169,8 +169,8 @@ public class PATEventHandler {
             };
         }
 
-        public static ExecuteCommandEvent createEmptyExecuteCommandEvent(Object senderObj, String command, boolean blocked) {
-            return new ExecuteCommandEvent(senderObj, command, blocked) {
+        public static ExecuteCommandEvent createEmptyExecuteCommandEvent(Object senderObj, String command, boolean blocked, boolean notify) {
+            return new ExecuteCommandEvent(senderObj, command, blocked, notify) {
                 @Override
                 public void handle(ExecuteCommandEvent event) {
 

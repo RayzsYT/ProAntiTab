@@ -51,12 +51,17 @@ public class BungeeBlockCommandListener implements Listener {
             return;
 
         if (!Storage.Blacklist.canPlayerAccessChat(player, command, serverName)) {
-            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), true);
+            ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
+                    player,
+                    event.getMessage(),
+                    true,
+                    !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED
+            );
 
             if (executeCommandEvent.isBlocked()) {
                 event.setCancelled(true);
 
-                if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+                if (!executeCommandEvent.doesNotify())
                     return;
 
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
@@ -76,7 +81,7 @@ public class BungeeBlockCommandListener implements Listener {
                 return;
         }
 
-        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), false);
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), false, false);
         if (executeCommandEvent.isBlocked())
             event.setCancelled(true);
     }
