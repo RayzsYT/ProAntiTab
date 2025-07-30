@@ -46,26 +46,22 @@ public class ResponseHandler {
                 fromIndex = Integer.parseInt(indexSplit[0]) - 1;
                 toIndex = Integer.parseInt(indexSplit[1]);
             } else {
-                fromIndex = Integer.parseInt(part) - 1;
+                fromIndex = Integer.parseInt(part);
                 toIndex = fromIndex;
             }
 
             if (fromIndex < 0 || toIndex > length) {
-                Logger.warning("Out of bounds! (" + input + ")");
+                Logger.warning("Custom response contains an error! (" + input + ")");
+                Logger.warning("Out of bounds! (Input: " + input + ", Possible: " + (length > 1 ? "1-" : "") + length + ")");
                 continue;
             }
 
             String replacement;
 
-            if (fromIndex != toIndex) {
-                replacement = String.join(" ", Arrays.copyOfRange(commandSplit, fromIndex, toIndex));;
+            if (fromIndex == toIndex) {
+                replacement = commandSplit[fromIndex - 1];
             } else {
-                if (fromIndex >= length) {
-                    Logger.warning("Out of bounds! (" + input + ")");
-                    continue;
-                }
-
-                replacement = commandSplit[fromIndex];
+                replacement = String.join(" ", Arrays.copyOfRange(commandSplit, fromIndex, toIndex));;
             }
 
             split[i] = replacement;
