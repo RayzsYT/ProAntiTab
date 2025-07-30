@@ -158,7 +158,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     @Override
     public boolean doesPlayerExist(String playerName) {
-        return getOfflinePlayerNames().contains(playerName);
+        return ArrayUtils.containsIgnoreCase(getOfflinePlayerNames(), playerName);
     }
 
     @Override
@@ -223,13 +223,8 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             return;
 
         updaterTask = PATScheduler.createAsyncScheduler(() -> {
-            String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
-                    .setProperties("ProAntiTab", "4654").connect().getResponse();
 
-            if (result == null)
-                result = "/";
-
-            if (VersionComparer.get().computeComparison(result))
+            if (VersionComparer.get().computeComparison())
                 updaterTask.cancelTask();
 
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);

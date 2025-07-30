@@ -230,13 +230,8 @@ public class BungeeLoader extends Plugin implements PluginLoader {
             return;
 
         updaterTask = getProxy().getScheduler().schedule(this, () -> {
-            String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
-                    .setProperties("ProAntiTab", "4654").connect().getResponse();
 
-            if (result == null)
-                result = "/";
-
-            if (VersionComparer.get().computeComparison(result))
+            if (VersionComparer.get().computeComparison())
                 getProxy().getScheduler().cancel(updaterTask);
 
         }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);

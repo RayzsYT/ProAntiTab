@@ -271,13 +271,8 @@ public class VelocityLoader implements PluginLoader {
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
 
         updaterTask = server.getScheduler().buildTask(this, () -> {
-            String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
-                    .setProperties("ProAntiTab", "4654").connect().getResponse();
 
-            if (result == null)
-                result = "/";
-
-            if (VersionComparer.get().computeComparison(result))
+            if (VersionComparer.get().computeComparison())
                 updaterTask.cancel();
 
         }).delay(1, TimeUnit.SECONDS).repeat(Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.SECONDS).schedule();

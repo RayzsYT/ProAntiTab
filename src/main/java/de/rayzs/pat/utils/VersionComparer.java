@@ -18,8 +18,10 @@ public class VersionComparer {
 
     private VersionComparer() {}
 
-    private final int versionLength = 3;
     private final List<String> ignoreVersions = Arrays.asList("1.9.1", "1.9.2");
+    private final String versionUrl = "https://www.rayzs.de/proantitab/api/version.php";
+
+    private final int versionLength = 3;
 
     private Version currentVersion, newestVersion;
     private VersionState versionState = VersionState.UPDATED;
@@ -27,7 +29,15 @@ public class VersionComparer {
     private boolean shouldAnnounce = true;
 
 
-    public boolean computeComparison(String result) {
+    public boolean computeComparison() {
+        String result = new ConnectionBuilder().setUrl(versionUrl)
+                .setProperties("ProAntiTab", "4454")
+                .connect()
+                .getResponse();
+
+        if (result == null)
+            result = "/";
+
         if (result.equals("/")) {
             Logger.warning("Failed to connect to plugin page! Version comparison cannot be made. (No internet?)");
             return false;

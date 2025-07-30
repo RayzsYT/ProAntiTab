@@ -37,16 +37,21 @@ public class ConnectionBuilder {
 
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
             connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
             if(parameters != null && parameters.length > 0) {
+
                 Object firstParam = null, secondParam = null;
                 for (Object parameter : parameters) {
-                    if(firstParam == null) firstParam = parameter;
-                    else if(secondParam == null) secondParam = parameter;
-                    else {
-                        connection.setRequestProperty((String) firstParam, (String) secondParam);
-                        firstParam = null;
-                        secondParam = null;
+
+                    if (firstParam == null) {
+                        firstParam = parameter;
+                        continue;
                     }
+
+                    secondParam = parameter;
+
+                    connection.setRequestProperty((String) firstParam, (String) secondParam);
+                    firstParam = null;
                 }
             }
 
