@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.response.action.impl;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
+import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.response.action.Action;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -17,35 +18,39 @@ import java.util.UUID;
 public class ModernBukkitAction implements Action {
 
     @Override
-    public void executeConsoleCommand(String action, UUID uuid, String command) {
+    public void executeConsoleCommand(String action, UUID uuid, String command, String message) {
         Player player = Bukkit.getPlayer(uuid);
+        message = ResponseHandler.replaceArgsVariables(message, command);
 
         if (player != null)
-            command = command.replace("%player%", player.getName());
+            message = message.replace("%player%", player.getName());
 
-        if (command.contains("%"))
-            command = PlaceholderReplacer.replace(player, command);
+        if (message.contains("%"))
+            message = PlaceholderReplacer.replace(player, message);
 
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), message);
     }
 
     @Override
-    public void executePlayerCommand(String action, UUID uuid, String command) {
+    public void executePlayerCommand(String action, UUID uuid, String command, String message) {
         Player player = Bukkit.getPlayer(uuid);
+        message = ResponseHandler.replaceArgsVariables(message, command);
 
         if(player != null)
-            command = command.replace("%player%", player.getName());
+            message = message.replace("%player%", player.getName());
 
-        if (command.contains("%"))
-            command = PlaceholderReplacer.replace(player, command);
+        if (message.contains("%"))
+            message = PlaceholderReplacer.replace(player, message);
 
         if (player != null)
-            Bukkit.dispatchCommand(player, command);
+            Bukkit.dispatchCommand(player, message);
     }
 
     @Override
-    public void sendTitle(String action, UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+    public void sendTitle(String action, UUID uuid, String command, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         Player player = Bukkit.getPlayer(uuid);
+        title = ResponseHandler.replaceArgsVariables(title, command);
+        subTitle = ResponseHandler.replaceArgsVariables(subTitle, command);
 
         if (player == null)
             return;
@@ -98,14 +103,15 @@ public class ModernBukkitAction implements Action {
     }
 
     @Override
-    public void sendActionbar(String action, UUID uuid, String text) {
+    public void sendActionbar(String action, UUID uuid, String command, String message) {
         Player player = Bukkit.getPlayer(uuid);
+        message = ResponseHandler.replaceArgsVariables(message, command);
 
         if (player == null)
             return;
 
-        text = PlaceholderReplacer.replace(player, StringUtils.replace(text, "&", "§", "%player%", player.getName()));
+        message = PlaceholderReplacer.replace(player, StringUtils.replace(message, "&", "§", "%player%", player.getName()));
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(text));
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
     }
 }

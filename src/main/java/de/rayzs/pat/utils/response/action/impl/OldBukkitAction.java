@@ -4,6 +4,7 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
+import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.response.action.Action;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -21,33 +22,40 @@ public class OldBukkitAction implements Action {
     private String versionPackage = null;
 
     @Override
-    public void executeConsoleCommand(String action, UUID uuid, String command) {
+    public void executeConsoleCommand(String action, UUID uuid, String command, String message) {
         Player player = Bukkit.getPlayer(uuid);
-        if(player != null) command = command.replace("%player%", player.getName());
+        message = ResponseHandler.replaceArgsVariables(message, command);
 
-        if (command.contains("%"))
-            command = PlaceholderReplacer.replace(player, command);
+        if(player != null)
+            message = message.replace("%player%", player.getName());
 
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        if (message.contains("%"))
+            message = PlaceholderReplacer.replace(player, message);
+
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), message);
     }
 
     @Override
-    public void executePlayerCommand(String action, UUID uuid, String command) {
+    public void executePlayerCommand(String action, UUID uuid, String command, String message) {
         Player player = Bukkit.getPlayer(uuid);
+        message = ResponseHandler.replaceArgsVariables(message, command);
 
         if (player != null)
-            command = command.replace("%player%", player.getName());
+            message = message.replace("%player%", player.getName());
 
-        if (command.contains("%"))
-            command = PlaceholderReplacer.replace(player, command);
+        if (message.contains("%"))
+            message = PlaceholderReplacer.replace(player, message);
 
         if (player != null)
-            Bukkit.dispatchCommand(player, command);
+            Bukkit.dispatchCommand(player, message);
     }
 
     @Override
-    public void sendTitle(String action, UUID uuid, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+    public void sendTitle(String action, UUID uuid, String command, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         Player player = Bukkit.getPlayer(uuid);
+        title = ResponseHandler.replaceArgsVariables(title, command);
+        subTitle = ResponseHandler.replaceArgsVariables(subTitle, command);
+
         if (player == null) return;
 
         title = PlaceholderReplacer.replace(player, StringUtils.replace(title, "&", "§", "%player%", player.getName()));
@@ -98,13 +106,14 @@ public class OldBukkitAction implements Action {
     }
 
     @Override
-    public void sendActionbar(String action, UUID uuid, String text) {
+    public void sendActionbar(String action, UUID uuid, String command, String message) {
         Player player = Bukkit.getPlayer(uuid);
+        message = ResponseHandler.replaceArgsVariables(message, command);
 
         if (player == null)
             return;
 
-        text = PlaceholderReplacer.replace(player, StringUtils.replace(text, "&", "§", "%player%", player.getName()));
+        message = PlaceholderReplacer.replace(player, StringUtils.replace(message, "&", "§", "%player%", player.getName()));
 
         try {
             if (versionPackage == null)
@@ -112,7 +121,7 @@ public class OldBukkitAction implements Action {
 
             Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
             Constructor<?> constructor = (Objects.<Class<?>>requireNonNull(Class.forName("net.minecraft.server." + versionPackage + ".PacketPlayOutChat"))).getConstructor(Class.forName("net.minecraft.server." + versionPackage + ".IChatBaseComponent"), byte.class);
-            Object iChatBaseComponent = (Objects.requireNonNull(Class.forName("net.minecraft.server." + versionPackage + ".IChatBaseComponent"))).getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + text + "\"}");
+            Object iChatBaseComponent = (Objects.requireNonNull(Class.forName("net.minecraft.server." + versionPackage + ".IChatBaseComponent"))).getDeclaredClasses()[0].getMethod("a", String.class).invoke(null, "{\"text\":\"" + message + "\"}");
             Object actionbarPacket = constructor.newInstance(iChatBaseComponent, (byte) 2);
             Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
             playerConnection.getClass().getMethod("sendPacket", Class.forName("net.minecraft.server." + versionPackage + ".Packet")).invoke(playerConnection, actionbarPacket);
@@ -123,6 +132,7 @@ public class OldBukkitAction implements Action {
                 | InvocationTargetException
                 | NoSuchFieldException
                 | InstantiationException exception) {
+
             Logger.warning("! Failed to run action: " + action);
             Logger.warning("  > Actionbars are not supported in this server version!");
         }

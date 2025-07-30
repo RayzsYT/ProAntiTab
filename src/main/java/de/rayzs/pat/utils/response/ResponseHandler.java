@@ -23,12 +23,65 @@ public class ResponseHandler {
         });
     }
 
+    public static String replaceArgsVariables(String input, String command) {
+        if (!input.contains(" "))
+            return input;
+
+        String[] commandSplit = command.contains(" ") ? command.split(" ") : new String[]{};
+        String[] split = input.split(" ");
+
+        for (int i = 0; i < split.length; i++) {
+            String part = split[i];
+
+            if (! (part.startsWith("%args[") && part.endsWith("]%")))
+                continue;
+
+            part = part.substring(part.indexOf('[') + 1, part.lastIndexOf(']'));
+
+            int length = commandSplit.length, fromIndex, toIndex;
+
+            if (part.contains("-")) {
+                String[] indexSplit = part.split("-");
+
+                fromIndex = Integer.parseInt(indexSplit[0]) - 1;
+                toIndex = Integer.parseInt(indexSplit[1]);
+            } else {
+                fromIndex = Integer.parseInt(part) - 1;
+                toIndex = fromIndex;
+            }
+
+            if (fromIndex < 0 || toIndex > length) {
+                Logger.warning("Out of bounds! (" + input + ")");
+                continue;
+            }
+
+            String replacement;
+
+            if (fromIndex != toIndex) {
+                replacement = String.join(" ", Arrays.copyOfRange(commandSplit, fromIndex, toIndex));;
+            } else {
+                if (fromIndex >= length) {
+                    Logger.warning("Out of bounds! (" + input + ")");
+                    continue;
+                }
+
+                replacement = commandSplit[fromIndex];
+            }
+
+            split[i] = replacement;
+        }
+
+        return String.join(" ", split);
+    }
+
     public static List<String> getResponse(UUID uuid, String input) {
         return getResponse(uuid, input, Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE.getLines());
     }
 
     public static List<String> getResponse(UUID uuid, String input, List<String> defaultMessage) {
-        final String finalInput = input.startsWith("/") ? StringUtils.replaceFirst(input, "/", "") : input;
+        final String finalInput = input.startsWith("/") && input.length() > 1
+                ? input.substring(1)
+                : input;
 
         final Optional<Response> optionalResponse = RESPONSES.stream().filter(response -> {
             for (String trigger : response.triggers)
@@ -39,7 +92,7 @@ public class ResponseHandler {
         }).findFirst();
 
         if (uuid != null && optionalResponse.isPresent()) {
-            optionalResponse.get().executeAction(uuid);
+            optionalResponse.get().executeAction(uuid, finalInput);
             return optionalResponse.get().message;
         }
 
@@ -56,7 +109,7 @@ public class ResponseHandler {
             this.actions = (List<String>) Storage.Files.CUSTOM_RESPONSES.getOrSet(key + ".actions", new ArrayList<>());
         }
 
-        public void executeAction(UUID uuid) {
+        public void executeAction(UUID uuid, String command) {
             String[] split;
 
             for (String action : actions) {
@@ -142,7 +195,7 @@ public class ResponseHandler {
                             continue;
                         }
 
-                        ActionHandler.sendTitle(action, uuid, split[1], split[2], fadeIn, stay, fadeOut);
+                        ActionHandler.sendTitle(action, uuid, command, split[1], split[2], fadeIn, stay, fadeOut);
                         continue;
 
                     case "sound":
@@ -192,7 +245,7 @@ public class ResponseHandler {
                             Logger.warning("  > e.g: console::say Hello world!");
                         }
 
-                        ActionHandler.executeConsoleCommand(action, uuid, split[1]);
+                        ActionHandler.executeConsoleCommand(action, uuid, command, split[1]);
 
                     case "execute":
                         if (split.length == 1) {
@@ -203,7 +256,7 @@ public class ResponseHandler {
                             Logger.warning("  > e.g: execute::help");
                         }
 
-                        ActionHandler.executePlayerCommand(action, uuid, split[1]);
+                        ActionHandler.executePlayerCommand(action, uuid, command, split[1]);
 
                     case "actionbar":
                         if (split.length == 1) {
@@ -214,7 +267,7 @@ public class ResponseHandler {
                             Logger.warning("  > e.g: actionbar::I like COOKIES");
                         }
 
-                        ActionHandler.sendActionbar(action, uuid, split[1]);
+                        ActionHandler.sendActionbar(action, uuid, command, split[1]);
                 }
 
             }
