@@ -42,6 +42,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
             event.setBlocked(true);
             event.setCancelled(true);
+            event.setDoesNotify(true);
             return;
         }
 
@@ -55,6 +56,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
             event.setBlocked(true);
             event.setCancelled(true);
+            event.setDoesNotify(true);
             return;
         }
 
@@ -91,6 +93,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
         final String unmodifiable = command;
         final String firstArgUnmodifiable = StringUtils.getFirstArg(unmodifiable);
+
         if (commands.stream().noneMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(firstArgUnmodifiable))) {
             return true;
         }
@@ -107,8 +110,9 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                 StringUtils.getFirstArg(s).equalsIgnoreCase(firstArgUnmodifiable) && s.contains("%")
         ).toList();
 
-        if (!placeholderCommands.isEmpty())
+        if (!placeholderCommands.isEmpty()) {
             command = SubArgsModule.replacePlaceholders(command);
+        }
 
         String cpyCommand;
         for (String c : commands) {
