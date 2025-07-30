@@ -4,6 +4,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class VersionComparer {
 
@@ -18,6 +19,7 @@ public class VersionComparer {
     private VersionComparer() {}
 
     private final int versionLength = 3;
+    private final List<String> ignoreVersions = Arrays.asList("1.9.1", "1.9.2");
 
     private Version currentVersion, newestVersion;
     private VersionState versionState = VersionState.UPDATED;
@@ -78,6 +80,9 @@ public class VersionComparer {
 
     public void setNewestVersion(String version) {
         if (version == null)
+            return;
+
+        if (ignoreVersions.contains(version))
             return;
 
         newestVersion = new Version(version);
