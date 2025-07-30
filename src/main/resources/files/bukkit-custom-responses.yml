@@ -32,6 +32,15 @@
 #        Syntax:  effect::potionEffect::duration::amplifier
 #        Example: effect::BLINDNESS::45::1
 
+#   Possible variable:
+#     %args[from-to]% to get the command arguments
+#     Example if you've typed: /shop open gui user
+#     %args[1]% = shop
+#     %args[2]% = open
+#     %args[1-2]% = shop open
+#     %args[1-3]% = shop open gui
+#     %args[2-4]% = open gui user
+
 # Here are a few examples:
 
 # Example for all blocked commands.
