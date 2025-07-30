@@ -1,121 +1,164 @@
 package de.rayzs.pat.utils;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
+
+import java.util.Arrays;
 
 public class VersionComparer {
 
-    private static Version CURRENT_VERSION, NEWEST_VERSION;
+    public enum VersionState { NEWER, UPDATED, OUTDATED }
 
-    public static void setCurrentVersion(String versionName) {
-        if(CURRENT_VERSION != null && CURRENT_VERSION.getVersionName().equals(versionName)) return;
-        CURRENT_VERSION = new Version(versionName);
+    private static final VersionComparer instance = new VersionComparer();
+
+    public static VersionComparer get() {
+        return instance;
     }
 
-    public static void setNewestVersion(String versionName) {
-        if(NEWEST_VERSION != null && NEWEST_VERSION.getVersionName().equals(versionName))
+    private VersionComparer() {}
+
+    private final int versionLength = 3;
+
+    private Version currentVersion, newestVersion;
+    private VersionState versionState = VersionState.UPDATED;
+
+    private boolean shouldAnnounce = true;
+
+
+    public boolean computeComparison(String result) {
+        if (result.equals("/")) {
+            Logger.warning("Failed to connect to plugin page! Version comparison cannot be made. (No internet?)");
+            return false;
+        }
+
+        Storage.NEWER_VERSION = result;
+        VersionComparer.get().setNewestVersion(Storage.NEWER_VERSION);
+
+        if (VersionComparer.get().isNewer()) {
+            if (shouldAnnounce) {
+                shouldAnnounce = false;
+
+                Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
+            }
+
+            return true;
+        }
+
+        if (VersionComparer.get().isUpdated()) {
+            if (shouldAnnounce) {
+                shouldAnnounce = false;
+
+                Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
+            }
+
+            return false;
+        }
+
+        if (VersionComparer.get().isOutdated()) {
+
+            if (shouldAnnounce) {
+                shouldAnnounce = false;
+
+                Storage.OUTDATED = true;
+                Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public void setCurrentVersion(String version) {
+        if (version == null)
             return;
 
-        NEWEST_VERSION = new Version(versionName);
+        currentVersion = new Version(version);
     }
 
-    public static Version getCurrentVersion() {
-        return CURRENT_VERSION;
+    public void setNewestVersion(String version) {
+        if (version == null)
+            return;
+
+        newestVersion = new Version(version);
+        compute();
     }
 
-    public static Version getNewestVersion() {
-        return NEWEST_VERSION;
+    public VersionState getVersionState() {
+        return versionState;
     }
 
-    public static boolean isNewest() {
-        if(CURRENT_VERSION == null || NEWEST_VERSION == null) return true;
-
-        return CURRENT_VERSION.isSame(NEWEST_VERSION);
+    public boolean isUpdated() {
+        return versionState == VersionState.UPDATED;
     }
 
-    public static boolean isUnreleased() {
-        if(CURRENT_VERSION == null || NEWEST_VERSION == null) return true;
-
-        return CURRENT_VERSION.isNewer(NEWEST_VERSION);
+    public boolean isOutdated() {
+        return versionState == VersionState.OUTDATED;
     }
 
-    public static boolean isOutdated() {
-        if(CURRENT_VERSION == null || NEWEST_VERSION == null) return false;
-        return CURRENT_VERSION.isOlder(NEWEST_VERSION);
+    public boolean isNewer() {
+        return versionState == VersionState.NEWER;
     }
 
-    public static boolean isDeveloperVersion() {
-        return CURRENT_VERSION.getState() == State.DEV;
-    }
+    private void compute() {
+        if (currentVersion == null || newestVersion == null)
+            return;
 
-    public static class Version {
-        private final String versionName;
-        private int release = -1, major = -1, patch = -1;
-        private State state = State.RELEASE;
+        int[] crntNum = currentVersion.getVersionNums();
+        int[] newNum = newestVersion.getVersionNums();
 
-        public Version(String version) {
-            this.versionName = version;
+        for (int i = 0; i < versionLength; i++) {
 
-            try {
-                String[] versionSplit = version.split("\\.");
-                release = Integer.parseInt(versionSplit[0]);
-                major = Integer.parseInt(versionSplit[1]);
-
-                String patchAsString = versionSplit[2];
-                patchAsString = patchAsString.contains("-") ? patchAsString.split("-")[0] : patchAsString;
-
-                patch = Integer.parseInt(patchAsString);
-
-                if(!version.contains("-")) return;
-                String stateName = version.split("-")[1].toUpperCase();
-                state = State.valueOf(stateName);
-
-            } catch (Throwable throwable) {
-                Logger.warning("Failed to read version name! [" + version + "]");
-                throwable.printStackTrace();
+            if (crntNum[i] > newNum[i]) {
+                versionState = VersionState.NEWER;
+                return;
             }
+
+            if (crntNum[i] < newNum[i]) {
+                versionState = VersionState.OUTDATED;
+                return;
+            }
+
+        }
+    }
+
+    private class Version {
+
+        private final int[] versionNums = new int[versionLength];
+        private final String versionString;
+
+
+        public Version(String versionString) {
+            this.versionString = versionString;
+            setVersionNums();
         }
 
         public String getVersionName() {
-            return versionName;
+            return versionString;
         }
 
-        public boolean isSame(Version version) {
-            return version.getVersionName().equals(versionName);
+        public int[] getVersionNums() {
+            return versionNums;
         }
 
-        public boolean isNewer(Version comparedVersion) {
-            return !isSame(comparedVersion) && !isOlder(comparedVersion);
+        private void setVersionNums() {
+
+            if (!versionString.contains("."))
+                return;
+
+            String[] details = versionString.split("\\.");
+            for (int i = 0; i < details.length; i++) {
+                if (i >= versionLength)
+                    break;
+
+                String detailString = details[i];
+
+                if (!NumberUtils.isDigit(detailString))
+                    continue;
+
+                int detail = Integer.parseInt(detailString);
+                versionNums[i] = detail;
+            }
         }
-
-        public boolean isOlder(Version comparedVersion) {
-            if(release > comparedVersion.getRelease()) return false;
-            if(major > comparedVersion.getMajor()) return false;
-
-            return patch < comparedVersion.getPatch();
-        }
-
-        public int getRelease() {
-            return release;
-        }
-
-        public int getMajor() {
-            return major;
-        }
-
-        public int getPatch() {
-            return patch;
-        }
-
-        public State getState() {
-            return state;
-        }
-
-        public boolean isInvalid() {
-            return release == -1 || major == -1 || patch == -1;
-        }
-    }
-
-    public enum State {
-        RELEASE, DEV, ALPHA, BETA
     }
 }

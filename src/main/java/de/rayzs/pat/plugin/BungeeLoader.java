@@ -56,7 +56,7 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         Storage.USE_SIMPLECLOUD = Reflection.doesClassExist("eu.thesimplecloud.plugin.startup.CloudPlugin");
 
         Storage.initialize(this, getDescription().getVersion());
-        VersionComparer.setCurrentVersion(Storage.CURRENT_VERSION);
+        VersionComparer.get().setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
 
@@ -226,7 +226,9 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     public void startUpdaterTask() {
-        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
+        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED)
+            return;
+
         updaterTask = getProxy().getScheduler().schedule(this, () -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
@@ -234,35 +236,9 @@ public class BungeeLoader extends Plugin implements PluginLoader {
             if (result == null)
                 result = "/";
 
-            if (!result.equals("/")) {
-                Storage.NEWER_VERSION = result;
-                VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
+            if (VersionComparer.get().computeComparison(result))
+                getProxy().getScheduler().cancel(updaterTask);
 
-                if(VersionComparer.isDeveloperVersion()) {
-                    getProxy().getScheduler().cancel(updaterTask);
-                    Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
-
-                } else if(!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
-                    getProxy().getScheduler().cancel(updaterTask);
-                    checkUpdate = true;
-
-                    if(VersionComparer.isUnreleased()) {
-                        Logger.info("§8[§fPAT | Proxy§8] §7Please be aware that you are currently using an §eunreleased §7version of ProAntiTab.");
-                        return;
-                    }
-
-                    checkUpdate = true;
-                    Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
-
-                } else if(VersionComparer.isOutdated()) {
-                    Storage.OUTDATED = true;
-                    Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
-
-                }
-
-            } else {
-                Logger.warning("Failed to connect to plugin page! Version comparison cannot be made. (No internet?)");
-            }
         }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);
     }
 

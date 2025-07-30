@@ -85,7 +85,7 @@ public class VelocityLoader implements PluginLoader {
 
         Storage.USE_SIMPLECLOUD = Reflection.doesClassExist("eu.thesimplecloud.plugin.startup.CloudPlugin");
         Storage.initialize(this, pluginContainer.getDescription().getVersion().get());
-        VersionComparer.setCurrentVersion(Storage.CURRENT_VERSION);
+        VersionComparer.get().setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
         MessageTranslator.initialize();
@@ -277,51 +277,10 @@ public class VelocityLoader implements PluginLoader {
             if (result == null)
                 result = "/";
 
-            if (!result.equals("/")) {
+            if (VersionComparer.get().computeComparison(result))
+                updaterTask.cancel();
 
-                Storage.NEWER_VERSION = result;
-                VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
-
-                if (VersionComparer.isDeveloperVersion()) {
-                    updaterTask.cancel();
-                    MessageTranslator.send(server.getConsoleCommandSource(), "<dark_gray>[</dark_gray><white>PAT | Proxy</white><dark_gray>]</dark_gray> <gray>Please be aware that you are currently using a</gray> <aqua>developer</aqua> <gray>version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.</gray>");
-
-                } else if (!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
-                    updaterTask.cancel();
-                    checkUpdate = true;
-
-                    if (VersionComparer.isUnreleased()) {
-                        MessageTranslator.send(server.getConsoleCommandSource(), "<dark_gray>[</dark_gray><white>PAT | Proxy</white><dark_gray>]</dark_gray> <gray>Please be aware that you are currently using an</gray> <yellow>unreleased</yellow> <gray>version of ProAntiTab.</gray>");
-                        return;
-                    }
-
-                    checkUpdate = true;
-                    MessageTranslator.send(server.getConsoleCommandSource(), Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines());
-
-                } else if (VersionComparer.isOutdated()) {
-                    Storage.OUTDATED = true;
-                    MessageTranslator.send(server.getConsoleCommandSource(), Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
-
-                }
-
-            } else {
-                Logger.warning("Failed to connect to plugin page! Version comparison cannot be made. (No internet?)");
-            }
         }).delay(1, TimeUnit.SECONDS).repeat(Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.SECONDS).schedule();
-    }
-
-    public static String getServerNameByPlayerUUID(UUID uuid) {
-        Optional<Player> optPlayer = server.getPlayer(uuid);
-        if(!optPlayer.isPresent()) return null;
-
-        Player player = optPlayer.get();
-        Optional<ServerConnection> optServer = player.getCurrentServer();
-        if(!optServer.isPresent()) return null;
-
-        ServerConnection server = optServer.get();
-        if(server.getServerInfo() == null) return null;
-
-        return server.getServerInfo().getName();
     }
 
     public static ProxyServer getServer() {

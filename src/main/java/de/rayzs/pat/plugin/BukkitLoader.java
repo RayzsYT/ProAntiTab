@@ -61,7 +61,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         ConfigUpdater.initialize();
 
         Storage.initialize(this, getDescription().getVersion());
-        VersionComparer.setCurrentVersion(Storage.CURRENT_VERSION);
+        VersionComparer.get().setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
 
@@ -219,7 +219,9 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     public void startUpdaterTask() {
-        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
+        if (!Storage.ConfigSections.Settings.UPDATE.ENABLED)
+            return;
+
         updaterTask = PATScheduler.createAsyncScheduler(() -> {
             String result = new ConnectionBuilder().setUrl("https://www.rayzs.de/proantitab/api/version.php")
                     .setProperties("ProAntiTab", "4654").connect().getResponse();
@@ -227,33 +229,8 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             if (result == null)
                 result = "/";
 
-            if (!result.equals("/")) {
-                Storage.NEWER_VERSION = result;
-                VersionComparer.setNewestVersion(Storage.NEWER_VERSION);
-
-                if (VersionComparer.isDeveloperVersion()) {
-                    updaterTask.cancelTask();
-                    Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
-
-                } else if (!checkUpdate && (VersionComparer.isNewest() || VersionComparer.isUnreleased())) {
-                    updaterTask.cancelTask();
-                    checkUpdate = true;
-
-                    if (VersionComparer.isUnreleased()) {
-                        Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using an §eunreleased §7version of ProAntiTab.");
-                        return;
-                    }
-
-                    Storage.ConfigSections.Settings.UPDATE.UPDATED.getLines().forEach(Logger::warning);
-
-                } else if (VersionComparer.isOutdated()) {
-                    updaterTask.cancelTask();
-                    Storage.OUTDATED = true;
-                    Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines().forEach(Logger::warning);
-                }
-            } else {
-                Logger.warning("Failed to connect to plugin page! Version comparison cannot be made. (No internet?)");
-            }
+            if (VersionComparer.get().computeComparison(result))
+                updaterTask.cancelTask();
 
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
     }
