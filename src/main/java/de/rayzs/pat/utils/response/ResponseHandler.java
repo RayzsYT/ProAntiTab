@@ -27,7 +27,7 @@ public class ResponseHandler {
         if (!input.contains(" "))
             return input;
 
-        String[] commandSplit = command.contains(" ") ? command.split(" ") : new String[]{};
+        String[] commandSplit = command.contains(" ") ? command.split(" ") : new String[]{command};
         String[] split = input.split(" ");
 
         for (int i = 0; i < split.length; i++) {
