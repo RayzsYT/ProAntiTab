@@ -7,6 +7,7 @@ import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.response.action.ActionHandler;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ResponseHandler {
 
@@ -89,7 +90,10 @@ public class ResponseHandler {
 
         if (uuid != null && optionalResponse.isPresent()) {
             optionalResponse.get().executeAction(uuid, finalInput);
-            return optionalResponse.get().message;
+
+            return new ArrayList<>(optionalResponse.get().message)
+                    .stream().map(s -> replaceArgsVariables(s, finalInput))
+                    .collect(Collectors.toList());
         }
 
         return defaultMessage;
