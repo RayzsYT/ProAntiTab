@@ -3,7 +3,7 @@ description: Hide more than just your plugins. Hide almost everything!
 website: https://www.rayzs.de/products/proantitab/page
 
 author: Rayzs_YT
-version: 2.0.5
+version: 2.0.6
 api-version: 1.13
 folia-supported: true
 main: de.rayzs.pat.plugin.BukkitLoader
