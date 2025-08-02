@@ -37,9 +37,12 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
-    private static boolean loaded = false, checkUpdate = false, suggestions = false;
+    private static boolean loaded = false, suggestions = false;
     private static Map<String, Command> commandsMap = null;
     private PATSchedulerTask updaterTask;
+
+    private final List<String> offlinePlayerNames = new ArrayList<>(List.of(Bukkit.getOfflinePlayers()))
+            .stream().map(OfflinePlayer::getName).toList();
 
     @Override
     public void onLoad() {
@@ -158,7 +161,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     @Override
     public boolean doesPlayerExist(String playerName) {
-        return ArrayUtils.containsIgnoreCase(getOfflinePlayerNames(), playerName);
+        return ArrayUtils.containsIgnoreCase(getPlayerNames(), playerName);
     }
 
     @Override
@@ -188,15 +191,14 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     @Override
     public List<String> getOfflinePlayerNames() {
-        return new ArrayList<>(List.of(Bukkit.getOfflinePlayers())).stream().map(OfflinePlayer::getName).toList();
+        return offlinePlayerNames;
     }
 
     @Override
     public List<String> getPlayerNames() {
-        List<String> playerNames = new ArrayList<>();
+        List<String> playerNames = new ArrayList<>(offlinePlayerNames);
 
         playerNames.addAll(getOnlinePlayerNames());
-        playerNames.addAll(getOfflinePlayerNames());
 
         return playerNames;
     }

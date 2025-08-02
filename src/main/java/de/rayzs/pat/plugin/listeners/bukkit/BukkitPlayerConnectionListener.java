@@ -5,10 +5,12 @@ import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.scheduler.PATScheduler;
 import org.bukkit.event.player.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -30,10 +32,21 @@ public class BukkitPlayerConnectionListener implements Listener {
         if(CustomServerBrand.isEnabled())
             CustomServerBrand.sendBrandToPlayer(player);
 
-        if(!BukkitPacketAnalyzer.inject(player)) player.kickPlayer("Failed to inject player!");
+        if(!BukkitPacketAnalyzer.inject(player)) {
+
+            PATScheduler.createScheduler(() -> {
+                if (player.isOnline()) {
+                    if (!BukkitPacketAnalyzer.inject(player)) {
+                        Logger.warning("Failed to inject into player! (" + player.getName() + ")" );
+                        player.kickPlayer("Failed to inject player!");
+                    }
+                }
+            }, 10);
+
+        }
 
         if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
-            Bukkit.getScheduler().runTaskLater(BukkitLoader.getPlugin(), () -> {
+            PATScheduler.createScheduler(() -> {
                 if (player.isOnline()) {
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
                 }
