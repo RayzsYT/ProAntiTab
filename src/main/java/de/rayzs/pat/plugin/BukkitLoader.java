@@ -41,8 +41,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     private static Map<String, Command> commandsMap = null;
     private PATSchedulerTask updaterTask;
 
-    private final List<String> offlinePlayerNames = new ArrayList<>(List.of(Bukkit.getOfflinePlayers()))
-            .stream().map(OfflinePlayer::getName).toList();
+    private final List<String> offlinePlayerNames = new ArrayList<>();
 
     @Override
     public void onLoad() {
@@ -56,6 +55,10 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     public void onEnable() {
         plugin = this;
         logger = getLogger();
+
+        for (OfflinePlayer offlinePlayerName : Bukkit.getOfflinePlayers()) {
+            offlinePlayerNames.add(offlinePlayerName.getName());
+        }
 
         loadCommandMap();
 
