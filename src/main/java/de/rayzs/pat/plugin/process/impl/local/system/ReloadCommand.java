@@ -42,6 +42,7 @@ public class ReloadCommand extends ProCommand {
         }
 
         ConfigUpdater.initialize();
+        Storage.getLoader().handleReload();
 
         sender.sendMessage(Storage.ConfigSections.Messages.RELOAD.DONE);
         return true;
