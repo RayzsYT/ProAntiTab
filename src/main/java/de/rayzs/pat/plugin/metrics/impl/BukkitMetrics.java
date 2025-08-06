@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.metrics.impl;
 
+import de.rayzs.pat.utils.scheduler.PATScheduler;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.nio.charset.StandardCharsets;
 import javax.net.ssl.HttpsURLConnection;
@@ -171,7 +172,7 @@ public class BukkitMetrics {
             }
             // Nevertheless we want our code to run in the Bukkit main thread, so we have to use the Bukkit scheduler
             // Don't be afraid! The connection to the bStats server is still async, only the stats collection is sync ;)
-            Bukkit.getScheduler().runTask(plugin, this::submitData);
+            PATScheduler.createScheduler(this::submitData);
         };
 
         // Many servers tend to restart at a fixed time at xx:00 which causes an uneven distribution of requests on the
@@ -264,6 +265,7 @@ public class BukkitMetrics {
      * Collects the data and sends it afterwards.
      */
     private void submitData() {
+        System.out.println("Submitting data...");
         final JsonObject data = getServerData();
 
         JsonArray pluginData = new JsonArray();
