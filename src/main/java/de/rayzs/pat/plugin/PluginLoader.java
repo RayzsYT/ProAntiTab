@@ -8,6 +8,9 @@ import java.util.UUID;
 
 public interface PluginLoader {
 
+    void handleReload();
+    boolean doesCommandExist(String command);
+
     HashMap<String, CommandsCache> getCommandsCacheMap();
 
     void updateCommandCache();
