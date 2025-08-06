@@ -550,7 +550,12 @@ public class Storage {
             boolean listed = isListed(command, type, server),
                     turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
 
-            return !(listed && turn);
+            if (turn) {
+                return !listed;
+            } else {
+                return listed;
+            }
+
         }
 
         private static boolean isListed(String unmodifiedCommand, BlockType type, String server) {
