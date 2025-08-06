@@ -114,6 +114,14 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     @Override
+    public void handleReload() {}
+
+    @Override
+    public boolean doesCommandExist(String command) {
+        return false;
+    }
+
+    @Override
     public Object getConsoleSender() {
         return ProxyServer.getInstance().getConsole();
     }
