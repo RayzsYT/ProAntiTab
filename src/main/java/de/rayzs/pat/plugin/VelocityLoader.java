@@ -38,7 +38,7 @@ import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "2.0.7",
+version = "2.0.8",
 authors = "Rayzs_YT",
 description = "Hide more than just your plugins. Hide almost everything!",
 url = "https://www.rayzs.de/products/proantitab/page",
@@ -143,6 +143,14 @@ public class VelocityLoader implements PluginLoader {
 
             PATEventHandler.callUpdatePlayerCommandsEvents(uuid, commands, true);
         }).delay(1, TimeUnit.SECONDS).schedule();
+    }
+
+    @Override
+    public void handleReload() {}
+
+    @Override
+    public boolean doesCommandExist(String command) {
+        return false;
     }
 
     @Override
