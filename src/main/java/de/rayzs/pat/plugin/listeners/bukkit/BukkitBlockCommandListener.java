@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -25,14 +24,20 @@ public class BukkitBlockCommandListener implements Listener {
     public void onUnknownCommandRecognition(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
+
         String rawCommand = StringUtils.getFirstArg(event.getMessage()),
                 command =  rawCommand.substring(1);
 
         if (!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled()) return;
 
-        if (PermissionUtil.hasBypassPermission(player)) return;
-        //if (BukkitLoader.doesCommandExist(command, false)) return;
-        if (Bukkit.getHelpMap().getHelpTopic(rawCommand) != null) return;
+        if (PermissionUtil.hasBypassPermission(player))
+            return;
+
+        if (Storage.getLoader().doesCommandExist(command))
+            return;
+
+        if (Bukkit.getHelpMap().getHelpTopic(rawCommand) != null)
+            return;
 
         event.setCancelled(true);
         MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE, "%command%", command, "%world%", world.getName());
