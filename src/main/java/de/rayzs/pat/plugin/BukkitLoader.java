@@ -35,6 +35,8 @@ import java.util.*;
 
 public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
+    private static List<String> commands = new ArrayList<>(), allowedCommands = new ArrayList<>();
+
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
     private static boolean loaded = false, suggestions = false;
@@ -42,6 +44,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     private PATSchedulerTask updaterTask;
 
     private final List<String> offlinePlayerNames = new ArrayList<>();
+    private long lastCommandsLoad = -1;
 
     @Override
     public void onLoad() {
@@ -110,12 +113,15 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         if (getServer().getPluginManager().getPlugin("ViaVersion") != null)
             ViaVersionAdapter.initialize();
 
-        if (Storage.USE_SIMPLECLOUD)
+        if (Storage.USE_SIMPLECLOUD) {
             Logger.warning("Detected SimpleCloud. Therefore, MiniMessages are disabled!");
+        }
 
         ConfigUpdater.broadcastMissingParts();
         ActionHandler.initialize();
         SubArgsModule.initialize();
+
+        PATScheduler.createScheduler(this::loadAllCommands);
     }
 
     @Override
@@ -132,6 +138,21 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             pluginCommand.setExecutor(command);
             pluginCommand.setTabCompleter(command);
         }
+    }
+
+    @Override
+    public void handleReload() {
+        loadAllCommands();
+    }
+
+    @Override
+    public boolean doesCommandExist(String command) {
+        if (commandsMap == null)
+            return false;
+
+        loadAllCommands();
+
+        return getAllCommands().contains(command);
     }
 
     @Override
@@ -309,12 +330,12 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         PATEventHandler.callReceiveSyncEvents(packetBundle);
     }
 
-    public static boolean doesCommandExist(String command, boolean replace) {
-        if (commandsMap == null)
-            return false;
+    public static List<String> getAllCommands() {
+        return new ArrayList<>(commands);
+    }
 
-        if (replace) command = StringUtils.replaceFirst(command, "/", "");
-        return getAllCommands().contains(command);
+    public static List<String> getAllowedCommands() {
+        return new ArrayList<>(allowedCommands);
     }
 
     private void loadCommandMap() {
@@ -325,45 +346,65 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
                 SimpleCommandMap simpleCommandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getPluginManager());
                 Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
                 knownCommandsField.setAccessible(true);
-                commandsMap = (Map<String, Command>)knownCommandsField.get(simpleCommandMap);
+                commandsMap = (Map<String, Command>) knownCommandsField.get(simpleCommandMap);
             }
         } catch (Throwable ignored) { }
 
-        if(commandsMap == null)
+        if (commandsMap == null) {
             Logger.warning("Failed to get server commands!");
+        }
     }
 
-    public static List<String> getNotBlockedCommands() {
-        List<String> commands = new ArrayList<>();
-        Bukkit.getHelpMap().getHelpTopics().stream()
-                .filter(topic -> !topic.getName().contains(":") && topic.getName().startsWith("/") && !Storage.Blacklist.getBlacklist().isListed(topic.getName().replaceFirst("/", "")))
-                .forEach(topic -> commands.add(topic.getName().replaceFirst("/", "")));
-        return commands;
-    }
+    private void loadAllCommands() {
 
-    public static List<String> getAllCommands() {
-        if (commandsMap == null) return getNotBlockedCommands();
+        if (lastCommandsLoad != -1 && System.currentTimeMillis() - lastCommandsLoad < 1000)
+            return;
 
-        List<String> result = new LinkedList<>();
-        for (String command : commandsMap.keySet()) if(!result.contains(command)) result.add(command);
+        List<String> result = new ArrayList<>();
 
-        if(Reflection.getMinor() == 20 && Reflection.getRelease() >= 5 || Reflection.getMinor() >= 21)
-            for (String s : commandsMap.keySet()) {
-                if (commandsMap.containsKey(s)) {
-                    if (!commandsMap.get(s).getAliases().isEmpty()) {
-                        for (String alias : commandsMap.get(s).getAliases()) {
-                            if (!result.contains(alias)) result.add(alias);
-                        }
+        if (commandsMap == null) {
+            result.addAll(
+                    Bukkit.getHelpMap().getHelpTopics().stream()
+                    .map(topic -> {
+                        String name = topic.getName();
 
-                    } else if (Bukkit.getServer().getCommandAliases().get(s) != null)
-                        for (String alias : Bukkit.getServer().getCommandAliases().get(s))
-                            if (!result.contains(alias)) result.add(alias);
-                }
+                        if (name.startsWith("/"))
+                            name = name.substring(1);
+
+                        return name;
+                    }).toList()
+            );
+
+            return;
+        }
+
+        commandsMap.entrySet().forEach(entry -> {
+            String key = entry.getKey();
+            Command command = entry.getValue();
+
+            result.add(key);
+
+            if (!command.getAliases().isEmpty()) {
+                result.addAll(command.getAliases());
+            }
+        });
+
+        boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+        List<String> allowedCommands = new ArrayList<>(result).stream().filter(command -> {
+
+            if (turn) {
+                return Storage.Blacklist.getBlacklist().isListed(command);
+            } else {
+                return !Storage.Blacklist.getBlacklist().isListed(command);
             }
 
-        return result;
-    }
+        }).toList();
 
+        lastCommandsLoad = System.currentTimeMillis();
+
+        BukkitLoader.commands = result;
+        BukkitLoader.allowedCommands = allowedCommands;
+    }
 
     public static boolean useSuggestions() {
         return suggestions;
