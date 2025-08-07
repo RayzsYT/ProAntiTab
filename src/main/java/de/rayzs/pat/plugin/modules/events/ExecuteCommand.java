@@ -23,7 +23,10 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                 ? command.substring(1)
                 : command;
 
-        final String displayCommand = StringUtils.getFirstArg(command);
+        final String displayCommand = StringUtils.replaceTriggers(
+                command, "",
+                "\\", "<", ">", "&"
+        );
 
         CommandSender sender = CommandSenderHandler.from(event.getSenderObj());
 
@@ -37,7 +40,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             MessageTranslator.send(
                     event.getSenderObj(),
                     Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
-                    "%command%", displayCommand
+                    "%command%", StringUtils.getFirstArg(displayCommand)
             );
 
             event.setBlocked(true);
@@ -51,7 +54,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             MessageTranslator.send(
                     event.getSenderObj(),
                     Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
-                    "%command%", displayCommand
+                    "%command%", StringUtils.getFirstArg(displayCommand)
             );
 
             event.setBlocked(true);
@@ -66,7 +69,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
             MessageTranslator.send(event.getSenderObj(),
                     ResponseHandler.getResponse(uuid, event.getCommand()),
-                    "%command%", command);
+                    "%command%", displayCommand);
 
             return;
         }
@@ -79,7 +82,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         MessageTranslator.send(
                 event.getSenderObj(),
                 ResponseHandler.getResponse(uuid, event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()),
-                "%command%", displayCommand
+                "%command%", StringUtils.getFirstArg(displayCommand)
         );
 
     }

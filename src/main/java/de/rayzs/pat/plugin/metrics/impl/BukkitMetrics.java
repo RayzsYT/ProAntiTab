@@ -265,7 +265,6 @@ public class BukkitMetrics {
      * Collects the data and sends it afterwards.
      */
     private void submitData() {
-        System.out.println("Submitting data...");
         final JsonObject data = getServerData();
 
         JsonArray pluginData = new JsonArray();

@@ -70,9 +70,7 @@ public class BukkitBlockCommandListener implements Listener {
         command = command.substring(1);
         command = StringUtils.getFirstArg(command);
 
-        final String displayName = command;
-
-        command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
+        final String displayName = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
         command = command.toLowerCase();
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(

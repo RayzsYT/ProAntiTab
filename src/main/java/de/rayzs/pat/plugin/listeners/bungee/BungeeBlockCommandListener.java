@@ -36,9 +36,8 @@ public class BungeeBlockCommandListener implements Listener {
         command = command.startsWith("/") ? command.substring(1) : command;
         command = StringUtils.getFirstArg(command);
 
-        final String displayCommand = command;
+        final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
-        command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
         command = command.toLowerCase();
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(

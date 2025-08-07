@@ -39,9 +39,8 @@ public class VelocityBlockCommandListener {
         if (bypassPermission)
             return event;
 
-        final String displayCommand = command;
+        final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
-        command = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
         command = command.toLowerCase();
 
 
