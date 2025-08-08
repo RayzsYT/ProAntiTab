@@ -58,7 +58,6 @@ public class VelocityLoader implements PluginLoader {
     private ScheduledTask updaterTask;
 
     private static final HashMap<String, CommandsCache> commandsCacheMap = new HashMap<>();
-    private static boolean checkUpdate = false;
 
     @Inject
     public VelocityLoader(ProxyServer server, org.slf4j.Logger logger, VelocityMetrics.Factory metricsFactory) {

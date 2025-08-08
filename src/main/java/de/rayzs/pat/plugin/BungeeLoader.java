@@ -33,7 +33,6 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
 
-    private static boolean checkUpdate = false;
     private static final HashMap<String, CommandsCache> commandsCacheMap = new HashMap<>();
 
     @Override
