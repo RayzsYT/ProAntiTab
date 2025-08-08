@@ -19,7 +19,7 @@ public class NumberUtils {
 
             char c = str.charAt(i);
 
-            if (c == '.' || c == ',')
+            if (c == '.' || c == ',' || c == 'k' || c == 'm' || c == 'b')
                 continue;
 
             if (!Character.isDigit(c))
