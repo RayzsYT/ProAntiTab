@@ -38,7 +38,7 @@ import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "2.0.8",
+version = "2.0.9",
 authors = "Rayzs_YT",
 description = "Hide more than just your plugins. Hide almost everything!",
 url = "https://www.rayzs.de/products/proantitab/page",
