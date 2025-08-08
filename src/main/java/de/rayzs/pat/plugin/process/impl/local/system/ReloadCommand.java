@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.process.impl.local.system;
 
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.api.command.ProCommand;
@@ -26,6 +27,7 @@ public class ReloadCommand extends ProCommand {
         sender.sendMessage(Storage.ConfigSections.Messages.RELOAD.LOADING);
 
         Storage.loadAll(Reflection.isProxyServer() || !backend);
+
         CustomServerBrand.initialize();
         GroupManager.clearAllGroups();
         GroupManager.initialize();

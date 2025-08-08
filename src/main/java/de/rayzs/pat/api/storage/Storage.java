@@ -204,6 +204,8 @@ public class Storage {
 
             } else {
 
+                Storage.Blacklist.Experimental.forceCacheReset();
+
                 if (isVelocity) {
                     List<UUID> playerIds = Storage.getLoader().getPlayerIds();
 
@@ -384,6 +386,19 @@ public class Storage {
 
     public static class Blacklist {
 
+        public static class Experimental {
+
+            public static void forceCacheReset() {
+                for (Object o : CACHED_SERVER_BLACKLIST.getCache().asMap().keySet()) {
+                    String s = (String) o;
+
+                    clearServerBlacklists(s);
+                    loadCachedServerBlacklists(s);
+                }
+            }
+
+        }
+
         public enum BlockType {
             CHAT("[CMD]"),
             TAB("[TAB]"),
@@ -428,14 +443,9 @@ public class Storage {
             BLACKLIST.getConfig().getKeys("global.servers", true).forEach(key -> {
                 GeneralBlacklist blacklist = BlacklistCreator.createGeneralBlacklist(key);
                 blacklist.load();
-
                 SERVER_BLACKLISTS.put(key, blacklist);
             });
 
-            loadAllCachedServerBlacklists();
-        }
-
-        private static void loadAllCachedServerBlacklists() {
             getServers().forEach(Blacklist::loadCachedServerBlacklists);
         }
 
@@ -443,9 +453,7 @@ public class Storage {
             List<GeneralBlacklist> blacklists = SERVER_BLACKLISTS.entrySet().stream()
                     .filter(entry ->
                             isServer(entry.getKey(), server)
-                    ).map(entry ->
-                            entry.getValue()
-                    ).toList();
+                    ).map(Map.Entry::getValue).toList();
 
             CACHED_SERVER_BLACKLIST.put(server, blacklists);
         }
