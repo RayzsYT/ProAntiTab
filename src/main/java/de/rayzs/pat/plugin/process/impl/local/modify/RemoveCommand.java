@@ -60,9 +60,7 @@ public class RemoveCommand extends ProCommand {
         final int length = args.length;
 
         if (length == 1) {
-            boolean exist = command.contains(" ")
-                    ? Storage.Blacklist.getBlacklist().getCommands().contains(command)
-                    : Storage.Blacklist.getBlacklist().isListed(command);
+            boolean exist = Storage.Blacklist.getBlacklist().getCommands().contains(command);
 
             if (exist) {
                 Storage.Blacklist.getBlacklist().remove(command).save();
