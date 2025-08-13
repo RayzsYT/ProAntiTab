@@ -9,12 +9,12 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.event.player.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
-import org.bukkit.Bukkit;
 
 public class BukkitPlayerConnectionListener implements Listener {
 
@@ -23,16 +23,26 @@ public class BukkitPlayerConnectionListener implements Listener {
         Player player = event.getPlayer();
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
-        if(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             BackendUpdater.handle();
 
         PermissionUtil.setPlayerPermissions(player.getUniqueId());
         CustomServerBrand.preparePlayer(player);
 
-        if(CustomServerBrand.isEnabled())
+        if (CustomServerBrand.isEnabled())
             CustomServerBrand.sendBrandToPlayer(player);
 
-        if(!BukkitPacketAnalyzer.inject(player)) {
+        if (!Storage.USE_LUCKPERMS && !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+            PATScheduler.createScheduler(() -> {
+                CommandSender sender = CommandSenderHandler.from(player);
+
+                assert sender != null;
+                PermissionUtil.reloadPermissions(sender);
+                BukkitAntiTabListener.handleTabCompletion(player.getUniqueId());
+            }, 20);
+        }
+
+        if (!BukkitPacketAnalyzer.inject(player)) {
 
             PATScheduler.createScheduler(() -> {
                 if (player.isOnline()) {
