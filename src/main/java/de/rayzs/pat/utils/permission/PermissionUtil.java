@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
@@ -23,11 +24,13 @@ public class PermissionUtil {
     }
 
     public static void reloadPermissions(UUID uuid) {
-        if (!MAP.containsKey(uuid))
-            return;
-
         MAP.get(uuid).clear();
         setPlayerPermissions(uuid);
+    }
+
+    public static void reloadPermissions(CommandSender sender) {
+        resetPermissions(sender.getUniqueId());
+        setPlayerPermissions(sender);
     }
 
     public static String getPermissionsAsString(UUID uuid) {
@@ -41,17 +44,32 @@ public class PermissionUtil {
 
     public static Set<String> getPermissions(UUID uuid) {
         PermissionMap permissionMap = MAP.get(uuid);
-        if(permissionMap == null) return null;
+        if(permissionMap == null)
+            return null;
+
         return permissionMap.getHashedPermissions();
     }
 
+    public static void setPlayerPermissions(CommandSender sender) {
+        if (Storage.USE_LUCKPERMS) {
+            LuckPermsAdapter.setPermissions(sender.getUniqueId());
+        } else {
+            GroupManager.getGroups().forEach(group -> group.hasPermission(sender));
+        }
+    }
+
     public static void setPlayerPermissions(UUID uuid) {
-        if (Storage.USE_LUCKPERMS)
+        if (Storage.USE_LUCKPERMS) {
             LuckPermsAdapter.setPermissions(uuid);
+        } else {
+            GroupManager.getGroups().forEach(group -> group.hasPermission(uuid));
+        }
     }
 
     public static void resetPermissions(UUID uuid) {
-        if(!MAP.containsKey(uuid)) return;
+        if (!MAP.containsKey(uuid))
+            return;
+
         MAP.get(uuid).clear();
     }
 
@@ -86,7 +104,7 @@ public class PermissionUtil {
             uuid = sender.getUniqueId();
         }
 
-        if(!MAP.containsKey(uuid)) {
+        if (!MAP.containsKey(uuid)) {
             MAP.put(uuid, new PermissionMap(uuid));
             return false;
         }
