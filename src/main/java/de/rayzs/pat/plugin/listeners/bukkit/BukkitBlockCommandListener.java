@@ -46,8 +46,9 @@ public class BukkitBlockCommandListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
+        final String commandFirstArg = StringUtils.getFirstArg(event.getMessage());
 
-        if (Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.isCommand(StringUtils.getFirstArg(event.getMessage()))) {
+        if (Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.isCommand(commandFirstArg)) {
             String command = event.getMessage();
 
             if (command.contains(" ")) {
@@ -56,9 +57,11 @@ public class BukkitBlockCommandListener implements Listener {
                 command = String.join(" ", args);
             } else command = command.toLowerCase();
 
-            player.chat(command);
-            event.setCancelled(true);
-            return;
+            if (!commandFirstArg.equals(command)) {
+                player.chat(command);
+                event.setCancelled(true);
+                return;
+            }
         }
 
         World world = player.getWorld();
