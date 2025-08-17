@@ -63,7 +63,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             return;
         }
 
-        if (command.contains(" ") && !canPlayerExecute(sender, command)) {
+        if (isBlocked(sender, command)) {
             event.setBlocked(true);
             event.setCancelled(true);
 
@@ -87,19 +87,38 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
     }
 
-    private boolean canPlayerExecute(CommandSender sender, String command) {
-        boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
-        boolean listed = false;
+    private boolean isBlocked(CommandSender sender, String command) {
+        final Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Arguments.ARGUMENTS);
+        final List<String> commands = new ArrayList<>(arguments.CHAT_ARGUMENTS.getGeneralArgument().getInputs());
+        final String firstArgument = StringUtils.getFirstArg(command);
 
-        Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Arguments.ARGUMENTS);
-        List<String> commands = new ArrayList<>(arguments.CHAT_ARGUMENTS.getGeneralArgument().getInputs());
+        final String blockBaseCommandStr = firstArgument + " -_";
+        final boolean blockBaseCommand = commands.contains(blockBaseCommandStr);
+
+        if (!command.contains(" ")) {
+            return blockBaseCommand;
+        }
+
+        if (blockBaseCommand) {
+            commands.remove(blockBaseCommandStr);
+        }
+
+        if (commands.stream().noneMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(firstArgument))) {
+            return false;
+        }
+
+
+        boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+        boolean listed = isListed(command, commands);
+
+        return turn != listed;
+    }
+
+    private boolean isListed(String command, List<String> commands) {
+        boolean listed = false;
 
         final String unmodifiable = command;
         final String firstArgUnmodifiable = StringUtils.getFirstArg(unmodifiable);
-
-        if (commands.stream().noneMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(firstArgUnmodifiable))) {
-            return true;
-        }
 
         commands = commands.stream().map(c -> {
             if (c.contains("%hidden")) {
@@ -147,6 +166,6 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             }
         }
 
-        return turn == listed;
+        return listed;
     }
 }

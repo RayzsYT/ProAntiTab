@@ -24,6 +24,8 @@ public class TabCompletion extends FilteredTabCompletionEvent {
         Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, Arguments.ARGUMENTS);
         List<String> possibilities = event.getCompletion(), result = new ArrayList<>(arguments.getResultTab(cursor));
 
+        result.removeIf(s -> s.contains("-_"));
+
         if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             possibilities = result;
 
