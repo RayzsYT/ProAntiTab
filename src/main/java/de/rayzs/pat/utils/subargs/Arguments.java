@@ -23,7 +23,9 @@ public class Arguments {
 
     public void buildArgumentStacks(String input) {
         Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
-        input = Storage.Blacklist.BlockTypeFetcher.modify(input, type);
+        if (type != Storage.Blacklist.BlockType.NEGATE) {
+            input = Storage.Blacklist.BlockTypeFetcher.modify(input, type);
+        }
 
         switch (type) {
             case TAB:
