@@ -2,6 +2,8 @@ package de.rayzs.pat.utils;
 
 public class NumberUtils {
 
+    private static final char[] EXCEPTIONS = {'.', ',', 'k', 'm', 'b'};
+
     public static boolean isBetween(int n, int l, int r) {
         int min = Math.min(l, r);
         int max = Math.max(l, r);
@@ -16,10 +18,9 @@ public class NumberUtils {
         int length = str.length();
 
         for (int i = 0; i < length; i++) {
-
             char c = str.charAt(i);
 
-            if (c == '.' || c == ',' || c == 'k' || c == 'm' || c == 'b')
+            if (isExceptionalDigit(c))
                 continue;
 
             if (!Character.isDigit(c))
@@ -28,4 +29,17 @@ public class NumberUtils {
         return true;
     }
 
+    private static boolean isExceptionalDigit(char c) {
+        for (char q : EXCEPTIONS) {
+            if (c == q) {
+                return true;
+            }
+
+            if (Character.isAlphabetic(c) && c == Character.toUpperCase(q)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
