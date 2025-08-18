@@ -1,5 +1,7 @@
 package de.rayzs.pat.utils.subargs;
 
+import de.rayzs.pat.utils.StringUtils;
+
 import java.util.*;
 
 public class ArgumentBuilder {
@@ -15,7 +17,7 @@ public class ArgumentBuilder {
     }
 
     public List<String> getResult(String input) {
-        String firstInputArg = input.contains(" ") ? input.split(" ")[0] : input;
+        String firstInputArg = StringUtils.getFirstArg(input);
 
         for (Map.Entry<String, ArgumentStack> entry : source.ARGUMENT_STACKS.entrySet()) {
             if (!entry.getKey().equals(firstInputArg))
