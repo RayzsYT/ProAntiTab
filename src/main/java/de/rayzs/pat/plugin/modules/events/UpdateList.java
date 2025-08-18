@@ -48,11 +48,26 @@ public class UpdateList {
                 for (String command : event.getCommands())
                     argument.buildArgumentStacks(command);
 
-                for (String command : argument.CHAT_ARGUMENTS.getGeneralArgument().getInputs())
-                    argument.CHAT_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
+                final List<String> chatInputs = new ArrayList<>(argument.CHAT_ARGUMENTS.getGeneralArgument().getInputs());
+                final List<String> tabInput = new ArrayList<>(argument.TAB_ARGUMENTS.getGeneralArgument().getInputs());
 
-                for (String command : argument.TAB_ARGUMENTS.getGeneralArgument().getInputs())
-                    argument.TAB_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
+                for (String command : chatInputs) {
+                    Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
+
+                    if (type != Storage.Blacklist.BlockType.NEGATE)
+                        command = Storage.Blacklist.BlockTypeFetcher.modify(command, type);
+
+                    argument.CHAT_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
+                }
+
+                for (String command : tabInput) {
+                    Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
+
+                    if (type != Storage.Blacklist.BlockType.NEGATE)
+                        command = Storage.Blacklist.BlockTypeFetcher.modify(command, type);
+
+                    argument.TAB_ARGUMENTS.buildArguments(command);
+                }
 
                 for (String command : SubArgsModule.getGroupCommands(uuid, serverName))
                     argument.buildArgumentStacks(command);

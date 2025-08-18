@@ -13,7 +13,7 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
     @Override
     public void handle(FilteredTabCompletionEvent event) {
-        String cursor = StringUtils.replaceFirst(event.getCursor(), "/", "");
+        String cursor = event.getCursor().substring(1);
 
         if (event.getCompletion().isEmpty()) return;
 
@@ -22,12 +22,20 @@ public class TabCompletion extends FilteredTabCompletionEvent {
                 : CommandSenderHandler.from(event.getSenderObj()).getUniqueId();
 
         Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, Arguments.ARGUMENTS);
+
         List<String> possibilities = event.getCompletion(), result = new ArrayList<>(arguments.getResultTab(cursor));
+        List<String> negated = new ArrayList<>(arguments.getResultTab("!" + cursor));
+
 
         result.removeIf(s -> s.contains("-_"));
 
         if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             possibilities = result;
+
+            if (possibilities.isEmpty() && !negated.isEmpty()) {
+                possibilities = event.getCompletion();
+                possibilities.removeAll(negated);
+            }
 
             if (result.contains("%numbers%")) {
                 possibilities.remove("%numbers%");
@@ -77,7 +85,6 @@ public class TabCompletion extends FilteredTabCompletionEvent {
             }
 
         } else {
-
             if (result.contains("%numbers%"))
                 possibilities.removeIf(NumberUtils::isDigit);
 
@@ -87,7 +94,14 @@ public class TabCompletion extends FilteredTabCompletionEvent {
             if (result.contains("%online_players%"))
                 possibilities.removeIf(possibility -> SubArgsModule.getOnlinePlayerNames().contains(possibility));
 
-            possibilities.removeAll(result);
+
+            possibilities.removeIf(s -> {
+                if (negated.contains(s)) {
+                    return false;
+                }
+
+                return result.contains(s);
+            });
         }
 
         cursor = StringUtils.getFirstArg(cursor.toLowerCase());

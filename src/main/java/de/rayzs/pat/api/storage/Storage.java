@@ -555,8 +555,19 @@ public class Storage {
         }
 
         public static boolean isBlocked(String command, BlockType type, String server) {
+
+            BlockType negation = BlockType.NEGATE;
+            String negatedCommand = negation + command;
+
             boolean listed = isListed(command, type, server),
+                    negatedListed = isListed(negatedCommand, type, server),
                     turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+
+
+            if (!turn && negatedListed) {
+                listed = !listed;
+            }
+
 
             if (turn) {
                 return !listed;
@@ -573,18 +584,17 @@ public class Storage {
             boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
             boolean listed = false;
 
-            if (type == BlockType.NEGATE)
-                turn = !turn;
-
             String command = type.toString() + unmodifiedCommand;
 
-            if (server == null || !isIgnoredServer(server))
+            if (server == null || !isIgnoredServer(server)) {
                 listed = BLACKLIST.isListed(command, !turn);
+            }
 
             if (server == null) {
 
-                if (!listed && type != BlockType.BOTH)
+                if (!listed && type != BlockType.BOTH) {
                     return isListed(unmodifiedCommand, BlockType.BOTH, null);
+                }
 
                 return listed;
             }
