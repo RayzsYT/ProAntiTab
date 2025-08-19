@@ -1,22 +1,19 @@
 package de.rayzs.pat.plugin.logger.impl;
 
-import de.rayzs.pat.plugin.BungeeLoader;
-import de.rayzs.pat.plugin.logger.LoggerPriority;
-import de.rayzs.pat.plugin.logger.LoggerTemplate;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.plugin.BungeeLoader;
 import net.md_5.bungee.api.ProxyServer;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import de.rayzs.pat.utils.LimitedList;
+import de.rayzs.pat.plugin.logger.*;
+import java.util.*;
 
 public class BungeeLogger implements LoggerTemplate {
 
-    private final List<String> LOGS = new ArrayList<>();
+    private final LimitedList<String> LOGS = new LimitedList<>(LOG_MAX_CAPACITY);
     private final java.util.logging.Logger logger = BungeeLoader.getPluginLogger();
 
     @Override
-    public List<String> getLogs() {
+    public LimitedList<String> getLogs() {
         return LOGS;
     }
 

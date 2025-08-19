@@ -1,13 +1,15 @@
 package de.rayzs.pat.plugin.logger;
 
+import de.rayzs.pat.utils.LimitedList;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 public interface LoggerTemplate {
 
-    SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss:SS");
+    int LOG_MAX_CAPACITY = 350;
 
-    List<String> getLogs();
+    SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss:SS");
+    LimitedList<String> getLogs();
 
     void info(List<String> messages);
     void warn(List<String> messages);

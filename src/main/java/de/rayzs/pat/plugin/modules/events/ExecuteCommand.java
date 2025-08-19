@@ -103,13 +103,27 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             commands.remove(blockBaseCommandStr);
         }
 
-        if (commands.stream().noneMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(firstArgument))) {
+
+        boolean inCommands = commands.stream().anyMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase(firstArgument));
+        boolean negationInCommands = commands.stream().anyMatch(c -> StringUtils.getFirstArg(c).equalsIgnoreCase("!" + firstArgument));
+
+
+        if (!inCommands && !negationInCommands) {
             return false;
         }
 
 
         boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
         boolean listed = isListed(command, commands);
+        boolean negated = isListed("!" + command, commands);
+
+        if (!listed && !inCommands) {
+            listed = turn;
+        }
+
+        if (negated) {
+            listed = !turn;
+        }
 
         return turn != listed;
     }

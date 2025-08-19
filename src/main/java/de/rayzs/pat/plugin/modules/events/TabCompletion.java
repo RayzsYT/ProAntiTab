@@ -13,23 +13,43 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
     @Override
     public void handle(FilteredTabCompletionEvent event) {
-        String cursor = event.getCursor().substring(1);
+        final String cursor = event.getCursor().substring(1);
 
         if (event.getCompletion().isEmpty()) return;
 
-        UUID uuid = event.getSenderObj() instanceof UUID
+        final boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+        final UUID uuid = event.getSenderObj() instanceof UUID
                 ? (UUID) event.getSenderObj()
                 : CommandSenderHandler.from(event.getSenderObj()).getUniqueId();
 
-        Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, Arguments.ARGUMENTS);
+        final Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, Arguments.ARGUMENTS);
 
         List<String> possibilities = event.getCompletion(), result = new ArrayList<>(arguments.getResultTab(cursor));
-        List<String> negated = new ArrayList<>(arguments.getResultTab("!" + cursor));
+        final List<String> negated = new ArrayList<>(arguments.getResultTab("!" + cursor));
 
+        final List<String> negatedInputs = new ArrayList<>(arguments.TAB_ARGUMENTS.INPUTS).stream().filter(s -> {
+            if (s.isEmpty())
+                return false;
+
+            boolean n = s.charAt(0) == '!';
+
+            if (!n && s.length() > 5)
+                n = s.charAt(5) == '!';
+
+            return n;
+        }).map(s -> s.substring(1 + (s.charAt(0) == '[' ? 5 : 0))).toList();
+
+        if (negatedInputs.stream().anyMatch(cursor::startsWith)) {
+            if (turn) {
+                event.setCompletion(new ArrayList<>());
+            }
+
+            return;
+        }
 
         result.removeIf(s -> s.contains("-_"));
 
-        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+        if (turn) {
             possibilities = result;
 
             if (possibilities.isEmpty() && !negated.isEmpty()) {
@@ -104,8 +124,8 @@ public class TabCompletion extends FilteredTabCompletionEvent {
             });
         }
 
-        cursor = StringUtils.getFirstArg(cursor.toLowerCase());
-        if (possibilities.isEmpty() && !SubArgsModule.GENERAL_LIST.contains(cursor)) {
+        String firstCursorArg = StringUtils.getFirstArg(cursor.toLowerCase());
+        if (possibilities.isEmpty() && !SubArgsModule.GENERAL_LIST.contains(firstCursorArg)) {
             return;
         }
 

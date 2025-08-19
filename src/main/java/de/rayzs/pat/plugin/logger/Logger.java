@@ -3,18 +3,31 @@ package de.rayzs.pat.plugin.logger;
 import de.rayzs.pat.plugin.logger.impl.*;
 import java.nio.charset.StandardCharsets;
 import javax.net.ssl.HttpsURLConnection;
-import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.Reflection;
+
+import de.rayzs.pat.utils.*;
 import java.net.URL;
 import java.util.*;
 import java.io.*;
 
 public class Logger {
 
+    private static final String LOG_HEADER;
+
+    static {
+        final String software = Reflection.isProxyServer()
+                ? Reflection.isVelocityServer() ? "Velocity" : "Bungeecord"
+                : (Reflection.isPaper() ? "Paper" : Reflection.isFoliaServer() ? "Folia" : "Spigot/Bukkit");
+
+        final String version = Reflection.isProxyServer() ? "" : " " + Reflection.getRawVersionName().replace("_", ".");
+
+        LOG_HEADER = "> ProAntiTab v" + version + " [" + software + version + "]";
+    }
+
     private final static LoggerTemplate LOGGER =
             Reflection.isVelocityServer() ? new VelocityLogger()
                     : Reflection.isProxyServer() ? new BungeeLogger()
                     : new BukkitLogger();
+
 
     public static void info(List<String> messages) {
         LOGGER.info(messages);
@@ -41,18 +54,13 @@ public class Logger {
     }
 
     public static String post() throws IOException {
-        ArrayList<String> clonedLogs = new ArrayList<>(LOGGER.getLogs());
-        int startIndex = clonedLogs.size() > 980 ? clonedLogs.size() - 980 : 0;
-        StringBuilder textBuilder = new StringBuilder("[ProAntiTab " + Storage.CURRENT_VERSION + " | " + (Reflection.isProxyServer() ? Reflection.isVelocityServer() ? "Velocity" : "Proxy" : Reflection.isPaper() ? "Paper" : "Bukkit") + "]" + (Reflection.getRawVersionName() != null ? " Server version: " + Reflection.getVersionName() + " " + Reflection.getRawVersionName().replace("_", ".") : "") + "\n" + (startIndex != 0 ? "... another part is split!\n\n" : ""));
+        LimitedList<String> clonedLogs = new LimitedList<>(LOGGER.getLogs());
+        StringBuilder textBuilder = new StringBuilder(LOG_HEADER);
 
-        for (int i = startIndex; i < clonedLogs.size(); i++) {
-            if (clonedLogs.get(i) == null)
-                continue;
-
-            String line = clonedLogs.get(i);
+        clonedLogs.iterate(line -> {
             textBuilder.append("\n");
             textBuilder.append(line);
-        }
+        });
 
         byte[] textInBytes = textBuilder.toString().getBytes(StandardCharsets.UTF_8);
         int postDataLength = textInBytes.length;
