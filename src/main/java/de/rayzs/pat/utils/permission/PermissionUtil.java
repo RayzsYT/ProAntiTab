@@ -112,20 +112,22 @@ public class PermissionUtil {
         permissionMap = MAP.get(uuid);
 
         if (sender != null) {
+
             if (!Storage.USE_LUCKPERMS) {
-                if (permissionMap.hasPermissionState("*"))
+
+                if (!permissionMap.hasPermissionState("*"))
                     permissionMap.setState("*", sender.hasPermission("*"));
 
-                if (permissionMap.hasPermissionState("proantitab.*"))
+                if (!permissionMap.hasPermissionState("proantitab.*"))
                     permissionMap.setState("proantitab.*", sender.hasPermission("proantitab.*"));
 
-                if (permissionMap.hasPermissionState("proantitab." + permission))
+                if (!permissionMap.hasPermissionState("proantitab." + permission))
                     permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
+
             }
 
-            if (sender.isOperator())
-                if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
-                    return true;
+            if (sender.isOperator() && !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+                return true;
         }
 
         return permissionMap.isPermitted("*") || permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);

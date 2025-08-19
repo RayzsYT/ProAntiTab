@@ -41,8 +41,13 @@ public class PermissionMap {
     }
 
     public PermissionState getPermissionState(String permission) {
-        if(!hasPermissionState(permission)) return PermissionState.EMPTY;
-        return permissionMap.get(permission) ? PermissionState.PERMITTED : PermissionState.DENIED;
+        if (!hasPermissionState(permission)) {
+            return PermissionState.EMPTY;
+        }
+
+        return permissionMap.get(permission)
+                ? PermissionState.PERMITTED
+                : PermissionState.DENIED;
     }
 
     public boolean hasPermissionState(String permission) {
