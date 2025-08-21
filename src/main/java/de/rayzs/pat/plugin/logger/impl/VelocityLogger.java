@@ -56,9 +56,13 @@ public class VelocityLogger implements LoggerTemplate {
     public void send(LoggerPriority priority, String message) {
         message = MessageTranslator.replaceMessage(message);
 
+        /*
         String time = TIME_FORMAT.format(new Date(System.currentTimeMillis()));
-        if(time.length() != 12) time = time.substring(0, 9) + 0 + time.split(":")[3];
+        if (time.length() != 12)
+            time = time.substring(0, 9) + 0 + time.split(":")[3];
+
         LOGS.add("[" + priority.name() + " | " + time + "] " + MessageTranslator.colorless(message));
+        */
 
         if (priority == LoggerPriority.DEBUG)
             return;
