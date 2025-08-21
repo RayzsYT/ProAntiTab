@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
+import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.command.CommandSource;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
@@ -12,6 +13,11 @@ import de.rayzs.pat.api.event.*;
 import java.util.List;
 
 public class VelocityBlockCommandListener {
+
+    @Subscribe
+    public void onCommandExecute(CommandExecuteEvent event) {
+        handleCommand(event);
+    }
 
     public static CommandExecuteEvent handleCommand(Player player, String command) {
         return handleCommand(new CommandExecuteEvent(player, command));

@@ -38,7 +38,7 @@ import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "2.0.12",
+version = "2.0.13",
 authors = "Rayzs_YT",
 description = "Hide more than just your plugins. Hide almost everything!",
 url = "https://www.rayzs.de/products/proantitab/page",
@@ -94,7 +94,7 @@ public class VelocityLoader implements PluginLoader {
         metricsFactory.make(this, 21638);
 
         server.getCommandManager().register("bpat", new VelocityCommand(), "bungeeproantitab");
-        //server.getEventManager().register(this, new VelocityBlockCommandListener(server));
+        server.getEventManager().register(this, new VelocityBlockCommandListener());
         server.getEventManager().register(this, new VelocityAntiTabListener(server));
         server.getEventManager().register(this, new VelocityConnectionListener(server, this));
         server.getEventManager().register(this, new VelocityPingListener(server));
