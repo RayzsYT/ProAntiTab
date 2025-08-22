@@ -6,7 +6,10 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.Storage.Blacklist.BlockType;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 
 public class GroupManager {
 
@@ -57,9 +60,16 @@ public class GroupManager {
     }
 
     public static boolean canAccessCommand(Object targetObj, String unmodifiedCommand, Storage.Blacklist.BlockType type, String server) {
-        final List<Group> playerGroups = getPlayerGroups(targetObj);
+        final CommandSender sender = CommandSenderHandler.from(targetObj);
 
-        if(playerGroups.isEmpty()) {
+        if (sender == null) {
+            Logger.warning("Failed to load player! (GroupManager#62)");
+            return false;
+        }
+
+        final List<Group> playerGroups = sender.getGroups();
+
+        if (playerGroups == null || playerGroups.isEmpty()) {
             return false;
         }
         

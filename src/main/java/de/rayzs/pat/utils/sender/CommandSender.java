@@ -1,5 +1,8 @@
 package de.rayzs.pat.utils.sender;
 
+import de.rayzs.pat.utils.group.Group;
+
+import java.util.List;
 import java.util.UUID;
 
 public interface CommandSender {
@@ -16,6 +19,9 @@ public interface CommandSender {
 
     String getName();
     String getServerName();
+
+    List<Group> getGroups();
+    void updateGroups();
 
     void sendMessage(String message);
 }

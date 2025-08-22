@@ -31,8 +31,9 @@ public class CommandSenderHandler {
             sender = new BukkitSender(senderObj);
         }
 
-        if (sender.getUniqueId() == null)
+        if (sender.getUniqueId() == null) {
             return null;
+        }
 
         return CACHE.putAndGet(uuid, sender);
     }

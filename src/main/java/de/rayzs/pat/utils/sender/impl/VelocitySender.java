@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.sender.impl;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
@@ -27,6 +28,7 @@ public class VelocitySender extends CommandSenderAbstract {
             this.uuid = player.getUniqueId();
             this.console = false;
 
+            updateGroups();
             return;
         }
 
@@ -41,11 +43,6 @@ public class VelocitySender extends CommandSenderAbstract {
         }
 
         this.console = true;
-    }
-
-    @Override
-    public Object getSenderObject() {
-        return sender;
     }
 
     @Override
@@ -88,5 +85,10 @@ public class VelocitySender extends CommandSenderAbstract {
     @Override
     public void sendMessage(String message) {
         MessageTranslator.send(sender, message);
+    }
+
+    @Override
+    public void updateGroups() {
+        setGroups(GroupManager.getGroups());
     }
 }

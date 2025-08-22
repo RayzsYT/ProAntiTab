@@ -31,6 +31,7 @@ public class PermissionUtil {
     public static void reloadPermissions(CommandSender sender) {
         resetPermissions(sender.getUniqueId());
         setPlayerPermissions(sender);
+        sender.updateGroups();
     }
 
     public static String getPermissionsAsString(UUID uuid) {
