@@ -15,7 +15,7 @@ public class CommandsCache {
         if (change || !isOutdated(commands)) 
             return;
 
-        filteredCommands = new LinkedList<>();
+        LinkedList<String> tmpFilteredCommands = new LinkedList<>();
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
@@ -36,6 +36,7 @@ public class CommandsCache {
 
         }
 
+        filteredCommands = tmpFilteredCommands;
         change = true;
     }
 
@@ -43,7 +44,7 @@ public class CommandsCache {
         if(!isOutdated(commands)) 
             return;
 
-        filteredCommands = new LinkedList<>();
+        LinkedList<String> tmpFilteredCommands = new LinkedList<>();
         allCommands = new ArrayList<>(commands);
 
         for (String command : allCommands) {
@@ -62,6 +63,8 @@ public class CommandsCache {
             }
 
         }
+
+        filteredCommands = tmpFilteredCommands;
     }
 
     public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid) {
