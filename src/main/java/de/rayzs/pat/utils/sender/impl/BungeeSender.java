@@ -94,6 +94,6 @@ public class BungeeSender extends CommandSenderAbstract {
 
     @Override
     public void updateGroups() {
-        setGroups(GroupManager.getGroups());
+        setGroups(GroupManager.getPlayerGroups(this.uuid));
     }
 }

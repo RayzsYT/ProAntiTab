@@ -89,6 +89,6 @@ public class VelocitySender extends CommandSenderAbstract {
 
     @Override
     public void updateGroups() {
-        setGroups(GroupManager.getGroups());
+        setGroups(GroupManager.getPlayerGroups(this.uuid));
     }
 }
