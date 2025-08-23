@@ -75,21 +75,32 @@ public class GroupManager {
         
         String command = type.toString() + unmodifiedCommand;
 
-        boolean permitted = playerGroups.stream().anyMatch(group -> {
-            if (group == null)
-                return false;
+        boolean permitted = false;
+        for (Group group : playerGroups) {
 
             if (server != null) {
+
                 List<String> servers = group.getBlacklistServerNames(server);
 
                 for (String s : servers) {
-                    if (group.contains(command, s))
-                        return true;
+                    if (!group.contains(command, s)) {
+                        continue;
+                    }
+
+                    permitted = true;
+                    break;
                 }
+
+            } else {
+                permitted = group.contains(command);
             }
 
-            return group.contains(command);
-        });
+
+            if (permitted) {
+                break;
+            }
+
+        }
 
         if (!permitted && type != BlockType.BOTH)
             return canAccessCommand(targetObj, unmodifiedCommand, Storage.Blacklist.BlockType.BOTH, server);
