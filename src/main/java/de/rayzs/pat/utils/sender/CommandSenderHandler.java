@@ -14,6 +14,10 @@ public class CommandSenderHandler {
     private static final ExpireCache<UUID, CommandSender> CACHE = new ExpireCache<>(1, TimeUnit.HOURS);
 
 
+    public static CommandSender getSenderFromUUID(UUID uuid) {
+        return CACHE.get(uuid);
+    }
+
     public static CommandSender from(Object senderObj) {
         UUID uuid = extractUUID(senderObj);
 
