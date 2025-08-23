@@ -35,6 +35,6 @@ public abstract class CommandSenderAbstract implements CommandSender {
     }
 
     protected void setGroups(List<Group> groups) {
-        this.groups.put(KEY, groups);
+        this.groups.putIgnoreIfContains(KEY, groups);
     }
 }
