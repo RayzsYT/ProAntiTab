@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
@@ -152,15 +151,12 @@ public class Group implements Serializable {
 
         GroupBlacklist groupBlacklist;
 
-        if (this.groupServerBlacklist.containsKey(server) && this.groupServerBlacklist.get(server) != null)
+        if (this.groupServerBlacklist.get(server) != null)
             groupBlacklist = this.groupServerBlacklist.get(server);
         else {
             groupBlacklist = BlacklistCreator.createGroupBlacklist(this.groupName, server, ignoreExist);
             this.groupServerBlacklist.put(server, groupBlacklist);
         }
-
-        if (groupBlacklist != null)
-            groupBlacklist.load();
 
         return groupBlacklist;
     }
