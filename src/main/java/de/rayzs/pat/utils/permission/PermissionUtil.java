@@ -24,8 +24,13 @@ public class PermissionUtil {
     }
 
     public static void reloadPermissions(UUID uuid) {
-        MAP.get(uuid).clear();
+        resetPermissions(uuid);
         setPlayerPermissions(uuid);
+
+        CommandSender sender = CommandSenderHandler.getSenderFromUUID(uuid);
+        if (sender != null) {
+            sender.updateGroups();
+        }
     }
 
     public static void reloadPermissions(CommandSender sender) {
