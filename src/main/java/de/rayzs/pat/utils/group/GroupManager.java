@@ -78,6 +78,12 @@ public class GroupManager {
         boolean permitted = false;
         for (Group group : playerGroups) {
 
+            permitted = group.contains(command);
+
+            if (permitted) {
+                break;
+            }
+
             if (server != null) {
 
                 List<String> servers = group.getBlacklistServerNames(server);
@@ -91,13 +97,6 @@ public class GroupManager {
                     break;
                 }
 
-            } else {
-                permitted = group.contains(command);
-            }
-
-
-            if (permitted) {
-                break;
             }
 
         }
