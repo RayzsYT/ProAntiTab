@@ -89,12 +89,12 @@ public class GroupManager {
                 List<String> servers = group.getBlacklistServerNames(server);
 
                 for (String s : servers) {
-                    if (!group.contains(command, s)) {
-                        continue;
+
+                    if (group.contains(command, s)) {
+                        permitted = true;
+                        break;
                     }
 
-                    permitted = true;
-                    break;
                 }
 
             }
