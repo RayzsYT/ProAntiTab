@@ -54,9 +54,11 @@ public class VelocityLogger implements LoggerTemplate {
 
     @Override
     public void send(LoggerPriority priority, String message) {
-        message = MessageTranslator.replaceMessage(message);
+
 
         /*
+        message = MessageTranslator.replaceMessage(message);
+
         String time = TIME_FORMAT.format(new Date(System.currentTimeMillis()));
         if (time.length() != 12)
             time = time.substring(0, 9) + 0 + time.split(":")[3];
@@ -66,6 +68,8 @@ public class VelocityLogger implements LoggerTemplate {
 
         if (priority == LoggerPriority.DEBUG)
             return;
+
+        message = MessageTranslator.replaceMessage(message);
 
         if (message.contains("§")) {
             MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), message);
