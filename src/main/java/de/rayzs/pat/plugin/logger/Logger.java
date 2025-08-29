@@ -1,10 +1,17 @@
 package de.rayzs.pat.plugin.logger;
 
+import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.api.communication.client.ClientInfo;
+import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.logger.impl.*;
 import java.nio.charset.StandardCharsets;
 import javax.net.ssl.HttpsURLConnection;
 
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
+
 import java.net.URL;
 import java.util.*;
 import java.io.*;
@@ -20,7 +27,7 @@ public class Logger {
 
         final String version = Reflection.isProxyServer() ? "" : " " + Reflection.getRawVersionName().replace("_", ".");
 
-        LOG_HEADER = "> ProAntiTab v" + version + " [" + software + version + "]";
+        LOG_HEADER = "> ProAntiTab v" + Storage.CURRENT_VERSION + " [" + software + version + "]";
     }
 
     private final static LoggerTemplate LOGGER =
@@ -37,10 +44,6 @@ public class Logger {
         LOGGER.warn(messages);
     }
 
-    public static void debug(List<String> messages) {
-        LOGGER.debug(messages);
-    }
-
     public static void info(String message) {
         LOGGER.info(message);
     }
@@ -49,20 +52,9 @@ public class Logger {
         LOGGER.warn(message);
     }
 
-    public static void debug(String message) {
-        LOGGER.debug(message);
-    }
-
     public static String post() throws IOException {
-        LimitedList<String> clonedLogs = new LimitedList<>(LOGGER.getLogs());
-        StringBuilder textBuilder = new StringBuilder(LOG_HEADER);
 
-        clonedLogs.iterate(line -> {
-            textBuilder.append("\n");
-            textBuilder.append(line);
-        });
-
-        byte[] textInBytes = textBuilder.toString().getBytes(StandardCharsets.UTF_8);
+        byte[] textInBytes = (LOG_HEADER + "\n\n" + createInfo()).getBytes(StandardCharsets.UTF_8);
         int postDataLength = textInBytes.length;
         URL url = new URL("https://haste.rayzs.de/documents");
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -84,5 +76,81 @@ public class Logger {
         if (response == null || !response.contains("\"key\"")) return null;
         response = response.substring(response.indexOf(":") + 2, response.length() - 2);
         return "https://haste.rayzs.de/" + response + ".txt";
+    }
+
+    private static String createInfo() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("Updated: ")
+                .append(!Storage.OUTDATED)
+                .append("\n\n");
+
+        builder.append("Mode: ")
+                .append(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? "WHITELIST" : "BLACKLIST")
+                .append("\n\n");
+
+        builder.append("Plugins:")
+                .append("\n");
+
+        builder.append(" LuckPerms installed: ")
+                .append(Storage.USE_LUCKPERMS)
+                .append("\n");
+
+        builder.append(" PlaceholderAPI installed: ")
+                .append(Storage.USE_PLACEHOLDERAPI)
+                .append("\n");
+
+        builder.append(" ViaVersion installed: ")
+                .append(Storage.USE_VIAVERSION)
+                .append("\n");
+
+        if (!Reflection.isProxyServer()) {
+            builder.append("server-name: ")
+                    .append(Storage.SERVER_NAME)
+                    .append("\n");
+
+            builder.append("last-received-sync: ")
+                    .append(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED ? Storage.LAST_SYNC : "Deactivated")
+                    .append("\n");
+        }
+
+        builder.append("\ncommands: ")
+                .append(String.join(", ", Storage.Blacklist.getBlacklist().getCommands()))
+                .append("\n\n");
+
+        if (Reflection.isProxyServer()) {
+            builder.append("\nservers: ")
+                    .append(String.join(", ", Storage.getServers()))
+                    .append("\n");
+
+            builder.append("last-sent-sync: ")
+                    .append(Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED ? "Deactivated" : (System.currentTimeMillis() - Storage.LAST_SYNC))
+                    .append("\n\n");
+
+            for (ClientInfo client : Communicator.CLIENTS) {
+                builder.append("synced-server: ")
+                        .append(client.getName() + " (" + client.getSyncTime() + ")")
+                        .append(", ");
+            }
+
+            builder.append("\n\n");
+        }
+
+        builder.append("server-commands:").append("\n");
+
+        for (Map.Entry<String, GeneralBlacklist> blacklist : Storage.Blacklist.getBlacklists()) {
+            builder.append("  ")
+                    .append(blacklist.getKey()).append(": ")
+                    .append(String.join(", ", blacklist.getValue().getCommands()))
+                    .append("\n");
+        }
+
+        builder.append("\ngroups:");
+        for (Group group : GroupManager.getGroups()) {
+            builder.append("\n")
+                    .append(group.getGroupInfo());
+        }
+
+        return builder.toString();
     }
 }
