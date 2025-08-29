@@ -568,7 +568,6 @@ public class Storage {
                 listed = !listed;
             }
 
-
             if (turn) {
                 return !listed;
             } else {
@@ -604,7 +603,7 @@ public class Storage {
                 blacklists.add(BLACKLIST);
 
             for (GeneralBlacklist blacklist : blacklists) {
-                if (listed && turn) {
+                if (listed/* && turn*/) {
                     break;
                 }
 
