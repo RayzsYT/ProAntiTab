@@ -1,9 +1,7 @@
 package de.rayzs.pat.utils.group;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import de.rayzs.pat.api.storage.Storage;
@@ -55,6 +53,35 @@ public class Group implements Serializable {
         this.generalGroupBlacklist.setList(commands);
 
         loadServerBlacklist();
+    }
+
+    public String getGroupInfo() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("  groupName: ")
+                .append(groupName).append("\n")
+                .append("  priority: ")
+                .append(priority).append("\n");
+
+        builder.append("  commands: ")
+                .append(String.join(", ", getCommands()))
+                .append("\n");
+
+        builder.append("  servers:\n");
+
+        for (Map.Entry<String, GroupBlacklist> entry : groupServerBlacklist.entrySet()) {
+            builder.append("    ")
+                    .append(entry.getKey())
+                    .append(": ");
+
+            for (GroupBlacklist blacklist : getAllServerGroupBlacklist(entry.getKey())) {
+                builder.append(String.join(", ", blacklist.getCommands()));
+                builder.append(", ");
+            }
+
+            builder.append("\n");
+        }
+
+        return builder.toString();
     }
 
     private void loadServerBlacklist() {
@@ -155,7 +182,11 @@ public class Group implements Serializable {
             groupBlacklist = this.groupServerBlacklist.get(server);
         else {
             groupBlacklist = BlacklistCreator.createGroupBlacklist(this.groupName, server, ignoreExist);
-            this.groupServerBlacklist.put(server, groupBlacklist);
+
+            if (groupBlacklist != null) {
+                groupBlacklist.load();
+                this.groupServerBlacklist.put(server, groupBlacklist);
+            }
         }
 
         return groupBlacklist;
