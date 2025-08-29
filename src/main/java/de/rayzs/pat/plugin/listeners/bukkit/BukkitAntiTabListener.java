@@ -5,15 +5,12 @@ import org.bukkit.event.player.PlayerCommandSendEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
 import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import org.bukkit.entity.Player;
 import de.rayzs.pat.utils.*;
 import org.bukkit.event.*;
 import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import java.util.*;
 
 public class BukkitAntiTabListener implements Listener {
@@ -27,13 +24,11 @@ public class BukkitAntiTabListener implements Listener {
         String uuidSubstring = uuid.toString().substring(uuid.toString().length() - 5);
 
         if (Storage.USE_VELOCITY || player.isOp()) {
-            Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (Veloctiy? " + Storage.USE_VELOCITY + ". OP? " + player.isOp() + ")");
             return;
         }
 
         if (!BukkitLoader.isLoaded()) {
             event.getCommands().clear();
-            Logger.debug("Doesn't even tried to create the commands list for player with uuid " + uuidSubstring + ". (not loaded)");
             return;
         }
 
@@ -41,15 +36,13 @@ public class BukkitAntiTabListener implements Listener {
             return;
 
         if (event.getCommands().isEmpty()) {
-            Logger.debug("No available commands to filter! Ignoring rest of the code until at least one command is listed in there.");
             return;
         }
-        List<String> allCommands = getCommands();
 
+        List<String> allCommands = getCommands();
         COMMANDS_CACHE.handleCommands(allCommands);
 
         if (PermissionUtil.hasBypassPermission(player)) {
-            Logger.debug("Player with uuid " + uuidSubstring + " skipped the commands-list creation due to its permissions.");
             return;
         }
 
@@ -62,7 +55,6 @@ public class BukkitAntiTabListener implements Listener {
             return;
 
         event.getCommands().addAll(filteredSuggestionEvent.getSuggestions());
-        Logger.debug("Player with uuid " + uuidSubstring + " has a total of " + playerCommands.size() + " commands.");
     }
 
     public static List<String> getCommands() {

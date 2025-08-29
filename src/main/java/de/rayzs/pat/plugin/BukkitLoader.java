@@ -318,13 +318,8 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         if (!loaded)
             loaded = true;
 
-        if (Reflection.getMinor() >= 13) {
-
-            if (updatedList) {
-                BukkitAntiTabListener.updateCommands();
-                Logger.debug("Force server to load all players tab-completion due to received sync!");
-            }
-
+        if (Reflection.getMinor() >= 13 && updatedList) {
+            BukkitAntiTabListener.updateCommands();
         }
 
         PATEventHandler.callReceiveSyncEvents(packetBundle);
