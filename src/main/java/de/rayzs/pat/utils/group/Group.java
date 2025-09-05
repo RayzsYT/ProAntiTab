@@ -8,6 +8,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.BlacklistCreator;
 import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.utils.ExpireCache;
+import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 
@@ -66,19 +67,21 @@ public class Group implements Serializable {
                 .append(String.join(", ", getCommands()))
                 .append("\n");
 
-        builder.append("  servers:\n");
+        if (Reflection.isProxyServer()) {
+            builder.append("  servers:\n");
 
-        for (Map.Entry<String, GroupBlacklist> entry : groupServerBlacklist.entrySet()) {
-            builder.append("    ")
-                    .append(entry.getKey())
-                    .append(": ");
+            for (Map.Entry<String, GroupBlacklist> entry : groupServerBlacklist.entrySet()) {
+                builder.append("    ")
+                        .append(entry.getKey())
+                        .append(": ");
 
-            for (GroupBlacklist blacklist : getAllServerGroupBlacklist(entry.getKey())) {
-                builder.append(String.join(", ", blacklist.getCommands()));
-                builder.append(", ");
+                for (GroupBlacklist blacklist : getAllServerGroupBlacklist(entry.getKey())) {
+                    builder.append(String.join(", ", blacklist.getCommands()));
+                    builder.append(", ");
+                }
+
+                builder.append("\n");
             }
-
-            builder.append("\n");
         }
 
         return builder.toString();
