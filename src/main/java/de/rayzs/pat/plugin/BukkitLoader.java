@@ -333,6 +333,18 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         return new ArrayList<>(allowedCommands);
     }
 
+    @Override
+    public List<String> getPluginNames() {
+        List<String> pluginNames = new ArrayList<>();
+
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            PluginDescriptionFile description = plugin.getDescription();
+            pluginNames.add(description.getName() + " (" + description.getVersion() + ")");
+        }
+
+        return pluginNames;
+    }
+
     private void loadCommandMap() {
         try {
             if (Bukkit.getPluginManager() instanceof SimplePluginManager) {

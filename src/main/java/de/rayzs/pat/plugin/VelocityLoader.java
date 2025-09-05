@@ -274,6 +274,21 @@ public class VelocityLoader implements PluginLoader {
         return new ArrayList<>(server.getAllServers().stream().map(registeredServer -> registeredServer.getServerInfo().getName()).toList());
     }
 
+    @Override
+    public List<String> getPluginNames() {
+        List<String> pluginNames = new ArrayList<>();
+        for (PluginContainer plugin : server.getPluginManager().getPlugins()) {
+            PluginDescription description = plugin.getDescription();
+
+            String pluginName = description.getName().orElse("/");
+            String version = description.getVersion().orElse("/");
+
+            pluginNames.add(pluginName + " (" + version + ")");
+        }
+
+        return pluginNames;
+    }
+
     public void startUpdaterTask() {
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
 

@@ -38,4 +38,6 @@ public interface PluginLoader {
     List<String> getPlayerNames();
     List<String> getOnlinePlayerNames();
     List<String> getOfflinePlayerNames();
+
+    List<String> getPluginNames();
 }

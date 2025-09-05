@@ -87,26 +87,30 @@ public class Logger {
 
         builder.append("Mode: ")
                 .append(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? "WHITELIST" : "BLACKLIST")
-                .append("\n\n");
-
-        builder.append("Plugins:")
                 .append("\n");
 
-        builder.append(" LuckPerms installed: ")
+        builder.append("Installed: \n  ")
+                .append(String.join("\n  ", Storage.getLoader().getPluginNames()))
+                .append("\n\n");
+
+        builder.append("Detected supported plugins:")
+                .append("\n");
+
+        builder.append(" LuckPerms: ")
                 .append(Storage.USE_LUCKPERMS)
                 .append("\n");
 
-        builder.append(" PlaceholderAPI installed: ")
+        builder.append(" PlaceholderAPI: ")
                 .append(Storage.USE_PLACEHOLDERAPI)
                 .append("\n");
 
-        builder.append(" ViaVersion installed: ")
+        builder.append(" ViaVersion: ")
                 .append(Storage.USE_VIAVERSION)
-                .append("\n");
+                .append("\n\n");
 
         if (!Reflection.isProxyServer()) {
             builder.append("server-name: ")
-                    .append(Storage.SERVER_NAME)
+                    .append(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED ? Storage.SERVER_NAME : "Not connected to a proxy using PAT")
                     .append("\n");
 
             builder.append("last-received-sync: ")
@@ -136,13 +140,15 @@ public class Logger {
             builder.append("\n\n");
         }
 
-        builder.append("server-commands:").append("\n");
+        if (Reflection.isProxyServer()) {
+            builder.append("server-commands:").append("\n");
 
-        for (Map.Entry<String, GeneralBlacklist> blacklist : Storage.Blacklist.getBlacklists()) {
-            builder.append("  ")
-                    .append(blacklist.getKey()).append(": ")
-                    .append(String.join(", ", blacklist.getValue().getCommands()))
-                    .append("\n");
+            for (Map.Entry<String, GeneralBlacklist> blacklist : Storage.Blacklist.getBlacklists()) {
+                builder.append("  ")
+                        .append(blacklist.getKey()).append(": ")
+                        .append(String.join(", ", blacklist.getValue().getCommands()))
+                        .append("\n");
+            }
         }
 
         builder.append("\ngroups:");
