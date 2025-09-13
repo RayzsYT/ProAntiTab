@@ -185,7 +185,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     @Override
     public boolean doesPlayerExist(String playerName) {
-        return ArrayUtils.containsIgnoreCase(getPlayerNames(), playerName);
+        return isPlayerOnline(playerName) || ArrayUtils.containsIgnoreCase(getPlayerNames(), playerName);
     }
 
     @Override
