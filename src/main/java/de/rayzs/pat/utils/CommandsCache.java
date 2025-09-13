@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 
 public class CommandsCache {
 
@@ -72,11 +73,22 @@ public class CommandsCache {
 
     public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid, String serverName) {
         List<String> playerCommands = new LinkedList<>(unfilteredCommands);
-        List<String> localFilteredCommands = filteredCommands == null ? null : new LinkedList<>(filteredCommands);
+        List<String> localFilteredCommands = filteredCommands == null ? null : new LinkedList<>();
 
         if (localFilteredCommands == null)
             return playerCommands;
-        
+
+
+        final int max = filteredCommands.size();
+        for (int i = 0; i < max; i++) {
+            try {
+                String command = filteredCommands.get(i);
+                filteredCommands.add(command);
+            } catch (ArrayIndexOutOfBoundsException outOfBoundsException) {
+                Logger.warning("Array is out of bounds! " + outOfBoundsException.getMessage());
+            }
+        }
+
 
         boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(targetObj);
 
