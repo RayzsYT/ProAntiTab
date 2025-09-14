@@ -1,9 +1,6 @@
 package de.rayzs.pat.utils.permission;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -20,7 +17,8 @@ public class PermissionUtil {
     }
 
     public static void reloadPermissions() {
-        MAP.keySet().forEach(PermissionUtil::reloadPermissions);
+        List<UUID> uuids = new ArrayList<>(MAP.keySet());
+        uuids.forEach(PermissionUtil::reloadPermissions);
     }
 
     public static void reloadPermissions(UUID uuid) {
