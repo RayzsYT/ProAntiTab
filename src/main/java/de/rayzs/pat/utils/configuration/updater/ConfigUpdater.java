@@ -13,8 +13,7 @@ import java.util.*;
 
 public class ConfigUpdater {
 
-    private static List<String> NEWEST_CONFIG_INPUT = new ArrayList<>(),
-                                MISSING_PARTS = new ArrayList<>();
+    private static final List<String> MISSING_PARTS = new ArrayList<>();
 
     private static boolean LOADED = false, AUTO_UPDATE = false, ANNOUNCE = false;
 
@@ -22,19 +21,19 @@ public class ConfigUpdater {
             HOW_TO_READ_FILE_NAME = "How-To-Read.txt";
 
     public static void initialize() {
-        try {
-            MISSING_PARTS.clear();
+        LOADED = false;
+        MISSING_PARTS.clear();
 
+        try {
             ConfigurationBuilder config =  Configurator.get("config");
 
             ANNOUNCE = (boolean) config.getOrSet("updater.announce-missing-parts", true);
             AUTO_UPDATE = (boolean) config.getOrSet("updater.auto-update-config", false);
 
+            LOADED = true;
         } catch (Exception exception) {
             Logger.warning("Failed to find section 'updater.auto-config-updater' in config.yml!");
         }
-
-        LOADED = true;
     }
 
     public static boolean shouldAutoUpdate() {
@@ -68,9 +67,6 @@ public class ConfigUpdater {
 
         if (!ANNOUNCE)
             return;
-
-        List<String> configInput = new LinkedList<>(Arrays.asList("# WARNING: This file is auto generated and its sole purpose is to be used as comparison!\n# WARNING: It will be deleted once this file is no longer needed.", " ", " "));
-        configInput.addAll(NEWEST_CONFIG_INPUT);
 
         Configurator.createResourcedFile(
                 "files\\" + (Reflection.isProxyServer() ? "proxy" : "bukkit") + "-config.yml",
