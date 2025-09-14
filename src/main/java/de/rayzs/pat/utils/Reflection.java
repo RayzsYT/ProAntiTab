@@ -46,7 +46,7 @@ public class Reflection {
             }
         }
 
-        if(proxy) {
+        if (proxy) {
             try {
                 Class.forName("com.velocitypowered.api.proxy.ProxyServer");
                 velocity = true;
@@ -56,6 +56,10 @@ public class Reflection {
         if (proxy) version = Version.UNKNOWN;
 
         oldChannelMethod = folia || paper && Reflection.isWeird();
+    }
+
+    public static void toggleInjectionMethod() {
+        oldChannelMethod = !oldChannelMethod;
     }
 
 
