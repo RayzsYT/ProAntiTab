@@ -47,8 +47,8 @@ public class BukkitPacketAnalyzer {
 
         try {
             Channel channel = Reflection.getPlayerChannel(player);
+
             if (channel == null) {
-                Logger.warning("Failed to inject " + player.getName() + "! Channel is null.");
                 return false;
             }
 
@@ -57,8 +57,22 @@ public class BukkitPacketAnalyzer {
 
             channel.pipeline().addBefore(BukkitPacketAnalyzer.PIPELINE_NAME, BukkitPacketAnalyzer.HANDLER_NAME, new PacketDecoder(player));
             BukkitPacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+            Reflection.toggleInjectionMethod();
+
+            Logger.info("Injection failed. Switching to secondary injection method.");
+            boolean success = inject(player);
+
+            if (success) {
+                Logger.info("Secondary injection method was successful.");
+            } else {
+                Logger.warning("Secondary injection method failed!");
+            }
+
+            return success;
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
             return false;
 
         }
