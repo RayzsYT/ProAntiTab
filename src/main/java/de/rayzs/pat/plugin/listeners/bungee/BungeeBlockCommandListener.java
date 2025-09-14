@@ -38,7 +38,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
-        command = command.toLowerCase();
+        //command = command.toLowerCase();
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(
                 Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
