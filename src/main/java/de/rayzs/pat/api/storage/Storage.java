@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
@@ -28,19 +29,6 @@ import de.rayzs.pat.api.storage.config.messages.ReloadSection;
 import de.rayzs.pat.api.storage.config.messages.ServerListSection;
 import de.rayzs.pat.api.storage.config.messages.StatsSection;
 import de.rayzs.pat.api.storage.config.messages.UpdatePermissionsSection;
-import de.rayzs.pat.api.storage.config.settings.AutoLowercaseCommandsSection;
-import de.rayzs.pat.api.storage.config.settings.BlockNamespaceCommandsSection;
-import de.rayzs.pat.api.storage.config.settings.CancelCommandSection;
-import de.rayzs.pat.api.storage.config.settings.CustomBrandSection;
-import de.rayzs.pat.api.storage.config.settings.CustomPluginsSection;
-import de.rayzs.pat.api.storage.config.settings.CustomProtocolPingSection;
-import de.rayzs.pat.api.storage.config.settings.CustomUnknownCommandSection;
-import de.rayzs.pat.api.storage.config.settings.CustomVersionSection;
-import de.rayzs.pat.api.storage.config.settings.DisableSyncSection;
-import de.rayzs.pat.api.storage.config.settings.HandleThroughProxySection;
-import de.rayzs.pat.api.storage.config.settings.PatchExploitSection;
-import de.rayzs.pat.api.storage.config.settings.TurnBlacklistToWhitelistSection;
-import de.rayzs.pat.api.storage.config.settings.UpdateSection;
 import de.rayzs.pat.api.storage.placeholders.commands.general.ListCommandsPlaceholder;
 import de.rayzs.pat.api.storage.placeholders.commands.general.ListReversedCommandsPlaceholder;
 import de.rayzs.pat.api.storage.placeholders.commands.general.ListSizeCommandsPlaceholder;
@@ -302,6 +290,7 @@ public class Storage {
             public static CustomProtocolPingSection CUSTOM_PROTOCOL_PING = new CustomProtocolPingSection();
             public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
             public static TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
+            public static BaseCommandCaseSensitiveSection BASE_COMMAND_CASE_SENSITIVE = new BaseCommandCaseSensitiveSection();
             public static UpdateSection UPDATE = new UpdateSection();
 
             public static void initialize() {}

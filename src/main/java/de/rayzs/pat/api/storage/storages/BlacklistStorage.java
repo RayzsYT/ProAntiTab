@@ -21,6 +21,8 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public boolean isListed(String command, boolean ignoreColons) {
+        final boolean caseSensitive = Storage.ConfigSections.Settings.BASE_COMMAND_CASE_SENSITIVE.ENABLED;
+
         if (commands == null || command.isEmpty()) {
             return false;
         }
@@ -40,8 +42,15 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
                     command = command.substring(command.indexOf(':'));
             }
 
-            if (StringUtils.getFirstArg(listedCommand).equalsIgnoreCase(StringUtils.getFirstArg(command)))
-                return true;
+            if (caseSensitive) {
+                if (StringUtils.getFirstArg(listedCommand).equals(StringUtils.getFirstArg(command))) {
+                    return true;
+                }
+            } else {
+                if (StringUtils.getFirstArg(listedCommand).equalsIgnoreCase(StringUtils.getFirstArg(command))) {
+                    return true;
+                }
+            }
         }
 
         return false;
