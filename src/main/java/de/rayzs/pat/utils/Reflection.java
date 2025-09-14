@@ -25,10 +25,10 @@ public class Reflection {
             proxy = false;
         } catch (Throwable ignored) { proxy = true; }
 
-        if(!proxy) {
+        if (!proxy) {
             try {
-                Class.forName("com.destroystokyo.paper.proxy.VelocityProxy");
-                folia = versionName.toLowerCase().contains("folia");
+                Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+                folia = true;
             } catch (Throwable throwable) {
                 folia = false;
             }
