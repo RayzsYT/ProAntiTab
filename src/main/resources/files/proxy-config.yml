@@ -40,6 +40,14 @@ disable-sync: false
 # Enabling this will disable ALL commands except for those that are in the (group-)list.
 turn-blacklist-to-whitelist: true
 
+# This decides whether PAT ignores or detects whether a command is written in upper/-lower cased letters.
+# Here are a few examples if this option is enabled:
+# Example with allowing the command "HelP"
+#   /help --> Blocked
+#   /Help --> Blocked
+#   /HelP --> Allowed
+base-command-case-sensitive: true
+
 # Here you can customize the server version that is displayed on a ping. (The text at the player-count)
 custom-protocol-ping:
   enabled: true
