@@ -90,7 +90,7 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
 
         if (fileName.equals("config")) {
             if (!ConfigUpdater.shouldAutoUpdate()) {
-                ConfigUpdater.addMissingPart(path + "." + target);
+                ConfigUpdater.addMissingPart((!path.isBlank() ? path + "." : "") + target);
                 return object;
             }
 
