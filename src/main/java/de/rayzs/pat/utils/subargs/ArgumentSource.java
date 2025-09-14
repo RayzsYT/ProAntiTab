@@ -12,9 +12,12 @@ public class ArgumentSource {
     public final HashMap<String, ArgumentStack> ARGUMENT_STACKS = new HashMap<>();
 
     public ArgumentBuilder getGeneralArgument() {
+        /* Experimental removal
         ArgumentBuilder copiedGeneralArguments = new ArgumentBuilder(this);
         GENERAL.getInputs().forEach(copiedGeneralArguments::buildArgumentStacks);
         return copiedGeneralArguments;
+         */
+        return GENERAL;
     }
 
     public List<String> getOptions(String input) {
