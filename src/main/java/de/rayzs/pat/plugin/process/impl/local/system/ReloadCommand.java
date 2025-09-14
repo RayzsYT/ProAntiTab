@@ -26,6 +26,7 @@ public class ReloadCommand extends ProCommand {
         boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !proxy;
         sender.sendMessage(Storage.ConfigSections.Messages.RELOAD.LOADING);
 
+        ConfigUpdater.initialize();
         Storage.loadAll(Reflection.isProxyServer() || !backend);
 
         CustomServerBrand.initialize();
@@ -37,13 +38,12 @@ public class ReloadCommand extends ProCommand {
             BackendUpdater.start();
         }
 
-        ConfigUpdater.broadcastMissingParts();
-
         if (!backend) {
             Storage.handleChange();
         }
 
-        ConfigUpdater.initialize();
+        ConfigUpdater.broadcastMissingParts();
+
         Storage.getLoader().handleReload();
 
         sender.sendMessage(Storage.ConfigSections.Messages.RELOAD.DONE);
