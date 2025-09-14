@@ -11,12 +11,12 @@ public class BaseCommandCaseSensitiveSection extends ConfigStorage {
     public boolean ENABLED;
 
     public BaseCommandCaseSensitiveSection() {
-        super("");
+        super("base-command-case-sensitive");
     }
 
     @Override
     public void load() {
         super.load();
-        ENABLED = new ConfigSectionHelper<Boolean>(this, "base-command-case-sensitive", true).getOrSet();
+        ENABLED = new ConfigSectionHelper<Boolean>(this, null, true).getOrSet();
     }
 }
