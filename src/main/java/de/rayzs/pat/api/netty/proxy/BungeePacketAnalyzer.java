@@ -47,9 +47,13 @@ public class BungeePacketAnalyzer {
 
     private static Class<?> channelWrapperClass, serverConnectionClass;
 
-    private static final List<String> PROXY_COMMANDS;
+    private static List<String> PROXY_COMMANDS;
 
     static {
+        loadProxyCommands();
+    }
+
+    public static void loadProxyCommands() {
         PROXY_COMMANDS = ProxyServer.getInstance().getPluginManager().getCommands().stream().map(entry -> {
             String key = entry.getKey();
             return key.startsWith("/") ? key.substring(1) : key;
@@ -146,7 +150,7 @@ public class BungeePacketAnalyzer {
 
         CommandsCache commandsCache = cache.get(serverName);
 
-        List<String> commandsAsString = new ArrayList<String>(PROXY_COMMANDS);
+        List<String> commandsAsString = new ArrayList<>(PROXY_COMMANDS);
         commandsAsString.addAll(helper.getChildrenNames());
 
         commandsCache.handleCommands(commandsAsString, serverName);
@@ -163,14 +167,16 @@ public class BungeePacketAnalyzer {
             if (commands.getRoot().getChild(command.getKey()) != null)
                 continue;
 
-            if (!command.getValue().hasPermission(player))
+            if (!command.getValue().hasPermission(player)) {
                 continue;
+            }
 
             String commandName = command.getKey();
             commandName = commandName.startsWith("/") ? commandName.substring(1) : commandName;
 
-            if (!playerCommands.contains(commandName))
+            if (!playerCommands.contains(commandName)) {
                 continue;
+            }
 
             CommandNode dummy = createDummyCommandNode(command.getKey());
             commands.getRoot().addChild(dummy);
