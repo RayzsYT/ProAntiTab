@@ -97,6 +97,8 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         ConfigUpdater.broadcastMissingParts();
         ActionHandler.initialize();
         SubArgsModule.initialize();
+
+        ProxyServer.getInstance().getScheduler().schedule(this, BungeePacketAnalyzer::loadProxyCommands, 1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -113,7 +115,9 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     @Override
-    public void handleReload() {}
+    public void handleReload() {
+        BungeePacketAnalyzer.loadProxyCommands();
+    }
 
     @Override
     public boolean doesCommandExist(String command) {
