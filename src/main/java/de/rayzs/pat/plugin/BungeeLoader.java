@@ -98,7 +98,10 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         ActionHandler.initialize();
         SubArgsModule.initialize();
 
-        ProxyServer.getInstance().getScheduler().schedule(this, BungeePacketAnalyzer::loadProxyCommands, 1, TimeUnit.SECONDS);
+        // Reload proxy commands after 1, 5, and 15 seconds.
+        for (int i : new Integer[] { 1, 5, 15 }) {
+            ProxyServer.getInstance().getScheduler().schedule(this, BungeePacketAnalyzer::loadProxyCommands, i, TimeUnit.SECONDS);
+        }
     }
 
     @Override
