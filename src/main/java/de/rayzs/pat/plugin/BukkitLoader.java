@@ -35,7 +35,9 @@ import java.util.*;
 
 public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
-    private static List<String> commands = new ArrayList<>(), allowedCommands = new ArrayList<>();
+    private static List<String> commands = new ArrayList<>(),
+            allowedCommands = new ArrayList<>(),
+            disallowedCommands = new ArrayList<>();
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
@@ -333,6 +335,10 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         return new ArrayList<>(allowedCommands);
     }
 
+    public static List<String> getDisallowedCommands() {
+        return disallowedCommands;
+    }
+
     @Override
     public List<String> getPluginNames() {
         List<String> pluginNames = new ArrayList<>();
@@ -411,6 +417,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         BukkitLoader.commands = result;
         BukkitLoader.allowedCommands = allowedCommands;
+        BukkitLoader.disallowedCommands = commands.stream().filter(command -> !allowedCommands.contains(command)).toList();
     }
 
     public static boolean useSuggestions() {
