@@ -107,7 +107,7 @@ public class AddCommand extends ProCommand {
             if (Reflection.isProxyServer())
                 return null;
 
-            return BukkitLoader.getAllowedCommands();
+            return BukkitLoader.getDisallowedCommands();
         }
 
         String fullString = String.join(" ", args);
