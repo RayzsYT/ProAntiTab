@@ -21,7 +21,6 @@ import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.rayzs.pat.plugin.listeners.velocity.*;
 import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.ConnectionBuilder;
 import de.rayzs.pat.utils.VersionComparer;
 import de.rayzs.pat.plugin.logger.Logger;
 import com.velocitypowered.api.plugin.*;
@@ -38,7 +37,7 @@ import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "2.0.17",
+version = "2.0.18",
 authors = "Rayzs_YT",
 description = "Hide more than just your plugins. Hide almost everything!",
 url = "https://www.rayzs.de/products/proantitab/page",
