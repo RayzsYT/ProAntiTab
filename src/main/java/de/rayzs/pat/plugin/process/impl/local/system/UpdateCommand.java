@@ -1,4 +1,4 @@
-package de.rayzs.pat.plugin.process.impl.local.info;
+package de.rayzs.pat.plugin.process.impl.local.system;
 
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.utils.Reflection;
