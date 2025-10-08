@@ -9,6 +9,7 @@ import de.rayzs.pat.plugin.process.impl.local.modify.list.ListPrioritiesCommand;
 import de.rayzs.pat.plugin.process.impl.local.system.NotifyCommand;
 import de.rayzs.pat.plugin.process.impl.local.system.PostDebugCommand;
 import de.rayzs.pat.plugin.process.impl.local.system.ReloadCommand;
+import de.rayzs.pat.plugin.process.impl.local.system.UpdateCommand;
 import de.rayzs.pat.plugin.process.impl.server.ServAddCommand;
 import de.rayzs.pat.plugin.process.impl.server.ServClearCommand;
 import de.rayzs.pat.plugin.process.impl.server.ServRemoveCommand;
