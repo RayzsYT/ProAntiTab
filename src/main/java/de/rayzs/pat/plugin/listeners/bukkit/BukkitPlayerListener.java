@@ -55,7 +55,7 @@ public class BukkitPlayerListener implements Listener {
 
         }
 
-        if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
+        if (Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
             PATScheduler.createScheduler(() -> {
                 if (player.isOnline()) {
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
@@ -71,14 +71,14 @@ public class BukkitPlayerListener implements Listener {
 
         BukkitPacketAnalyzer.uninject(player.getUniqueId());
         PermissionUtil.resetPermissions(player.getUniqueId());
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
     }
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
 
-        CustomServerBrand.sendBrandToPlayer(player);
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
+            CustomServerBrand.sendBrandToPlayer(player);
+        }
     }
 }
