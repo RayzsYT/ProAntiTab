@@ -55,7 +55,6 @@ handle-through-proxy:
 # Enabling this will disable ALL commands except for those that are in the (group-)list.
 turn-blacklist-to-whitelist: true
 
-
 # This decides whether PAT ignores or detects whether a command is written in upper/-lower cased letters.
 # Here are a few examples if this option is enabled:
 # Example with allowing the command "HelP"
