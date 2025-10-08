@@ -91,7 +91,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             BukkitPacketAnalyzer.injectAll();
         } else BackendUpdater.handle();
 
-        manager.registerEvents(new BukkitPlayerConnectionListener(), this);
+        manager.registerEvents(new BukkitPlayerListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
 
         if (Reflection.getMinor() >= 13) {
