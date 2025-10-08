@@ -6,6 +6,7 @@ import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.Storage;
@@ -79,6 +80,14 @@ public class BukkitPlayerListener implements Listener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
             CustomServerBrand.sendBrandToPlayer(player);
+        }
+
+        if (Storage.ConfigSections.Settings.UPDATE_COMMANDS_PER_WORLD.ENABLED) {
+            CommandSender sender = CommandSenderHandler.from(player);
+
+            assert sender != null;
+            PermissionUtil.reloadPermissions(sender);
+            BukkitAntiTabListener.handleTabCompletion(player);
         }
     }
 }
