@@ -9,7 +9,7 @@ public class UpdateCommandsPerWorldSection extends ConfigStorage {
     public boolean ENABLED;
 
     public UpdateCommandsPerWorldSection() {
-        super("update-commands-per-worLd");
+        super("update-commands-per-world");
     }
 
     @Override
@@ -19,6 +19,6 @@ public class UpdateCommandsPerWorldSection extends ConfigStorage {
         if (Reflection.isProxyServer())
             return;
 
-        ENABLED = new ConfigSectionHelper<Boolean>(this, null, true).getOrSet();
+        ENABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
     }
 }
