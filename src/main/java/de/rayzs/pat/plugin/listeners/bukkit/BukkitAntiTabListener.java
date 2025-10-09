@@ -69,14 +69,6 @@ public class BukkitAntiTabListener implements Listener {
 
     // --------------- LUCKPERMS SECTIONS --------------- //
 
-    public static void luckpermsNetworkSync() {
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), PermissionUtil::reloadPermissions, 40);
-    }
-
-    public static void luckpermsNetworkUserSync(UUID uuid) {
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> PermissionUtil.reloadPermissions(uuid));
-    }
-
     public static void updateCommands() {
         Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::updateCommands);
     }
