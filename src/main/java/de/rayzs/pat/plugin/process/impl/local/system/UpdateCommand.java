@@ -35,7 +35,7 @@ public class UpdateCommand extends ProCommand {
                 }
             });
 
-            if (!Reflection.isProxyServer()) {
+            if (!Reflection.isProxyServer() && Reflection.getMinor() >= 13) {
                 BukkitAntiTabListener.handleTabCompletion();
             }
 
@@ -64,7 +64,7 @@ public class UpdateCommand extends ProCommand {
 
             PermissionUtil.reloadPermissions(targetSender);
 
-            if (!Reflection.isProxyServer()) {
+            if (!Reflection.isProxyServer() && Reflection.getMinor() >= 13) {
                 BukkitAntiTabListener.handleTabCompletion(uuid);
             }
 
