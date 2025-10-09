@@ -217,7 +217,17 @@ public class Storage {
 
         PermissionUtil.reloadPermissions();
 
-        if (Reflection.getMinor() >= 13) {
+        if (Reflection.getMinor() < 13) {
+            final List<UUID> playerIds = Storage.getLoader().getPlayerIds();
+            final List<String> commands = new ArrayList<>(Blacklist.BLACKLIST.getCommands());
+
+            playerIds.forEach(playerId -> {
+                List<String> playerCommands = new ArrayList<>(commands);
+                playerCommands.addAll(SubArgsModule.getGroupCommands(playerId));
+
+                PATEventHandler.callUpdatePlayerCommandsEvents(playerId, playerCommands, true);
+            });
+        } else {
             BukkitAntiTabListener.handleTabCompletion();
         }
     }
