@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import de.rayzs.pat.utils.StringUtils;
 import org.bukkit.entity.Player;
 
 import de.rayzs.pat.api.event.PATEventHandler;
@@ -13,7 +13,6 @@ import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketHandler;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
 
@@ -34,75 +33,78 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
 
     @Override
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
-        String input = BukkitPacketAnalyzer.getPlayerInput(player);
+        final String rawInput = BukkitPacketAnalyzer.getPlayerInput(player);
 
-        if(input == null)
+        if(rawInput == null)
             return false;
 
-        boolean cancelsBeforeHand;
-        int spaces = 0;
+        String input = rawInput;
+        boolean cancelsBeforeHand = false;
 
-        if (input.startsWith("/")) {
-            input = input.replace("/", "");
+        if (!input.startsWith("/")) {
+            return true;
+        }
 
-            if (input.contains(" ")) {
-                String[] split = input.split(" ");
-                spaces = split.length;
-                if (spaces > 0)
-                    input = split[0];
-            }
+        input = input.substring(1);
 
-            cancelsBeforeHand = Storage.Blacklist.canPlayerAccessTab(player, input);
-            
-            if (!cancelsBeforeHand) 
-                cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
-        } else return true;
+        final boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player);
+        final boolean spaces = input.contains(" ");
+
+        if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(input) && !doesBypassNamespace) {
+            cancelsBeforeHand = true;
+        }
+
+        if (!cancelsBeforeHand && !input.isEmpty()) {
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.getFirstArg(input));
+        }
+
+        if (!cancelsBeforeHand) {
+            cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input);
+        }
 
         for (Field field : Reflection.getFields(packetObj)) {
             field.setAccessible(true);
             Object result = field.get(packetObj);
 
-            if (!(result instanceof String[]))
+            if (!(result instanceof String[])) {
                 continue;
-
-            List<String> newResultList = new ArrayList<>();
-            String[] tR = (String[]) result;
-
-            String tempName;
-
-            boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player);
-
-            if (spaces == 0) {
-                for (String s : tR) {
-                    if (!BukkitLoader.isLoaded())
-                        continue;
-
-                    if (!s.startsWith("/")) {
-                        newResultList.add(s);
-                        continue;
-                    }
-
-                    tempName = s.replaceFirst("/", "");
-
-                    if (!doesBypassNamespace && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(tempName))
-                        continue;
-
-                    if (!Storage.Blacklist.canPlayerAccessTab(player, tempName))
-                        newResultList.add(s);
-                }
-            } else {
-                if (!cancelsBeforeHand) {
-                    FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), input, Arrays.asList(tR));
-
-                    if (!filteredTabCompletionEvent.isCancelled()) {
-                        List<String> suggestions = Arrays.stream(tR).filter(s -> filteredTabCompletionEvent.getCompletion().contains(s)).collect(Collectors.toList());
-                        newResultList.addAll(suggestions);
-                    }
-
-                }
             }
 
-            field.set(packetObj, newResultList.toArray(new String[0]));
+            String[] tR = (String[]) result;
+            List<String> suggestions = new ArrayList<>(Arrays.asList(tR));
+
+            if (spaces) {
+
+                if (cancelsBeforeHand) {
+                    suggestions.clear();
+                    field.set(packetObj, suggestions.toArray(new String[0]));
+                    return true;
+                }
+
+                FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawInput, new ArrayList<>(suggestions));
+
+                if (filteredTabCompletionEvent.isCancelled()) {
+                    suggestions.clear();
+                } else {
+                    suggestions.removeIf(s -> !filteredTabCompletionEvent.getCompletion().contains(s));
+                }
+
+            } else {
+                suggestions.removeIf(s -> {
+                    String cpy = s;
+                    if (cpy.startsWith("/")) {
+                        cpy = cpy.substring(1);
+                    }
+
+                    if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(cpy) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(cpy)) {
+                        return false;
+                    }
+
+                    return !Storage.Blacklist.canPlayerAccessTab(player, cpy);
+                });
+            }
+
+            field.set(packetObj, suggestions.toArray(new String[0]));
         }
 
         return true;
