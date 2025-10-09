@@ -29,9 +29,7 @@ public class LuckPermsAdapter {
         eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeMutateEvent.class, LuckPermsAdapter::onNoteMutate);
 
         if (!Reflection.isProxyServer()) {
-
-            if (BukkitLoader.useSuggestions())
-                eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitAntiTabListener.luckpermsNetworkSync());
+            eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitLoader.delayedPermissionsReload());
 
         } else {
 
@@ -107,10 +105,7 @@ public class LuckPermsAdapter {
             UUID uuid = user.getUniqueId();
 
             if (!Reflection.isProxyServer()) {
-
-                if (Reflection.getMinor() >= 13)
-                    BukkitAntiTabListener.luckpermsNetworkUserSync(user.getUniqueId());
-
+                BukkitLoader.userPermissionsReload(user.getUniqueId());
                 return;
             }
 
