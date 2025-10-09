@@ -22,6 +22,7 @@ import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.response.action.ActionHandler;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.scheduler.*;
@@ -32,6 +33,7 @@ import org.bukkit.command.*;
 import org.bukkit.plugin.*;
 import org.bukkit.Bukkit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
@@ -207,7 +209,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     @Override
     public List<UUID> getPlayerIds() {
-        return null;
+        return Bukkit.getOnlinePlayers().stream().map(Entity::getUniqueId).collect(Collectors.toList());
     }
 
     @Override
@@ -244,6 +246,14 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     @Override
     public List<String> getServerNames() {
         return List.of();
+    }
+
+    public static void delayedPermissionsReload() {
+        PATScheduler.createScheduler(PermissionUtil::reloadPermissions, 40);
+    }
+
+    public static void userPermissionsReload(UUID uuid) {
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> PermissionUtil.reloadPermissions(uuid));
     }
 
     public void startUpdaterTask() {
