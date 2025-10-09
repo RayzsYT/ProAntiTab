@@ -6,6 +6,7 @@ import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -17,21 +18,29 @@ import org.bukkit.event.player.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class BukkitPlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
+        final UUID uuid = player.getUniqueId();
+
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
-        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             BackendUpdater.handle();
+        }
 
         PermissionUtil.setPlayerPermissions(player.getUniqueId());
         CustomServerBrand.preparePlayer(player);
 
-        if (CustomServerBrand.isEnabled())
+        if (CustomServerBrand.isEnabled()) {
             CustomServerBrand.sendBrandToPlayer(player);
+        }
 
         if (!Storage.USE_LUCKPERMS && !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             PATScheduler.createScheduler(() -> {
@@ -39,12 +48,14 @@ public class BukkitPlayerListener implements Listener {
 
                 assert sender != null;
                 PermissionUtil.reloadPermissions(sender);
-                BukkitAntiTabListener.handleTabCompletion(player.getUniqueId());
+
+                if (Reflection.getMinor() >= 13) {
+                    BukkitAntiTabListener.handleTabCompletion(player.getUniqueId());
+                }
             }, 20);
         }
 
         if (!BukkitPacketAnalyzer.inject(player)) {
-
             PATScheduler.createScheduler(() -> {
                 if (player.isOnline()) {
                     if (!BukkitPacketAnalyzer.inject(player)) {
@@ -53,7 +64,13 @@ public class BukkitPlayerListener implements Listener {
                     }
                 }
             }, 10);
+        }
 
+        if (Reflection.getMinor() < 13) {
+            List<String> playerCommands = new ArrayList<>(SubArgsModule.getServerCommands(uuid));
+            playerCommands.addAll(SubArgsModule.getGroupCommands(uuid));
+
+            PATEventHandler.callUpdatePlayerCommandsEvents(uuid, playerCommands, false);
         }
 
         if (Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
@@ -87,7 +104,10 @@ public class BukkitPlayerListener implements Listener {
 
             assert sender != null;
             PermissionUtil.reloadPermissions(sender);
-            BukkitAntiTabListener.handleTabCompletion(player);
+
+            if (Reflection.getMinor() >= 13) {
+                BukkitAntiTabListener.handleTabCompletion(player);
+            }
         }
     }
 }
