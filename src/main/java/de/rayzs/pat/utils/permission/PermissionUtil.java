@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.permission;
 import java.util.*;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.adapter.GroupManagerAdapter;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
@@ -57,6 +58,8 @@ public class PermissionUtil {
     public static void setPlayerPermissions(CommandSender sender) {
         if (Storage.USE_LUCKPERMS) {
             LuckPermsAdapter.setPermissions(sender.getUniqueId());
+        } else if (Storage.USE_GROUPMANAGER) {
+            GroupManagerAdapter.setPermissions(sender.getUniqueId());
         } else {
             GroupManager.getGroups().forEach(group -> group.hasPermission(sender));
         }
@@ -65,6 +68,8 @@ public class PermissionUtil {
     public static void setPlayerPermissions(UUID uuid) {
         if (Storage.USE_LUCKPERMS) {
             LuckPermsAdapter.setPermissions(uuid);
+        } else if (Storage.USE_GROUPMANAGER) {
+            GroupManagerAdapter.setPermissions(uuid);
         } else {
             GroupManager.getGroups().forEach(group -> group.hasPermission(uuid));
         }

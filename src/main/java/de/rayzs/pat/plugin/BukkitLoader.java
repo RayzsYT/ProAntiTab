@@ -5,6 +5,7 @@ import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
+import de.rayzs.pat.utils.adapter.GroupManagerAdapter;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.group.TinyGroup;
@@ -111,6 +112,12 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
             LuckPermsAdapter.initialize();
+            Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
+        }
+
+        final Plugin groupManagerPlugin = getServer().getPluginManager().getPlugin("GroupManager");
+        if (groupManagerPlugin != null) {
+            GroupManagerAdapter.initialize(groupManagerPlugin);
             Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
         }
 

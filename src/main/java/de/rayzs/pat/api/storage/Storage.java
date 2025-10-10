@@ -70,7 +70,7 @@ public class Storage {
     public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
     public static Object PLUGIN_OBJECT;
-    public static boolean USE_LUCKPERMS = false, USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false, USE_VELOCITY = false, USE_SIMPLECLOUD;
+    public static boolean USE_LUCKPERMS = false, USE_GROUPMANAGER = false, USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false, USE_VELOCITY = false, USE_SIMPLECLOUD;
     public static long LAST_SYNC = System.currentTimeMillis();
 
     public static void initialize(PluginLoader loader, String currentVersion) {
