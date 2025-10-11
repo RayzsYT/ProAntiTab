@@ -25,50 +25,56 @@ public class ResponseHandler {
     }
 
     public static String replaceArgsVariables(String input, String command) {
-        if (!input.contains(" "))
-            return input;
+        final String[] commandSplit = command.contains(" ") ? command.split(" ") : new String[] { command };
+        final String[] inputSplit = input.contains(" ") ? input.split(" ") : new String[] { input };
 
-        String[] commandSplit = command.contains(" ") ? command.split(" ") : new String[]{command};
-        String[] split = input.split(" ");
+        final StringBuilder output = new StringBuilder();
+        final int commandLength = commandSplit.length;
 
-        for (int i = 0; i < split.length; i++) {
-            String part = split[i];
+        for (int i = 0; i < inputSplit.length; i++) {
+            String part = inputSplit[i];
 
-            if (! (part.startsWith("%args[") && part.endsWith("]%")))
+            if (i > 0) {
+                output.append(" ");
+            }
+
+            if (! (part.startsWith("%args[") && part.endsWith("]%"))) {
+                output.append(part);
                 continue;
+            }
 
             part = part.substring(part.indexOf('[') + 1, part.lastIndexOf(']'));
 
-            int length = commandSplit.length, fromIndex, toIndex;
+            int fromIndex, toIndex;
 
-            if (part.contains("-")) {
-                String[] indexSplit = part.split("-");
+            try {
+                if (part.contains("-")) {
+                    final String[] partSplit = part.split("-");
+                    fromIndex = Integer.parseInt(partSplit[0]);
+                    toIndex = Integer.parseInt(partSplit[1]);
+                } else if (part.startsWith("_")) {
+                    final String[] partSplit = part.split("_");
+                    fromIndex = 0;
+                    toIndex = Integer.parseInt(partSplit[1]);
+                } else if (part.endsWith("_")) {
+                    final String[] partSplit = part.split("_");
+                    fromIndex = Integer.parseInt(partSplit[0]);
+                    toIndex = commandLength + 1;
+                } else {
+                    fromIndex = Integer.parseInt(part);
+                    toIndex = fromIndex;
+                }
 
-                fromIndex = Integer.parseInt(indexSplit[0]) - 1;
-                toIndex = Integer.parseInt(indexSplit[1]);
-            } else {
-                fromIndex = Integer.parseInt(part);
-                toIndex = fromIndex;
+                fromIndex = Math.max(0, fromIndex - 1);
+                toIndex = Math.min(commandLength, toIndex);
+
+                output.append(String.join(" ", Arrays.copyOfRange(commandSplit, fromIndex, toIndex)));
+            } catch (NumberFormatException exception) {
+                Logger.warning("Failed to convert number! (" + part + ")");
             }
-
-            if (fromIndex < 0 || toIndex > length) {
-                Logger.warning("Custom response contains an error! (" + input + ")");
-                Logger.warning("Out of bounds! (Input: " + input + ", Possible: " + (length > 1 ? "1-" : "") + length + ")");
-                continue;
-            }
-
-            String replacement;
-
-            if (fromIndex == toIndex) {
-                replacement = commandSplit[fromIndex - 1];
-            } else {
-                replacement = String.join(" ", Arrays.copyOfRange(commandSplit, fromIndex, toIndex));;
-            }
-
-            split[i] = replacement;
         }
 
-        return String.join(" ", split);
+        return output.toString();
     }
 
     public static List<String> getResponse(UUID uuid, String input) {
