@@ -108,6 +108,10 @@ public class Logger {
                 .append(Storage.USE_LUCKPERMS)
                 .append("\n");
 
+        builder.append(" GroupManager: ")
+                .append(Storage.USE_GROUPMANAGER)
+                .append("\n");
+
         builder.append(" PlaceholderAPI: ")
                 .append(Storage.USE_PLACEHOLDERAPI)
                 .append("\n");
