@@ -48,8 +48,8 @@
 #     %args[3_]% = gui user
 # _B:
 #     %args[_1]% = shop
-#     %args[_2]% = open gui
-#     %args[_3]% = open gui user
+#     %args[_2]% = shop open
+#     %args[_3]% = shop open gui
 
 # Here are a few examples:
 
