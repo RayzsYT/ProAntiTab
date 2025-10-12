@@ -15,6 +15,7 @@ import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.node.CommandNodeHelper;
 import de.rayzs.pat.utils.Reflection;
@@ -161,11 +162,11 @@ public class BungeePacketAnalyzer {
         helper.removeIf(str -> !playerCommands.contains(str));
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE && !bypassPermissions) {
-            Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines().forEach(helper::add);
+            Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines().forEach(input -> helper.add(input, false));
         }
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ALWAYS_TAB_COMPLETABLE && !bypassPermissions) {
-            Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines().forEach(helper::add);
+            Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines().forEach(input -> helper.add(input, false));
         }
 
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
@@ -194,9 +195,9 @@ public class BungeePacketAnalyzer {
             commands.getRoot().addChild(dummy);
         }
 
-        // Disabled temporarily
-        // PROXY_COMMANDS.stream().filter(playerCommands::contains).forEach(helper::add);
-        // SubArgsModule.handleCommandNode(player.getUniqueId(), helper);
+
+        PROXY_COMMANDS.stream().filter(playerCommands::contains).forEach(input -> helper.add(input, true));
+        SubArgsModule.handleCommandNode(player.getUniqueId(), helper);
     }
 
     private static CommandNode createDummyCommandNode(String command) {

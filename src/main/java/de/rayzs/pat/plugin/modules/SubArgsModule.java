@@ -72,11 +72,11 @@ public class SubArgsModule {
         ArgumentSource source = arguments.TAB_ARGUMENTS;
         if (source == null) return;
 
-        List<String> inputs = source.getAllInputs().stream().filter(str -> !str.contains("%")).toList();
+        List<String> inputs = source.getAllInputs();
         List<String> allEntries = inputs.stream().map(StringUtils::getFirstArg).toList();
 
         helper.removeIf(allEntries::contains);
-        inputs.forEach(helper::add);
+        inputs.forEach(input -> helper.add(input, true));
     }
 
     public static List<String> getServerCommands(UUID uuid) {

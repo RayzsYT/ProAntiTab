@@ -1,8 +1,18 @@
 package de.rayzs.pat.utils.node;
 
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.*;
+import net.md_5.bungee.protocol.packet.Commands;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -76,27 +86,52 @@ public class CommandNodeHelper<T> {
         return this;
     }
 
-    public CommandNodeHelper<T> add(String commandPath) {
-        if (commandPath.endsWith("_-"))
-            commandPath = commandPath.substring(0, commandPath.length() - 3);
-
+    public CommandNodeHelper<T> add(String commandPath, boolean autoSuggestions) {
         String[] args = commandPath.split(" ");
-        add(rootNode, args, 0);
+        add(rootNode, args, 0, autoSuggestions);
         return this;
     }
 
-    private void add(CommandNode<T> parent, String[] args, int index) {
+    private void add(CommandNode<T> parent, String[] args, int index, boolean autoSuggestions) {
         if (index >= args.length) return;
 
         String part = args[index];
+        String next = index + 1 >= args.length ? null : args[index + 1];
         CommandNode<T> childNode = parent.getChild(part);
 
         if (childNode == null) {
-            LiteralCommandNode<T> newNode = LiteralArgumentBuilder.<T>literal(part).build();
+            LiteralCommandNode newNode;
+
+            boolean cancel = next != null && (next.equals("_-"));
+            boolean stop = next != null && next.startsWith("%") && next.endsWith("%");
+            boolean skip = part.equals("-_");
+
+            if (skip) {
+                return;
+            }
+
+            if (!autoSuggestions || cancel || !stop && index != args.length - 1) {
+                newNode = LiteralArgumentBuilder.literal(part)
+                        .then(RequiredArgumentBuilder
+                                .argument("args", StringArgumentType.string()))
+                        .build();
+            } else {
+                newNode = LiteralArgumentBuilder.literal(part)
+                        .then(RequiredArgumentBuilder
+                                .argument("args", (ArgumentType) StringArgumentType.greedyString())
+                                .suggests(Commands.SuggestionRegistry.ASK_SERVER))
+                        .build();
+            }
+
             parent.addChild(newNode);
+
+            if (stop || cancel) {
+                return;
+            }
+
             childNode = newNode;
         }
 
-        add(childNode, args, index + 1);
+        add(childNode, args, index + 1, autoSuggestions);
     }
 }
