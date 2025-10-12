@@ -143,10 +143,20 @@ public class PermissionUtil {
     }
 
     public static boolean hasBypassPermission(Object targetObj) {
+
+        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+            return false;
+        }
+
         return hasPermission(targetObj, "bypass");
     }
 
     public static boolean hasBypassPermission(Object targetObj, String command) {
+
+        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+            return false;
+        }
+
         return hasBypassPermission(targetObj) || hasPermission(targetObj, "bypass." + command);
     }
 
