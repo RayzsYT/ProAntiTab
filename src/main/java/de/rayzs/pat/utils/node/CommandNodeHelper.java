@@ -1,16 +1,47 @@
 package de.rayzs.pat.utils.node;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.tree.*;
 import net.md_5.bungee.protocol.packet.Commands;
+
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class CommandNodeHelper<T> {
+
+    private static final Command DUMMY_COMMAND = (context) -> 0;
+    private static SuggestionProvider DEFAULT_SUGGESTION_PROVIDER;
+
+    public static void setDefaultSuggestionProvider(SuggestionProvider<?> suggestionProvider) {
+        DEFAULT_SUGGESTION_PROVIDER = suggestionProvider;
+    }
+
+    public static CommandNode createDummyCommandNode(String command) {
+        return LiteralArgumentBuilder
+                .literal(command)
+                .executes(DUMMY_COMMAND)
+                .then(RequiredArgumentBuilder
+                        .argument("args", (ArgumentType) StringArgumentType.greedyString())
+                        .suggests(DEFAULT_SUGGESTION_PROVIDER)
+                        .executes(DUMMY_COMMAND))
+                .build();
+    }
+
+    public static CommandNode createEmptyDummyCommandNode(String command) {
+        return LiteralArgumentBuilder
+                .literal(command)
+                .executes(DUMMY_COMMAND)
+                .then(RequiredArgumentBuilder
+                        .argument("args", (ArgumentType) StringArgumentType.greedyString())
+                        .executes(DUMMY_COMMAND))
+                .build();
+    }
 
     private final RootCommandNode<T> rootNode;
 

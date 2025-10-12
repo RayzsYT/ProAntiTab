@@ -43,8 +43,6 @@ public class BungeePacketAnalyzer {
     private static final HashMap<ProxiedPlayer, Boolean> PLAYER_MODIFIED = new HashMap<>();
     private static final HashMap<ProxiedPlayer, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
-    private static final com.mojang.brigadier.Command DUMMY_COMMAND = (context) -> 0;
-
     private static final List<String> PLUGIN_COMMANDS = new ArrayList<>();
 
     private static Class<?> channelWrapperClass, serverConnectionClass;
@@ -52,6 +50,7 @@ public class BungeePacketAnalyzer {
     private static List<String> PROXY_COMMANDS;
 
     static {
+        CommandNodeHelper.setDefaultSuggestionProvider(Commands.SuggestionRegistry.ASK_SERVER);
         loadProxyCommands();
     }
 
@@ -192,7 +191,7 @@ public class BungeePacketAnalyzer {
                 continue;
             }
 
-            CommandNode dummy = createDummyCommandNode(command.getKey());
+            CommandNode dummy = CommandNodeHelper.createDummyCommandNode(command.getKey());
             commands.getRoot().addChild(dummy);
         }
 
@@ -202,34 +201,13 @@ public class BungeePacketAnalyzer {
     }
 
     public static void sendCommandsPacket() {
-        RootCommandNode root = new RootCommandNode();
-        Commands packet = new Commands(root);
-
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+            RootCommandNode root = new RootCommandNode();
+            Commands packet = new Commands(root);
+
             modifyCommands(player, packet);
             player.unsafe().sendPacket(packet);
         }
-    }
-
-    private static CommandNode createDummyCommandNode(String command) {
-        return LiteralArgumentBuilder
-                .literal(command)
-                .executes(DUMMY_COMMAND)
-                .then(RequiredArgumentBuilder
-                        .argument("args", (ArgumentType) StringArgumentType.greedyString())
-                        .suggests(Commands.SuggestionRegistry.ASK_SERVER)
-                        .executes(DUMMY_COMMAND))
-                .build();
-    }
-
-    private static CommandNode createEmptyDummyCommandNode(String command) {
-        return LiteralArgumentBuilder
-                .literal(command)
-                .executes(DUMMY_COMMAND)
-                .then(RequiredArgumentBuilder
-                        .argument("args", (ArgumentType) StringArgumentType.greedyString())
-                        .executes(DUMMY_COMMAND))
-                .build();
     }
 
     private static class PacketDecoder extends MessageToMessageDecoder<PacketWrapper> {
