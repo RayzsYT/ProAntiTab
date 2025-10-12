@@ -174,6 +174,10 @@ public class BungeePacketAnalyzer {
             String commandName = command.getKey();
             commandName = commandName.startsWith("/") ? commandName.substring(1) : commandName;
 
+            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(commandName) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(commandName)) {
+                continue;
+            }
+
             if (!playerCommands.contains(commandName)) {
                 continue;
             }

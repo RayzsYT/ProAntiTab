@@ -36,7 +36,14 @@ public class BungeeAntiTabListener implements Listener {
         FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player, cursor, event.getSuggestions());
         List<String> suggestions = filteredTabCompletionEvent.getCompletion();
 
-        event.getSuggestions().removeIf(suggestion -> !suggestions.contains(suggestion));
+        event.getSuggestions().removeIf(suggestion -> {
+
+            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(suggestion) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(suggestion)) {
+                return false;
+            }
+
+            return !suggestions.contains(suggestion);
+        });
     }
 
     @EventHandler

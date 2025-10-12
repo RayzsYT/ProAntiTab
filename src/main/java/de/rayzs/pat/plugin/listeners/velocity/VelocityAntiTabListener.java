@@ -36,7 +36,14 @@ public class VelocityAntiTabListener {
 
         if (PermissionUtil.hasBypassPermission(player) || event.getSuggestions().isEmpty() || !player.getCurrentServer().isPresent()) return;
 
-        event.getSuggestions().removeIf(command -> !Storage.Blacklist.canPlayerAccessTab(player, command, serverName));
+        event.getSuggestions().removeIf(command -> {
+            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+                return false;
+            }
+
+            return !Storage.Blacklist.canPlayerAccessTab(player, command, serverName);
+        });
+
         FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, event.getSuggestions());
         if(filteredSuggestionEvent.isCancelled()) event.getSuggestions().clear();
     }
@@ -87,6 +94,10 @@ public class VelocityAntiTabListener {
 
                 if (command.getName().equals("args"))
                     return false;
+
+                if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command.getName()) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command.getName())) {
+                    return false;
+                }
 
                 return !playerCommands.contains(command.getName());
             });
