@@ -21,9 +21,6 @@ public class WaterfallAntiTabListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onProxyDefineCommands(ProxyDefineCommandsEvent event) {
-
-        System.out.println("CALL");
-
         if(!(event.getReceiver() instanceof ProxiedPlayer) || event.getCommands().isEmpty()) return;
 
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
@@ -49,7 +46,7 @@ public class WaterfallAntiTabListener implements Listener {
         List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
         event.getCommands().entrySet().removeIf(command -> {
 
-            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command.getKey()) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command.getKey())) {
+            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command.getKey()) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command.getKey())) {
                 return false;
             }
 

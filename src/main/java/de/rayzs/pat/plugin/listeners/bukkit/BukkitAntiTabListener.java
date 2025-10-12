@@ -76,11 +76,11 @@ public class BukkitAntiTabListener implements Listener {
 
         event.getCommands().addAll(filteredSuggestionEvent.getSuggestions());
 
-        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ENABLED) {
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ALWAYS_TAB_COMPLETABLE) {
             event.getCommands().addAll(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines());
         }
 
-        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ENABLED) {
+        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE) {
             event.getCommands().addAll(Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines());
         }
     }

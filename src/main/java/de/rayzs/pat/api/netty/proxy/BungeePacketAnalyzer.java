@@ -174,7 +174,7 @@ public class BungeePacketAnalyzer {
             String commandName = command.getKey();
             commandName = commandName.startsWith("/") ? commandName.substring(1) : commandName;
 
-            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(commandName) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(commandName)) {
+            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(commandName) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(commandName)) {
                 continue;
             }
 
@@ -251,7 +251,7 @@ public class BungeePacketAnalyzer {
                             cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.replaceFirst(playerInput, "/", ""), server);
 
                             if (!cancelsBeforeHand)
-                                cancelsBeforeHand = !Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", "")) ||  Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", ""));
+                                cancelsBeforeHand = !Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", "")) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", ""));
                         }
 
                         final String cursor = playerInput;

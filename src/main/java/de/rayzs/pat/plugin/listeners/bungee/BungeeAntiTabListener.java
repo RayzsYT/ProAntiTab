@@ -38,37 +38,11 @@ public class BungeeAntiTabListener implements Listener {
 
         event.getSuggestions().removeIf(suggestion -> {
 
-            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(suggestion) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(suggestion)) {
+            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(suggestion) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(suggestion)) {
                 return false;
             }
 
             return !suggestions.contains(suggestion);
         });
-    }
-
-    @EventHandler
-    public void onTabComplete(TabCompleteResponseEvent event) {
-        // Ignoring this at first, due to transfer to the packet-based solution only. Hehe
-
-        /*
-        if (!(event.getSender() instanceof ProxiedPlayer))
-            return;
-
-        ProxiedPlayer player = (ProxiedPlayer) event.getSender();
-
-        ServerInfo serverInfo = player.getServer().getInfo();
-        String serverName = serverInfo.getName();
-
-        if (Storage.Blacklist.isDisabledServer(serverName))
-            return;
-
-        if(PermissionUtil.hasBypassPermission(player)) 
-            return;
-
-        event.getSuggestions().removeIf(command -> !Storage.Blacklist.canPlayerAccessTab(player, command, serverName));
-        
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, event.getSuggestions());
-        if (filteredSuggestionEvent.isCancelled()) event.getSuggestions().clear();
-         */
     }
 }
