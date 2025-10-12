@@ -421,13 +421,8 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
         List<String> allowedCommands = new ArrayList<>(result).stream().filter(command -> {
-
-            if (turn) {
-                return Storage.Blacklist.getBlacklist().isListed(command);
-            } else {
-                return !Storage.Blacklist.getBlacklist().isListed(command);
-            }
-
+            boolean contains = Storage.Blacklist.getBlacklist().getCommands().contains(command);
+            return turn == contains;
         }).toList();
 
         lastCommandsLoad = System.currentTimeMillis();
