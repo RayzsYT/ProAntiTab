@@ -131,6 +131,10 @@ public class CommandNodeHelper<T> {
             boolean stop = next != null && next.startsWith("%") && next.endsWith("%");
             boolean skip = part.equals("-_");
 
+            if (index == 0 && part.charAt(0) == '!' && part.length() > 1) {
+                return;
+            }
+
             if (skip) {
                 return;
             }
