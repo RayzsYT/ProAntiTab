@@ -222,6 +222,10 @@ public class VelocityPacketAnalyzer {
                                 String command = offer.getText();
                                 if (command.startsWith("/")) command = StringUtils.replaceFirst(command, "/", "");
 
+                                if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command)) {
+                                    return false;
+                                }
+
                                 return !Storage.Blacklist.canPlayerAccessTab(player, command, player.getCurrentServer().get().getServerInfo().getName());
                             });
                         } else {
@@ -237,6 +241,7 @@ public class VelocityPacketAnalyzer {
                             }
 
                             response.getOffers().removeIf(offer -> !filteredTabCompletionEvent.getCompletion().contains(offer.getText()));
+
                             if (response.getOffers().isEmpty()) return;
                         }
                     }
@@ -279,6 +284,10 @@ public class VelocityPacketAnalyzer {
 
                             if (command.getName().equals("args"))
                                 return false;
+
+                           if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command.getName()) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command.getName())) {
+                               return false;
+                           }
 
                             return !playerCommands.contains(command.getName());
                         });
