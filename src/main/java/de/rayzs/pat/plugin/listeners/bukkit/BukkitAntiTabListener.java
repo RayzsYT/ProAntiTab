@@ -16,14 +16,26 @@ import java.util.*;
 public class BukkitAntiTabListener implements Listener {
 
     private static final CommandsCache COMMANDS_CACHE = new CommandsCache();
+    private static final List<UUID> knownOperators = new ArrayList<>();
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
-        Player player = event.getPlayer();
-        UUID uuid = player.getUniqueId();
-        String uuidSubstring = uuid.toString().substring(uuid.toString().length() - 5);
+        final Player player = event.getPlayer();
+        final UUID uuid = player.getUniqueId();
 
-        if (Storage.USE_VELOCITY || player.isOp()) {
+        final boolean noPermissionsPlugin = !Storage.USE_LUCKPERMS && !Storage.USE_GROUPMANAGER;
+
+
+        if (Storage.USE_VELOCITY) {
+            return;
+        }
+
+        if (player.isOp()) {
+
+            if (noPermissionsPlugin && !knownOperators.contains(uuid)) {
+                knownOperators.add(uuid);
+            }
+
             return;
         }
 
@@ -43,7 +55,14 @@ public class BukkitAntiTabListener implements Listener {
         COMMANDS_CACHE.handleCommands(allCommands);
 
         if (PermissionUtil.hasBypassPermission(player)) {
-            return;
+
+            if (noPermissionsPlugin && knownOperators.contains(uuid)) {
+                PermissionUtil.reloadPermissions(uuid);
+                knownOperators.remove(uuid);
+            } else {
+                return;
+            }
+
         }
 
         final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), player, player.getUniqueId());
@@ -51,10 +70,19 @@ public class BukkitAntiTabListener implements Listener {
 
         event.getCommands().clear();
 
-        if (filteredSuggestionEvent.isCancelled()) 
+        if (filteredSuggestionEvent.isCancelled()) {
             return;
+        }
 
         event.getCommands().addAll(filteredSuggestionEvent.getSuggestions());
+
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ENABLED) {
+            event.getCommands().addAll(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines());
+        }
+
+        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ENABLED) {
+            event.getCommands().addAll(Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines());
+        }
     }
 
     public static List<String> getCommands() {
