@@ -156,8 +156,17 @@ public class BungeePacketAnalyzer {
         commandsCache.handleCommands(commandsAsString, serverName);
 
         List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
+        boolean bypassPermissions = PermissionUtil.hasBypassPermission(player.getUniqueId());
 
         helper.removeIf(str -> !playerCommands.contains(str));
+
+        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE && !bypassPermissions) {
+            Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines().forEach(helper::add);
+        }
+
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ALWAYS_TAB_COMPLETABLE && !bypassPermissions) {
+            Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines().forEach(helper::add);
+        }
 
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
 
@@ -174,11 +183,10 @@ public class BungeePacketAnalyzer {
             String commandName = command.getKey();
             commandName = commandName.startsWith("/") ? commandName.substring(1) : commandName;
 
-            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(commandName) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(commandName)) {
-                continue;
-            }
+            boolean tabablePluginCommand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(commandName);
+            boolean tabableVersionCommand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(commandName);
 
-            if (!playerCommands.contains(commandName)) {
+            if (!tabablePluginCommand && !tabableVersionCommand && !playerCommands.contains(commandName)) {
                 continue;
             }
 
@@ -198,6 +206,16 @@ public class BungeePacketAnalyzer {
                 .then(RequiredArgumentBuilder
                         .argument("args", (ArgumentType) StringArgumentType.greedyString())
                         .suggests(Commands.SuggestionRegistry.ASK_SERVER)
+                        .executes(DUMMY_COMMAND))
+                .build();
+    }
+
+    private static CommandNode createEmptyDummyCommandNode(String command) {
+        return LiteralArgumentBuilder
+                .literal(command)
+                .executes(DUMMY_COMMAND)
+                .then(RequiredArgumentBuilder
+                        .argument("args", (ArgumentType) StringArgumentType.greedyString())
                         .executes(DUMMY_COMMAND))
                 .build();
     }
