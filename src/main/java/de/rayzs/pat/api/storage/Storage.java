@@ -221,6 +221,7 @@ public class Storage {
             return;
         }
 
+        getLoader().handleReload();
         PermissionUtil.reloadPermissions();
 
         if (Reflection.getMinor() < 13) {
