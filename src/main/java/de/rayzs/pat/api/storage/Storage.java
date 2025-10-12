@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
@@ -212,6 +213,11 @@ public class Storage {
 
             Storage.getLoader().updateCommandCache();
             Communicator.sendPermissionReset();
+
+            if (!Reflection.isVelocityServer()) {
+                BungeePacketAnalyzer.sendCommandsPacket();
+            }
+
             return;
         }
 

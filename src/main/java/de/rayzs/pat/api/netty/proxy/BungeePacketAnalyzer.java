@@ -10,6 +10,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 
+import com.mojang.brigadier.tree.RootCommandNode;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.communication.client.ClientInfo;
@@ -198,6 +199,16 @@ public class BungeePacketAnalyzer {
 
         PROXY_COMMANDS.stream().filter(playerCommands::contains).forEach(input -> helper.add(input, true));
         SubArgsModule.handleCommandNode(player.getUniqueId(), helper);
+    }
+
+    public static void sendCommandsPacket() {
+        RootCommandNode root = new RootCommandNode();
+        Commands packet = new Commands(root);
+
+        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+            modifyCommands(player, packet);
+            player.unsafe().sendPacket(packet);
+        }
     }
 
     private static CommandNode createDummyCommandNode(String command) {
