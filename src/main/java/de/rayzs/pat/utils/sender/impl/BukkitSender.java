@@ -12,10 +12,11 @@ import java.util.UUID;
 
 public class BukkitSender extends CommandSenderAbstract {
 
-    private final CommandSender sender;
     private final UUID uuid;
     private final String name;
     private final boolean console;
+
+    private CommandSender sender;
 
     public BukkitSender(Object senderObj) {
         super(senderObj);
@@ -27,7 +28,7 @@ public class BukkitSender extends CommandSenderAbstract {
             this.uuid = player.getUniqueId();
             this.console = false;
 
-            updateGroups();
+            //updateGroups();
             return;
         }
 
@@ -42,6 +43,17 @@ public class BukkitSender extends CommandSenderAbstract {
         }
 
         this.console = true;
+    }
+
+    @Override
+    public void updateSenderObject(Object senderObj) {
+        super.updateSenderObject(senderObj);
+
+        if (senderObj instanceof Player player) {
+            this.sender = player;
+        } else if (senderObj instanceof CommandSender commandSender) {
+            this.sender = commandSender;
+        }
     }
 
     @Override
@@ -91,6 +103,6 @@ public class BukkitSender extends CommandSenderAbstract {
 
     @Override
     public void updateGroups() {
-        setGroups(GroupManager.getPlayerGroups(this.uuid));
+        setGroups(GroupManager.getPlayerGroups(getSenderObject()));
     }
 }
