@@ -12,11 +12,12 @@ import java.util.UUID;
 
 public class VelocitySender extends CommandSenderAbstract {
 
-    private final CommandSource sender;
+    private final boolean console;
+
     private final UUID uuid;
     private final String name;
 
-    private final boolean console;
+    private CommandSource sender;
 
     public VelocitySender(Object senderObj) {
         super(senderObj);
@@ -27,8 +28,6 @@ public class VelocitySender extends CommandSenderAbstract {
             this.name = player.getUsername();
             this.uuid = player.getUniqueId();
             this.console = false;
-
-            updateGroups();
             return;
         }
 
@@ -43,6 +42,17 @@ public class VelocitySender extends CommandSenderAbstract {
         }
 
         this.console = true;
+    }
+
+    @Override
+    public void updateSenderObject(Object senderObj) {
+        super.updateSenderObject(senderObj);
+
+        if (senderObj instanceof Player player) {
+            sender = player;
+        } else if (senderObj instanceof CommandSource commandSource) {
+            sender = commandSource;
+        }
     }
 
     @Override
@@ -89,6 +99,6 @@ public class VelocitySender extends CommandSenderAbstract {
 
     @Override
     public void updateGroups() {
-        setGroups(GroupManager.getPlayerGroups(this.uuid));
+        setGroups(GroupManager.getPlayerGroups(getSenderObject()));
     }
 }
