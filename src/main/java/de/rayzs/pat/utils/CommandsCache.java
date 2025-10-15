@@ -5,6 +5,7 @@ import java.util.*;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class CommandsCache {
 
@@ -67,11 +68,11 @@ public class CommandsCache {
         filteredCommands = tmpFilteredCommands;
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid) {
-        return getPlayerCommands(unfilteredCommands, targetObj, uuid, null);
+    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj) {
+        return getPlayerCommands(unfilteredCommands, targetObj, null);
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, UUID uuid, String serverName) {
+    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, String serverName) {
         List<String> playerCommands = new LinkedList<>(unfilteredCommands);
         List<String> localFilteredCommands = filteredCommands == null ? null : new LinkedList<>();
 
@@ -91,19 +92,22 @@ public class CommandsCache {
         }
 
 
-        boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(targetObj);
+        if (!PermissionUtil.hasBypassPermission(targetObj)) {
+            boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(targetObj);
 
-        playerCommands.removeIf(command -> {
-            if (!hasNamespaceBypass && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)) {
-                return true;
-            }
+            playerCommands.removeIf(command -> {
+                if (!hasNamespaceBypass && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)) {
+                    return true;
+                }
 
-            if (localFilteredCommands.contains(command)) {
-                return false;
-            }
+                if (localFilteredCommands.contains(command)) {
+                    return false;
+                }
 
-            return !Storage.Blacklist.canPlayerAccessTab(targetObj, command, serverName);
-        });
+                return !Storage.Blacklist.canPlayerAccessTab(targetObj, command, serverName);
+            });
+
+        }
 
         PATEventHandler.callUpdatePlayerCommandsEvents(targetObj, playerCommands, serverName != null);
 
