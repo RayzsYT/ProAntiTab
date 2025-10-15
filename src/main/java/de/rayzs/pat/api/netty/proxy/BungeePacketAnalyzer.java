@@ -139,6 +139,9 @@ public class BungeePacketAnalyzer {
     }
 
     private static void modifyCommands(ProxiedPlayer player, Commands commands) {
+        if (PermissionUtil.hasBypassPermission(player))
+            return;
+
         ServerInfo serverInfo = player.getServer().getInfo();
         String serverName = serverInfo.getName();
 
@@ -156,16 +159,15 @@ public class BungeePacketAnalyzer {
 
         commandsCache.handleCommands(commandsAsString, serverName);
 
-        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
-        boolean bypassPermissions = PermissionUtil.hasBypassPermission(player.getUniqueId());
+        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, serverName);
 
         helper.removeIf(str -> !playerCommands.contains(str));
 
-        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE && !bypassPermissions) {
+        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE) {
             Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines().forEach(input -> helper.add(input, false));
         }
 
-        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ALWAYS_TAB_COMPLETABLE && !bypassPermissions) {
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ALWAYS_TAB_COMPLETABLE) {
             Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines().forEach(input -> helper.add(input, false));
         }
 
