@@ -83,12 +83,20 @@ public class Storage {
     }
 
     public static void setPermissionPlugin(PermissionPlugin permissionPlugin) {
-
         if (PERMISSION_PLUGIN == PermissionPlugin.LUCKPERMS) {
             return;
         }
 
         PERMISSION_PLUGIN = permissionPlugin;
+    }
+
+    public static void broadcastPermissionsPluginNotice() {
+        if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
+            return;
+        }
+
+        Logger.warning("No known permissions plugin found, so some features may be disabled.");
+        Logger.warning("Read more about it here: http://rayzs.de/products/proantitab/nkppf");
     }
 
     public static PermissionPlugin getPermissionPlugin() {
@@ -550,8 +558,10 @@ public class Storage {
                 return true;
             }
 
-            if (PermissionUtil.hasBypassPermission(player, command)) {
-                return true;
+            if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
+                if (PermissionUtil.hasBypassPermission(player, command)) {
+                    return true;
+                }
             }
 
             return GroupManager.canAccessCommand(player, command, type, server);
