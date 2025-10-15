@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.permission;
 import java.util.*;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.adapter.GroupManagerAdapter;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.sender.CommandSender;
@@ -39,10 +40,16 @@ public class PermissionUtil {
     }
 
     public static String getPermissionsAsString(UUID uuid) {
+
+        if (Storage.getPermissionPlugin() == PermissionPlugin.NONE) {
+            return "No permission plugin detected. Therefore, no permissions have been cached.";
+        }
+
         PermissionMap permissionMap = MAP.get(uuid);
 
-        if (permissionMap == null)
+        if (permissionMap == null) {
             return "";
+        }
 
         return Arrays.toString(permissionMap.getHashedPermissions().toArray()).replace("[", "").replace("]", "");
     }
@@ -106,6 +113,29 @@ public class PermissionUtil {
         else
             sender = CommandSenderHandler.from(targetObj);
 
+        // No permission plugin found!
+        if (Storage.getPermissionPlugin() == PermissionPlugin.NONE) {
+
+            if (sender == null) {
+                try {
+                    throw new Exception("Unknown sender!");
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+
+                return true;
+            }
+
+            if (sender.isConsole()) {
+                return true;
+            }
+
+            return sender.isOperator()
+                    || sender.hasPermission("*")
+                    || sender.hasPermission("proantitab.*")
+                    || sender.hasPermission("proantitab." + permission);
+        }
+
         if (uuid == null) {
             if (sender == null || sender.isConsole())
                 return true;
@@ -115,7 +145,7 @@ public class PermissionUtil {
 
         if (!MAP.containsKey(uuid)) {
             MAP.put(uuid, new PermissionMap(uuid));
-            return false;
+            return sender != null && sender.isOperator();
         }
 
         permissionMap = MAP.get(uuid);
@@ -135,8 +165,9 @@ public class PermissionUtil {
 
             }
 
-            if (sender.isOperator() && !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+            if (sender.isOperator()) {
                 return true;
+            }
         }
 
         return permissionMap.isPermitted("*") || permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
@@ -144,7 +175,7 @@ public class PermissionUtil {
 
     public static boolean hasBypassPermission(Object targetObj) {
 
-        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+        if (!Reflection.isProxyServer() && Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             return false;
         }
 
@@ -153,21 +184,29 @@ public class PermissionUtil {
 
     public static boolean hasBypassPermission(Object targetObj, String command) {
 
-        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+        if (!Reflection.isProxyServer() && Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             return false;
         }
 
-        return hasBypassPermission(targetObj) || hasPermission(targetObj, "bypass." + command);
+        if (hasBypassPermission(targetObj)) {
+            return true;
+        }
+
+        if (Storage.getPermissionPlugin() == PermissionPlugin.NONE) {
+            return false;
+        }
+
+        return hasPermission(targetObj, "bypass." + command);
     }
 
     public static boolean hasPermissionWithResponse(Object targetObj, String command) {
         boolean permitted = hasPermission(targetObj, command);
 
         if (!permitted && targetObj instanceof CommandSender) {
-            ((CommandSender) targetObj).sendMessage(
-                    Storage.ConfigSections.Messages.NO_PERMISSION.MESSAGE
-                            .replace("%permission%", "proantitab." + command)
-            );
+            String message = Storage.ConfigSections.Messages.NO_PERMISSION.MESSAGE;
+            message = message.replace("%permission%", "proantitab." + command);
+
+            ((CommandSender) targetObj).sendMessage(message);
         }
 
         
