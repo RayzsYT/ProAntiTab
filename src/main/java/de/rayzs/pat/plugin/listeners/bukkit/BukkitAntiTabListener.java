@@ -66,7 +66,7 @@ public class BukkitAntiTabListener implements Listener {
 
         }
 
-        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), player, player.getUniqueId());
+        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), player);
         FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, playerCommands);
 
         event.getCommands().clear();
@@ -117,10 +117,12 @@ public class BukkitAntiTabListener implements Listener {
 
     public static void handleTabCompletion(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null)
-            return;
 
-        handleTabCompletion(player);
+        if (player == null) {
+            return;
+        }
+
+        handleTabCompletion(player, getCommands());
     }
 
     public static void handleTabCompletion(Player player) {
