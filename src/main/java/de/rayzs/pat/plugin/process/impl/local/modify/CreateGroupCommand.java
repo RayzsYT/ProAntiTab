@@ -8,6 +8,7 @@ import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CreateGroupCommand extends ProCommand {
@@ -50,6 +51,6 @@ public class CreateGroupCommand extends ProCommand {
 
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
-        return args.length < 2 ? GroupManager.getGroupNames() : null;
+        return Collections.emptyList();
     }
 }
