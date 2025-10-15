@@ -40,9 +40,7 @@ public class BukkitPlayerListener implements Listener {
         }
 
         CustomServerBrand.preparePlayer(player);
-
-        PermissionUtil.setPlayerPermissions(sender);
-        sender.updateGroups();
+        PermissionUtil.reloadPermissions(sender);
 
         if (CustomServerBrand.isEnabled()) {
             CustomServerBrand.sendBrandToPlayer(player);
