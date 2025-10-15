@@ -268,7 +268,7 @@ public class VelocityPacketAnalyzer {
                         if (PermissionUtil.hasBypassPermission(player)) return;
 
                         final boolean newer = player.getProtocolVersion().getProtocol() > 340;
-                        final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
+                        final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, serverName);
 
                         if (commands.getRootNode().getChildren().size() == 1 && newer
                                 && commands.getRootNode().getChild("args") != null
