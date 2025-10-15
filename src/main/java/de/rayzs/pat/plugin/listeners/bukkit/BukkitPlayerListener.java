@@ -30,34 +30,41 @@ public class BukkitPlayerListener implements Listener {
         final Player player = event.getPlayer();
         final UUID uuid = player.getUniqueId();
 
+        final CommandSender sender = CommandSenderHandler.from(player);
+        sender.updateSenderObject(player);
+
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             BackendUpdater.handle();
         }
 
-        PermissionUtil.setPlayerPermissions(player.getUniqueId());
         CustomServerBrand.preparePlayer(player);
+
+        PermissionUtil.setPlayerPermissions(sender);
+        sender.updateGroups();
 
         if (CustomServerBrand.isEnabled()) {
             CustomServerBrand.sendBrandToPlayer(player);
         }
 
-        if (Storage.getPermissionPlugin() != PermissionPlugin.LUCKPERMS) {
+        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+            if (Storage.getPermissionPlugin() != PermissionPlugin.LUCKPERMS) {
 
-            if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
                 PATScheduler.createScheduler(() -> {
-                    CommandSender sender = CommandSenderHandler.from(player);
 
-                    assert sender != null;
-                    PermissionUtil.reloadPermissions(sender);
+                    if (Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER) {
+                        PermissionUtil.reloadPermissions(sender);
+                    } else {
+                        sender.updateGroups();
+                    }
 
                     if (Reflection.getMinor() >= 13) {
-                        BukkitAntiTabListener.handleTabCompletion(player.getUniqueId());
+                        BukkitAntiTabListener.handleTabCompletion(player);
                     }
                 }, 20);
-            }
 
+            }
         }
 
         if (!BukkitPacketAnalyzer.inject(player)) {
