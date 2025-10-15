@@ -6,6 +6,8 @@ import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 import de.rayzs.pat.api.storage.Storage;
@@ -19,7 +21,10 @@ public class BungeePlayerConnectionListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPostLogin(PostLoginEvent event) {
-        ProxiedPlayer player = event.getPlayer();
+        final ProxiedPlayer player = event.getPlayer();
+        final CommandSender sender = CommandSenderHandler.from(player);
+        sender.updateSenderObject(player);
+
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
         if(CustomServerBrand.isEnabled())
@@ -27,7 +32,8 @@ public class BungeePlayerConnectionListener implements Listener {
                 if (player.isConnected()) CustomServerBrand.sendBrandToPlayer(player);
             }, 500, TimeUnit.MILLISECONDS);
 
-        PermissionUtil.setPlayerPermissions(player.getUniqueId());
+        PermissionUtil.setPlayerPermissions(sender);
+        sender.updateGroups();
 
         if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {

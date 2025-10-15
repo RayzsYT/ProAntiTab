@@ -12,6 +12,9 @@ import com.velocitypowered.api.event.player.*;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.api.storage.Storage;
 import com.velocitypowered.api.proxy.*;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
+
 import java.util.concurrent.TimeUnit;
 
 public class VelocityConnectionListener {
@@ -26,7 +29,10 @@ public class VelocityConnectionListener {
 
     @Subscribe
     public void onServerPreConnect(ServerPreConnectEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
+        final CommandSender sender = CommandSenderHandler.from(player);
+        sender.updateSenderObject(player);
+
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
         if(CustomServerBrand.isEnabled())
@@ -34,7 +40,8 @@ public class VelocityConnectionListener {
                 if (player.isActive()) CustomServerBrand.sendBrandToPlayer(player);
             }).delay(500, TimeUnit.MILLISECONDS).schedule();
 
-        PermissionUtil.setPlayerPermissions(player.getUniqueId());
+        PermissionUtil.setPlayerPermissions(sender);
+        sender.updateGroups();
 
         if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
             server.getScheduler().buildTask(loader, () -> {
