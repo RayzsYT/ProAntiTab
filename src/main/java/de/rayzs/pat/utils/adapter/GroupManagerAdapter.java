@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.adapter;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -25,8 +26,10 @@ public class GroupManagerAdapter implements Listener {
     private static GroupManager manager;
 
     public static void initialize(Plugin plugin) {
-        manager = (GroupManager) plugin;
+        Logger.info("Successfully hooked into GroupManager for easier usage.");
+
         Storage.setPermissionPlugin(PermissionPlugin.GROUPMANAGER);
+        manager = (GroupManager) plugin;
 
         Bukkit.getServer().getPluginManager().registerEvents(new GroupManagerListener(), BukkitLoader.getPlugin());
     }
@@ -53,26 +56,18 @@ public class GroupManagerAdapter implements Listener {
         @EventHandler
         public void onGMUser(GMUserEvent event) {
             PATScheduler.createScheduler(() -> {
-                BukkitLoader.userPermissionsReload(event.getUser().getBukkitPlayer().getUniqueId());
+                PermissionUtil.reloadPermissions(event.getUser().getBukkitPlayer().getUniqueId());
             }, 10);
         }
 
         @EventHandler
         public void onGMGroup(GMGroupEvent event) {
-            PATScheduler.createScheduler(() -> {
-                Bukkit.getOnlinePlayers().forEach(player -> {
-                    BukkitLoader.userPermissionsReload(player.getUniqueId());
-                });
-            }, 10);
+            PATScheduler.createScheduler(PermissionUtil::reloadPermissions, 10);
         }
 
         @EventHandler
         public void onGMSystem(GMSystemEvent event) {
-            PATScheduler.createScheduler(() -> {
-                Bukkit.getOnlinePlayers().forEach(player -> {
-                    BukkitLoader.userPermissionsReload(player.getUniqueId());
-                });
-            }, 10);
+            PATScheduler.createScheduler(PermissionUtil::reloadPermissions, 10);
         }
     }
 }
