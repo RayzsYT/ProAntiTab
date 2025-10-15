@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.adapter;
 
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import net.luckperms.api.event.sync.PreNetworkSyncEvent;
@@ -8,7 +9,6 @@ import de.rayzs.pat.plugin.VelocityLoader;
 import net.luckperms.api.model.user.User;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.BukkitLoader;
 import net.luckperms.api.event.EventBus;
 import net.luckperms.api.event.node.*;
 import de.rayzs.pat.utils.Reflection;
@@ -28,19 +28,7 @@ public class LuckPermsAdapter {
         EventBus eventBus = PROVIDER.getEventBus();
 
         eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeMutateEvent.class, LuckPermsAdapter::onNoteMutate);
-
-        if (!Reflection.isProxyServer()) {
-            eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> BukkitLoader.delayedPermissionsReload());
-
-        } else {
-
-            if (Reflection.isVelocityServer()) {
-                eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> VelocityLoader.delayedPermissionsReload());
-            }
-
-            Storage.getLoader().updateCommandCache();
-
-        }
+        eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> Storage.getLoader().delayedPermissionsReload());
     }
 
 
@@ -53,13 +41,6 @@ public class LuckPermsAdapter {
         if (user == null) return null;
 
         return user.getCachedData().getPermissionData().getPermissionMap();
-    }
-
-    public static boolean hasAnyPermissions(UUID uuid) {
-        Map<String, Boolean> permissions = getPermissions(uuid);
-        if (permissions == null) return false;
-
-        return !permissions.isEmpty();
     }
 
     public static void setPermissions(UUID uuid) {
@@ -105,15 +86,17 @@ public class LuckPermsAdapter {
             User user = (User) event.getTarget();
             UUID uuid = user.getUniqueId();
 
-            if (!Reflection.isProxyServer()) {
-                BukkitLoader.userPermissionsReload(user.getUniqueId());
-                return;
+            PermissionUtil.reloadPermissions(user.getUniqueId());
+
+            if (Reflection.isProxyServer()) {
+                Communicator.sendUpdateCommand(uuid);
+
+                if (Reflection.isVelocityServer()) {
+                    VelocityLoader.delayedPlayerReload(uuid);
+                }
+
             }
 
-            if (Reflection.isVelocityServer()) {
-                PermissionUtil.reloadPermissions(user.getUniqueId());
-                VelocityLoader.delayedPlayerReload(uuid);
-            }
         }
     }
 }
