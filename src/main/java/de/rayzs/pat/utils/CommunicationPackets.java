@@ -58,6 +58,33 @@ public class CommunicationPackets {
         }
     }
 
+    public static class UpdateCommandsPacket implements CommunicationPacket, Serializable {
+        private final String proxyToken;
+        private final UUID targetUUID;
+
+        public UpdateCommandsPacket(String proxyToken) {
+            this.proxyToken = proxyToken;
+            this.targetUUID = null;
+        }
+
+        public UpdateCommandsPacket(String proxyToken, UUID targetUUID) {
+            this.proxyToken = proxyToken;
+            this.targetUUID = targetUUID;
+        }
+
+        public boolean hasTargetUUID() {
+            return targetUUID != null;
+        }
+
+        public UUID getTargetUUID() {
+            return targetUUID;
+        }
+
+        public boolean isToken(String token) {
+            return proxyToken.equals(token);
+        }
+    }
+
     public static class FeedbackPacket implements CommunicationPacket, Serializable {
         private final String proxyToken, serverId;
 
