@@ -28,9 +28,7 @@ public class BungeeBlockCommandListener implements Listener {
         String serverName = player.getServer().getInfo().getName();
         String command = event.getMessage();
 
-        boolean bypassPermission = PermissionUtil.hasBypassPermission(player, command);
-
-        if (bypassPermission)
+        if (PermissionUtil.hasBypassPermission(player, command))
             return;
 
         command = command.startsWith("/") ? command.substring(1) : command;
@@ -38,7 +36,6 @@ public class BungeeBlockCommandListener implements Listener {
 
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
-        //command = command.toLowerCase();
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(
                 Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
