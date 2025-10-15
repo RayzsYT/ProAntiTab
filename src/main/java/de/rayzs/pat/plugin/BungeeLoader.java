@@ -10,6 +10,7 @@ import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.response.action.ActionHandler;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import de.rayzs.pat.plugin.commands.BungeeCommand;
@@ -94,7 +95,10 @@ public class BungeeLoader extends Plugin implements PluginLoader {
             Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
         BungeePacketAnalyzer.injectAll();
+
+        Storage.broadcastPermissionsPluginNotice();
         ConfigUpdater.broadcastMissingParts();
+
         ActionHandler.initialize();
         SubArgsModule.initialize();
 
@@ -120,6 +124,16 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     @Override
     public void handleReload() {
         BungeePacketAnalyzer.loadProxyCommands();
+    }
+
+    @Override
+    public void delayedPermissionsReload() {
+        getProxy().getScheduler().schedule(this, () -> {
+            PermissionUtil.reloadPermissions();
+            Storage.getLoader().updateCommandCache();
+
+            Communicator.sendRequest();
+        }, 1, TimeUnit.SECONDS);
     }
 
     @Override

@@ -13,6 +13,8 @@ public interface PluginLoader {
 
     HashMap<String, CommandsCache> getCommandsCacheMap();
 
+    void delayedPermissionsReload();
+
     void updateCommandCache();
 
     List<String> getServerNames();
