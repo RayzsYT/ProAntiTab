@@ -1,7 +1,6 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +56,10 @@ public class VelocityAntiTabListener {
                 return;
             }
 
+            if (PermissionUtil.hasBypassPermission(player)) {
+                return;
+            }
+
             String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
 
             Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
@@ -71,12 +74,8 @@ public class VelocityAntiTabListener {
             event.getRootNode().getChildren().stream().filter(command -> command != null && command.getName() != null).forEach(command -> commandsAsString.add(command.getName()));
             commandsCache.handleCommands(commandsAsString, serverName);
 
-            if (PermissionUtil.hasBypassPermission(player)) {
-                return;
-            }
-
             final boolean newer = player.getProtocolVersion().getProtocol() > 340, argsChildrenExist = event.getRootNode().getChild("args") != null;
-            final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
+            final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, serverName);
 
             if (event.getRootNode().getChildren().size() == 1
                     && newer && argsChildrenExist
