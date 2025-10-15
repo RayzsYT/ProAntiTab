@@ -143,12 +143,12 @@ public class PermissionUtil {
             uuid = sender.getUniqueId();
         }
 
-        if (!MAP.containsKey(uuid)) {
-            MAP.put(uuid, new PermissionMap(uuid));
-            return sender != null && sender.isOperator();
-        }
-
         permissionMap = MAP.get(uuid);
+
+        if (permissionMap == null) {
+            permissionMap = new PermissionMap(uuid);
+            MAP.put(uuid, permissionMap);
+        }
 
         if (sender != null) {
 
