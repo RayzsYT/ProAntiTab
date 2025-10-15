@@ -11,10 +11,15 @@ public abstract class CommandSenderAbstract implements CommandSender {
 
     private static final byte KEY = (byte) 0;
 
-    private final Object senderObj;
     private final ExpireCache<Byte, List<Group>> groups = new ExpireCache<>(1, TimeUnit.HOURS);
+    private Object senderObj;
 
     public CommandSenderAbstract(Object senderObj) {
+        this.senderObj = senderObj;
+    }
+
+    @Override
+    public void updateSenderObject(Object senderObj) {
         this.senderObj = senderObj;
     }
 
