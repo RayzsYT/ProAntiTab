@@ -37,7 +37,7 @@ import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "2.0.21",
+version = "2.1.0",
 authors = "Rayzs_YT",
 description = "Hide more than just your plugins. Hide almost everything!",
 url = "https://www.rayzs.de/products/proantitab/page",
@@ -116,7 +116,9 @@ public class VelocityLoader implements PluginLoader {
         if(Storage.USE_SIMPLECLOUD)
             Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
+        Storage.broadcastPermissionsPluginNotice();
         ConfigUpdater.broadcastMissingParts();
+
         ActionHandler.initialize();
         SubArgsModule.initialize();
     }
@@ -125,10 +127,12 @@ public class VelocityLoader implements PluginLoader {
         return logger;
     }
 
-    public static void delayedPermissionsReload() {
+    @Override
+    public void delayedPermissionsReload() {
         server.getScheduler().buildTask(VelocityLoader.instance, () -> {
             PermissionUtil.reloadPermissions();
             Storage.getLoader().updateCommandCache();
+
         }).delay(1, TimeUnit.SECONDS).schedule();
     }
 
