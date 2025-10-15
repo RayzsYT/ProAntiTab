@@ -26,7 +26,7 @@ public class WaterfallAntiTabListener implements Listener {
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
         String serverName = player.getServer().getInfo().getName();
 
-        if (Storage.Blacklist.isDisabledServer(serverName))
+        if (Storage.Blacklist.isDisabledServer(serverName) || PermissionUtil.hasBypassPermission(player))
             return;
 
         Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
@@ -41,9 +41,7 @@ public class WaterfallAntiTabListener implements Listener {
         event.getCommands().forEach((key, value) -> commandsAsString.add(key));
         commandsCache.handleCommands(commandsAsString, serverName);
 
-        if (PermissionUtil.hasBypassPermission(player)) return;
-
-        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, player.getUniqueId(), serverName);
+        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, serverName);
         event.getCommands().entrySet().removeIf(command -> {
 
             if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command.getKey()) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command.getKey())) {
