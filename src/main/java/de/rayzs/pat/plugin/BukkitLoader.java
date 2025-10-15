@@ -113,12 +113,12 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
             LuckPermsAdapter.initialize();
             Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
-        }
-
-        final Plugin groupManagerPlugin = getServer().getPluginManager().getPlugin("GroupManager");
-        if (groupManagerPlugin != null) {
-            GroupManagerAdapter.initialize(groupManagerPlugin);
-            Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
+        } else {
+            final Plugin groupManagerPlugin = getServer().getPluginManager().getPlugin("GroupManager");
+            if (groupManagerPlugin != null) {
+                GroupManagerAdapter.initialize(groupManagerPlugin);
+                Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
+            }
         }
 
         if (getServer().getPluginManager().getPlugin("ViaVersion") != null)
@@ -128,7 +128,9 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             Logger.warning("Detected SimpleCloud. Therefore, MiniMessages are disabled!");
         }
 
+        Storage.broadcastPermissionsPluginNotice();
         ConfigUpdater.broadcastMissingParts();
+
         ActionHandler.initialize();
         SubArgsModule.initialize();
 
@@ -255,12 +257,9 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         return List.of();
     }
 
-    public static void delayedPermissionsReload() {
+    @Override
+    public void delayedPermissionsReload() {
         PATScheduler.createScheduler(PermissionUtil::reloadPermissions, 40);
-    }
-
-    public static void userPermissionsReload(UUID uuid) {
-        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(BukkitLoader.getPlugin(), () -> PermissionUtil.reloadPermissions(uuid));
     }
 
     public void startUpdaterTask() {
@@ -273,6 +272,19 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
                 updaterTask.cancelTask();
 
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
+    }
+
+    public static void handleUpdateCommandsPacket(CommunicationPackets.UpdateCommandsPacket packet) {
+
+        if (!packet.hasTargetUUID()) {
+            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+            return;
+        }
+
+        Player player = Bukkit.getPlayer(packet.getTargetUUID());
+        if (player != null) {
+            player.updateCommands();
+        }
     }
 
     public static void synchronize(CommunicationPackets.PacketBundle packetBundle) {
