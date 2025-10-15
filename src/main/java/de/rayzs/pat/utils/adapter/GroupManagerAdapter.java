@@ -4,6 +4,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
 import org.anjocaido.groupmanager.GroupManager;
@@ -25,7 +26,7 @@ public class GroupManagerAdapter implements Listener {
 
     public static void initialize(Plugin plugin) {
         manager = (GroupManager) plugin;
-        Storage.USE_GROUPMANAGER = true;
+        Storage.setPermissionPlugin(PermissionPlugin.GROUPMANAGER);
 
         Bukkit.getServer().getPluginManager().registerEvents(new GroupManagerListener(), BukkitLoader.getPlugin());
     }

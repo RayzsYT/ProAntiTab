@@ -9,6 +9,7 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
@@ -42,17 +43,21 @@ public class BukkitPlayerListener implements Listener {
             CustomServerBrand.sendBrandToPlayer(player);
         }
 
-        if (!Storage.USE_LUCKPERMS && !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
-            PATScheduler.createScheduler(() -> {
-                CommandSender sender = CommandSenderHandler.from(player);
+        if (Storage.getPermissionPlugin() != PermissionPlugin.LUCKPERMS) {
 
-                assert sender != null;
-                PermissionUtil.reloadPermissions(sender);
+            if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+                PATScheduler.createScheduler(() -> {
+                    CommandSender sender = CommandSenderHandler.from(player);
 
-                if (Reflection.getMinor() >= 13) {
-                    BukkitAntiTabListener.handleTabCompletion(player.getUniqueId());
-                }
-            }, 20);
+                    assert sender != null;
+                    PermissionUtil.reloadPermissions(sender);
+
+                    if (Reflection.getMinor() >= 13) {
+                        BukkitAntiTabListener.handleTabCompletion(player.getUniqueId());
+                    }
+                }, 20);
+            }
+
         }
 
         if (!BukkitPacketAnalyzer.inject(player)) {

@@ -56,9 +56,9 @@ public class PermissionUtil {
     }
 
     public static void setPlayerPermissions(CommandSender sender) {
-        if (Storage.USE_LUCKPERMS) {
+        if (Storage.getPermissionPlugin() == PermissionPlugin.LUCKPERMS) {
             LuckPermsAdapter.setPermissions(sender.getUniqueId());
-        } else if (Storage.USE_GROUPMANAGER) {
+        } else if (Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER) {
             GroupManagerAdapter.setPermissions(sender.getUniqueId());
         } else {
             GroupManager.getGroups().forEach(group -> group.hasPermission(sender));
@@ -66,9 +66,9 @@ public class PermissionUtil {
     }
 
     public static void setPlayerPermissions(UUID uuid) {
-        if (Storage.USE_LUCKPERMS) {
+        if (Storage.getPermissionPlugin() == PermissionPlugin.LUCKPERMS) {
             LuckPermsAdapter.setPermissions(uuid);
-        } else if (Storage.USE_GROUPMANAGER) {
+        } else if (Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER) {
             GroupManagerAdapter.setPermissions(uuid);
         } else {
             GroupManager.getGroups().forEach(group -> group.hasPermission(uuid));
@@ -122,7 +122,7 @@ public class PermissionUtil {
 
         if (sender != null) {
 
-            if (!Storage.USE_LUCKPERMS) {
+            if (Storage.getPermissionPlugin() != PermissionPlugin.LUCKPERMS) {
 
                 if (!permissionMap.hasPermissionState("*"))
                     permissionMap.setState("*", sender.hasPermission("*"));

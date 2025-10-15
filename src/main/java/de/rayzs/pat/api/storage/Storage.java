@@ -9,6 +9,7 @@ import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.utils.permission.PermissionPlugin;
 import org.bukkit.entity.Player;
 
 import de.rayzs.pat.api.event.PATEventHandler;
@@ -71,12 +72,27 @@ public class Storage {
     public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
     public static Object PLUGIN_OBJECT;
-    public static boolean USE_LUCKPERMS = false, USE_GROUPMANAGER = false, USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false, USE_VELOCITY = false, USE_SIMPLECLOUD;
+    public static boolean USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false, USE_VELOCITY = false, USE_SIMPLECLOUD;
     public static long LAST_SYNC = System.currentTimeMillis();
+
+    private static PermissionPlugin PERMISSION_PLUGIN = PermissionPlugin.NONE;
 
     public static void initialize(PluginLoader loader, String currentVersion) {
         LOADER = loader;
         CURRENT_VERSION = currentVersion;
+    }
+
+    public static void setPermissionPlugin(PermissionPlugin permissionPlugin) {
+
+        if (PERMISSION_PLUGIN == PermissionPlugin.LUCKPERMS) {
+            return;
+        }
+
+        PERMISSION_PLUGIN = permissionPlugin;
+    }
+
+    public static PermissionPlugin getPermissionPlugin() {
+        return PERMISSION_PLUGIN;
     }
 
     public static void loadAll(boolean loadBlacklist) {

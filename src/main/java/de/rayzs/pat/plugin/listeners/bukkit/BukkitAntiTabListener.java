@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
+import de.rayzs.pat.utils.permission.PermissionPlugin;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
@@ -23,7 +24,7 @@ public class BukkitAntiTabListener implements Listener {
         final Player player = event.getPlayer();
         final UUID uuid = player.getUniqueId();
 
-        final boolean noPermissionsPlugin = !Storage.USE_LUCKPERMS && !Storage.USE_GROUPMANAGER;
+        final boolean noPermissionsPlugin = Storage.getPermissionPlugin() == PermissionPlugin.NONE;
 
 
         if (Storage.USE_VELOCITY) {

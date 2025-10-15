@@ -11,6 +11,7 @@ import javax.net.ssl.HttpsURLConnection;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.permission.PermissionPlugin;
 
 import java.net.URL;
 import java.util.*;
@@ -105,12 +106,12 @@ public class Logger {
                 .append("\n");
 
         builder.append(" LuckPerms: ")
-                .append(Storage.USE_LUCKPERMS)
+                .append(Storage.getPermissionPlugin() == PermissionPlugin.LUCKPERMS)
                 .append("\n");
 
         if (!Reflection.isProxyServer()) {
             builder.append(" GroupManager: ")
-                    .append(Storage.USE_GROUPMANAGER)
+                    .append(Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER)
                     .append("\n");
         }
 

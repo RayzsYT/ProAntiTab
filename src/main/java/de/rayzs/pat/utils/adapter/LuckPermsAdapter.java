@@ -1,6 +1,7 @@
 package de.rayzs.pat.utils.adapter;
 
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
+import de.rayzs.pat.utils.permission.PermissionPlugin;
 import net.luckperms.api.event.sync.PreNetworkSyncEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.plugin.VelocityLoader;
@@ -22,7 +23,7 @@ public class LuckPermsAdapter {
     public static void initialize() {
         Logger.info("Successfully hooked into LuckPerms for easier usage.");
 
-        Storage.USE_LUCKPERMS = true;
+        Storage.setPermissionPlugin(PermissionPlugin.LUCKPERMS);
         PROVIDER = LuckPermsProvider.get();
         EventBus eventBus = PROVIDER.getEventBus();
 
