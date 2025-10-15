@@ -14,6 +14,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 
@@ -101,7 +102,7 @@ public class VelocityAntiTabListener {
                 return !playerCommands.contains(command.getName());
             });
         } catch (Exception exception) {
-            System.out.println("An error occurred while processing commands in PAT: " + exception.getMessage());
+            Logger.warning("An error occurred while processing commands in PAT: " + exception.getMessage());
             exception.printStackTrace();
         }
     }
