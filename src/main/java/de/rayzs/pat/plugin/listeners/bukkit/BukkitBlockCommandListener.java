@@ -68,13 +68,10 @@ public class BukkitBlockCommandListener implements Listener {
         String command = event.getMessage(),
                 worldName = world.getName();
 
-        boolean bypassPermission = PermissionUtil.hasBypassPermission(player, command);
-
         command = command.substring(1);
         command = StringUtils.getFirstArg(command);
 
         final String displayName = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
-        //command = command.toLowerCase();
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(
                 Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
@@ -82,8 +79,9 @@ public class BukkitBlockCommandListener implements Listener {
                 "%command%", displayName,
                 "%world%", worldName);
 
-        if (bypassPermission)
+        if (PermissionUtil.hasBypassPermission(player, command)) {
             return;
+        }
 
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
             return;
