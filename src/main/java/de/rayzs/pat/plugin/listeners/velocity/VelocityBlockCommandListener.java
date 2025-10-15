@@ -40,14 +40,10 @@ public class VelocityBlockCommandListener {
                 ? player.getCurrentServer().get().getServerInfo().getName()
                 : "unknown";
 
-        boolean bypassPermission = PermissionUtil.hasBypassPermission(player, command);
-
-        if (bypassPermission)
+        if (PermissionUtil.hasBypassPermission(player, command))
             return event;
 
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
-
-        //command = command.toLowerCase();
 
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(
