@@ -12,9 +12,10 @@ import java.util.UUID;
 
 public class BungeeSender extends CommandSenderAbstract {
 
-    private final CommandSender sender;
     private final UUID uuid;
     private final String name;
+
+    private CommandSender sender;
 
     private final boolean console;
 
@@ -27,8 +28,6 @@ public class BungeeSender extends CommandSenderAbstract {
             this.name = player.getName();
             this.uuid = player.getUniqueId();
             this.console = false;
-
-            updateGroups();
             return;
         }
 
@@ -43,6 +42,17 @@ public class BungeeSender extends CommandSenderAbstract {
         }
 
         this.console = true;
+    }
+
+    @Override
+    public void updateSenderObject(Object senderObj) {
+        super.updateSenderObject(senderObj);
+
+        if (senderObj instanceof ProxiedPlayer player) {
+            sender = player;
+        } else if (senderObj instanceof CommandSender commandSender) {
+            sender = commandSender;
+        }
     }
 
     @Override
@@ -94,6 +104,6 @@ public class BungeeSender extends CommandSenderAbstract {
 
     @Override
     public void updateGroups() {
-        setGroups(GroupManager.getPlayerGroups(this.uuid));
+        setGroups(GroupManager.getPlayerGroups(getSenderObject()));
     }
 }
