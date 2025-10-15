@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.adapter;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
+import de.rayzs.pat.utils.scheduler.PATScheduler;
 import net.luckperms.api.event.sync.PreNetworkSyncEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.plugin.VelocityLoader;
@@ -86,15 +87,18 @@ public class LuckPermsAdapter {
             User user = (User) event.getTarget();
             UUID uuid = user.getUniqueId();
 
-            PermissionUtil.reloadPermissions(user.getUniqueId());
-
             if (Reflection.isProxyServer()) {
+                PermissionUtil.reloadPermissions(user.getUniqueId());
                 Communicator.sendUpdateCommand(uuid);
 
                 if (Reflection.isVelocityServer()) {
                     VelocityLoader.delayedPlayerReload(uuid);
                 }
 
+            } else {
+                PATScheduler.createScheduler(() -> {
+                    PermissionUtil.reloadPermissions(user.getUniqueId());
+                });
             }
 
         }
