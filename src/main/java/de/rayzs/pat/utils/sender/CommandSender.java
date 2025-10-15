@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface CommandSender {
 
+    void updateSenderObject(Object senderObj);
     Object getSenderObject();
 
     boolean isConsole();
