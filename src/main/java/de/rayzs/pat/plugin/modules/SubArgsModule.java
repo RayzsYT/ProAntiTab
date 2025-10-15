@@ -5,9 +5,12 @@ import de.rayzs.pat.plugin.modules.events.ExecuteCommand;
 import de.rayzs.pat.plugin.modules.events.TabCompletion;
 import de.rayzs.pat.plugin.modules.events.UpdateList;
 import de.rayzs.pat.utils.node.CommandNodeHelper;
+import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import de.rayzs.pat.utils.subargs.*;
 import java.util.stream.Collectors;
 import de.rayzs.pat.utils.group.*;
@@ -104,7 +107,14 @@ public class SubArgsModule {
 
     public static List<String> getGroupCommands(UUID uuid, String serverName) {
         List<String> commands = new ArrayList<>();
-        List<Group> groups = GroupManager.getPlayerGroups(uuid);
+        List<Group> groups;
+
+        if (Storage.getPermissionPlugin() == PermissionPlugin.NONE) {
+            CommandSender sender = CommandSenderHandler.getSenderFromUUID(uuid);
+            groups = GroupManager.getPlayerGroups(sender);
+        } else {
+            groups = GroupManager.getPlayerGroups(uuid);
+        }
 
         if (serverName == null) {
             groups.forEach(group -> commands.addAll(group.getCommands()));
