@@ -263,6 +263,20 @@ public class Storage {
         }
     }
 
+    // Quickly updates all player subarguments.
+    public static void quickSubArgumentUpdate(UUID uuid) {
+
+        System.out.println("QuickSubArgumentUpdate: " + uuid);
+
+        List<String> playerCommands = new ArrayList<>(SubArgsModule.getServerCommands(uuid));
+        playerCommands.addAll(SubArgsModule.getGroupCommands(uuid));
+
+        System.out.println("PlayerCommands: " + playerCommands);
+        System.out.println("SubArgsModule: " + SubArgsModule.getGroupCommands(uuid));
+
+        PATEventHandler.callUpdatePlayerCommandsEvents(uuid, playerCommands, false);
+    }
+
     public static PluginLoader getLoader() {
         return LOADER;
     }
