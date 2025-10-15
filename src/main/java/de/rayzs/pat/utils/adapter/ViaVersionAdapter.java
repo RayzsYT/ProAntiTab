@@ -1,6 +1,6 @@
 package de.rayzs.pat.utils.adapter;
 
-import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.api.storage.Storage;
 import com.viaversion.viaversion.api.*;
 import java.util.UUID;
 
@@ -9,8 +9,7 @@ public class ViaVersionAdapter {
     private static ViaAPI API;
 
     public static void initialize() {
-        Logger.info("Successfully hooked into ViaVersion for easier usage.");
-
+        Storage.USE_VIAVERSION = true;
         API = Via.getAPI();
     }
 
