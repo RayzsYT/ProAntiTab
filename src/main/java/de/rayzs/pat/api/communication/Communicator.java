@@ -71,6 +71,14 @@ public class Communicator {
             return;
         }
 
+        if (packet instanceof CommunicationPackets.UpdateCommandsPacket) {
+            if (Reflection.isProxyServer())
+                return;
+
+            CommunicationPackets.UpdateCommandsPacket updateCommandsPacket = (CommunicationPackets.UpdateCommandsPacket) packet;
+            BukkitLoader.handleUpdateCommandsPacket(updateCommandsPacket);
+        }
+
         if (packet instanceof CommunicationPackets.ForcePermissionResetPacket) {
             if (Reflection.isProxyServer())
                 return;
@@ -217,6 +225,14 @@ public class Communicator {
     public static void sendPermissionReset() {
         if(Reflection.isProxyServer())
             sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN));
+    }
+
+    public static void sendUpdateCommand() {
+        sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN));
+    }
+
+    public static void sendUpdateCommand(UUID targetUUID) {
+        sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN, targetUUID));
     }
 
     public static void sendFeedback() {
