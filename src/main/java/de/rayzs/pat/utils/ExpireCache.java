@@ -16,13 +16,19 @@ public class ExpireCache<T, K> {
     }
 
     public boolean put(T t, K k) {
-        if(contains(t)) return false;
+        if (contains(t)) {
+            return false;
+        }
+
         cache.put(t, k);
         return true;
     }
 
     public boolean remove(T t) {
-        if(!contains(t)) return false;
+        if (!contains(t)) {
+            return false;
+        }
+        
         cache.invalidate(t);
         return true;
     }
