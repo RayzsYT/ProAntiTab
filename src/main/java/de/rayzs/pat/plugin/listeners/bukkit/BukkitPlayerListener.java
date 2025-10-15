@@ -78,11 +78,9 @@ public class BukkitPlayerListener implements Listener {
             }, 10);
         }
 
+        // Update sub arguments for <1.12.2 servers.
         if (Reflection.getMinor() < 13) {
-            List<String> playerCommands = new ArrayList<>(SubArgsModule.getServerCommands(uuid));
-            playerCommands.addAll(SubArgsModule.getGroupCommands(uuid));
-
-            PATEventHandler.callUpdatePlayerCommandsEvents(uuid, playerCommands, false);
+            Storage.quickSubArgumentUpdate(uuid);
         }
 
         if (Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
