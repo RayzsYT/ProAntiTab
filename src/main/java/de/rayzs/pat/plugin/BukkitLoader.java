@@ -22,6 +22,8 @@ import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.response.action.ActionHandler;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -346,8 +348,13 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         if (Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
             Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = unknownCommandPacket.isEnabled();
 
-        if (!loaded)
+        if (!loaded) {
             loaded = true;
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                CommandSender sender = CommandSenderHandler.from(player);
+                sender.updateGroups();
+            });
+        }
 
         if (Reflection.getMinor() >= 13 && updatedList) {
             BukkitAntiTabListener.updateCommands();
