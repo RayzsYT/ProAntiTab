@@ -26,7 +26,7 @@ public class ListGroupsCommand extends ProCommand {
 
             String message = Storage.ConfigSections.Messages.GROUP.LIST_GROUP_MESSAGE;
             message = StringUtils.replace(message,
-                    "%size%", String.valueOf(Storage.Blacklist.getBlacklist().getCommands().size()),
+                    "%size%", String.valueOf(GroupManager.getGroups().size()),
                     "%groups%", groupsListMessage
             );
 
