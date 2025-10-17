@@ -33,7 +33,7 @@ public abstract class CommandSenderAbstract implements CommandSender {
         final List<Group> groupList = groups.get(KEY);
 
         if (groupList == null) {
-            return groups.putAndGet(KEY, GroupManager.getPlayerGroups(getUniqueId()));
+            return groups.putAndGet(KEY, GroupManager.getPlayerGroups(getSenderObject()));
         }
 
         return groupList;
