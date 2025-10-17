@@ -84,9 +84,9 @@ public class CommandsCache {
         for (int i = 0; i < max; i++) {
             try {
                 String command = filteredCommands.get(i);
-                filteredCommands.add(command);
-            } catch (ArrayIndexOutOfBoundsException outOfBoundsException) {
-                Logger.warning("Array is out of bounds " + i + "/" + max + "! " + outOfBoundsException.getMessage());
+                localFilteredCommands.add(command);
+            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+                Logger.warning("Array is out of bounds " + i + "/" + max + "! " + indexOutOfBoundsException.getMessage());
                 break;
             }
         }
