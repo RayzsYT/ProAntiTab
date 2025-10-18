@@ -50,8 +50,9 @@ public class BungeePlayerConnectionListener implements Listener {
 
         BungeePacketAnalyzer.inject(player);
 
-        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1)
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) {
             return;
+        }
 
         CustomServerBrand.sendBrandToPlayer(player);
     }
