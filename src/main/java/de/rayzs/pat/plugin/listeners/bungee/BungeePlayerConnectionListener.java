@@ -64,8 +64,9 @@ public class BungeePlayerConnectionListener implements Listener {
         PermissionUtil.resetPermissions(player.getUniqueId());
         BungeePacketAnalyzer.uninject(player);
 
-        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1)
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) {
             return;
+        }
 
         CustomServerBrand.sendBrandToPlayer(player);
     }

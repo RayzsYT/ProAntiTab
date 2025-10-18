@@ -58,7 +58,10 @@ public class VelocityConnectionListener {
         if(!VelocityPacketAnalyzer.isInjected(player))
             VelocityPacketAnalyzer.inject(player);
 
-        if(Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) return;
+        if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) {
+            return;
+        }
+
         CustomServerBrand.sendBrandToPlayer(player);
     }
 
