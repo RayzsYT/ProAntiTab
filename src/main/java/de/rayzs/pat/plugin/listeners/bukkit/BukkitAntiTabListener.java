@@ -1,7 +1,8 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
-import de.rayzs.pat.utils.permission.PermissionPlugin;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
@@ -24,16 +25,13 @@ public class BukkitAntiTabListener implements Listener {
         final Player player = event.getPlayer();
         final UUID uuid = player.getUniqueId();
 
-        final boolean noPermissionsPlugin = Storage.getPermissionPlugin() == PermissionPlugin.NONE;
-
 
         if (Storage.USE_VELOCITY) {
             return;
         }
 
         if (player.isOp()) {
-
-            if (noPermissionsPlugin && !knownOperators.contains(uuid)) {
+            if (!knownOperators.contains(uuid)) {
                 knownOperators.add(uuid);
             }
 
@@ -45,8 +43,9 @@ public class BukkitAntiTabListener implements Listener {
             return;
         }
 
-        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             return;
+        }
 
         if (event.getCommands().isEmpty()) {
             return;
@@ -55,19 +54,19 @@ public class BukkitAntiTabListener implements Listener {
         List<String> allCommands = getCommands();
         COMMANDS_CACHE.handleCommands(allCommands);
 
+        if (!player.isOp() && knownOperators.contains(uuid)) {
+            knownOperators.remove(uuid);
+
+            CommandSender sender = CommandSenderHandler.getSenderFromUUID(uuid);
+            PermissionUtil.reloadPermissions(sender);
+        }
+
         if (PermissionUtil.hasBypassPermission(player)) {
-
-            if (noPermissionsPlugin && knownOperators.contains(uuid)) {
-                PermissionUtil.reloadPermissions(uuid);
-                knownOperators.remove(uuid);
-            } else {
-                return;
-            }
-
+            return;
         }
 
         final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), player);
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, playerCommands);
+        final FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, playerCommands);
 
         event.getCommands().clear();
 
