@@ -107,7 +107,7 @@ public class BukkitPlayerListener implements Listener {
             CustomServerBrand.sendBrandToPlayer(player);
         }
 
-        if (Storage.ConfigSections.Settings.UPDATE_COMMANDS_PER_WORLD.ENABLED) {
+        if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_WORLD.ENABLED) {
             CommandSender sender = CommandSenderHandler.from(player);
 
             assert sender != null;
