@@ -55,8 +55,15 @@ public class VelocityConnectionListener {
     public void onServerSwitch(ServerConnectedEvent event) {
         Player player = event.getPlayer();
 
-        if(!VelocityPacketAnalyzer.isInjected(player))
+        if (!VelocityPacketAnalyzer.isInjected(player))
             VelocityPacketAnalyzer.inject(player);
+
+        if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
+            CommandSender sender = CommandSenderHandler.from(player);
+
+            assert sender != null;
+            PermissionUtil.reloadPermissions(sender);
+        }
 
         if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) {
             return;

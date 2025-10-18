@@ -50,6 +50,13 @@ public class BungeePlayerConnectionListener implements Listener {
 
         BungeePacketAnalyzer.inject(player);
 
+        if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
+            CommandSender sender = CommandSenderHandler.from(player);
+
+            assert sender != null;
+            PermissionUtil.reloadPermissions(sender);
+        }
+
         if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY != -1) {
             return;
         }
