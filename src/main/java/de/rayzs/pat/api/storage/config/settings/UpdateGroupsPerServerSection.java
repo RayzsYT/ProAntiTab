@@ -4,12 +4,12 @@ import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
-public class UpdateCommandsPerWorldSection extends ConfigStorage {
+public class UpdateGroupsPerServerSection extends ConfigStorage {
 
     public boolean ENABLED;
 
-    public UpdateCommandsPerWorldSection() {
-        super("update-commands-per-world");
+    public UpdateGroupsPerServerSection() {
+        super("update-groups-per-server");
     }
 
     @Override

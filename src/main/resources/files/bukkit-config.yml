@@ -68,13 +68,13 @@ base-command-case-sensitive: true
 #     Enabling this could lead to performance issues if many players
 #     change worlds frequently in short amount of time.
 #
-# This decides whether PAT updates the commands for a player after changing worlds.
+# This decides whether PAT updates the commands for a player after switching worlds.
 # Enabling this allows you to make per-world commands using PAT's group system by
 # giving a user/group the PAT group permission using a LuckPerms world as context.
 #
 # Example command:
 #   lp (...) permission set proantitab.group.<group> world=<world>
-update-commands-per-world: false
+update-groups-per-world: false
 
 # Here you can customize the server version that is displayed on a ping. (The text at the player-count)
 # (!) Warning: It's required to use Paper or Purpur to use this feature!

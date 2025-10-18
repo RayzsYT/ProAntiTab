@@ -340,7 +340,8 @@ public class Storage {
             public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
             public static TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
             public static BaseCommandCaseSensitiveSection BASE_COMMAND_CASE_SENSITIVE = new BaseCommandCaseSensitiveSection();
-            public static UpdateCommandsPerWorldSection UPDATE_COMMANDS_PER_WORLD = new UpdateCommandsPerWorldSection();
+            public static UpdateGroupsPerWorldSection UPDATE_GROUPS_PER_WORLD = new UpdateGroupsPerWorldSection();
+
             public static UpdateSection UPDATE = new UpdateSection();
 
             public static void initialize() {}
