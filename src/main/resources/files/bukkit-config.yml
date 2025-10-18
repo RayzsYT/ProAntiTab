@@ -66,7 +66,7 @@ base-command-case-sensitive: true
 
 # (!) Warning:
 #     Enabling this could lead to performance issues if many players
-#     change worlds frequently in short amount of time.
+#     change worlds frequently in a short amount of time.
 #
 # This decides whether PAT updates the commands for a player after switching worlds.
 # Enabling this allows you to make per-world commands using PAT's group system by
