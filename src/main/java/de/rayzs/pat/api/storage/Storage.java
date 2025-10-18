@@ -341,6 +341,7 @@ public class Storage {
             public static TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
             public static BaseCommandCaseSensitiveSection BASE_COMMAND_CASE_SENSITIVE = new BaseCommandCaseSensitiveSection();
             public static UpdateGroupsPerWorldSection UPDATE_GROUPS_PER_WORLD = new UpdateGroupsPerWorldSection();
+            public static UpdateGroupsPerServerSection UPDATE_GROUPS_PER_SERVER = new UpdateGroupsPerServerSection();
 
             public static UpdateSection UPDATE = new UpdateSection();
 
