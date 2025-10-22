@@ -9,14 +9,14 @@ public class UpdateGroupsPerWorldSection extends ConfigStorage {
     public boolean ENABLED;
 
     public UpdateGroupsPerWorldSection() {
-        super("update-groups-per-server");
+        super("update-groups-per-world");
     }
 
     @Override
     public void load() {
         super.load();
 
-        if (!Reflection.isProxyServer())
+        if (Reflection.isProxyServer())
             return;
 
         ENABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
