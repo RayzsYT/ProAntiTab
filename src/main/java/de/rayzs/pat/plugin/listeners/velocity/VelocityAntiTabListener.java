@@ -29,6 +29,11 @@ public class VelocityAntiTabListener {
     @Subscribe (order = PostOrder.LAST)
     public void onTabComplete(TabCompleteEvent event) {
         Player player = event.getPlayer();
+
+        if (!event.getPartialMessage().startsWith("/")) {
+            return;
+        }
+
         String serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown";
 
         if (Storage.Blacklist.isDisabledServer(serverName))
