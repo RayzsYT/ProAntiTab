@@ -48,18 +48,6 @@ turn-blacklist-to-whitelist: true
 #   /HelP --> Allowed
 base-command-case-sensitive: true
 
-# (!) Warning:
-#     Enabling this could lead to performance issues if many players
-#     switch servers frequently in a short amount of time.
-#
-# This decides whether PAT updates the PAT groups for a player after switching servers.
-# Enabling this allows you to assign PAT groups to players for certain servers only
-# by giving a user/group the PAT group permission using LuckPerms with a server context.
-#
-# Example command:
-#   lp(b/v) (...) permission set proantitab.group.<group> server=<server>
-update-groups-per-server: false
-
 # Here you can customize the server version that is displayed on a ping. (The text at the player-count)
 custom-protocol-ping:
   enabled: true
