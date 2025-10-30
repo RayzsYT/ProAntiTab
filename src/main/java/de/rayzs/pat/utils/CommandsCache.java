@@ -46,9 +46,10 @@ public class CommandsCache {
             return;
 
         LinkedList<String> tmpFilteredCommands = new LinkedList<>();
-        allCommands = new ArrayList<>(commands);
+        List<String> tmpAllCommands = new ArrayList<>(commands);
+        allCommands = tmpAllCommands;
 
-        for (String command : allCommands) {
+        for (String command : tmpAllCommands) {
             command = StringUtils.getFirstArg(command);
 
             Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
