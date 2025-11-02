@@ -53,6 +53,30 @@ public class VelocityBlockCommandListener {
                 "%server%", serverName
         );
 
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
+
+            MessageTranslator.send(
+                    player,
+                    Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
+                    "%command%", StringUtils.getFirstArg(displayCommand)
+            );
+
+            event.setResult(CommandExecuteEvent.CommandResult.denied());
+            return event;
+        }
+
+        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+
+            MessageTranslator.send(
+                    player,
+                    Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
+                    "%command%", StringUtils.getFirstArg(displayCommand)
+            );
+
+            event.setResult(CommandExecuteEvent.CommandResult.denied());
+            return event;
+        }
+
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
             return event;
 

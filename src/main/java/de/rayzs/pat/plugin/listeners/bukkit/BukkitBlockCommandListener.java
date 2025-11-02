@@ -71,15 +71,39 @@ public class BukkitBlockCommandListener implements Listener {
         command = command.substring(1);
         command = StringUtils.getFirstArg(command);
 
-        final String displayName = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
+        final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(
                 Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
                 "%player%", player.getName(),
-                "%command%", displayName,
+                "%command%", displayCommand,
                 "%world%", worldName);
 
         if (PermissionUtil.hasBypassPermission(player, command)) {
+            return;
+        }
+
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
+
+            MessageTranslator.send(
+                    player,
+                    Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
+                    "%command%", StringUtils.getFirstArg(displayCommand)
+            );
+
+            event.setCancelled(true);
+            return;
+        }
+
+        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+
+            MessageTranslator.send(
+                    player,
+                    Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
+                    "%command%", StringUtils.getFirstArg(displayCommand)
+            );
+
+            event.setCancelled(true);
             return;
         }
 

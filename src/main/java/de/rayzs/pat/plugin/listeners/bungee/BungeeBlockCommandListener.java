@@ -43,6 +43,30 @@ public class BungeeBlockCommandListener implements Listener {
                 "%command%", displayCommand,
                 "%server%", serverName);
 
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
+
+            MessageTranslator.send(
+                    player,
+                    Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
+                    "%command%", StringUtils.getFirstArg(displayCommand)
+            );
+
+            event.setCancelled(true);
+            return;
+        }
+
+        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+
+            MessageTranslator.send(
+                    player,
+                    Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
+                    "%command%", StringUtils.getFirstArg(displayCommand)
+            );
+
+            event.setCancelled(true);
+            return;
+        }
+
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
             return;
 
