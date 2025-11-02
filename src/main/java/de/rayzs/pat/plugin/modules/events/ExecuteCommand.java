@@ -35,34 +35,6 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
         UUID uuid = sender.getUniqueId();
 
-        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
-
-            MessageTranslator.send(
-                    event.getSenderObj(),
-                    Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
-                    "%command%", StringUtils.getFirstArg(displayCommand)
-            );
-
-            event.setBlocked(true);
-            event.setCancelled(true);
-            event.setDoesNotify(true);
-            return;
-        }
-
-        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
-
-            MessageTranslator.send(
-                    event.getSenderObj(),
-                    Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
-                    "%command%", StringUtils.getFirstArg(displayCommand)
-            );
-
-            event.setBlocked(true);
-            event.setCancelled(true);
-            event.setDoesNotify(true);
-            return;
-        }
-
         if (isBlocked(sender, command)) {
             event.setBlocked(true);
             event.setCancelled(true);
