@@ -61,6 +61,16 @@ public class VelocityBlockCommandListener {
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
 
+            if (Storage.SEND_CONSOLE_NOTIFICATION)
+                MessageTranslator.send(consoleSender, notificationMessage);
+
+            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
+                if (p != null) {
+                    MessageTranslator.send(p, notificationMessage);
+                }
+            });
+
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             return event;
         }
@@ -72,6 +82,16 @@ public class VelocityBlockCommandListener {
                     Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
+
+            if (Storage.SEND_CONSOLE_NOTIFICATION)
+                MessageTranslator.send(consoleSender, notificationMessage);
+
+            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
+                if (p != null) {
+                    MessageTranslator.send(p, notificationMessage);
+                }
+            });
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
             return event;
@@ -96,7 +116,7 @@ public class VelocityBlockCommandListener {
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
                     MessageTranslator.send(consoleSender, notificationMessage);
 
-                Storage.NOTIFY_PLAYERS.stream().forEach(uuid -> {
+                Storage.NOTIFY_PLAYERS.forEach(uuid -> {
                     Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
                     if (p != null) {
                         MessageTranslator.send(p, notificationMessage);

@@ -91,6 +91,16 @@ public class BukkitBlockCommandListener implements Listener {
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
 
+            if (Storage.SEND_CONSOLE_NOTIFICATION)
+                Logger.info(notificationMessage);
+
+            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
+                if (p != null) {
+                    MessageTranslator.send(p, notificationMessage);
+                }
+            });
+
             event.setCancelled(true);
             return;
         }
@@ -102,6 +112,16 @@ public class BukkitBlockCommandListener implements Listener {
                     Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
+
+            if (Storage.SEND_CONSOLE_NOTIFICATION)
+                Logger.info(notificationMessage);
+
+            Storage.NOTIFY_PLAYERS.forEach(uuid -> {
+                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
+                if (p != null) {
+                    MessageTranslator.send(p, notificationMessage);
+                }
+            });
 
             event.setCancelled(true);
             return;
