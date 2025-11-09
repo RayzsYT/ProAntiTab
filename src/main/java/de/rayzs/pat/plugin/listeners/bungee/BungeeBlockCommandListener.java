@@ -28,7 +28,7 @@ public class BungeeBlockCommandListener implements Listener {
         String serverName = player.getServer().getInfo().getName();
         String command = event.getMessage();
 
-        if (PermissionUtil.hasBypassPermission(player, command))
+        if (PermissionUtil.hasBypassPermission(player, command) || Storage.Blacklist.isDisabledServer(serverName))
             return;
 
         command = command.startsWith("/") ? command.substring(1) : command;

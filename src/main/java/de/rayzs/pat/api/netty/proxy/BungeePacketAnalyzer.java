@@ -145,6 +145,9 @@ public class BungeePacketAnalyzer {
         ServerInfo serverInfo = player.getServer().getInfo();
         String serverName = serverInfo.getName();
 
+        if (Storage.Blacklist.isDisabledServer(serverName))
+            return;
+
         CommandNodeHelper helper = new CommandNodeHelper<CommandNode>(commands.getRoot());
 
         Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
@@ -241,9 +244,10 @@ public class BungeePacketAnalyzer {
 
             } else if (wrapper.packet instanceof TabCompleteResponse) {
                 TabCompleteResponse response = (TabCompleteResponse) wrapper.packet;
+                String serverName = player.getServer().getInfo().getName();
 
-                if(player.getPendingConnection().getVersion() < 754) {
-                    if(!PermissionUtil.hasBypassPermission(player)) {
+                if (!Storage.Blacklist.isDisabledServer(serverName) && player.getPendingConnection().getVersion() < 754) {
+                    if (!PermissionUtil.hasBypassPermission(player)) {
 
                         ClientInfo clientInfo = Communicator.getClientByName(player.getServer().getInfo().getName());
                         if (clientInfo == null || !PLAYER_INPUT_CACHE.containsKey(player))
