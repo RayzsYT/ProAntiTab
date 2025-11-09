@@ -17,8 +17,11 @@ public class DisabledServersStorage extends StorageTemplate {
 
     public DisabledServersStorage add(String server) {
         server = server.toLowerCase();
-        if(!servers.contains(server))
+
+        if (!servers.contains(server)) {
             servers.add(server);
+        }
+
         return this;
     }
 
@@ -29,7 +32,10 @@ public class DisabledServersStorage extends StorageTemplate {
     }
 
     public boolean isListed(String server) {
-        if(servers.isEmpty()) return false;
+        if (servers.isEmpty()) {
+            return false;
+        }
+
         return Storage.isServer(server, servers);
     }
 
@@ -42,7 +48,11 @@ public class DisabledServersStorage extends StorageTemplate {
 
     @Override
     public void load() {
-        if(!Reflection.isProxyServer()) return;
+
+        if (!Reflection.isProxyServer()) {
+            return;
+        }
+
         getConfig().reload();
         servers = (ArrayList<String>) getConfig().getOrSet(getNavigatePath(), servers);
    }
