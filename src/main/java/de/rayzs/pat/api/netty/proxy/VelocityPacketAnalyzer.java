@@ -190,6 +190,13 @@ public class VelocityPacketAnalyzer {
 
             } else if (packet instanceof TabCompleteResponsePacket) {
 
+                String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
+
+                if (Storage.Blacklist.isDisabledServer(serverName)) {
+                    super.write(ctx, msg, promise);
+                    return;
+                }
+
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
                     TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
 
@@ -250,10 +257,17 @@ public class VelocityPacketAnalyzer {
             } else if (packet instanceof AvailableCommandsPacket) {
 
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
+
+                    String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
+
+                    if (Storage.Blacklist.isDisabledServer(serverName)) {
+                        super.write(ctx, msg, promise);
+                        return;
+                    }
+
                     AvailableCommandsPacket commands = (AvailableCommandsPacket) packet;
 
                     if(!commands.getRootNode().getChildren().isEmpty()) {
-                        String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
                         Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
 
                         if (!cache.containsKey(serverName))

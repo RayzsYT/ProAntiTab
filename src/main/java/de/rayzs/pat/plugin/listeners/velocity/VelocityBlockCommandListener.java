@@ -40,7 +40,7 @@ public class VelocityBlockCommandListener {
                 ? player.getCurrentServer().get().getServerInfo().getName()
                 : "unknown";
 
-        if (PermissionUtil.hasBypassPermission(player, command))
+        if (PermissionUtil.hasBypassPermission(player, command) || Storage.Blacklist.isDisabledServer(serverName))
             return event;
 
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");

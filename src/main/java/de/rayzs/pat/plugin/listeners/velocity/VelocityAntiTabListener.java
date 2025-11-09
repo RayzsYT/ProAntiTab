@@ -68,6 +68,10 @@ public class VelocityAntiTabListener {
 
             String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
 
+            if (Storage.Blacklist.isDisabledServer(serverName)) {
+                return;
+            }
+
             Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
 
             if (!cache.containsKey(serverName)) {
