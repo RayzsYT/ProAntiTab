@@ -237,7 +237,7 @@ perms-check:
   player-not-online: "&c%player% is not online!"
 
 convert:
-  converter-not-found: '&cConverter or necessary files to convert %converter% could not be found!'
+  converter-not-found: '&cConverter or necessary files could not be found!'
   success: '&aSuccessfully converted &e%converter% &ainto the PAT storage.yml!'
 
 help:

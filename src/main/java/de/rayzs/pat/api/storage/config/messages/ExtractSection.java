@@ -23,9 +23,9 @@ public class ExtractSection extends ConfigStorage {
             return;
         }
 
-        USAGE = new ConfigSectionHelper<String>(this, "usage", "&cUsage: /pat extract [plugin] <group/use-colon> : <use-colon>").getOrSet();
+        USAGE = new ConfigSectionHelper<String>(this, "usage", "&7Usage: &f/pat extract [plugin] <use-colon> &7or &f<group> <use-colon>").getOrSet();
         PLUGIN_NOT_FOUND = new ConfigSectionHelper<String>(this, "plugin-not-found", "&cPlugin %plugin% not found!").getOrSet();
-        SUCCESS = new ConfigSectionHelper<String>(this, "success", "&aSuccessfully extracted &e%amount% &anew commands!").getOrSet();
+        SUCCESS = new ConfigSectionHelper<String>(this, "success", "&aSuccessfully extracted &e%amount% &anew commands from %plugin%!").getOrSet();
 
     }
 }

@@ -18,7 +18,7 @@ public class ConvertSection extends ConfigStorage {
     public void load() {
         super.load();
 
-        INVALID_CONVERTER = new ConfigSectionHelper<String>(this, "converter-not-found", "&cConverter or necessary files to convert %converter% could not be found!").getOrSet();
+        INVALID_CONVERTER = new ConfigSectionHelper<String>(this, "converter-not-found", "&cConverter or necessary files could not be found!").getOrSet();
         SUCCESS = new ConfigSectionHelper<String>(this, "success", "&aSuccessfully converted &e%converter% &ainto the PAT storage.yml!").getOrSet();
 
     }
