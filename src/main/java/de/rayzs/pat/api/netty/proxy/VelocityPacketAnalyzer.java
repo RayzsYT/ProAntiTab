@@ -1,10 +1,7 @@
 package de.rayzs.pat.api.netty.proxy;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.velocitypowered.api.proxy.Player;
@@ -73,20 +70,27 @@ public class VelocityPacketAnalyzer {
 
             channel = (Channel) Reflection.getMethodsByName(minecraftConnectionClass, "getChannel").get(0).invoke(minecraftConnectionObj);
 
-            if(channel == null) {
+            if (channel == null) {
                 Logger.warning("Failed to inject " + player.getUsername() + "! Channel is null.");
                 return false;
             }
 
-            if(channel.pipeline().names().contains(VelocityPacketAnalyzer.PIPELINE_NAME))
+            if (channel.pipeline().names().contains(VelocityPacketAnalyzer.PIPELINE_NAME))
                 uninject(player);
 
             channel.pipeline().addBefore(VelocityPacketAnalyzer.HANDLER_NAME, VelocityPacketAnalyzer.PIPELINE_NAME, new PacketDecoder(player));
             VelocityPacketAnalyzer.INJECTED_PLAYERS.put(player, channel);
+
+        } catch (NoSuchElementException e) {
+            Logger.warning("Failed to find 'handler' inside player pipeline! (name=" + player.getUsername() + ", uuid=" + player.getUniqueId() + ", version=" + player.getProtocolVersion() + ", brand=" + player.getClientBrand() + " )");
+            return false;
+
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return false;
-        } return true;
+        }
+
+        return true;
     }
 
     public static void uninject(Player player) {
