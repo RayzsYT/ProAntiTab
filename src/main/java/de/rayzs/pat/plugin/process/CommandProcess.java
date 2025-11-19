@@ -35,6 +35,12 @@ public class CommandProcess {
         COMMANDS.add(new RemoveCommand());
         COMMANDS.add(new ClearCommand());
 
+        COMMANDS.add(new ConvertCommand());
+
+        if (!Reflection.isProxyServer()) {
+            COMMANDS.add(new ExtractCommand());
+        }
+
         COMMANDS.add(new CreateGroupCommand());
         COMMANDS.add(new DeleteGroupCommand());
 
