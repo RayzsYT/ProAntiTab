@@ -17,7 +17,7 @@ public abstract class Converter {
         this.pluginName = pluginName;
         this.fileName = fileName;
         this.folderPath = "./plugins/" + folderName;
-        this.config = Configurator.get(fileName, folderPath);
+        this.config = exists() ? Configurator.get(fileName, folderPath) : null;
     }
 
     public String getPluginName() {
