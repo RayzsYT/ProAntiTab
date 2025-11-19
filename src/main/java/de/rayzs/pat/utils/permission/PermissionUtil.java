@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.permission;
 import java.util.*;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.adapter.GroupManagerAdapter;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -24,6 +25,10 @@ public class PermissionUtil {
     }
 
     public static void reloadPermissions(UUID uuid) {
+        if (uuid == null) {
+            return;
+        }
+
         resetPermissions(uuid);
         setPlayerPermissions(uuid);
 
