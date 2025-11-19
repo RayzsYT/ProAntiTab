@@ -30,7 +30,8 @@ public class ExtractCommand extends ProCommand {
     public boolean execute(CommandSender sender, String[] args) {
 
         if (args.length < 1) {
-            return false;
+            sender.sendMessage(Storage.ConfigSections.Messages.EXTRACT.USAGE);
+            return true;
         }
 
         String pluginName = args[0].toLowerCase();
@@ -115,7 +116,8 @@ public class ExtractCommand extends ProCommand {
         storage.save();
 
         sender.sendMessage(StringUtils.replace(Storage.ConfigSections.Messages.EXTRACT.SUCCESS,
-                "%amount%", String.valueOf(commands.size())
+                "%amount%", String.valueOf(commands.size()),
+                "%plugin%", pluginName
         ));
 
         return true;
