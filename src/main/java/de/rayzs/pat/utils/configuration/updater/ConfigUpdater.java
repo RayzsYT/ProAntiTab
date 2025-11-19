@@ -101,13 +101,20 @@ public class ConfigUpdater {
         }
 
         Logger.warning(" ");
-        Logger.warning("The config.yml is missing a few parts.");
-        Logger.warning("What can be done to solve this issue? There are two options:");
+        Logger.warning("Hey, the config.yml is missing a few parts.");
+        Logger.warning("This most likely happened because PAT added a new feature or message.");
+        Logger.warning(" ");
+        Logger.warning("No worries though! This isn't a bad or dangerous thing.");
+        Logger.warning("You can even ignore or disable this warning entirely by disabling 'announce-missing-parts'.");
+        Logger.warning(" ");
+        Logger.warning("But more importantly. If you want to fill the missing parts,");
+        Logger.warning("then you would have three options on how to do so:");
         Logger.warning(" ");
         Logger.warning("Option 1: Delete your current config.yml and restart the server.");
         Logger.warning("Option 2: Set the missing parts/sections yourself in the config.yml.");
+        Logger.warning("Option 3: Enable 'auto-update-config'. But *please* read the warning message above that option.");
         Logger.warning(" ");
-        Logger.warning("To simplify that process, a new file with the newest config.yml content has been created as comparison. (plugins/ProAntiTab/comparable-config.yml)");
+        Logger.warning("To simplify this process, a new file with the newest config.yml content has been created as comparison. (plugins/ProAntiTab/comparable-config.yml)");
         Logger.warning(" ");
         Logger.warning("Following parts are missing:");
 
@@ -116,7 +123,9 @@ public class ConfigUpdater {
         });
 
         Logger.warning(" ");
-        Logger.warning("How to read? Check out the newly generated " + HOW_TO_READ_FILE_NAME + " file. ^^");
+        Logger.warning("You don't know how to interpret the missing parts? No worries.");
+        Logger.warning("A new file has been created which explains with examples on how to read and apply the missing parts.");
+        Logger.warning("-> ./plugins/ProAntiTab/" + HOW_TO_READ_FILE_NAME);
         Logger.warning(" ");
     }
 }
