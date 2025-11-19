@@ -5,6 +5,7 @@ import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.proxy.VelocityPacketAnalyzer;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.api.event.Subscribe;
@@ -14,6 +15,7 @@ import de.rayzs.pat.api.storage.Storage;
 import com.velocitypowered.api.proxy.*;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
+import net.kyori.adventure.text.Component;
 
 import java.util.concurrent.TimeUnit;
 
@@ -55,8 +57,20 @@ public class VelocityConnectionListener {
     public void onServerSwitch(ServerConnectedEvent event) {
         Player player = event.getPlayer();
 
-        if (!VelocityPacketAnalyzer.isInjected(player))
-            VelocityPacketAnalyzer.inject(player);
+        if (!VelocityPacketAnalyzer.isInjected(player)) {
+
+            if (!VelocityPacketAnalyzer.inject(player)) {
+                Logger.warning("Attempting delayed injection for " + player.getUsername());
+                server.getScheduler().buildTask(loader, () -> {
+
+                    if (!VelocityPacketAnalyzer.inject(player)) {
+                        Logger.warning("Second injection for " + player.getUsername() + " failed as well!");
+                        player.disconnect(Component.text("Failed to inject player!"));
+                    }
+
+                }).delay(1, TimeUnit.SECONDS).schedule();
+            }
+        }
 
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
             CommandSender sender = CommandSenderHandler.from(player);
