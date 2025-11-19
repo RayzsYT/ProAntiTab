@@ -51,7 +51,7 @@ public class ListCommand extends ProCommand {
         String message = Storage.ConfigSections.Messages.GROUP.LIST_MESSAGE;
         message = StringUtils.replace(message,
                 "%group%", groupName,
-                "%size%", String.valueOf(Storage.Blacklist.getBlacklist().getCommands().size()),
+                "%size%", String.valueOf(group.getCommands().size()),
                 "%commands%", commandsListMessage
         );
 
