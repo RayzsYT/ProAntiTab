@@ -81,14 +81,9 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if (fileName.equals("config")) {
-            if (!ConfigUpdater.shouldAutoUpdate()) {
-                ConfigUpdater.addMissingPart((!path.isBlank() ? path + "." : "") + target);
-                return object;
-            }
-
-            set(path, target, object);
-            return get(path, target);
+        if (fileName.equals("config") && !ConfigUpdater.shouldAutoUpdate()) {
+            ConfigUpdater.addMissingPart((!path.isBlank() ? path + "." : "") + target);
+            return object;
         }
 
         set(path, target, object);
@@ -103,14 +98,9 @@ public class BukkitConfigurationBuilder implements ConfigurationBuilder {
         if (result != null)
             return result;
 
-        if (fileName.equals("config")) {
-            if (!ConfigUpdater.shouldAutoUpdate()) {
-                ConfigUpdater.addMissingPart(target);
-                return object;
-            }
-
-            set(target, object);
-            return get(target);
+        if (fileName.equals("config") && !ConfigUpdater.shouldAutoUpdate()) {
+            ConfigUpdater.addMissingPart(target);
+            return object;
         }
 
         set(target, object);
