@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin;
 
 
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.converter.StorageConverter;
 import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
@@ -101,6 +102,8 @@ public class BungeeLoader extends Plugin implements PluginLoader {
 
         ActionHandler.initialize();
         SubArgsModule.initialize();
+
+        StorageConverter.initialize();
 
         // Reload proxy commands after 1, 5, and 15 seconds.
         for (int i : new Integer[] { 1, 5, 15 }) {

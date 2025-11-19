@@ -122,6 +122,8 @@ public class VelocityLoader implements PluginLoader {
 
         ActionHandler.initialize();
         SubArgsModule.initialize();
+
+        StorageConverter.initialize();
     }
 
     public static org.slf4j.Logger getPluginLogger() {

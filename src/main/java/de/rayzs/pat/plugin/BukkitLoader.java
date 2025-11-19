@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin;
 
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.converter.StorageConverter;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
@@ -135,6 +136,8 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         ActionHandler.initialize();
         SubArgsModule.initialize();
+
+        StorageConverter.initialize();
 
         PATScheduler.createScheduler(this::loadAllCommands);
     }
@@ -449,6 +452,10 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         BukkitLoader.commands = result;
         BukkitLoader.allowedCommands = allowedCommands;
         BukkitLoader.disallowedCommands = commands.stream().filter(command -> !allowedCommands.contains(command)).toList();
+    }
+
+    public static Map<String, Command> getCommandsMap() {
+        return commandsMap;
     }
 
     public static boolean useSuggestions() {
