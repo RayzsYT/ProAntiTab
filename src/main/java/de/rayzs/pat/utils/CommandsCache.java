@@ -42,28 +42,31 @@ public class CommandsCache {
     }
 
     public void handleCommands(List<String> commands, String server) {
-        if(!isOutdated(commands)) 
+        if (!isOutdated(commands))
             return;
 
         LinkedList<String> tmpFilteredCommands = new LinkedList<>();
-        List<String> tmpAllCommands = new ArrayList<>(commands);
+        List<String> tmpAllCommands = Collections.unmodifiableList(commands);
         allCommands = tmpAllCommands;
 
-        for (String command : tmpAllCommands) {
-            command = StringUtils.getFirstArg(command);
+        final int length = allCommands.size();
+        for (int i = 0; i < length; i++) {
+            if (i >= tmpAllCommands.size())
+                break;
 
+            String command = StringUtils.getFirstArg(tmpAllCommands.get(i));
             Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
+
             if (type != Storage.Blacklist.BlockType.BOTH && type != Storage.Blacklist.BlockType.TAB)
                 continue;
 
             if (isFilterListAvailable()) {
-                if (filteredCommands.contains(command)) 
+                if (filteredCommands.contains(command))
                     continue;
 
                 if (!Storage.Blacklist.isBlockedTab(command, server))
-                    filteredCommands.add(command);
+                    tmpFilteredCommands.add(command);
             }
-
         }
 
         filteredCommands = tmpFilteredCommands;
