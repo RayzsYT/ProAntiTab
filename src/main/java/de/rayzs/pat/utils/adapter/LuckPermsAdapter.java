@@ -34,6 +34,12 @@ public class LuckPermsAdapter {
 
 
     public static User getUser(UUID uuid) {
+
+        if (uuid == null) {
+            Logger.warning("Attempted to get LuckPerms user with null UUID!");
+            return null;
+        }
+
         return PROVIDER.getUserManager().getUser(uuid);
     }
 
