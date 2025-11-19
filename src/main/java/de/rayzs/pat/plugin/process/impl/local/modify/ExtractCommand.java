@@ -6,6 +6,7 @@ import de.rayzs.pat.api.storage.storages.BlacklistStorage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.converter.Converter;
 import de.rayzs.pat.plugin.converter.StorageConverter;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.sender.CommandSender;
@@ -32,7 +33,7 @@ public class ExtractCommand extends ProCommand {
             return false;
         }
 
-        String pluginName = args[0];
+        String pluginName = args[0].toLowerCase();
         boolean failed = false, useColons = false;
         Group group = null;
 
@@ -70,20 +71,31 @@ public class ExtractCommand extends ProCommand {
         }
 
         if (failed) {
-            sender.sendMessage("&cUsage: /pat extract [plugin] <group> <colons>");
+            sender.sendMessage(Storage.ConfigSections.Messages.EXTRACT.USAGE);
             return true;
         }
 
-        Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
+        List<String> pluginNames = Storage.getLoader().getPluginNames("%n");
+        boolean pluginFound = false;
 
-        if (plugin == null) {
-            sender.sendMessage("&cPlugin '" + pluginName + "' not found.");
+        for (String name : pluginNames) {
+            if (name.equalsIgnoreCase(pluginName)) {
+                pluginFound = true;
+                break;
+            }
+        }
+
+        if (!pluginFound) {
+            sender.sendMessage(StringUtils.replace(Storage.ConfigSections.Messages.EXTRACT.PLUGIN_NOT_FOUND,
+                    "%plugin%", pluginName)
+            );
+
             return true;
         }
 
         List<String> commands = new ArrayList<>();
         for (Map.Entry<String, Command> entry : BukkitLoader.getCommandsMap().entrySet()) {
-            if (entry.getKey().toLowerCase().startsWith(plugin.getName().toLowerCase() + ":")) {
+            if (entry.getKey().toLowerCase().startsWith(pluginName + ":")) {
                 String command = entry.getKey().substring(args[0].length() + 1);
                 commands.add(command);
 
@@ -102,7 +114,10 @@ public class ExtractCommand extends ProCommand {
 
         storage.save();
 
-        sender.sendMessage("&aDone! Extracted &e" + commands.size() + "&a commands in total.");
+        sender.sendMessage(StringUtils.replace(Storage.ConfigSections.Messages.EXTRACT.SUCCESS,
+                "%amount%", String.valueOf(commands.size())
+        ));
+
         return true;
     }
 
@@ -111,7 +126,7 @@ public class ExtractCommand extends ProCommand {
         final int length = args.length;
 
         if (length <= 1) {
-            return Arrays.stream(Bukkit.getPluginManager().getPlugins()).map(Plugin::getName).toList();
+            return Storage.getLoader().getPluginNames("%n");
         }
 
         List<String> result = new ArrayList<>();

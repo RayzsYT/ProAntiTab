@@ -16,6 +16,7 @@ public class HelpSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
+
         MESSAGE = new MultipleMessagesHelper(this, null, Reflection.isProxyServer() ?
                 Arrays.asList(
                         "&7Available commands are: &f/%label%&7..."
@@ -26,6 +27,8 @@ public class HelpSection extends ConfigStorage {
                         , "&f  postdebug &7to post the PAT logs"
                         , "&f  update <player> &7to update player(s) permissions"
                         , "&f  perms <player> &7to check a player's permissions"
+                        , "&f  extract (plugin) &7to extract all plugin commands"
+                        , "&f  convert (plugin) &7converts into a PAT storage.yml"
                         , "&f  creategroup (group) &7Create a group"
                         , "&f  deletegroup (group) &7Delete a group"
                         , "&f  setpriority (group) (priority) &7to set the priority"
@@ -44,6 +47,7 @@ public class HelpSection extends ConfigStorage {
                         , "&f  postdebug &7to post the PAT logs"
                         , "&f  update <player> &7to update player(s) permissions"
                         , "&f  perms <player> &7to check a player's permissions"
+                        , "&f  extract (plugin) &7to extract all plugin commands"
                         , "&f  creategroup (group) &7Create a group"
                         , "&f  deletegroup (group) &7Delete a group"
                         , "&f  setpriority (group) (priority) &7to set the priority"

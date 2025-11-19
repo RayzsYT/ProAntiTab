@@ -1,8 +1,10 @@
 package de.rayzs.pat.plugin.process.impl.local.modify;
 
 import de.rayzs.pat.api.command.ProCommand;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.converter.Converter;
 import de.rayzs.pat.plugin.converter.StorageConverter;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.sender.CommandSender;
 
 import java.util.List;
@@ -25,11 +27,19 @@ public class ConvertCommand extends ProCommand {
         String converterName = args[0];
         Converter converter = StorageConverter.getConverter(converterName);
         if (converter == null) {
-            return false;
+            sender.sendMessage(StringUtils.replace(Storage.ConfigSections.Messages.CONVERT.INVALID_CONVERTER,
+                    "%converter%", converterName)
+            );
+
+            return true;
         }
 
+        converterName = converter.getPluginName();
         converter.apply();
-        sender.sendMessage("§aDone!");
+
+        sender.sendMessage(StringUtils.replace(Storage.ConfigSections.Messages.CONVERT.SUCCESS,
+                "%converter%", converterName)
+        );
 
         return true;
     }

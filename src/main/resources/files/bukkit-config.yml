@@ -271,6 +271,15 @@ perms-check:
   player-is-missing: "&cPlease specify the player whose permission you want to check."
   player-not-online: "&c%player% is not online!"
 
+extract:
+  usage: '&cUsage: /pat extract [plugin] <group/use-colon> : <use-colon>'
+  plugin-not-found: '&cPlugin %plugin% not found!'
+  success: '&aSuccessfully extracted &e%amount% &anew commands!'
+
+convert:
+  converter-not-found: '&cConverter or necessary files to convert %converter% could not be found!'
+  success: '&aSuccessfully converted &e%converter% &ainto the PAT storage.yml!'
+
 help:
   - '&7Available commands are: &f/%label%&7... &8[&fBUKKIT&8]'
   - '&7Format: &8<optional> (required)'
@@ -280,6 +289,8 @@ help:
   - '&f  postdebug &7to post the PAT logs'
   - '&f  update <player> &7to update player(s) permissions'
   - "&f  perms <player> &7to check a player's permissions"
+  - "&f  extract (plugin) &7to extract all plugin commands"
+  - "&f  convert (plugin) &7converts into a PAT storage.yml"
   - '&f  add/rem (command) &8<group> &7to manage the list'
   - '&f  clear &8<group> &7to clear the list'
   - '&f  creategroup (group) &7to create a group'
