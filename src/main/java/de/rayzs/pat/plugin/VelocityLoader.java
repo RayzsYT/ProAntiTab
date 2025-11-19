@@ -6,6 +6,7 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.plugin.converter.StorageConverter;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.utils.CommandsCache;
@@ -37,7 +38,7 @@ import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "2.1.1",
+version = "2.1.2",
 authors = "Rayzs_YT",
 description = "Hide more than just your plugins. Hide almost everything!",
 url = "https://www.rayzs.de/products/proantitab/page",
@@ -132,7 +133,6 @@ public class VelocityLoader implements PluginLoader {
         server.getScheduler().buildTask(VelocityLoader.instance, () -> {
             PermissionUtil.reloadPermissions();
             Storage.getLoader().updateCommandCache();
-
         }).delay(1, TimeUnit.SECONDS).schedule();
     }
 
