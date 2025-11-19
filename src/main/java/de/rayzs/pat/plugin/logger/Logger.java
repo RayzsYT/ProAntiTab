@@ -99,7 +99,7 @@ public class Logger {
                 .append("\n");
 
         builder.append("Installed plugins: \n  ")
-                .append(String.join("\n  ", Storage.getLoader().getPluginNames()))
+                .append(String.join("\n  ", Storage.getLoader().getPluginNames("%n (%v)")))
                 .append("\n\n");
 
         builder.append("Detected supported plugins:")
