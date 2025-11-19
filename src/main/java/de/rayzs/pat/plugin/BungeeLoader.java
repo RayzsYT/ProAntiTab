@@ -257,12 +257,16 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     @Override
-    public List<String> getPluginNames() {
+    public List<String> getPluginNames(String format) {
         List<String> pluginNames = new ArrayList<>();
 
         for (Plugin plugin : ProxyServer.getInstance().getPluginManager().getPlugins()) {
             PluginDescription description = plugin.getDescription();
-            pluginNames.add(description.getName() + " (" + description.getVersion() + ")");
+
+            pluginNames.add(
+                    format.replace("%n", description.getName())
+                            .replace("%v", description.getVersion())
+            );
         }
 
         return pluginNames;

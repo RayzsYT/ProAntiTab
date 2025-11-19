@@ -379,12 +379,16 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     @Override
-    public List<String> getPluginNames() {
+    public List<String> getPluginNames(String format) {
         List<String> pluginNames = new ArrayList<>();
 
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
             PluginDescriptionFile description = plugin.getDescription();
-            pluginNames.add(description.getName() + " (" + description.getVersion() + ")");
+
+            pluginNames.add(
+                    format.replace("%n", description.getName())
+                            .replace("%v", description.getVersion())
+            );
         }
 
         return pluginNames;

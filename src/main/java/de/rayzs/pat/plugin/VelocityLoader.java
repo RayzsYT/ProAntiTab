@@ -280,7 +280,7 @@ public class VelocityLoader implements PluginLoader {
     }
 
     @Override
-    public List<String> getPluginNames() {
+    public List<String> getPluginNames(String format) {
         List<String> pluginNames = new ArrayList<>();
         for (PluginContainer plugin : server.getPluginManager().getPlugins()) {
             PluginDescription description = plugin.getDescription();
@@ -288,7 +288,10 @@ public class VelocityLoader implements PluginLoader {
             String pluginName = description.getName().orElse("/");
             String version = description.getVersion().orElse("/");
 
-            pluginNames.add(pluginName + " (" + version + ")");
+            pluginNames.add(
+                    format.replace("%n", pluginName)
+                            .replace("%v", version)
+            );
         }
 
         return pluginNames;
