@@ -26,6 +26,6 @@ public class HandleThroughProxySection extends ConfigStorage {
         TOKEN = new ConfigSectionHelper<String>(this, "token", "insert-token-of-proxy-here").getOrSet();
 
         LOAD_FROM_ENV = new ConfigSectionHelper<Boolean>(this, "load-from-env.enabled", false).getOrSet();
-        ENV_NAME = new ConfigSectionHelper<String>(this, "load-from-env.name", false).getOrSet();
+        ENV_NAME = new ConfigSectionHelper<String>(this, "load-from-env.name", "PAT_TOKEN").getOrSet();
     }
 }
