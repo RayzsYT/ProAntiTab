@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.storage.config.settings;
 
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.helper.*;
 import java.util.*;
 
@@ -31,13 +32,8 @@ public class CustomPluginsSection extends ConfigStorage {
 
     public boolean isCommand(String command) {
         if(!ENABLED) return false;
+        command = StringUtils.getFirstArg(command);
 
-        if (command.contains(" ")) {
-            String[] split = command.split(" ");
-            if (split.length > 0)
-                command = split[0];
-            command = command.split(" ")[0];
-        }
         for (String currentCommand : COMMANDS.getLines()) {
             if (currentCommand.equalsIgnoreCase(command))
                 return true;
