@@ -1,6 +1,6 @@
 package de.rayzs.pat.plugin.converter;
 
-import de.rayzs.pat.plugin.converter.converters.CommandWhitelist;
+import de.rayzs.pat.plugin.converter.converters.*;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
@@ -17,7 +17,11 @@ public class StorageConverter {
             return;
         }
 
-        registerConverter(new CommandWhitelist());
+        registerConverter(new AdvancedPlHideConverter());
+        registerConverter(new CommandWhitelistConverter());
+        registerConverter(new PluginHiderPlus());
+        registerConverter(new PlHideFree());
+        registerConverter(new PlHidePro());
     }
 
     public static Set<String> getConverters() {
