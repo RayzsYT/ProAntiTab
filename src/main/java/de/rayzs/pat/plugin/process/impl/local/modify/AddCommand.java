@@ -107,7 +107,9 @@ public class AddCommand extends ProCommand {
             if (Reflection.isProxyServer())
                 return null;
 
-            return BukkitLoader.getDisallowedCommands();
+            return Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED
+                    ? BukkitLoader.getDisallowedCommands()
+                    : BukkitLoader.getAllowedCommands();
         }
 
         String fullString = String.join(" ", args);
