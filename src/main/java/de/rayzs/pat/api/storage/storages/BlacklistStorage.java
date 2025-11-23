@@ -1,8 +1,6 @@
 package de.rayzs.pat.api.storage.storages;
 
 import de.rayzs.pat.utils.StringUtils;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.*;
 
 import java.io.Serializable;
@@ -17,7 +15,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public boolean isListed(String command) {
-        return isListed(command, !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+        return isListed(command, false/*!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED*/);
     }
 
     public boolean isListed(String command, boolean ignoreColons) {
