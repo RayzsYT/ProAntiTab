@@ -1,9 +1,9 @@
 package de.rayzs.pat.plugin.converter;
 
-import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.api.storage.storages.BlacklistStorage;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.utils.configuration.Configurator;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 import java.io.File;
 import java.util.List;
@@ -42,5 +42,5 @@ public abstract class Converter {
         storage.save();
     }
 
-    public abstract void apply();
+    public abstract void apply(CommandSender sender);
 }

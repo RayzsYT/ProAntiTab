@@ -35,12 +35,12 @@ public class ConvertCommand extends ProCommand {
         }
 
         converterName = converter.getPluginName();
-        converter.apply();
-
         sender.sendMessage(StringUtils.replace(Storage.ConfigSections.Messages.CONVERT.SUCCESS,
                 "%converter%", converterName)
         );
 
+        converter.apply(sender);
+        Storage.reload();
         return true;
     }
 
