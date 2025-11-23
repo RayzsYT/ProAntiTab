@@ -59,7 +59,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
         }
 
         if (!cancelsBeforeHand) {
-            cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input);
+            cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(input) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(input);
         }
 
         for (Field field : Reflection.getFields(packetObj)) {
