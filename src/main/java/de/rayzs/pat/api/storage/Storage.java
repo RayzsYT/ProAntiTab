@@ -3,6 +3,8 @@ package de.rayzs.pat.api.storage;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.config.messages.*;
@@ -10,6 +12,7 @@ import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import org.bukkit.entity.Player;
 
@@ -617,7 +620,7 @@ public class Storage {
             String command = type.toString() + unmodifiedCommand;
 
             if (server == null || !isIgnoredServer(server)) {
-                listed = BLACKLIST.isListed(command, !turn);
+                listed = BLACKLIST.isListed(command, false/*!turn*/);
             }
 
             if (server == null) {
@@ -638,7 +641,7 @@ public class Storage {
                     break;
                 }
 
-                listed = blacklist.isListed(command, turn);
+                listed = blacklist.isListed(command, false/*turn*/);
             }
 
             if (!listed && type != BlockType.BOTH) {
