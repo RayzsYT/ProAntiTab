@@ -163,6 +163,30 @@ public class Storage {
             ConfigSections.PLACEHOLDERS.forEach(PlaceholderStorage::load);
     }
 
+    public static void reload() {
+        boolean proxy = Reflection.isProxyServer();
+        boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !proxy;
+
+        ConfigUpdater.initialize();
+        Storage.loadAll(Reflection.isProxyServer() || !backend);
+
+        CustomServerBrand.initialize();
+        GroupManager.clearAllGroups();
+        GroupManager.initialize();
+
+        if (!proxy) {
+            BackendUpdater.stop();
+            BackendUpdater.start();
+        }
+
+        if (!backend) {
+            Storage.handleChange();
+        }
+
+        ConfigUpdater.broadcastMissingParts();
+        Storage.getLoader().handleReload();
+    }
+
     public static void handleChange() {
         handleChange(null);
     }
