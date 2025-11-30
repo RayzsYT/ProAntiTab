@@ -9,6 +9,14 @@ import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class CommandsCache {
 
+    /**
+     *
+     *
+     * RECODE PLANNED
+     *
+     *
+     */
+
     private List<String> filteredCommands = null, allCommands = null;
     private boolean change = false;
 
