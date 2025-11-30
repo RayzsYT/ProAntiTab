@@ -46,7 +46,7 @@ public class CommandsCache {
             return;
 
         LinkedList<String> tmpFilteredCommands = new LinkedList<>();
-        List<String> tmpAllCommands = Collections.unmodifiableList(commands);
+        List<String> tmpAllCommands = new ArrayList<>(commands);
         allCommands = tmpAllCommands;
 
         final int length = allCommands.size();
