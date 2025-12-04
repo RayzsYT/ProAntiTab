@@ -71,6 +71,14 @@ public class BukkitBlockCommandListener implements Listener {
         command = command.substring(1);
         command = StringUtils.getFirstArg(command);
 
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+            return;
+        }
+
+        if (PermissionUtil.hasBypassPermission(player, command)) {
+            return;
+        }
+
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
         List<String> notificationMessage = MessageTranslator.replaceMessageList(
@@ -78,10 +86,6 @@ public class BukkitBlockCommandListener implements Listener {
                 "%player%", player.getName(),
                 "%command%", displayCommand,
                 "%world%", worldName);
-
-        if (PermissionUtil.hasBypassPermission(player, command)) {
-            return;
-        }
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
 
@@ -128,9 +132,6 @@ public class BukkitBlockCommandListener implements Listener {
         }
 
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
-            return;
-        
-        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             return;
 
         if (!Storage.Blacklist.canPlayerAccessChat(player, command)) {
