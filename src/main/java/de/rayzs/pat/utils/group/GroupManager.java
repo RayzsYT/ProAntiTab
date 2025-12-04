@@ -63,7 +63,7 @@ public class GroupManager {
         final CommandSender sender = CommandSenderHandler.from(targetObj);
 
         if (sender == null) {
-            Logger.warning("Failed to load player! (GroupManager#62)");
+            Logger.warning("Failed to load player! (GroupManager#66)");
             return false;
         }
 
@@ -72,13 +72,20 @@ public class GroupManager {
         if (playerGroups == null || playerGroups.isEmpty()) {
             return false;
         }
-        
-        String command = type.toString() + unmodifiedCommand;
 
-        boolean permitted = false;
+        String command = type.toString() + unmodifiedCommand;
+        String allCommand = type + "*";
+        String negatedCommand = type.toString() + BlockType.NEGATE + unmodifiedCommand;
+
+        boolean all = false,
+                permitted = false,
+                negated = false;
+
         for (Group group : playerGroups) {
 
+            all = group.contains(allCommand);
             permitted = group.contains(command);
+            negated = group.contains(negatedCommand);
 
             if (permitted) {
                 break;
@@ -90,15 +97,29 @@ public class GroupManager {
 
                 for (String s : servers) {
 
-                    if (group.contains(command, s)) {
-                        permitted = true;
-                        break;
+                    if (!all) {
+                        all = group.contains(allCommand, s);
                     }
 
+                    if (!permitted) {
+                        permitted = group.contains(command, s);
+                    }
+
+                    if (!negated) {
+                        negated = group.contains(negatedCommand, s);
+                    }
                 }
 
             }
 
+        }
+
+        if (negated) {
+            return false;
+        }
+
+        if (all) {
+            return true;
         }
 
         if (!permitted && type != BlockType.BOTH)

@@ -617,34 +617,45 @@ public class Storage {
             BlockType negation = BlockType.NEGATE;
             String negatedCommand = negation + command;
 
-            boolean listed = isListed(command, type, server),
+            boolean all = isListed("*", type, server),
+                    listed = isListed(command, type, server),
                     negatedListed = isListed(negatedCommand, type, server),
                     turn = ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
 
+            if (all) {
+                // Only listens to negated commands
+                if (negatedListed) {
+                    return turn;
+                }
 
-            if (!turn && negatedListed) {
-                listed = !listed;
+                return !turn;
             }
 
+
+
+            /*
             if (turn) {
                 return !listed;
             } else {
                 return listed;
             }
+             */
+
+            return turn != listed; // Shorter version of above's code
 
         }
 
         private static boolean isListed(String unmodifiedCommand, BlockType type, String server) {
-            if (server != null && isDisabledServer(server))
+            if (server != null && isDisabledServer(server)) {
                 return false;
+            }
 
-            boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
             boolean listed = false;
 
             String command = type.toString() + unmodifiedCommand;
 
             if (server == null || !isIgnoredServer(server)) {
-                listed = BLACKLIST.isListed(command, false/*!turn*/);
+                listed = BLACKLIST.isListed(command, false);
             }
 
             if (server == null) {
@@ -661,11 +672,11 @@ public class Storage {
                 blacklists.add(BLACKLIST);
 
             for (GeneralBlacklist blacklist : blacklists) {
-                if (listed/* && turn*/) {
+                if (listed) {
                     break;
                 }
 
-                listed = blacklist.isListed(command, false/*turn*/);
+                listed = blacklist.isListed(command, false);
             }
 
             if (!listed && type != BlockType.BOTH) {

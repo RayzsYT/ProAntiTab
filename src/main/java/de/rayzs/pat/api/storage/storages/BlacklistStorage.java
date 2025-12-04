@@ -15,7 +15,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public boolean isListed(String command) {
-        return isListed(command, false/*!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED*/);
+        return isListed(command, false);
     }
 
     public boolean isListed(String command, boolean ignoreColons) {
@@ -25,8 +25,16 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
             return false;
         }
 
+        /*
         if (!isNegated(command) && commands.contains("*")) {
             return true;
+        }
+        */
+
+        boolean isNegated = isNegated(command);
+
+        if (!isNegated) {
+            command = StringUtils.getFirstArg(command);
         }
 
         for (String listedCommand : commands) {
@@ -40,14 +48,14 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
                     command = command.substring(command.indexOf(':'));
             }
 
-            if (caseSensitive) {
-                if (StringUtils.getFirstArg(listedCommand).equals(StringUtils.getFirstArg(command))) {
-                    return true;
-                }
-            } else {
-                if (StringUtils.getFirstArg(listedCommand).equalsIgnoreCase(StringUtils.getFirstArg(command))) {
-                    return true;
-                }
+            if (!isNegated) {
+                listedCommand = StringUtils.getFirstArg(listedCommand);
+            }
+
+            if (caseSensitive && listedCommand.equals(command)) {
+                return true;
+            } else if (!caseSensitive && listedCommand.equalsIgnoreCase(command)) {
+                return true;
             }
         }
 
