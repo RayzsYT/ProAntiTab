@@ -139,39 +139,40 @@ public class BungeePacketAnalyzer {
     }
 
     private static void modifyCommands(ProxiedPlayer player, Commands commands) {
-        if (PermissionUtil.hasBypassPermission(player))
-            return;
-
         ServerInfo serverInfo = player.getServer().getInfo();
         String serverName = serverInfo.getName();
 
-        if (Storage.Blacklist.isDisabledServer(serverName))
-            return;
+        final boolean ignore = PermissionUtil.hasBypassPermission(player) || Storage.Blacklist.isDisabledServer(serverName);
 
         CommandNodeHelper helper = new CommandNodeHelper<CommandNode>(commands.getRoot());
-
-        Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
-
-        if (!cache.containsKey(serverName))
-            cache.put(serverName, new CommandsCache());
-
-        CommandsCache commandsCache = cache.get(serverName);
 
         List<String> commandsAsString = new ArrayList<>(PROXY_COMMANDS);
         commandsAsString.addAll(helper.getChildrenNames());
 
-        commandsCache.handleCommands(commandsAsString, serverName);
+        List<String> playerCommands = new ArrayList<>();
 
-        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, serverName);
+        if (!ignore) {
 
-        helper.removeIf(str -> !playerCommands.contains(str));
+            Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
+            if (!cache.containsKey(serverName)) {
+                cache.put(serverName, new CommandsCache());
+            }
 
-        if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE) {
-            Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines().forEach(input -> helper.add(input, false));
-        }
+            CommandsCache commandsCache = cache.get(serverName);
+            commandsCache.handleCommands(commandsAsString, serverName);
 
-        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ALWAYS_TAB_COMPLETABLE) {
-            Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines().forEach(input -> helper.add(input, false));
+            List<String> tmpPlayerCommands = commandsCache.getPlayerCommands(commandsAsString, player, serverName);
+            helper.removeIf(str -> !tmpPlayerCommands.contains(str));
+
+            if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE) {
+                Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines().forEach(input -> helper.add(input, false));
+            }
+
+            if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ALWAYS_TAB_COMPLETABLE) {
+                Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines().forEach(input -> helper.add(input, false));
+            }
+
+            playerCommands = tmpPlayerCommands;
         }
 
         for (Map.Entry<String, Command> command : ProxyServer.getInstance().getPluginManager().getCommands()) {
@@ -189,11 +190,13 @@ public class BungeePacketAnalyzer {
             String commandName = command.getKey();
             commandName = commandName.startsWith("/") ? commandName.substring(1) : commandName;
 
-            boolean tabablePluginCommand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(commandName);
-            boolean tabableVersionCommand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(commandName);
+            if (!ignore) {
+                boolean tabablePluginCommand = Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(commandName);
+                boolean tabableVersionCommand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(commandName);
 
-            if (!tabablePluginCommand && !tabableVersionCommand && !playerCommands.contains(commandName)) {
-                continue;
+                if (!tabablePluginCommand && !tabableVersionCommand && !playerCommands.contains(commandName)) {
+                    continue;
+                }
             }
 
             CommandNode dummy = CommandNodeHelper.createDummyCommandNode(command.getKey());
@@ -201,8 +204,15 @@ public class BungeePacketAnalyzer {
         }
 
 
-        PROXY_COMMANDS.stream().filter(playerCommands::contains).forEach(input -> helper.add(input, true));
-        SubArgsModule.handleCommandNode(player.getUniqueId(), helper);
+        for (String command : PROXY_COMMANDS) {
+            if (ignore || playerCommands.contains(command)) {
+                helper.add(command, true);
+            }
+        }
+
+        if (!ignore) {
+            SubArgsModule.handleCommandNode(player.getUniqueId(), helper);
+        }
     }
 
     public static void sendCommandsPacket() {
