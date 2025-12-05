@@ -129,7 +129,7 @@ public class Logger {
                     .append("\n");
 
             builder.append("last-received-sync: ")
-                    .append(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED ? Storage.LAST_SYNC : "Deactivated")
+                    .append(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED ? TimeConverter.calcAndGetTime(Storage.LAST_SYNC) : "Deactivated")
                     .append("\n");
         }
 
@@ -143,7 +143,7 @@ public class Logger {
                     .append("\n");
 
             builder.append("last-sent-sync: ")
-                    .append(Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED ? "Deactivated" : (System.currentTimeMillis() - Storage.LAST_SYNC))
+                    .append(Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED ? "Deactivated" : (TimeConverter.calcAndGetTime(Storage.LAST_SYNC)))
                     .append("\n\n");
 
             for (ClientInfo client : Communicator.CLIENTS) {
