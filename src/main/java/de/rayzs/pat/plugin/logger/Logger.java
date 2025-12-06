@@ -90,13 +90,15 @@ public class Logger {
                 .append(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED ? "WHITELIST" : "BLACKLIST")
                 .append("\n");
 
-        builder.append("Detected Software-API: ")
-                .append(Reflection.isProxyServer()
-                        ? Reflection.isPaper() ? "Waterfall" :
-                        Reflection.isVelocityServer() ? "Velocity" : "Bungeecord"
-                        : Reflection.isFoliaServer() ? "Folia"
-                        : Reflection.isPaper() ? "Paper" : "Spigot")
-                .append("\n");
+        builder.append("Detected Software-API: ");
+
+        if (Reflection.isProxyServer()) {
+            builder.append(Reflection.isPaper() ? "Waterfall" : Reflection.isVelocityServer() ? "Velocity" : "Bungeecord");
+        } else {
+            builder.append(Reflection.isFoliaServer() ? "Folia" : Reflection.isPaper() ? "Paper" : "Spigot");
+        }
+
+        builder.append("\n");
 
         builder.append("Installed plugins: \n  ")
                 .append(String.join("\n  ", Storage.getLoader().getPluginNames("%n (%v)")))
