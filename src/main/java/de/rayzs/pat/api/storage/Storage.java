@@ -589,8 +589,36 @@ public class Storage {
                 }
             }
 
-            return GroupManager.canAccessCommand(player, command, type, server);
+            return GroupManager.canAccessCommand(player, command, type, server).asBoolean();
         }
+
+        /*
+        Experimental:
+
+        It allows to negate commands inside a PAT group to block them off,
+        even though it is allowed inside the global section.
+
+        public static boolean canPlayerAccess(Object player, String command, BlockType type, String server) {
+            boolean blocked = isBlocked(command, type, server);
+            GroupManager.AccessResult groupResult = GroupManager.canAccessCommand(player, command, type, server);
+
+            if (groupResult == GroupManager.AccessResult.NEGATED) {
+                return false;
+            }
+
+            if (!blocked) {
+                return true;
+            }
+
+            if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
+                if (PermissionUtil.hasBypassPermission(player, command)) {
+                    return true;
+                }
+            }
+
+            return groupResult.asBoolean();
+        }
+         */
 
         public static boolean isBlockedChat(String command) {
             return isBlocked(command, BlockType.CHAT, null);
