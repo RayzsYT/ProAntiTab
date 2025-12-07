@@ -55,22 +55,23 @@ public class GroupManager {
         return playerGroups;
     }
 
-    public static boolean canAccessCommand(Object targetObj, String unmodifiedCommand, Storage.Blacklist.BlockType type) {
+    public static AccessResult canAccessCommand(Object targetObj, String unmodifiedCommand, Storage.Blacklist.BlockType type) {
         return canAccessCommand(targetObj, unmodifiedCommand, type, null);
     }
 
-    public static boolean canAccessCommand(Object targetObj, String unmodifiedCommand, Storage.Blacklist.BlockType type, String server) {
+    public static AccessResult
+    canAccessCommand(Object targetObj, String unmodifiedCommand, Storage.Blacklist.BlockType type, String server) {
         final CommandSender sender = CommandSenderHandler.from(targetObj);
 
         if (sender == null) {
             Logger.warning("Failed to load player! (GroupManager#66)");
-            return false;
+            return AccessResult.UNKNOWN;
         }
 
         final List<Group> playerGroups = sender.getGroups();
 
         if (playerGroups == null || playerGroups.isEmpty()) {
-            return false;
+            return AccessResult.NO_GROUPS;
         }
 
         String command = type.toString() + unmodifiedCommand;
@@ -115,17 +116,17 @@ public class GroupManager {
         }
 
         if (negated) {
-            return false;
+            return AccessResult.NEGATED;
         }
 
         if (all) {
-            return true;
+            return AccessResult.ALLOWED;
         }
 
         if (!permitted && type != BlockType.BOTH)
             return canAccessCommand(targetObj, unmodifiedCommand, Storage.Blacklist.BlockType.BOTH, server);
         
-        return permitted;
+        return permitted ? AccessResult.ALLOWED : AccessResult.NOT_LISTED;
     }
 
     public static void setGroup(String groupName, List<String> commands) {
@@ -271,5 +272,20 @@ public class GroupManager {
 
     public static boolean isGroupRegistered(String groupName) {
         return getGroupByName(groupName) != null;
+    }
+
+    public enum AccessResult {
+        ALLOWED(true), NEGATED(false),
+        NO_GROUPS(false), NOT_LISTED(false),
+        UNKNOWN(false);
+
+        private final boolean bool;
+        AccessResult(boolean bool) {
+            this.bool = bool;
+        }
+
+        public boolean asBoolean() {
+            return this.bool;
+        }
     }
 }
