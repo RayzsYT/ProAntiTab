@@ -65,6 +65,15 @@ turn-blacklist-to-whitelist: true
 base-command-case-sensitive: true
 
 # (!) Warning:
+#     Enabling this could lead to performance issues depending on
+#     the amount of players and commands. (> 1100)
+#
+# This allows PAT groups to block commands, which have been allowed
+# inside the global section. This can be achieved by negating commands
+# inside a PAT group.
+allow-group-overruling: false
+
+# (!) Warning:
 #     Enabling this could lead to performance issues if many players
 #     change worlds frequently in a short amount of time.
 #

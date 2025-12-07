@@ -48,6 +48,15 @@ turn-blacklist-to-whitelist: true
 #   /HelP --> Allowed
 base-command-case-sensitive: true
 
+# (!) Warning:
+#     Enabling this could lead to performance issues depending on
+#     the amount of players and commands. (> 1100)
+#
+# This allows PAT groups to block commands, which have been allowed
+# inside the global section. This can be achieved by negating commands
+# inside a PAT group.
+allow-group-overruling: false
+
 # Here you can customize the server version that is displayed on a ping. (The text at the player-count)
 custom-protocol-ping:
   enabled: true

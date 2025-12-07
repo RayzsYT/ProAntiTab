@@ -340,6 +340,7 @@ public class Storage {
 
         public static class Settings {
 
+            public static AllowGroupOverrulingSection ALLOW_GROUP_OVERRULING = new AllowGroupOverrulingSection();
             public static AutoLowercaseCommandsSection AUTO_LOWERCASE_COMMANDS = new AutoLowercaseCommandsSection();
             public static BlockNamespaceCommandsSection BLOCK_NAMESPACE_COMMANDS = new BlockNamespaceCommandsSection();
             public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
@@ -577,7 +578,28 @@ public class Storage {
         }
 
         public static boolean canPlayerAccess(Object player, String command, BlockType type, String server) {
-            boolean blocked = isBlocked(command, type, server);
+            final boolean allowGroupOverruling = ConfigSections.Settings.ALLOW_GROUP_OVERRULING.ENABLED;
+            final boolean blocked = isBlocked(command, type, server);
+
+            if (allowGroupOverruling) {
+                GroupManager.AccessResult groupResult = GroupManager.canAccessCommand(player, command, type, server);
+                if (groupResult == GroupManager.AccessResult.NEGATED) {
+                    return false;
+                }
+
+                if (!blocked) {
+                    return true;
+                }
+
+                if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
+                    if (PermissionUtil.hasBypassPermission(player, command)) {
+                        return true;
+                    }
+                }
+
+                return groupResult.asBoolean();
+            }
+
 
             if (!blocked) {
                 return true;
