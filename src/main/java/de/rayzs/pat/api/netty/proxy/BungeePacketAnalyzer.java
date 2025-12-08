@@ -3,6 +3,7 @@ package de.rayzs.pat.api.netty.proxy;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -18,6 +19,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.utils.CommandsCache;
+import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.node.CommandNodeHelper;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
@@ -33,6 +35,7 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Commands;
 import net.md_5.bungee.protocol.packet.PluginMessage;
+import net.md_5.bungee.protocol.packet.TabCompleteRequest;
 import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 
 public class BungeePacketAnalyzer {
@@ -41,7 +44,7 @@ public class BungeePacketAnalyzer {
 
     private static final String HANDLER_NAME = "pat-bungee-handler", PIPELINE_NAME = "packet-decoder";
     private static final HashMap<ProxiedPlayer, Boolean> PLAYER_MODIFIED = new HashMap<>();
-    private static final HashMap<ProxiedPlayer, String> PLAYER_INPUT_CACHE = new HashMap<>();
+    private static final ExpireCache<UUID, String> PLAYER_INPUT_CACHE = new ExpireCache<>(5, TimeUnit.SECONDS);
 
     private static final List<String> PLUGIN_COMMANDS = new ArrayList<>();
 
@@ -115,7 +118,7 @@ public class BungeePacketAnalyzer {
     }
 
     public static void uninject(ProxiedPlayer player) {
-        BungeePacketAnalyzer.PLAYER_INPUT_CACHE.remove(player);
+        BungeePacketAnalyzer.PLAYER_INPUT_CACHE.remove(player.getUniqueId());
         BungeePacketAnalyzer.PLAYER_MODIFIED.remove(player);
 
         if(BungeePacketAnalyzer.INJECTED_PLAYERS.containsKey(player)) {
@@ -132,9 +135,13 @@ public class BungeePacketAnalyzer {
         }
     }
 
+    public static void setPlayerInput(ProxiedPlayer player, String input) {
+        PLAYER_INPUT_CACHE.putIgnoreIfContains(player.getUniqueId(), input);
+    }
+
     public static String getPlayerInput(ProxiedPlayer player) {
-        String input = PLAYER_INPUT_CACHE.get(player);
-        PLAYER_INPUT_CACHE.remove(player);
+        String input = PLAYER_INPUT_CACHE.get(player.getUniqueId());
+        PLAYER_INPUT_CACHE.remove(player.getUniqueId());
         return input;
     }
 
@@ -217,6 +224,9 @@ public class BungeePacketAnalyzer {
 
     public static void sendCommandsPacket() {
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+            if (player.getPendingConnection().getVersion() < 754)
+                continue;
+
             RootCommandNode root = new RootCommandNode();
             Commands packet = new Commands(root);
 
@@ -240,7 +250,7 @@ public class BungeePacketAnalyzer {
                 return;
             }
 
-            if(wrapper.packet instanceof PluginMessage) {
+            if (wrapper.packet instanceof PluginMessage) {
                 PluginMessage pluginMessage = (PluginMessage) wrapper.packet;
                 if(CustomServerBrand.isEnabled() && CustomServerBrand.isBrandTag(pluginMessage.getTag()))
                     return;
@@ -252,24 +262,31 @@ public class BungeePacketAnalyzer {
                 player.unsafe().sendPacket(response);
                 return;
 
+                /*
             } else if (wrapper.packet instanceof TabCompleteResponse) {
                 TabCompleteResponse response = (TabCompleteResponse) wrapper.packet;
                 String serverName = player.getServer().getInfo().getName();
 
+                System.out.println("damn");
+
                 if (!Storage.Blacklist.isDisabledServer(serverName) && player.getPendingConnection().getVersion() < 754) {
                     if (!PermissionUtil.hasBypassPermission(player)) {
 
-                        ClientInfo clientInfo = Communicator.getClientByName(player.getServer().getInfo().getName());
-                        if (clientInfo == null || !PLAYER_INPUT_CACHE.containsKey(player))
+                        System.out.println("Further!");
+                        System.out.println("Got: " + PLAYER_INPUT_CACHE.get(player.getUniqueId()));
+
+                        if (!PLAYER_INPUT_CACHE.contains(player.getUniqueId()))
                             return;
 
                         boolean cancelsBeforeHand = false;
 
-                        String rawPlayerInput = getPlayerInput(player);
+                        String rawPlayerInput = PLAYER_INPUT_CACHE.get(player.getUniqueId());
                         int spaces = rawPlayerInput.contains(" ") ? rawPlayerInput.split(" ").length : 0;
 
                         String playerInput = StringUtils.getFirstArg(rawPlayerInput),
                                 server = player.getServer().getInfo().getName();
+
+                        System.out.println("NETTY -> " + playerInput);
 
                         if (!playerInput.equals("/")) {
                             cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.replaceFirst(playerInput, "/", ""), server);
@@ -328,7 +345,7 @@ public class BungeePacketAnalyzer {
                             player.unsafe().sendPacket(new TabCompleteResponse(response.getCommands()));
                         }
                     }
-                }
+                }*/
             }
 
             list.add(wrapper);
