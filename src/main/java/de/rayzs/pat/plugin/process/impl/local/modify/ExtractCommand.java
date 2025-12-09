@@ -94,17 +94,7 @@ public class ExtractCommand extends ProCommand {
             return true;
         }
 
-        List<String> commands = new ArrayList<>();
-        for (Map.Entry<String, Command> entry : BukkitLoader.getCommandsMap().entrySet()) {
-            if (entry.getKey().toLowerCase().startsWith(pluginName + ":")) {
-                String command = entry.getKey().substring(args[0].length() + 1);
-                commands.add(command);
-
-                if (useColons) {
-                    commands.add(entry.getKey());
-                }
-            }
-        }
+        List<String> commands = Storage.getLoader().getPluginCommands(args[0], useColons);
 
         BlacklistStorage storage = group == null
                 ? Storage.Blacklist.getBlacklist()
