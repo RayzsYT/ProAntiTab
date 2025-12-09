@@ -108,6 +108,7 @@ public class Storage {
     }
 
     public static void loadToken() {
+        Files.TOKEN.reload();
 
         boolean invalidEnv = false;
 
