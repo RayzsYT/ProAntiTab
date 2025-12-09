@@ -78,6 +78,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
 
     public BlacklistStorage remove(String command) {
         commands.remove(command);
+        hiddenCommands.remove(command);
         return this;
     }
 
