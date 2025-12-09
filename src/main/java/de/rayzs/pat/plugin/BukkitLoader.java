@@ -400,9 +400,12 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         if (pluginName.isBlank()) return commands;
 
+        pluginName = pluginName.toLowerCase();
+
         for (Map.Entry<String, Command> entry : BukkitLoader.getCommandsMap().entrySet()) {
             if (entry.getKey().toLowerCase().startsWith(pluginName + ":")) {
                 String command = entry.getKey().substring(pluginName.length() + 1);
+
                 commands.add(command);
 
                 if (useColons) {
