@@ -108,6 +108,10 @@ public class Group implements Serializable {
 
     public void add(String command) {
         this.generalGroupBlacklist.add(command).save();
+
+        if (command.startsWith("plugin=") || command.startsWith("!")) {
+            this.generalGroupBlacklist.load();
+        }
     }
 
     public void add(String command, String server) {
@@ -118,6 +122,10 @@ public class Group implements Serializable {
 
     public void remove(String command) {
         this.generalGroupBlacklist.remove(command).save();
+
+        if (command.startsWith("plugin=") || command.startsWith("!")) {
+            this.generalGroupBlacklist.load();
+        }
     }
 
     public void remove(String command, String server) {

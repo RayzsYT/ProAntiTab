@@ -58,6 +58,7 @@ public class AddCommand extends ProCommand {
         if (command.isEmpty())
             return false;
 
+        final boolean loadBlacklist = command.startsWith("plugin=") || command.startsWith("!");
         final int length = args.length;
 
         if (length == 1) {
@@ -67,6 +68,8 @@ public class AddCommand extends ProCommand {
 
             if (!exist) {
                 Storage.Blacklist.getBlacklist().add(command).save();
+                if (loadBlacklist) Storage.Blacklist.getBlacklist().load();
+
                 Storage.handleChange();
             }
 
