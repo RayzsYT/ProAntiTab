@@ -68,8 +68,10 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public BlacklistStorage add(String command) {
-        if (!commands.contains(command))
+        if (!commands.contains(command)) {
             commands.add(command);
+            hiddenCommands.add(command);
+        }
 
         return this;
     }
