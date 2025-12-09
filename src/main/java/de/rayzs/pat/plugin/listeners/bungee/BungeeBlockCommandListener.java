@@ -3,6 +3,8 @@ package de.rayzs.pat.plugin.listeners.bungee;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import de.rayzs.pat.plugin.logger.Logger;
@@ -20,12 +22,14 @@ public class BungeeBlockCommandListener implements Listener {
     public void onChat(ChatEvent event) {
         if (event.isCancelled()) return;
 
-        Connection connection = event.getSender();
+        final Connection connection = event.getSender();
         if (! (connection instanceof ProxiedPlayer) || !event.getMessage().startsWith("/"))
             return;
 
-        ProxiedPlayer player = (ProxiedPlayer) connection;
-        String serverName = player.getServer().getInfo().getName();
+        final ProxiedPlayer player = (ProxiedPlayer) connection;
+        final CommandSender sender = CommandSenderHandler.from(player.getUniqueId());
+        final String serverName = player.getServer().getInfo().getName();
+
         String command = event.getMessage();
 
         if (PermissionUtil.hasBypassPermission(player, command) || Storage.Blacklist.isDisabledServer(serverName))
@@ -87,10 +91,24 @@ public class BungeeBlockCommandListener implements Listener {
             return;
         }
 
-        if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
-            return;
+        final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
 
-        if (!Storage.Blacklist.canPlayerAccessChat(player, command, serverName)) {
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, command, serverName);
+        boolean blockedNamespace = false;
+
+        if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
+            blockedNamespace = cancelBlockedCommand
+                    ? Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)
+                    : Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesAlwaysBlock(command);
+
+            if (blockedNamespace) allowed = false;
+        }
+
+        if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED && !blockedNamespace) {
+            return;
+        }
+
+        if (!allowed) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
                     player,
                     event.getMessage(),

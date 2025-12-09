@@ -10,6 +10,9 @@ import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.api.event.*;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
+
 import java.util.List;
 
 public class VelocityBlockCommandListener {
@@ -27,18 +30,19 @@ public class VelocityBlockCommandListener {
         if(!event.getResult().isAllowed())
             return event;
 
-        CommandSource commandSource = event.getCommandSource();
-        Object consoleSender = Storage.getLoader().getConsoleSender();
+        final CommandSource commandSource = event.getCommandSource();
+        final Object consoleSender = Storage.getLoader().getConsoleSender();
 
         if(! (commandSource instanceof Player))
             return event;
 
-        Player player = (Player) commandSource;
-        String command = StringUtils.getFirstArg(event.getCommand());
-
-        String serverName = player.getCurrentServer().isPresent()
+        final Player player = (Player) commandSource;
+        final CommandSender sender = CommandSenderHandler.from(player);
+        final String serverName = player.getCurrentServer().isPresent()
                 ? player.getCurrentServer().get().getServerInfo().getName()
                 : "unknown";
+
+        String command = StringUtils.getFirstArg(event.getCommand());
 
         if (PermissionUtil.hasBypassPermission(player, command) || Storage.Blacklist.isDisabledServer(serverName))
             return event;
@@ -97,10 +101,24 @@ public class VelocityBlockCommandListener {
             return event;
         }
 
-        if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
-            return event;
+        final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
 
-        if (!Storage.Blacklist.canPlayerAccessChat(player, command, serverName)) {
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, command, serverName);
+        boolean blockedNamespace = false;
+
+        if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
+            blockedNamespace = cancelBlockedCommand
+                    ? Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)
+                    : Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesAlwaysBlock(command);
+
+            if (blockedNamespace) allowed = false;
+        }
+
+        if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED && !blockedNamespace) {
+            return event;
+        }
+
+        if (!allowed) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
                     player,
                     event.getCommand(),

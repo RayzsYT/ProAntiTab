@@ -2,6 +2,8 @@ package de.rayzs.pat.plugin.listeners.bukkit;
 
 import java.util.List;
 
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -45,7 +47,9 @@ public class BukkitBlockCommandListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
+        final CommandSender sender = CommandSenderHandler.from(player);
+
         final String commandFirstArg = StringUtils.getFirstArg(event.getMessage());
 
         if (Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.isCommand(commandFirstArg)) {
@@ -131,10 +135,24 @@ public class BukkitBlockCommandListener implements Listener {
             return;
         }
 
-        if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED)
-            return;
+        final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
 
-        if (!Storage.Blacklist.canPlayerAccessChat(player, command)) {
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, command);
+        boolean blockedNamespace = false;
+
+        if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
+            blockedNamespace = cancelBlockedCommand
+                    ? Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)
+                    : Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesAlwaysBlock(command);
+
+            if (blockedNamespace) allowed = false;
+        }
+
+        if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED && !blockedNamespace) {
+            return;
+        }
+
+        if (!allowed) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
                     player,
                     event.getMessage(),
