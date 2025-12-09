@@ -42,7 +42,7 @@ public class BukkitPacketAnalyzer {
     }
 
     public static boolean inject(Player player) {
-        if (Storage.USE_VELOCITY)
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             return true;
 
         try {
@@ -81,7 +81,7 @@ public class BukkitPacketAnalyzer {
     }
 
     public static void uninject(UUID uuid) {
-        if (Storage.USE_VELOCITY)
+        if (Storage.SEND_CONSOLE_NOTIFICATION)
             return;
 
         if (BukkitPacketAnalyzer.INJECTED_PLAYERS.containsKey(uuid)) {
@@ -91,7 +91,7 @@ public class BukkitPacketAnalyzer {
     }
 
     public static void uninject(Channel channel) {
-        if (Storage.USE_VELOCITY)
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
             return;
 
         if (channel != null) {
@@ -124,8 +124,9 @@ public class BukkitPacketAnalyzer {
         @Override
         public void channelRead(ChannelHandlerContext channel, Object packetObj) {
             try {
-                if (Storage.USE_VELOCITY || packetObj.getClass() == null) {
+                if (packetObj.getClass() == null || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
                     super.channelRead(channel, packetObj);
+                    return;
                 }
 
                 String packetName = packetObj.getClass().getSimpleName();
