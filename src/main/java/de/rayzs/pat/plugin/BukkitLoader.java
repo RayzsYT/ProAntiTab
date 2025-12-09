@@ -139,7 +139,10 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         StorageConverter.initialize();
 
-        PATScheduler.createScheduler(this::loadAllCommands);
+        PATScheduler.createScheduler(() -> {
+            Storage.reload();
+            loadAllCommands();
+        });
     }
 
     @Override
