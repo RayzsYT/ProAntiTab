@@ -60,7 +60,7 @@ public class BungeeAntiTabListener implements Listener {
         }
 
         if (!cancelsBeforeHand && !cursor.isEmpty()) {
-            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.getFirstArg(cursor));
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.getFirstArg(cursor), serverName);
         }
 
         if (!cancelsBeforeHand) {
@@ -94,7 +94,7 @@ public class BungeeAntiTabListener implements Listener {
                 return false;
             }
 
-            return !Storage.Blacklist.canPlayerAccessTab(player, cpy);
+            return !Storage.Blacklist.canPlayerAccessTab(player, cpy, serverName);
         });
     }
 
