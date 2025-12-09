@@ -150,7 +150,7 @@ public class BukkitPacketAnalyzer {
         public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
             try {
 
-                if(Storage.USE_VELOCITY || packetObj.getClass() == null) {
+                if(packetObj.getClass() == null || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
                     super.write(channel, packetObj, promise);
                     return;
                 }
