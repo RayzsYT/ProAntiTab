@@ -32,7 +32,6 @@ updater:
 # In other words, the backend servers won't receive any updates from the proxy about the storage.yml.
 # It's here to prevent any unnecessary communication between the proxy and the backend servers, if PAT is being used on the proxy alone.
 # For why this can be the case, read the following: https://github.com/RayzsYT/ProAntiTab/wiki/FAQ#can-i-install-pat-just-on-my-proxy-server
-# It is NOT recommended to enable this option, unless you know what you are doing.
 disable-sync: false
 
 # This is a very necessary feature if you have way too many commands to block and instead decide
