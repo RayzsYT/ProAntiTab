@@ -105,7 +105,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
 
         commands = (ArrayList<String>) getConfig().getOrSet(getNavigatePath(), commands);
 
-        List<String> tmpCommands = new ArrayList<>(commands);
+        List<String> tmpCommands = commands != null ? new ArrayList<>(commands) : new ArrayList<>();
         Set<String> pluginListCommands = new HashSet<>();
 
         final String pluginCommandPrefix = "plugin=";
