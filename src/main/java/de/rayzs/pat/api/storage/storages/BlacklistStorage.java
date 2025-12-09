@@ -95,7 +95,26 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     @Override
     public void load() {
         getConfig().reload();
-        commands = (ArrayList<String>) getConfig().getOrSet(getNavigatePath(), commands);
+
+        List<String> tmpCommands = (ArrayList<String>) getConfig().getOrSet(getNavigatePath(), commands);
+        Set<String> pluginListCommands = new HashSet<>();
+
+        final String pluginCommandPrefix = "plugin=";
+
+        for (String command : tmpCommands) {
+            if (command.startsWith(pluginCommandPrefix)) {
+                pluginListCommands.add(command);
+            }
+        }
+
+        tmpCommands.removeAll(pluginListCommands);
+
+        for (String pluginListCommand : pluginListCommands) {
+            pluginListCommand = pluginListCommand.substring(pluginCommandPrefix.length());
+            tmpCommands.addAll(Storage.getLoader().getPluginCommands(pluginListCommand, false));
+        }
+
+        commands = tmpCommands;
     }
 
     private boolean isNegated(String command) {
