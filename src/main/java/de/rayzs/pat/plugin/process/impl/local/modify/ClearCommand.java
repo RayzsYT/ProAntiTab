@@ -34,6 +34,7 @@ public class ClearCommand extends ProCommand {
             }
 
             Storage.Blacklist.getBlacklist().clear().save();
+            Storage.Blacklist.getBlacklist().load();
             Storage.handleChange();
 
             CONFIRMATION.remove(sender.getUniqueId());

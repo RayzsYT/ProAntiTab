@@ -136,6 +136,7 @@ public class Group implements Serializable {
 
     public void clear() {
         this.generalGroupBlacklist.clear().save();
+        this.generalGroupBlacklist.load();
     }
 
     public void clear(String server) {
