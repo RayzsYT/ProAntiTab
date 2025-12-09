@@ -153,6 +153,9 @@ custom-version:
 # You can bypass this restriction with the proantitab.namespace permission.
 block-namespace-commands:
   enabled: false
+  # Basically blocks the command execution no matter if
+  # 'cancel-blocked-commands' is enabled or not.
+  always-block-command: true
 
 # Patches a small exploit which causes the server to lag.
 # Due to the fact that PAT interacts directly with Tab-Completions and their packets,

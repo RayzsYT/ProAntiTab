@@ -187,6 +187,9 @@ custom-version:
 # You can bypass this restriction with the proantitab.namespace permission.
 block-namespace-commands:
   enabled: false
+  # Basically blocks the command execution no matter if
+  # 'cancel-blocked-commands' is enabled or not.
+  always-block-command: true
 
 #>> HTP (Overwritten)
 # Auto lowercase all commands when being executed,
