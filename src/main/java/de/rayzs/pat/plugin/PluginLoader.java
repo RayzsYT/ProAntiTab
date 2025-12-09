@@ -41,6 +41,8 @@ public interface PluginLoader {
     List<String> getOnlinePlayerNames();
     List<String> getOfflinePlayerNames();
 
+    List<String> getPluginCommands(String pluginName, boolean useColons);
+
     /**
      * <pre>
      * %n = Plugin name

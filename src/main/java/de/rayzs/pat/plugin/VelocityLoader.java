@@ -297,6 +297,11 @@ public class VelocityLoader implements PluginLoader {
         return pluginNames;
     }
 
+    @Override
+    public List<String> getPluginCommands(String pluginName, boolean useColons) {
+        return List.of();
+    }
+
     public void startUpdaterTask() {
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED) return;
 

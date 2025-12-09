@@ -394,6 +394,26 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         return pluginNames;
     }
 
+    @Override
+    public List<String> getPluginCommands(String pluginName, boolean useColons) {
+        List<String> commands = new ArrayList<>();
+
+        if (pluginName.isBlank()) return commands;
+
+        for (Map.Entry<String, Command> entry : BukkitLoader.getCommandsMap().entrySet()) {
+            if (entry.getKey().toLowerCase().startsWith(pluginName + ":")) {
+                String command = entry.getKey().substring(pluginName.length() + 1);
+                commands.add(command);
+
+                if (useColons) {
+                    commands.add(entry.getKey());
+                }
+            }
+        }
+
+        return commands;
+    }
+
     private void loadCommandMap() {
         try {
             if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
