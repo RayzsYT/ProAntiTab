@@ -124,21 +124,23 @@ public class BukkitPacketAnalyzer {
         @Override
         public void channelRead(ChannelHandlerContext channel, Object packetObj) {
             try {
-                if (packetObj.getClass() != null) {
-                    String packetName = packetObj.getClass().getSimpleName();
-
-                    if (!packetName.equals("PacketPlayInTabComplete") && !packetName.equals("ServerboundCommandSuggestionPacket")) {
-                        super.channelRead(channel, packetObj);
-                        return;
-                    }
-
-                    if (!PermissionUtil.hasBypassPermission(player)) {
-
-                        if (!PACKET_HANDLER.handleIncomingPacket(player, packetObj))
-                            return;
-
-                    }
+                if (Storage.USE_VELOCITY || packetObj.getClass() == null) {
+                    super.channelRead(channel, packetObj);
                 }
+
+                String packetName = packetObj.getClass().getSimpleName();
+
+                if (!packetName.equals("PacketPlayInTabComplete") && !packetName.equals("ServerboundCommandSuggestionPacket")) {
+                    super.channelRead(channel, packetObj);
+                    return;
+                }
+
+                if (!PermissionUtil.hasBypassPermission(player)) {
+
+                    if (!PACKET_HANDLER.handleIncomingPacket(player, packetObj))
+                        return;
+                }
+
 
                 super.channelRead(channel, packetObj);
             } catch (Throwable exception) { exception.printStackTrace(); }
@@ -148,30 +150,33 @@ public class BukkitPacketAnalyzer {
         public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
             try {
 
-                if(packetObj.getClass() != null) {
-                    String packetName = packetObj.getClass().getSimpleName();
+                if(Storage.USE_VELOCITY || packetObj.getClass() == null) {
+                    super.write(channel, packetObj, promise);
+                    return;
+                }
 
-                    if (!packetName.equals("PacketPlayOutTabComplete") && !packetName.equals("ClientboundCommandSuggestionsPacket")) {
-                        super.write(channel, packetObj, promise);
-                        return;
-                    }
+                String packetName = packetObj.getClass().getSimpleName();
 
-                    if (!PermissionUtil.hasBypassPermission(player)) {
+                if (!packetName.equals("PacketPlayOutTabComplete") && !packetName.equals("ClientboundCommandSuggestionsPacket")) {
+                    super.write(channel, packetObj, promise);
+                    return;
+                }
 
-                        UUID uuid = player.getUniqueId();
-                        Object sentPacketObj = SENT_PACKET.get(uuid);
+                if (!PermissionUtil.hasBypassPermission(player)) {
 
-                        if (sentPacketObj != null) {
-                            if (sentPacketObj == packetObj) {
-                                SENT_PACKET.remove(uuid);
-                                super.write(channel, sentPacketObj, promise);
-                                return;
-                            }
-                        }
+                    UUID uuid = player.getUniqueId();
+                    Object sentPacketObj = SENT_PACKET.get(uuid);
 
-                        if (!PACKET_HANDLER.handleOutgoingPacket(player, packetObj))
+                    if (sentPacketObj != null) {
+                        if (sentPacketObj == packetObj) {
+                            SENT_PACKET.remove(uuid);
+                            super.write(channel, sentPacketObj, promise);
                             return;
+                        }
                     }
+
+                    if (!PACKET_HANDLER.handleOutgoingPacket(player, packetObj))
+                        return;
                 }
 
                 super.write(channel, packetObj, promise);
