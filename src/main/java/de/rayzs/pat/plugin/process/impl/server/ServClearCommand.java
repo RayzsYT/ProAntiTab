@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.process.impl.server;
 
 import de.rayzs.pat.api.command.ProCommand;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.group.Group;
@@ -66,12 +67,14 @@ public class ServClearCommand extends ProCommand {
 
         if (group == null) {
 
-            sender.sendMessage(
-                    Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST_SERVER
-                            .replace("%group%", groupName)
-                            .replace("%server%", serverName)
+            String message = Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST_SERVER;
+
+            message = StringUtils.replace(message,
+                    "%group%", groupName,
+                    "%server%", serverName
             );
 
+            sender.sendMessage(message);
             return true;
         }
 

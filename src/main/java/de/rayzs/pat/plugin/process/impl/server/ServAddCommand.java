@@ -90,7 +90,15 @@ public class ServAddCommand extends ProCommand {
         Group group = GroupManager.getGroupByName(groupName);
 
         if (group == null) {
-            sender.sendMessage(Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST_SERVER.replace("%group%", groupName));
+
+            String message = Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST_SERVER;
+
+            message = StringUtils.replace(message,
+                    "%group%", groupName,
+                    "%server%", serverName
+            );
+
+            sender.sendMessage(message);
             return true;
         }
 

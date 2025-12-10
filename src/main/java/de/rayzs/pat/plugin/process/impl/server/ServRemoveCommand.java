@@ -95,12 +95,14 @@ public class ServRemoveCommand extends ProCommand {
 
         if (group == null) {
 
-            sender.sendMessage(
-                    Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST_SERVER
-                            .replace("%group%", groupName)
-                            .replace("%server%", serverName)
+            String message = Storage.ConfigSections.Messages.GROUP.DOES_NOT_EXIST_SERVER;
+
+            message = StringUtils.replace(message,
+                    "%group%", groupName,
+                    "%server%", serverName
             );
 
+            sender.sendMessage(message);
             return true;
         }
 
