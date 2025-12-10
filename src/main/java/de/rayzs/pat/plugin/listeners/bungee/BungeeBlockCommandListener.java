@@ -27,7 +27,7 @@ public class BungeeBlockCommandListener implements Listener {
             return;
 
         final ProxiedPlayer player = (ProxiedPlayer) connection;
-        final CommandSender sender = CommandSenderHandler.from(player.getUniqueId());
+        final CommandSender sender = CommandSenderHandler.from(player);
         final String serverName = player.getServer().getInfo().getName();
 
         String command = event.getMessage();
