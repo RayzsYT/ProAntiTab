@@ -10,6 +10,9 @@
 #  And how does it work? It's simple. You just provide the a trigger of the command that would be normally blocked.
 #  Commands that would normally work won't send the messages you have set here.
 #  This way PAT can offer you full control over certain commands and their normal responses.
+#
+# ----------------------------------------------------------------------
+#
 # What are these action section at each block?
 #  This is an additional feature to make your responses much more alive.
 #  Example actions that can be used are the following:
@@ -25,7 +28,7 @@
 #   Send title:
 #        Syntax:  title::title::subtitle::5::20::5
 #        Example: title::&aTest title::&cHello %player%!
-#   Play sound:
+#   Play sound: (Available sounds: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html)
 #        Syntax:  sound::soundName::volume::pitch
 #        Example: sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0
 #   Give potion effect:
@@ -64,6 +67,7 @@
 #    - "&cI'm blocked"
 #  actions:
 #    - "actionbar::&cSorry %player%, but this command is blocked."
+#    - "sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0"
 
 # Example with kits.
 # In here we only trigger the given message, if the player would type "/kit ...".
