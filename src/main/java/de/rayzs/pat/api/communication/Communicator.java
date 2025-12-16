@@ -150,7 +150,7 @@ public class Communicator {
     }
 
     public static void syncData(String serverId) {
-        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
+        if (!Reflection.isProxyServer() || Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
             return;
 
         LAST_DATA_UPDATE = System.currentTimeMillis();
