@@ -205,19 +205,12 @@ public class ResponseHandler {
                         continue;
 
                     case "sound":
-
-                        if (Reflection.isProxyServer()) {
-                            Logger.warning("! Failed to read action: " + action);
-                            Logger.warning("  > Sounds cannot be played on the proxy side!");
-                            continue;
-                        }
-
                         if (split.length != 4) {
                             Logger.warning("! Failed to read action: " + action);
                             Logger.warning("  > Action requires 4 arguments but only has " + split.length);
                             Logger.warning("  > Here's an example to compare with:");
                             Logger.warning("  > sound::soundName::volume::pitch");
-                            Logger.warning("  > e.g: sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0");
+                            Logger.warning("  > e.g: sound::" + (Reflection.isProxyServer() ? "entity.ender_dragon.growl:" : "ENTITY_ENDER_DRAGON_GROWL") + "::1.0::1.0");
                             continue;
                         }
 
@@ -225,6 +218,13 @@ public class ResponseHandler {
 
                         try {
                             volume = Float.parseFloat(split[2]);
+
+                            if (volume < 0 || volume > 10) {
+                                Logger.warning("! Failed to read action: " + action);
+                                Logger.warning("  > Your volume (" + split[2].toUpperCase() + ") must be between 0.0 and 10.0! (e.g: 1.0)");
+                                continue;
+                            }
+
                         } catch (Exception exception) {
                             Logger.warning("! Failed to read action: " + action);
                             Logger.warning("  > Volume " + split[2].toUpperCase() + " is not a valid float! (e.g: 1.0f)");
@@ -233,13 +233,26 @@ public class ResponseHandler {
 
                         try {
                             pitch = Float.parseFloat(split[3]);
+
+                            if (pitch < 0 || pitch > 10) {
+                                Logger.warning("! Failed to read action: " + action);
+                                Logger.warning("  > Your pitch (" + split[2].toUpperCase() + ") must be between 0.0 and 2.0! (e.g: 1.0)");
+                                continue;
+                            }
                         } catch (Exception exception) {
                             Logger.warning("! Failed to read action: " + action);
-                            Logger.warning("  > Pitch " + split[3].toUpperCase() + " is not a valid float! (e.g: 1.0f)");
+                            Logger.warning("  > Pitch " + split[3].toUpperCase() + " is not a valid float! (e.g: 1.0)");
                             continue;
                         }
 
-                        ActionHandler.playSound(action, uuid, split[1].toUpperCase(), volume, pitch);
+                        ActionHandler.playSound(
+                                action,
+                                uuid,
+                                Reflection.isProxyServer() ? split[1].toLowerCase() : split[1].toUpperCase(),
+                                volume,
+                                pitch
+                        );
+
                         continue;
 
                     case "console":

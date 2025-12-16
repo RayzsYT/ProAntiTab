@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.response.action.impl;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.response.ResponseHandler;
@@ -31,7 +32,7 @@ public class BungeeAction implements Action {
             return;
         }
 
-        message = StringUtils.replace(command, "%player%", player.getName());
+        message = StringUtils.replace(message, "%player%", player.getName());
         message = ResponseHandler.replaceArgsVariables(message, command);
 
         ProxyServer.getInstance().getPluginManager().dispatchCommand(player, message);
@@ -52,16 +53,6 @@ public class BungeeAction implements Action {
         subTitle = StringUtils.replace(subTitle, "%player%", player.getName());
 
         MessageTranslator.sendTitle(player, title, subTitle, fadeIn, stay, fadeOut);
-
-        /*
-        Title titleObj = ProxyServer.getInstance().createTitle();
-        titleObj.title(TextComponent.fromLegacyText(StringUtils.replace(title, "&", "§", "%player%", player.getName())));
-        titleObj.subTitle(TextComponent.fromLegacyText(StringUtils.replace(subTitle, "&", "§", "%player%", player.getName())));
-        titleObj.fadeIn(fadeIn);
-        titleObj.stay(stay);
-        titleObj.fadeOut(fadeOut);
-        player.sendTitle(titleObj);
-         */
     }
 
     @Override
@@ -70,6 +61,20 @@ public class BungeeAction implements Action {
 
     @Override
     public void playSound(String action, UUID uuid, String soundName, float volume, float pitch) {
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+
+        if (player == null) {
+            return;
+        }
+
+        try {
+            MessageTranslator.playSound(player, soundName, volume, pitch);
+        } catch (Exception exception) {
+            Logger.warning("! Failed to read action: " + action);
+            Logger.warning("  > The sound \"" + soundName + "\" could not be found!");
+            Logger.warning("  > Here's an example of an existing sound effect:");
+            Logger.warning("  > entity.ender_dragon.growl");
+        }
     }
 
     @Override
@@ -80,11 +85,8 @@ public class BungeeAction implements Action {
             return;
         }
 
-        message = StringUtils.replace(command, "%player%", player.getName());
+        message = StringUtils.replace(message, "%player%", player.getName());
         message = ResponseHandler.replaceArgsVariables(message, command);
         MessageTranslator.sendActionbar(player, message);
-
-        //player.sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(StringUtils.replace(message, "%player%", player.getName())));
-
     }
 }

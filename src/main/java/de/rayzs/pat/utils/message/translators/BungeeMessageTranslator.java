@@ -1,9 +1,10 @@
 package de.rayzs.pat.utils.message.translators;
 
 import de.rayzs.pat.utils.StringUtils;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -11,6 +12,8 @@ import net.kyori.adventure.audience.Audience;
 import de.rayzs.pat.utils.message.Translator;
 import net.md_5.bungee.api.CommandSender;
 import de.rayzs.pat.plugin.BungeeLoader;
+
+import java.time.Duration;
 
 public class BungeeMessageTranslator implements Translator {
 
@@ -27,36 +30,34 @@ public class BungeeMessageTranslator implements Translator {
 
     @Override
     public void send(Object target, String text) {
-        text = StringUtils.replace(text, "&", "§", "\\", "");
-
         Audience audience = target instanceof ProxiedPlayer ? audiences.player((ProxiedPlayer) target) : audiences.sender((CommandSender) target);
-        Component component = miniMessage.deserialize(text);
 
-        audience.sendMessage(component);
+        audience.sendMessage(toComponent(text));
     }
 
     @Override
     public void sendActionbar(Object target, String text) {
-        text = StringUtils.replace(text, "&", "§", "\\", "");
-
         Audience audience = target instanceof ProxiedPlayer ? audiences.player((ProxiedPlayer) target) : audiences.sender((CommandSender) target);
-        Component component = miniMessage.deserialize(text);
 
-        audience.sendActionBar(component);
+        audience.sendActionBar(toComponent(text));
     }
 
     @Override
     public void sendTitle(Object target, String titleStr, String subtitleStr, int fadeIn, int stay, int fadeOut) {
-        titleStr = StringUtils.replace(titleStr, "&", "§", "\\", "");
-        subtitleStr = StringUtils.replace(subtitleStr, "&", "§", "\\", "");
-
         Audience audience = target instanceof ProxiedPlayer ? audiences.player((ProxiedPlayer) target) : audiences.sender((CommandSender) target);
-        Component titleComponent = miniMessage.deserialize(titleStr);
-        Component subtitleComponent = miniMessage.deserialize(subtitleStr);
 
-        Title title = Title.title(titleComponent, subtitleComponent, fadeIn, stay, fadeOut);
+        Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut));
+        Title title = Title.title(toComponent(titleStr), toComponent(subtitleStr), times);
 
         audience.showTitle(title);
+    }
+
+    @Override
+    public void playSound(Object target, String soundKey, float volume, float pitch) throws Exception {
+        Audience audience = target instanceof ProxiedPlayer ? audiences.player((ProxiedPlayer) target) : audiences.sender((CommandSender) target);
+        Sound sound = Sound.sound(Key.key(soundKey), Sound.Source.MASTER, 1f, 1f);
+
+        audience.playSound(sound, Sound.Emitter.self());
     }
 
     @Override

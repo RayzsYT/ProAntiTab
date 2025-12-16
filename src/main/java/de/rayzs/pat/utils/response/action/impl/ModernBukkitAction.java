@@ -22,7 +22,7 @@ public class ModernBukkitAction implements Action {
         message = ResponseHandler.replaceArgsVariables(message, command);
 
         if (player != null) {
-            message = StringUtils.replace(command, "%player%", player.getName());
+            message = StringUtils.replace(message, "%player%", player.getName());
         }
 
         if (message.contains("%")) {
@@ -40,7 +40,7 @@ public class ModernBukkitAction implements Action {
             return;
         }
 
-        message = StringUtils.replace(command, "%player%", player.getName());
+        message = StringUtils.replace(message, "%player%", player.getName());
         message = ResponseHandler.replaceArgsVariables(message, command);
 
         if (message.contains("%")) {
@@ -65,8 +65,6 @@ public class ModernBukkitAction implements Action {
         subTitle = StringUtils.replace(subTitle, "&", "§", "%player%", player.getName());
 
         MessageTranslator.sendTitle(player, title, subTitle, fadeIn, stay, fadeOut);
-
-        //player.sendTitle(title, subTitle, fadeIn, stay, fadeOut);
     }
 
     @Override
@@ -102,8 +100,7 @@ public class ModernBukkitAction implements Action {
         }
 
         try {
-            Sound sound = Sound.valueOf(soundName);
-            player.playSound(player.getLocation(), sound, volume, pitch);
+            MessageTranslator.playSound(player, soundName, volume, pitch);
         } catch (Exception exception) {
             Logger.warning("! Failed to read action: " + action);
             Logger.warning("  > The sound \"" + soundName + "\" could not be found!");
@@ -120,10 +117,9 @@ public class ModernBukkitAction implements Action {
             return;
         }
 
-        message = StringUtils.replace(command, "%player%", player.getName());
+        message = StringUtils.replace(message, "%player%", player.getName());
         message = ResponseHandler.replaceArgsVariables(message, command);
-        MessageTranslator.sendActionbar(player, message);
 
-        //player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+        MessageTranslator.sendActionbar(player, message);
     }
 }

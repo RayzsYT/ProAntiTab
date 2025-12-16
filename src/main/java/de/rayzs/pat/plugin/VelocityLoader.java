@@ -102,7 +102,7 @@ public class VelocityLoader implements PluginLoader {
         startUpdaterTask();
 
         if (!Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
-            server.getScheduler().buildTask(this, Communicator::syncData).delay(5, TimeUnit.SECONDS).schedule();
+            server.getScheduler().buildTask(this, () -> Communicator.syncData()).delay(5, TimeUnit.SECONDS).schedule();
 
         Storage.PLUGIN_OBJECT = this;
 

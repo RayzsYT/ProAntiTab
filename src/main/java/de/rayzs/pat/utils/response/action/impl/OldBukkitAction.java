@@ -27,7 +27,7 @@ public class OldBukkitAction implements Action {
         message = ResponseHandler.replaceArgsVariables(message, command);
 
         if(player != null) {
-            message = message.replace("%player%", player.getName());
+            message = StringUtils.replace(message, "%player%", player.getName());
         }
 
         if (message.contains("%")) {
@@ -46,7 +46,7 @@ public class OldBukkitAction implements Action {
         }
 
         message = ResponseHandler.replaceArgsVariables(message, command);
-        message = message.replace("%player%", player.getName());
+        message = StringUtils.replace(message, "%player%", player.getName());
 
         if (message.contains("%")) {
             message = PlaceholderReplacer.replace(player, message);

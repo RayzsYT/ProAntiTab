@@ -3,14 +3,14 @@ package de.rayzs.pat.utils.response.action.impl;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.response.ResponseHandler;
-import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.key.Key;
 import de.rayzs.pat.utils.response.action.Action;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.plugin.VelocityLoader;
-import net.kyori.adventure.title.Title;
 import de.rayzs.pat.utils.StringUtils;
+import net.kyori.adventure.sound.Sound;
+
 import java.util.*;
-import java.time.*;
 
 public class VelocityAction implements Action {
 
@@ -36,7 +36,7 @@ public class VelocityAction implements Action {
 
         Player player = optPlayer.get();
 
-        message = command.replace("%player%", player.getUsername());
+        message = message.replace("%player%", player.getUsername());
         message = ResponseHandler.replaceArgsVariables(message, command);
 
         VelocityLoader.getServer().getCommandManager().executeAsync(player, message);
@@ -59,16 +59,6 @@ public class VelocityAction implements Action {
         subTitle = StringUtils.replace(subTitle, "%player%", player.getUsername());
 
         MessageTranslator.sendTitle(player, title, subTitle, fadeIn, stay, fadeOut);
-
-        /*
-        Title titleObj = Title.title(
-                MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(title)),
-                MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(subTitle)),
-                Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut))
-        );
-
-        player.showTitle(titleObj);
-         */
     }
 
     @Override
@@ -77,6 +67,22 @@ public class VelocityAction implements Action {
 
     @Override
     public void playSound(String action, UUID uuid, String soundName, float volume, float pitch) {
+        Optional<Player> optPlayer = VelocityLoader.getServer().getPlayer(uuid);
+
+        if (optPlayer.isEmpty()) {
+            return;
+        }
+
+        Player player = optPlayer.get();
+
+        try {
+            MessageTranslator.playSound(player, soundName, volume, pitch);
+        } catch (Exception exception) {
+            Logger.warning("! Failed to read action: " + action);
+            Logger.warning("  > The sound \"" + soundName + "\" could not be found!");
+            Logger.warning("  > Here's an example of an existing sound effect:");
+            Logger.warning("  > entity.ender_dragon.growl");
+        }
     }
 
     @Override
@@ -93,7 +99,5 @@ public class VelocityAction implements Action {
         message = StringUtils.replace(message, "%player%", player.getUsername());
 
         MessageTranslator.sendActionbar(player, message);
-
-        //player.sendActionBar(MiniMessage.miniMessage().deserialize(message));
     }
 }

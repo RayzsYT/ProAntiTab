@@ -148,10 +148,6 @@ public class MessageTranslator {
         return PlaceholderReplacer.replace(targetObj, text);
     }
 
-    public static String replaceMessageString(String rawText, String... replacements) {
-        return replaceMessage(StringUtils.replace(rawText, replacements));
-    }
-
     public static String replaceMessageString(Object targetObj, String rawText, String... replacements) {
         return replaceMessage(targetObj, StringUtils.replace(rawText, replacements));
     }
@@ -197,8 +193,8 @@ public class MessageTranslator {
         translator.sendTitle(targetObj, title, subtitle, fadeIn, stay, fadeOut);
     }
 
-    public static String translateIntoMiniMessage(String text) {
-        return translator.translate(replaceMessage(text));
+    public static void playSound(Object targetObj, String soundKey, float volume, float pitch) throws Exception {
+        translator.playSound(targetObj, soundKey, volume, pitch);
     }
 
     public static void closeAudiences() {
