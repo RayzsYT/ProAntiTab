@@ -1,14 +1,15 @@
 package de.rayzs.pat.utils.message.translators;
 
-import de.rayzs.pat.utils.StringUtils;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.audience.Audience;
 import de.rayzs.pat.plugin.BukkitLoader;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import de.rayzs.pat.utils.message.*;
 import org.bukkit.entity.Player;
+
+import java.time.Duration;
 
 public class BukkitMessageTranslator implements Translator {
 
@@ -25,36 +26,35 @@ public class BukkitMessageTranslator implements Translator {
 
     @Override
     public void send(Object target, String text) {
-        text = StringUtils.replace(text, "&", "§", "\\", "");
-
         Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
-        Component component = miniMessage.deserialize(text);
 
-        audience.sendMessage(component);
+        audience.sendMessage(toComponent(text));
     }
 
     @Override
     public void sendActionbar(Object target, String text) {
-        text = StringUtils.replace(text, "&", "§", "\\", "");
-
         Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
-        Component component = this.miniMessage.deserialize(text);
 
-        audience.sendActionBar(component);
+        audience.sendActionBar(toComponent(text));
     }
 
     @Override
     public void sendTitle(Object target, String titleStr, String subtitleStr, int fadeIn, int stay, int fadeOut) {
-        titleStr = StringUtils.replace(titleStr, "\\", "");
-        subtitleStr = StringUtils.replace(subtitleStr, "\\", "");
-
         Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
-        Component titleComponent = miniMessage.deserialize(titleStr);
-        Component subtitleComponent = miniMessage.deserialize(subtitleStr);
 
-        Title title = Title.title(titleComponent, subtitleComponent, fadeIn, stay, fadeOut);
+        Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut));
+        Title title = Title.title(toComponent(titleStr), toComponent(subtitleStr), times);
 
         audience.showTitle(title);
+    }
+
+    @Override
+    public void playSound(Object target, String soundKey, float volume, float pitch) throws Exception {
+        if (target instanceof Player player) {
+            Sound sound = Sound.valueOf(soundKey);
+
+            player.playSound(player.getLocation(), sound, volume, pitch);
+        }
     }
 
     @Override
