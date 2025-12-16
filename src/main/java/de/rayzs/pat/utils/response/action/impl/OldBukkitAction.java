@@ -26,11 +26,13 @@ public class OldBukkitAction implements Action {
         Player player = Bukkit.getPlayer(uuid);
         message = ResponseHandler.replaceArgsVariables(message, command);
 
-        if(player != null)
+        if(player != null) {
             message = message.replace("%player%", player.getName());
+        }
 
-        if (message.contains("%"))
+        if (message.contains("%")) {
             message = PlaceholderReplacer.replace(player, message);
+        }
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), message);
     }
@@ -38,28 +40,37 @@ public class OldBukkitAction implements Action {
     @Override
     public void executePlayerCommand(String action, UUID uuid, String command, String message) {
         Player player = Bukkit.getPlayer(uuid);
+
+        if (player == null) {
+            return;
+        }
+
         message = ResponseHandler.replaceArgsVariables(message, command);
+        message = message.replace("%player%", player.getName());
 
-        if (player != null)
-            message = message.replace("%player%", player.getName());
-
-        if (message.contains("%"))
+        if (message.contains("%")) {
             message = PlaceholderReplacer.replace(player, message);
+        }
 
-        if (player != null)
-            Bukkit.dispatchCommand(player, message);
+        Bukkit.dispatchCommand(player, message);
     }
 
     @Override
     public void sendTitle(String action, UUID uuid, String command, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         Player player = Bukkit.getPlayer(uuid);
+
+        if (player == null) {
+            return;
+        }
+
+        title = StringUtils.replace(title, "&", "§", "%player%", player.getName());
+        subTitle = StringUtils.replace(title, "&", "§", "%player%", player.getName());
+
         title = ResponseHandler.replaceArgsVariables(title, command);
         subTitle = ResponseHandler.replaceArgsVariables(subTitle, command);
 
-        if (player == null) return;
-
-        title = PlaceholderReplacer.replace(player, StringUtils.replace(title, "&", "§", "%player%", player.getName()));
-        subTitle = PlaceholderReplacer.replace(player, StringUtils.replace(subTitle, "&", "§", "%player%", player.getName()));
+        title = PlaceholderReplacer.replace(player, title);
+        subTitle = PlaceholderReplacer.replace(player, subTitle);
 
         player.sendTitle(title, subTitle);
     }
@@ -68,8 +79,9 @@ public class OldBukkitAction implements Action {
     public void addPotionEffect(String action, UUID uuid, String potionEffectTypeName, int duration, int amplifier) {
         Player player = Bukkit.getPlayer(uuid);
 
-        if (player == null)
+        if (player == null) {
             return;
+        }
 
         PotionEffectType potionEffectType = null;
         try {
@@ -91,8 +103,9 @@ public class OldBukkitAction implements Action {
     public void playSound(String action, UUID uuid, String soundName, float volume, float pitch) {
         Player player = Bukkit.getPlayer(uuid);
 
-        if(player == null)
+        if(player == null) {
             return;
+        }
 
         try {
             Sound sound = Sound.valueOf(soundName);
@@ -108,16 +121,19 @@ public class OldBukkitAction implements Action {
     @Override
     public void sendActionbar(String action, UUID uuid, String command, String message) {
         Player player = Bukkit.getPlayer(uuid);
-        message = ResponseHandler.replaceArgsVariables(message, command);
 
-        if (player == null)
+        if (player == null) {
             return;
+        }
 
-        message = PlaceholderReplacer.replace(player, StringUtils.replace(message, "&", "§", "%player%", player.getName()));
+        message = ResponseHandler.replaceArgsVariables(message, command);
+        message = StringUtils.replace(message, "&", "§", "%player%", player.getName());
+        message = PlaceholderReplacer.replace(player, message);
 
         try {
-            if (versionPackage == null)
+            if (versionPackage == null) {
                 versionPackage = Reflection.getVersionPackageName();
+            }
 
             Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
             Constructor<?> constructor = (Objects.<Class<?>>requireNonNull(Class.forName("net.minecraft.server." + versionPackage + ".PacketPlayOutChat"))).getConstructor(Class.forName("net.minecraft.server." + versionPackage + ".IChatBaseComponent"), byte.class);

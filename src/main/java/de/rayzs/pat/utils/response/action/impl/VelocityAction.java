@@ -19,8 +19,9 @@ public class VelocityAction implements Action {
         Optional<Player> optPlayer = VelocityLoader.getServer().getPlayer(uuid);
         message = ResponseHandler.replaceArgsVariables(message, command);
 
-        if (optPlayer.isPresent())
+        if (optPlayer.isPresent()) {
             message = message.replace("%player%", optPlayer.get().getUsername());
+        }
 
         VelocityLoader.getServer().getCommandManager().executeAsync(VelocityLoader.getServer().getConsoleCommandSource(), message);
     }
@@ -28,30 +29,46 @@ public class VelocityAction implements Action {
     @Override
     public void executePlayerCommand(String action, UUID uuid, String command, String message) {
         Optional<Player> optPlayer = VelocityLoader.getServer().getPlayer(uuid);
+
+        if (optPlayer.isEmpty()) {
+            return;
+        }
+
+        Player player = optPlayer.get();
+
+        message = command.replace("%player%", player.getUsername());
         message = ResponseHandler.replaceArgsVariables(message, command);
 
-        if (optPlayer.isPresent())
-            message = command.replace("%player%", optPlayer.get().getUsername());
-
-        VelocityLoader.getServer().getCommandManager().executeAsync(optPlayer.get(), message);
+        VelocityLoader.getServer().getCommandManager().executeAsync(player, message);
     }
 
     @Override
     public void sendTitle(String action, UUID uuid, String command, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
         Optional<Player> optPlayer = VelocityLoader.getServer().getPlayer(uuid);
+
+        if (optPlayer.isEmpty()) {
+            return;
+        }
+
+        Player player = optPlayer.get();
+
         title = ResponseHandler.replaceArgsVariables(title, command);
         subTitle = ResponseHandler.replaceArgsVariables(subTitle, command);
 
-        if (!optPlayer.isPresent()) return;
+        title = StringUtils.replace(title,  "%player%", player.getUsername());
+        subTitle = StringUtils.replace(subTitle, "%player%", player.getUsername());
 
-        Player player = optPlayer.get();
+        MessageTranslator.sendTitle(player, title, subTitle, fadeIn, stay, fadeOut);
+
+        /*
         Title titleObj = Title.title(
-                MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(StringUtils.replace(title,  "%player%", player.getUsername()))),
-                MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(StringUtils.replace(subTitle, "%player%", player.getUsername()))),
+                MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(title)),
+                MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(subTitle)),
                 Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut))
         );
 
         player.showTitle(titleObj);
+         */
     }
 
     @Override
@@ -65,12 +82,18 @@ public class VelocityAction implements Action {
     @Override
     public void sendActionbar(String action, UUID uuid, String command, String message) {
         Optional<Player> optPlayer = VelocityLoader.getServer().getPlayer(uuid);
-        message = ResponseHandler.replaceArgsVariables(message, command);
 
-        if (!optPlayer.isPresent())
+        if (optPlayer.isEmpty()) {
             return;
+        }
 
         Player player = optPlayer.get();
-        player.sendActionBar(MiniMessage.miniMessage().deserialize(MessageTranslator.replaceMessage(StringUtils.replace(message, "%player%", player.getUsername()))));
+
+        message = ResponseHandler.replaceArgsVariables(message, command);
+        message = StringUtils.replace(message, "%player%", player.getUsername());
+
+        MessageTranslator.sendActionbar(player, message);
+
+        //player.sendActionBar(MiniMessage.miniMessage().deserialize(message));
     }
 }

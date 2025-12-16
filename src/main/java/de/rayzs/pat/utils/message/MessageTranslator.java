@@ -189,6 +189,14 @@ public class MessageTranslator {
         return result;
     }
 
+    public static void sendActionbar(Object targetObj, String message) {
+        translator.sendActionbar(targetObj, message);
+    }
+
+    public static void sendTitle(Object targetObj, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        translator.sendTitle(targetObj, title, subtitle, fadeIn, stay, fadeOut);
+    }
+
     public static String translateIntoMiniMessage(String text) {
         return translator.translate(replaceMessage(text));
     }
