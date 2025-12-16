@@ -38,9 +38,9 @@ import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "2.2.0",
+version = "2.2.1",
 authors = "Rayzs_YT",
-description = "Hide more than just your plugins. Hide almost everything!",
+description = "Hides more than just your plugins.",
 url = "https://www.rayzs.de/products/proantitab/page",
 dependencies = {
         @Dependency(id = "luckperms", optional = true),
