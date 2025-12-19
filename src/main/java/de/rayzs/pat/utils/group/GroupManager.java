@@ -35,7 +35,7 @@ public class GroupManager {
             Object objServ = Storage.Files.STORAGE.get("groups." + group.getGroupName() + ".servers");
 
             if (objServ == null) {
-                Logger.warning("Group " + group.getGroupName() + " has no servers. Skipping...");
+                //Logger.info("Group " + group.getGroupName() + " has no servers. Skipping...");
                 return;
             }
 
