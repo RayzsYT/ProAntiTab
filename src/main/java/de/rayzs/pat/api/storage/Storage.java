@@ -85,7 +85,7 @@ public class Storage {
         }
 
         Logger.warning("No known permissions plugin found, so some features may be disabled.");
-        Logger.warning("Read more about it here: http://rayzs.de/products/proantitab/nkppf");
+        Logger.warning("Read more about it here: https://rayzs.de/products/proantitab/nkppf");
     }
 
     public static PermissionPlugin getPermissionPlugin() {
