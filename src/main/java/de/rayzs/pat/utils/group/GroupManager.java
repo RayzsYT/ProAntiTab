@@ -16,9 +16,29 @@ public class GroupManager {
     private static final List<Group> GROUPS = new LinkedList<>();
 
     public static void initialize() {
+
+        Object obj = Storage.Files.STORAGE.get("groups");
+
+        if (obj == null) {
+            Logger.info("No groups found. Skipping...");
+            return;
+        }
+
         Storage.Files.STORAGE.getKeys("groups", false).forEach(GroupManager::registerGroup);
-        if(!Reflection.isProxyServer()) return;
+
+        if (!Reflection.isProxyServer()) {
+            return;
+        }
+
         getGroups().forEach(group -> {
+
+            Object objServ = Storage.Files.STORAGE.get("groups." + group.getGroupName() + ".servers");
+
+            if (objServ == null) {
+                Logger.warning("Group " + group.getGroupName() + " has no servers. Skipping...");
+                return;
+            }
+
             Storage.Files.STORAGE.getKeys("groups." + group.getGroupName() + ".servers", false).forEach(key -> {
                 group.getOrCreateGroupBlacklist(key, true);
             });
