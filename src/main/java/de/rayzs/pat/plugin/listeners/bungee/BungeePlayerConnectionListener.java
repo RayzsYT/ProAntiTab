@@ -33,7 +33,6 @@ public class BungeePlayerConnectionListener implements Listener {
             }, 500, TimeUnit.MILLISECONDS);
 
         PermissionUtil.setPlayerPermissions(sender);
-        sender.updateGroups();
 
         if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {

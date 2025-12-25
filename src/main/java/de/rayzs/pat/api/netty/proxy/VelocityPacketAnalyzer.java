@@ -23,6 +23,8 @@ import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import io.netty.channel.Channel;
@@ -202,7 +204,8 @@ public class VelocityPacketAnalyzer {
                 }
 
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
-                    TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
+                    final TabCompleteResponsePacket response = (TabCompleteResponsePacket) packet;
+                    final List<Group> groups = GroupManager.getPlayerGroups(player);
 
                     boolean cancelsBeforeHand = false;
                     String playerInput = getPlayerInput(player), rawPlayerInput = playerInput, server = player.getCurrentServer().get().getServerInfo().getName();
@@ -215,7 +218,7 @@ public class VelocityPacketAnalyzer {
                     }
 
                     if(!playerInput.equals("/")) {
-                        cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.replaceFirst(playerInput, "/", ""), server);
+                        cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, groups, StringUtils.replaceFirst(playerInput, "/", ""), server);
 
                         if(!cancelsBeforeHand) 
                             cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", "")) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", ""));
@@ -237,7 +240,7 @@ public class VelocityPacketAnalyzer {
                                     return false;
                                 }
 
-                                return !Storage.Blacklist.canPlayerAccessTab(player, command, player.getCurrentServer().get().getServerInfo().getName());
+                                return !Storage.Blacklist.canPlayerAccessTab(player, groups, command, player.getCurrentServer().get().getServerInfo().getName());
                             });
                         } else {
                             if (cancelsBeforeHand) return;
@@ -261,15 +264,15 @@ public class VelocityPacketAnalyzer {
             } else if (packet instanceof AvailableCommandsPacket) {
 
                 if (!PermissionUtil.hasBypassPermission(player) && player.getCurrentServer().isPresent()) {
-
-                    String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
+                    final String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
 
                     if (Storage.Blacklist.isDisabledServer(serverName)) {
                         super.write(ctx, msg, promise);
                         return;
                     }
 
-                    AvailableCommandsPacket commands = (AvailableCommandsPacket) packet;
+                    final AvailableCommandsPacket commands = (AvailableCommandsPacket) packet;
+                    final List<Group> groups = GroupManager.getPlayerGroups(player);
 
                     if(!commands.getRootNode().getChildren().isEmpty()) {
                         Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
@@ -286,7 +289,7 @@ public class VelocityPacketAnalyzer {
                         if (PermissionUtil.hasBypassPermission(player)) return;
 
                         final boolean newer = player.getProtocolVersion().getProtocol() > 340;
-                        final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, serverName);
+                        final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, groups, serverName);
 
                         if (commands.getRootNode().getChildren().size() == 1 && newer
                                 && commands.getRootNode().getChild("args") != null

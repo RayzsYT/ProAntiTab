@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -61,9 +63,11 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         Object suggestionObj;
         String rawInput = BukkitPacketAnalyzer.getPlayerInput(player), input = rawInput;
 
-        if(input == null)
+        if(input == null) {
             return false;
+        }
 
+        final List<Group> groups = GroupManager.getPlayerGroups(player);
 
         boolean is121Packet = packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket"),
                 cancelsBeforeHand = false;
@@ -77,7 +81,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 if(spaces > 0) input = split[0];
             }
 
-            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, input);
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, groups, input);
 
             if (!cancelsBeforeHand)
                 cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
@@ -106,7 +110,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 if (spaces == 0) {
                     suggestions.removeIf(suggestion -> {
                         String command = getSuggestionFromEntry(suggestion);
-                        return !Storage.Blacklist.canPlayerAccessTab(player, command);
+                        return !Storage.Blacklist.canPlayerAccessTab(player, groups, command);
                     });
 
                     return true;
@@ -180,7 +184,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
 
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
-                return !Storage.Blacklist.canPlayerAccessTab(player, command);
+                return !Storage.Blacklist.canPlayerAccessTab(player, groups, command);
             });
 
             return true;

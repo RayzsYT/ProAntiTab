@@ -31,17 +31,11 @@ public class PermissionUtil {
 
         resetPermissions(uuid);
         setPlayerPermissions(uuid);
-
-        CommandSender sender = CommandSenderHandler.getSenderFromUUID(uuid);
-        if (sender != null) {
-            sender.updateGroups();
-        }
     }
 
     public static void reloadPermissions(CommandSender sender) {
         resetPermissions(sender.getUniqueId());
         setPlayerPermissions(sender);
-        sender.updateGroups();
     }
 
     public static String getPermissionsAsString(UUID uuid) {

@@ -20,6 +20,8 @@ import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.ExpireCache;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.node.CommandNodeHelper;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
@@ -160,15 +162,17 @@ public class BungeePacketAnalyzer {
 
         if (!ignore) {
 
-            Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
+            final List<Group> groups = GroupManager.getPlayerGroups(player);
+
+            final Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
             if (!cache.containsKey(serverName)) {
                 cache.put(serverName, new CommandsCache());
             }
 
-            CommandsCache commandsCache = cache.get(serverName);
+            final CommandsCache commandsCache = cache.get(serverName);
             commandsCache.handleCommands(commandsAsString, serverName);
 
-            List<String> tmpPlayerCommands = commandsCache.getPlayerCommands(commandsAsString, player, serverName);
+            final List<String> tmpPlayerCommands = commandsCache.getPlayerCommands(commandsAsString, player, groups, serverName);
             helper.removeIf(str -> !tmpPlayerCommands.contains(str));
 
             if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE) {

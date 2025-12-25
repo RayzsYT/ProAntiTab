@@ -6,7 +6,6 @@ import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
@@ -18,9 +17,6 @@ import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.event.player.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class BukkitPlayerListener implements Listener {
@@ -53,8 +49,6 @@ public class BukkitPlayerListener implements Listener {
 
                     if (Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER) {
                         PermissionUtil.reloadPermissions(sender);
-                    } else {
-                        sender.updateGroups();
                     }
 
                     if (Reflection.getMinor() >= 13) {

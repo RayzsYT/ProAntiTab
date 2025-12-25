@@ -75,12 +75,11 @@ public class GroupManager {
         return playerGroups;
     }
 
-    public static AccessResult canAccessCommand(Object targetObj, String unmodifiedCommand, Storage.Blacklist.BlockType type) {
-        return canAccessCommand(targetObj, unmodifiedCommand, type, null);
+    public static AccessResult canAccessCommand(Object targetObj, List<Group> groups, String unmodifiedCommand, Storage.Blacklist.BlockType type) {
+        return canAccessCommand(targetObj, groups, unmodifiedCommand, type, null);
     }
 
-    public static AccessResult
-    canAccessCommand(Object targetObj, String unmodifiedCommand, Storage.Blacklist.BlockType type, String server) {
+    public static AccessResult canAccessCommand(Object targetObj, List<Group> groups, String unmodifiedCommand, Storage.Blacklist.BlockType type, String server) {
         final CommandSender sender = CommandSenderHandler.from(targetObj);
 
         if (sender == null) {
@@ -88,9 +87,7 @@ public class GroupManager {
             return AccessResult.UNKNOWN;
         }
 
-        final List<Group> playerGroups = sender.getGroups();
-
-        if (playerGroups == null || playerGroups.isEmpty()) {
+        if (groups == null || groups.isEmpty()) {
             return AccessResult.NO_GROUPS;
         }
 
@@ -102,7 +99,7 @@ public class GroupManager {
                 permitted = false,
                 negated = false;
 
-        for (Group group : playerGroups) {
+        for (Group group : groups) {
 
             all = group.contains(allCommand);
             permitted = group.contains(command);
@@ -144,7 +141,7 @@ public class GroupManager {
         }
 
         if (!permitted && type != BlockType.BOTH)
-            return canAccessCommand(targetObj, unmodifiedCommand, Storage.Blacklist.BlockType.BOTH, server);
+            return canAccessCommand(targetObj, groups, unmodifiedCommand, Storage.Blacklist.BlockType.BOTH, server);
         
         return permitted ? AccessResult.ALLOWED : AccessResult.NOT_LISTED;
     }

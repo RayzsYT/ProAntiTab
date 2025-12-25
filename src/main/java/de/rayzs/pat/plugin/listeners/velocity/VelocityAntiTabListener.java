@@ -16,6 +16,8 @@ import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.CommandsCache;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class VelocityAntiTabListener {
@@ -34,19 +36,24 @@ public class VelocityAntiTabListener {
             return;
         }
 
-        String serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown";
+        final String serverName = player.getCurrentServer().isPresent() ? player.getCurrentServer().get().getServerInfo().getName() : "unknown";
 
-        if (Storage.Blacklist.isDisabledServer(serverName))
+        if (Storage.Blacklist.isDisabledServer(serverName)) {
             return;
+        }
 
-        if (PermissionUtil.hasBypassPermission(player) || event.getSuggestions().isEmpty() || !player.getCurrentServer().isPresent()) return;
+        if (PermissionUtil.hasBypassPermission(player) || event.getSuggestions().isEmpty() || player.getCurrentServer().isEmpty()) {
+            return;
+        }
+
+        final List<Group> groups = GroupManager.getPlayerGroups(player);
 
         event.getSuggestions().removeIf(command -> {
             if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command)) {
                 return false;
             }
 
-            return !Storage.Blacklist.canPlayerAccessTab(player, command, serverName);
+            return !Storage.Blacklist.canPlayerAccessTab(player, groups, command, serverName);
         });
 
         FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, event.getSuggestions());
@@ -56,7 +63,7 @@ public class VelocityAntiTabListener {
     @Subscribe (order = PostOrder.LAST)
     public void onPlayerAvailableCommands(PlayerAvailableCommandsEvent event) {
         try {
-            Player player = event.getPlayer();
+            final Player player = event.getPlayer();
 
             if (event.getRootNode().getChildren().isEmpty() || !player.getCurrentServer().isPresent()) {
                 return;
@@ -66,7 +73,7 @@ public class VelocityAntiTabListener {
                 return;
             }
 
-            String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
+            final String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
 
             if (Storage.Blacklist.isDisabledServer(serverName)) {
                 return;
@@ -78,14 +85,18 @@ public class VelocityAntiTabListener {
                 cache.put(serverName, new CommandsCache());
             }
 
-            CommandsCache commandsCache = cache.get(serverName);
+            final CommandsCache commandsCache = cache.get(serverName);
+            final List<Group> groups = GroupManager.getPlayerGroups(player);
+            final List<String> commandsAsString = new ArrayList<>();
 
-            List<String> commandsAsString = new ArrayList<>();
-            event.getRootNode().getChildren().stream().filter(command -> command != null && command.getName() != null).forEach(command -> commandsAsString.add(command.getName()));
+            event.getRootNode().getChildren().stream()
+                    .filter(command -> command != null && command.getName() != null)
+                    .forEach(command -> commandsAsString.add(command.getName()));
+
             commandsCache.handleCommands(commandsAsString, serverName);
 
             final boolean newer = player.getProtocolVersion().getProtocol() > 340, argsChildrenExist = event.getRootNode().getChild("args") != null;
-            final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, serverName);
+            final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, groups, serverName);
 
             if (event.getRootNode().getChildren().size() == 1
                     && newer && argsChildrenExist

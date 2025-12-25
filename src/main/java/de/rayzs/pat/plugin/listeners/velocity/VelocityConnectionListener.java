@@ -43,7 +43,6 @@ public class VelocityConnectionListener {
             }).delay(500, TimeUnit.MILLISECONDS).schedule();
 
         PermissionUtil.setPlayerPermissions(sender);
-        sender.updateGroups();
 
         if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
             server.getScheduler().buildTask(loader, () -> {

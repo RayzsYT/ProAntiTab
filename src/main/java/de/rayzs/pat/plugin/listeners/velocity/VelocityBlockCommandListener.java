@@ -4,6 +4,8 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.command.CommandSource;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.api.proxy.Player;
@@ -27,8 +29,9 @@ public class VelocityBlockCommandListener {
     }
 
     public static CommandExecuteEvent handleCommand(CommandExecuteEvent event) {
-        if(!event.getResult().isAllowed())
+        if (!event.getResult().isAllowed()) {
             return event;
+        }
 
         final CommandSource commandSource = event.getCommandSource();
         final Object consoleSender = Storage.getLoader().getConsoleSender();
@@ -42,7 +45,7 @@ public class VelocityBlockCommandListener {
                 ? player.getCurrentServer().get().getServerInfo().getName()
                 : "unknown";
 
-        String command = StringUtils.getFirstArg(event.getCommand());
+        final String command = StringUtils.getFirstArg(event.getCommand());
 
         if (PermissionUtil.hasBypassPermission(player, command) || Storage.Blacklist.isDisabledServer(serverName))
             return event;
@@ -50,7 +53,7 @@ public class VelocityBlockCommandListener {
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
 
-        List<String> notificationMessage = MessageTranslator.replaceMessageList(
+        final List<String> notificationMessage = MessageTranslator.replaceMessageList(
                 Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
                 "%player%", player.getUsername(),
                 "%command%", displayCommand,
@@ -102,9 +105,11 @@ public class VelocityBlockCommandListener {
         }
 
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
+        final List<Group> groups = GroupManager.getPlayerGroups(player);
 
-        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, command, serverName);
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, groups, command, serverName);
         boolean blockedNamespace = false;
+
 
         if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
             blockedNamespace = cancelBlockedCommand
@@ -114,9 +119,11 @@ public class VelocityBlockCommandListener {
             if (blockedNamespace) allowed = false;
         }
 
+
         if (!Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED && !blockedNamespace) {
             return event;
         }
+
 
         if (!allowed) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
@@ -146,9 +153,12 @@ public class VelocityBlockCommandListener {
                 return event;
         }
 
-        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getCommand(), false, false);
-        if (executeCommandEvent.isBlocked())
+
+        final ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getCommand(), false, false);
+
+        if (executeCommandEvent.isBlocked()) {
             event.setResult(CommandExecuteEvent.CommandResult.denied());
+        }
 
         return event;
     }

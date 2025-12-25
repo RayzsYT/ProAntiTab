@@ -1,6 +1,8 @@
 package de.rayzs.pat.plugin.listeners.bukkit;
 
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.event.player.PlayerCommandSendEvent;
@@ -65,7 +67,8 @@ public class BukkitAntiTabListener implements Listener {
             return;
         }
 
-        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), player);
+        final List<Group> groups = GroupManager.getPlayerGroups(player);
+        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), player, groups);
         final FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, playerCommands);
 
         event.getCommands().clear();

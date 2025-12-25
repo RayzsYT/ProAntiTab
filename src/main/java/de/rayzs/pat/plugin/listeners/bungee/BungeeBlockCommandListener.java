@@ -1,6 +1,8 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSender;
@@ -91,9 +93,10 @@ public class BungeeBlockCommandListener implements Listener {
             return;
         }
 
+        final List<Group> groups = GroupManager.getPlayerGroups(player);
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
 
-        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, command, serverName);
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, groups, command, serverName);
         boolean blockedNamespace = false;
 
         if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {

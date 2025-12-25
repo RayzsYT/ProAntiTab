@@ -2,6 +2,8 @@ package de.rayzs.pat.plugin.listeners.bukkit;
 
 import java.util.List;
 
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.Bukkit;
@@ -136,8 +138,9 @@ public class BukkitBlockCommandListener implements Listener {
         }
 
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
+        final List<Group> groups = GroupManager.getPlayerGroups(player);
 
-        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, command);
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, groups, command);
         boolean blockedNamespace = false;
 
         if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {

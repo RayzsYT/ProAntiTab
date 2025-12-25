@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import org.bukkit.entity.Player;
 
 import de.rayzs.pat.api.event.PATEventHandler;
@@ -35,8 +37,11 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
     public boolean handleOutgoingPacket(Player player, Object packetObj) throws Exception {
         final String rawInput = BukkitPacketAnalyzer.getPlayerInput(player);
 
-        if(rawInput == null)
+        if(rawInput == null) {
             return false;
+        }
+
+        final List<Group> groups = GroupManager.getPlayerGroups(player);
 
         String input = rawInput;
         boolean cancelsBeforeHand = false;
@@ -55,7 +60,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
         }
 
         if (!cancelsBeforeHand && !input.isEmpty()) {
-            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.getFirstArg(input));
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, groups, StringUtils.getFirstArg(input));
         }
 
         if (!cancelsBeforeHand) {
@@ -100,7 +105,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
                         return false;
                     }
 
-                    return !Storage.Blacklist.canPlayerAccessTab(player, cpy);
+                    return !Storage.Blacklist.canPlayerAccessTab(player, groups, cpy);
                 });
             }
 

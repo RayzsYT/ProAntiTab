@@ -5,6 +5,8 @@ import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
 import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -14,6 +16,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BungeeAntiTabListener implements Listener {
 
@@ -50,6 +53,7 @@ public class BungeeAntiTabListener implements Listener {
 
 
 
+        final List<Group> groups = GroupManager.getPlayerGroups(player);
         final boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player);
         final boolean spaces = cursor.contains(" ");
 
@@ -60,7 +64,7 @@ public class BungeeAntiTabListener implements Listener {
         }
 
         if (!cancelsBeforeHand && !cursor.isEmpty()) {
-            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, StringUtils.getFirstArg(cursor), serverName);
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, groups, StringUtils.getFirstArg(cursor), serverName);
         }
 
         if (!cancelsBeforeHand) {
@@ -94,7 +98,7 @@ public class BungeeAntiTabListener implements Listener {
                 return false;
             }
 
-            return !Storage.Blacklist.canPlayerAccessTab(player, cpy, serverName);
+            return !Storage.Blacklist.canPlayerAccessTab(player, groups, cpy, serverName);
         });
     }
 

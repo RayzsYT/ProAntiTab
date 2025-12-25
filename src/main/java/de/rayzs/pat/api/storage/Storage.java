@@ -13,6 +13,7 @@ import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
+import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import org.bukkit.entity.Player;
 
@@ -557,33 +558,33 @@ public class Storage {
             return IGNORED_SERVERS.isListed(server);
         }
 
-        public static boolean canPlayerAccess(Object player, String command, BlockType type) {
-            return canPlayerAccess(player, command, type, null);
+        public static boolean canPlayerAccess(Object player, List<Group> groups, String command, BlockType type) {
+            return canPlayerAccess(player, groups, command, type, null);
         }
 
-        public static boolean canPlayerAccessChat(Object player, String command) {
-            return canPlayerAccess(player, command, BlockType.CHAT, null);
+        public static boolean canPlayerAccessChat(Object player, List<Group> groups, String command) {
+            return canPlayerAccess(player, groups, command, BlockType.CHAT, null);
         }
 
 
-        public static boolean canPlayerAccessChat(Object player, String command, String server) {
-            return canPlayerAccess(player, command, BlockType.CHAT, server);
+        public static boolean canPlayerAccessChat(Object player, List<Group> groups, String command, String server) {
+            return canPlayerAccess(player, groups, command, BlockType.CHAT, server);
         }
 
-        public static boolean canPlayerAccessTab(Object player, String command) {
-            return canPlayerAccess(player, command, BlockType.TAB, null);
+        public static boolean canPlayerAccessTab(Object player, List<Group> groups, String command) {
+            return canPlayerAccess(player, groups, command, BlockType.TAB, null);
         }
 
-        public static boolean canPlayerAccessTab(Object player, String command, String server) {
-            return canPlayerAccess(player, command, BlockType.TAB, server);
+        public static boolean canPlayerAccessTab(Object player, List<Group> groups, String command, String server) {
+            return canPlayerAccess(player, groups, command, BlockType.TAB, server);
         }
 
-        public static boolean canPlayerAccess(Object player, String command, BlockType type, String server) {
+        public static boolean canPlayerAccess(Object player, List<Group> groups, String command, BlockType type, String server) {
             final boolean allowGroupOverruling = ConfigSections.Settings.ALLOW_GROUP_OVERRULING.ENABLED;
             final boolean blocked = isBlocked(command, type, server);
 
             if (allowGroupOverruling) {
-                GroupManager.AccessResult groupResult = GroupManager.canAccessCommand(player, command, type, server);
+                GroupManager.AccessResult groupResult = GroupManager.canAccessCommand(player, groups, command, type, server);
                 if (groupResult == GroupManager.AccessResult.NEGATED) {
                     return false;
                 }
@@ -612,7 +613,7 @@ public class Storage {
                 }
             }
 
-            return GroupManager.canAccessCommand(player, command, type, server).asBoolean();
+            return GroupManager.canAccessCommand(player, groups, command, type, server).asBoolean();
         }
 
         /*
