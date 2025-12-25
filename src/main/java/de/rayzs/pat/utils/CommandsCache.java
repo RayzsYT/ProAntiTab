@@ -5,6 +5,7 @@ import java.util.*;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class CommandsCache {
@@ -80,11 +81,11 @@ public class CommandsCache {
         filteredCommands = tmpFilteredCommands;
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj) {
-        return getPlayerCommands(unfilteredCommands, targetObj, null);
+    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, List<Group> groups) {
+        return getPlayerCommands(unfilteredCommands, targetObj, groups, null);
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, String serverName) {
+    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, List<Group> groups, String serverName) {
         List<String> playerCommands = new LinkedList<>(unfilteredCommands);
         List<String> localFilteredCommands = filteredCommands == null ? null : new LinkedList<>();
 
@@ -116,7 +117,7 @@ public class CommandsCache {
                     return false;
                 }
 
-                return !Storage.Blacklist.canPlayerAccessTab(targetObj, command, serverName);
+                return !Storage.Blacklist.canPlayerAccessTab(targetObj, groups, command, serverName);
             });
 
         }
