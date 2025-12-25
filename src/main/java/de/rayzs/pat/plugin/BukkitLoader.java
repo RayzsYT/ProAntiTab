@@ -356,10 +356,6 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         if (!loaded) {
             loaded = true;
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                CommandSender sender = CommandSenderHandler.from(player);
-                sender.updateGroups();
-            });
         }
 
         if (Reflection.getMinor() >= 13 && updatedList) {
@@ -395,6 +391,25 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         }
 
         return pluginNames;
+    }
+
+    @Override
+    public List<String> getAllCommands(boolean useColons) {
+        List<String> commands = new ArrayList<>();
+
+        for (Map.Entry<String, Command> entry : BukkitLoader.getCommandsMap().entrySet()) {
+            if (entry.getKey().toLowerCase().contains(":")) {
+                String command = entry.getKey().substring(entry.getKey().lastIndexOf(":") + 1);
+
+                commands.add(command);
+
+                if (useColons) {
+                    commands.add(entry.getKey());
+                }
+            }
+        }
+
+        return commands;
     }
 
     @Override

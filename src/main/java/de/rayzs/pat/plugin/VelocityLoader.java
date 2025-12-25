@@ -158,6 +158,11 @@ public class VelocityLoader implements PluginLoader {
     }
 
     @Override
+    public List<String> getAllCommands(boolean useColons) {
+        return List.of();
+    }
+
+    @Override
     public Object getConsoleSender() {
         return server.getConsoleCommandSource();
     }

@@ -145,6 +145,11 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     @Override
+    public List<String> getAllCommands(boolean useColons) {
+        return List.of();
+    }
+
+    @Override
     public Object getConsoleSender() {
         return ProxyServer.getInstance().getConsole();
     }

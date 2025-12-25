@@ -77,7 +77,7 @@ public class ExtractCommand extends ProCommand {
         }
 
         List<String> pluginNames = Storage.getLoader().getPluginNames("%n");
-        boolean pluginFound = false;
+        boolean pluginFound = false, all = pluginName.equalsIgnoreCase("*");
 
         for (String name : pluginNames) {
             if (name.equalsIgnoreCase(pluginName)) {
@@ -86,7 +86,7 @@ public class ExtractCommand extends ProCommand {
             }
         }
 
-        if (!pluginFound) {
+        if (!all && !pluginFound) {
             sender.sendMessage(StringUtils.replace(Storage.ConfigSections.Messages.EXTRACT.PLUGIN_NOT_FOUND,
                     "%plugin%", pluginName)
             );
@@ -94,7 +94,7 @@ public class ExtractCommand extends ProCommand {
             return true;
         }
 
-        List<String> commands = Storage.getLoader().getPluginCommands(args[0], useColons);
+        List<String> commands = all ? Storage.getLoader().getAllCommands(useColons) : Storage.getLoader().getPluginCommands(args[0], useColons);
 
         BlacklistStorage storage = group == null
                 ? Storage.Blacklist.getBlacklist()
@@ -118,7 +118,10 @@ public class ExtractCommand extends ProCommand {
         final int length = args.length;
 
         if (length <= 1) {
-            return Storage.getLoader().getPluginNames("%n");
+            final List<String> suggestions =  Storage.getLoader().getPluginNames("%n");
+            suggestions.add("*");
+
+            return suggestions;
         }
 
         List<String> result = new ArrayList<>();
