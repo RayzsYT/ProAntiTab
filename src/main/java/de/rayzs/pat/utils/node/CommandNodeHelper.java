@@ -7,7 +7,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.tree.*;
-import net.md_5.bungee.protocol.packet.Commands;
+import de.rayzs.pat.api.storage.Storage;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class CommandNodeHelper<T> {
 
     private static final Command DUMMY_COMMAND = (context) -> 0;
+
     private static SuggestionProvider DEFAULT_SUGGESTION_PROVIDER;
 
     public static void setDefaultSuggestionProvider(SuggestionProvider<?> suggestionProvider) {
@@ -64,6 +65,7 @@ public class CommandNodeHelper<T> {
                 continue;
 
             String name = n.getName();
+
             if (predicate.test(name)) {
                 objs.add(n);
             }
@@ -111,29 +113,59 @@ public class CommandNodeHelper<T> {
         return this;
     }
 
-    public CommandNodeHelper<T> add(String commandPath, boolean autoSuggestions) {
-        String[] args = commandPath.split(" ");
-        add(rootNode, args, 0, autoSuggestions);
+    public CommandNodeHelper<T> add(String original, boolean autoSuggestions) {
+        String[] args = original.split(" ");
+        add(original, rootNode, args, 0, autoSuggestions);
         return this;
     }
 
-    private void add(CommandNode<T> parent, String[] args, int index, boolean autoSuggestions) {
+    public CommandNodeHelper<T> removeSubArguments(String original) {
+        String[] args = original.split(" ");
+        removeSubArguments(rootNode, args, 0);
+        return this;
+    }
+
+    private void removeSubArguments(CommandNode<T> parent, String[] args, int index) {
         if (index >= args.length) return;
 
+        if (parent == null) {
+            return;
+        }
+
         String part = args[index];
+        CommandNode<T> childNode = parent.getChild(part);
+
+        if (index == (args.length - 1)) {
+            parent.getChildren().remove(childNode);
+            return;
+        }
+
+        removeSubArguments(childNode, args, index + 1);
+    }
+
+    private void add(final String original, CommandNode<T> parent, String[] args, int index, boolean autoSuggestions) {
+        if (index >= args.length) {
+            return;
+        }
+
+        String part = args[index];
+
+        if (index == 0)
+            part = Storage.Blacklist.BlockTypeFetcher.modify(Storage.Blacklist.BlockTypeFetcher.modify(part));
+
         String next = index + 1 >= args.length ? null : args[index + 1];
         CommandNode<T> childNode = parent.getChild(part);
+
+        if (original.charAt(0) == '!' && index == (args.length - 1)) {
+             return;
+        }
 
         if (childNode == null) {
             LiteralCommandNode newNode;
 
-            boolean cancel = next != null && (next.equals("_-"));
-            boolean stop = next != null && next.startsWith("%") && next.endsWith("%");
-            boolean skip = part.equals("-_");
-
-            if (index == 0 && part.charAt(0) == '!' && part.length() > 1) {
-                return;
-            }
+            final boolean cancel = next != null && (next.equals("_-"));
+            final boolean stop = next != null && next.startsWith("%") && next.endsWith("%");
+            final boolean skip = part.equals("-_");
 
             if (skip) {
                 return;
@@ -148,7 +180,7 @@ public class CommandNodeHelper<T> {
                 newNode = LiteralArgumentBuilder.literal(part)
                         .then(RequiredArgumentBuilder
                                 .argument("args", (ArgumentType) StringArgumentType.greedyString())
-                                .suggests(Commands.SuggestionRegistry.ASK_SERVER))
+                                .suggests(DEFAULT_SUGGESTION_PROVIDER))
                         .build();
             }
 
@@ -161,6 +193,6 @@ public class CommandNodeHelper<T> {
             childNode = newNode;
         }
 
-        add(childNode, args, index + 1, autoSuggestions);
+        add(original, childNode, args, index + 1, autoSuggestions);
     }
 }
