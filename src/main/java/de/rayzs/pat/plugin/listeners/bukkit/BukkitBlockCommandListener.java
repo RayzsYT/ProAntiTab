@@ -26,15 +26,16 @@ public class BukkitBlockCommandListener implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onUnknownCommandRecognition(PlayerCommandPreprocessEvent event) {
-        Player player = event.getPlayer();
-        World world = player.getWorld();
+        final Player player = event.getPlayer();
+        final CommandSender sender = CommandSenderHandler.from(player);
+        final World world = player.getWorld();
 
         String rawCommand = StringUtils.getFirstArg(event.getMessage()),
                 command =  rawCommand.substring(1);
 
         if (!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled()) return;
 
-        if (PermissionUtil.hasBypassPermission(player))
+        if (PermissionUtil.hasBypassPermission(sender))
             return;
 
         if (Storage.getLoader().doesCommandExist(command))
@@ -81,7 +82,7 @@ public class BukkitBlockCommandListener implements Listener {
             return;
         }
 
-        if (PermissionUtil.hasBypassPermission(player, command)) {
+        if (PermissionUtil.hasBypassPermission(sender, command)) {
             return;
         }
 
@@ -138,9 +139,9 @@ public class BukkitBlockCommandListener implements Listener {
         }
 
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
-        final List<Group> groups = GroupManager.getPlayerGroups(player);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender);
 
-        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, groups, command);
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(sender, groups, command);
         boolean blockedNamespace = false;
 
         if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
