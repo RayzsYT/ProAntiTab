@@ -15,6 +15,7 @@ import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
+import de.rayzs.pat.utils.sender.CommandSender;
 import org.bukkit.entity.Player;
 
 import de.rayzs.pat.api.event.PATEventHandler;
@@ -558,33 +559,33 @@ public class Storage {
             return IGNORED_SERVERS.isListed(server);
         }
 
-        public static boolean canPlayerAccess(Object player, List<Group> groups, String command, BlockType type) {
-            return canPlayerAccess(player, groups, command, type, null);
+        public static boolean canPlayerAccess(CommandSender sender, List<Group> groups, String command, BlockType type) {
+            return canPlayerAccess(sender, groups, command, type, null);
         }
 
-        public static boolean canPlayerAccessChat(Object player, List<Group> groups, String command) {
-            return canPlayerAccess(player, groups, command, BlockType.CHAT, null);
+        public static boolean canPlayerAccessChat(CommandSender sender, List<Group> groups, String command) {
+            return canPlayerAccess(sender, groups, command, BlockType.CHAT, null);
         }
 
 
-        public static boolean canPlayerAccessChat(Object player, List<Group> groups, String command, String server) {
-            return canPlayerAccess(player, groups, command, BlockType.CHAT, server);
+        public static boolean canPlayerAccessChat(CommandSender sender, List<Group> groups, String command, String server) {
+            return canPlayerAccess(sender, groups, command, BlockType.CHAT, server);
         }
 
-        public static boolean canPlayerAccessTab(Object player, List<Group> groups, String command) {
-            return canPlayerAccess(player, groups, command, BlockType.TAB, null);
+        public static boolean canPlayerAccessTab(CommandSender sender, List<Group> groups, String command) {
+            return canPlayerAccess(sender, groups, command, BlockType.TAB, null);
         }
 
-        public static boolean canPlayerAccessTab(Object player, List<Group> groups, String command, String server) {
-            return canPlayerAccess(player, groups, command, BlockType.TAB, server);
+        public static boolean canPlayerAccessTab(CommandSender sender, List<Group> groups, String command, String server) {
+            return canPlayerAccess(sender, groups, command, BlockType.TAB, server);
         }
 
-        public static boolean canPlayerAccess(Object player, List<Group> groups, String command, BlockType type, String server) {
+        public static boolean canPlayerAccess(CommandSender sender, List<Group> groups, String command, BlockType type, String server) {
             final boolean allowGroupOverruling = ConfigSections.Settings.ALLOW_GROUP_OVERRULING.ENABLED;
             final boolean blocked = isBlocked(command, type, server);
 
             if (allowGroupOverruling) {
-                GroupManager.AccessResult groupResult = GroupManager.canAccessCommand(player, groups, command, type, server);
+                GroupManager.AccessResult groupResult = GroupManager.canAccessCommand(groups, command, type, server);
                 if (groupResult == GroupManager.AccessResult.NEGATED) {
                     return false;
                 }
@@ -594,7 +595,7 @@ public class Storage {
                 }
 
                 if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
-                    if (PermissionUtil.hasBypassPermission(player, command)) {
+                    if (PermissionUtil.hasBypassPermission(sender, command)) {
                         return true;
                     }
                 }
@@ -608,41 +609,13 @@ public class Storage {
             }
 
             if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
-                if (PermissionUtil.hasBypassPermission(player, command)) {
+                if (PermissionUtil.hasBypassPermission(sender, command)) {
                     return true;
                 }
             }
 
-            return GroupManager.canAccessCommand(player, groups, command, type, server).asBoolean();
+            return GroupManager.canAccessCommand(groups, command, type, server).asBoolean();
         }
-
-        /*
-        Experimental:
-
-        It allows to negate commands inside a PAT group to block them off,
-        even though it is allowed inside the global section.
-
-        public static boolean canPlayerAccess(Object player, String command, BlockType type, String server) {
-            boolean blocked = isBlocked(command, type, server);
-            GroupManager.AccessResult groupResult = GroupManager.canAccessCommand(player, command, type, server);
-
-            if (groupResult == GroupManager.AccessResult.NEGATED) {
-                return false;
-            }
-
-            if (!blocked) {
-                return true;
-            }
-
-            if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
-                if (PermissionUtil.hasBypassPermission(player, command)) {
-                    return true;
-                }
-            }
-
-            return groupResult.asBoolean();
-        }
-         */
 
         public static boolean isBlockedChat(String command) {
             return isBlocked(command, BlockType.CHAT, null);
@@ -682,16 +655,6 @@ public class Storage {
 
                 return !turn;
             }
-
-
-
-            /*
-            if (turn) {
-                return !listed;
-            } else {
-                return listed;
-            }
-             */
 
             return turn != listed; // Shorter version of above's code
 
@@ -740,6 +703,19 @@ public class Storage {
 
         public static class BlockTypeFetcher {
 
+            public static boolean isNegated(String command) {
+                if (command.isEmpty()) {
+                    return false;
+                }
+
+                boolean negated = command.charAt(0) == '!';
+
+                if (!negated && command.length() > 5)
+                    negated = command.charAt(5) == '!';
+
+                return negated;
+            }
+
             public static BlockType getType(String command) {
                 for (BlockType blockType : BLOCK_TYPES) {
                     if (!command.startsWith(blockType.toString()))
@@ -761,6 +737,17 @@ public class Storage {
                     return command;
 
                 return command.substring(type.toString().length());
+            }
+
+            // Remove all BlockType elements from String
+            public static String cleanse(String command) {
+                BlockType type = getType(command);
+
+                if (type == null || type == BlockType.BOTH) {
+                    return command;
+                }
+
+                return modify(command, type);
             }
 
         }
