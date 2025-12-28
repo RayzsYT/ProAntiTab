@@ -5,16 +5,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 
 import com.mojang.brigadier.tree.RootCommandNode;
 import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.Communicator;
-import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
@@ -24,21 +18,19 @@ import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.node.CommandNodeHelper;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.protocol.PacketWrapper;
 import net.md_5.bungee.protocol.packet.Commands;
 import net.md_5.bungee.protocol.packet.PluginMessage;
-import net.md_5.bungee.protocol.packet.TabCompleteRequest;
-import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 
 public class BungeePacketAnalyzer {
 
@@ -147,11 +139,10 @@ public class BungeePacketAnalyzer {
         return input;
     }
 
-    private static void modifyCommands(ProxiedPlayer player, Commands commands) {
-        ServerInfo serverInfo = player.getServer().getInfo();
-        String serverName = serverInfo.getName();
+    private static void modifyCommands(ProxiedPlayer player, CommandSender sender, Commands commands) {
+        String serverName = sender.getServerName();
 
-        final boolean ignore = PermissionUtil.hasBypassPermission(player) || Storage.Blacklist.isDisabledServer(serverName);
+        final boolean ignore = PermissionUtil.hasBypassPermission(sender) || Storage.Blacklist.isDisabledServer(serverName);
 
         CommandNodeHelper helper = new CommandNodeHelper<CommandNode>(commands.getRoot());
 
@@ -161,8 +152,7 @@ public class BungeePacketAnalyzer {
         List<String> playerCommands = new ArrayList<>();
 
         if (!ignore) {
-
-            final List<Group> groups = GroupManager.getPlayerGroups(player);
+            final List<Group> groups = GroupManager.getPlayerGroups(sender);
 
             final Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
             if (!cache.containsKey(serverName)) {
@@ -172,8 +162,11 @@ public class BungeePacketAnalyzer {
             final CommandsCache commandsCache = cache.get(serverName);
             commandsCache.handleCommands(commandsAsString, serverName);
 
-            final List<String> tmpPlayerCommands = commandsCache.getPlayerCommands(commandsAsString, player, groups, serverName);
-            helper.removeIf(str -> !tmpPlayerCommands.contains(str));
+            final List<String> tmpPlayerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName);
+
+            if (commands.getRoot().getChildren().size() != 0) {
+                helper.removeIf(str -> !tmpPlayerCommands.contains(str));
+            }
 
             if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE) {
                 Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines().forEach(input -> helper.add(input, false));
@@ -231,10 +224,12 @@ public class BungeePacketAnalyzer {
             if (player.getPendingConnection().getVersion() < 754)
                 continue;
 
+            final CommandSender sender = CommandSenderHandler.from(player);
+
             RootCommandNode root = new RootCommandNode();
             Commands packet = new Commands(root);
 
-            modifyCommands(player, packet);
+            modifyCommands(player, sender, packet);
             player.unsafe().sendPacket(packet);
         }
     }
@@ -242,9 +237,11 @@ public class BungeePacketAnalyzer {
     private static class PacketDecoder extends MessageToMessageDecoder<PacketWrapper> {
 
         private final ProxiedPlayer player;
+        private final CommandSender sender;
 
         private PacketDecoder(ProxiedPlayer player) {
             this.player = player;
+            this.sender = CommandSenderHandler.from(player);
         }
 
         @Override
@@ -261,7 +258,7 @@ public class BungeePacketAnalyzer {
 
             } else if (wrapper.packet instanceof Commands) {
                 Commands response = (Commands) wrapper.packet;
-                modifyCommands(player, response);
+                modifyCommands(player, sender, response);
 
                 player.unsafe().sendPacket(response);
                 return;
