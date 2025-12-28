@@ -3,7 +3,7 @@ package de.rayzs.pat.api.storage.config.settings;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
-import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 public class BlockNamespaceCommandsSection extends ConfigStorage {
 
@@ -32,7 +32,7 @@ public class BlockNamespaceCommandsSection extends ConfigStorage {
         return StringUtils.getFirstArg(command).contains(":");
     }
 
-    public boolean doesBypass(Object targetObj) {
-        return !ENABLED || PermissionUtil.hasPermission(targetObj, "namespace");
+    public boolean doesBypass(CommandSender sender) {
+        return !ENABLED || sender.hasPermission("namespace");
     }
 }
