@@ -75,7 +75,7 @@ public class BukkitPlayerListener implements Listener {
             Storage.quickSubArgumentUpdate(uuid);
         }
 
-        if (Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
+        if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate")) {
             PATScheduler.createScheduler(() -> {
                 if (player.isOnline()) {
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());

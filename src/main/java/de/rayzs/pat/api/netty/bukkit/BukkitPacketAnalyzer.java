@@ -8,6 +8,9 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
 import java.util.concurrent.TimeUnit;
+
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.entity.Player;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
@@ -117,8 +120,11 @@ public class BukkitPacketAnalyzer {
     private static class PacketDecoder extends ChannelDuplexHandler {
 
         private final Player player;
+        private final CommandSender sender;
+
         private PacketDecoder(Player player) {
             this.player = player;
+            this.sender = CommandSenderHandler.from(player);
         }
 
         @Override
@@ -136,9 +142,9 @@ public class BukkitPacketAnalyzer {
                     return;
                 }
 
-                if (!PermissionUtil.hasBypassPermission(player)) {
+                if (!PermissionUtil.hasBypassPermission(sender)) {
 
-                    if (!PACKET_HANDLER.handleIncomingPacket(player, packetObj))
+                    if (!PACKET_HANDLER.handleIncomingPacket(player, sender, packetObj))
                         return;
                 }
 
@@ -163,7 +169,7 @@ public class BukkitPacketAnalyzer {
                     return;
                 }
 
-                if (!PermissionUtil.hasBypassPermission(player)) {
+                if (!PermissionUtil.hasBypassPermission(sender)) {
 
                     UUID uuid = player.getUniqueId();
                     Object sentPacketObj = SENT_PACKET.get(uuid);
@@ -176,7 +182,7 @@ public class BukkitPacketAnalyzer {
                         }
                     }
 
-                    if (!PACKET_HANDLER.handleOutgoingPacket(player, packetObj))
+                    if (!PACKET_HANDLER.handleOutgoingPacket(player, sender, packetObj))
                         return;
                 }
 
