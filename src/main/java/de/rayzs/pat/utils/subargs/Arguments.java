@@ -2,9 +2,7 @@ package de.rayzs.pat.utils.subargs;
 
 import de.rayzs.pat.api.storage.Storage;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class Arguments {
 
@@ -23,6 +21,7 @@ public class Arguments {
 
     public void buildArgumentStacks(String input) {
         Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
+
         if (type != Storage.Blacklist.BlockType.NEGATE) {
             input = Storage.Blacklist.BlockTypeFetcher.modify(input, type);
         }
