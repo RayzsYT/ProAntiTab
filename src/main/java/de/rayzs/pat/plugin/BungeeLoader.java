@@ -109,6 +109,8 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         for (int i : new Integer[] { 1, 5, 15 }) {
             ProxyServer.getInstance().getScheduler().schedule(this, BungeePacketAnalyzer::loadProxyCommands, i, TimeUnit.SECONDS);
         }
+
+        BungeePacketAnalyzer.injectAll();
     }
 
     @Override

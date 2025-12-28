@@ -6,6 +6,7 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
+import de.rayzs.pat.api.netty.proxy.VelocityPacketAnalyzer;
 import de.rayzs.pat.plugin.converter.StorageConverter;
 import de.rayzs.pat.plugin.modules.SubArgsModule;
 import de.rayzs.pat.plugin.process.CommandProcess;
@@ -114,7 +115,7 @@ public class VelocityLoader implements PluginLoader {
             Logger.info("Successfully hooked into PAPIProxyBridge!");
         }
 
-        if(Storage.USE_SIMPLECLOUD)
+        if (Storage.USE_SIMPLECLOUD)
             Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
         Storage.broadcastPermissionsPluginNotice();
@@ -124,6 +125,8 @@ public class VelocityLoader implements PluginLoader {
         SubArgsModule.initialize();
 
         StorageConverter.initialize();
+
+        VelocityPacketAnalyzer.injectAll();
     }
 
     public static org.slf4j.Logger getPluginLogger() {
