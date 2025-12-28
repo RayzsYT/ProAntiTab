@@ -1,14 +1,15 @@
 <center>
 
 ##### **![https://www.rayzs.de/proantitab/assets/Banner8.png](https://www.rayzs.de/proantitab/assets/Banner8.png)**
-<center>One of the simplest plugin & command hider!
-<center>Decide what plugins and commands your players should see! ^^
+One of the simplest plugin & command hider!
+Decide what plugins and commands your players should see! ^^
 
 **placeholderapi support - free - no dependencies required**
+
 ___________________________________
 
+</center>
 
-**</center>****</center>****</center>**
 # **A**BOUT
 ProAntiTab is an advanced **plugin hider** with **many features** and a very simple to understand system. It prevents your server from **plugin spoofers** used by hack clients, manipulates the **tab-completion**, blocks unwanted **suggestions** and much more!
 #####
