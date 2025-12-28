@@ -9,11 +9,11 @@ import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 
 public class GroupManager {
 
     private static final List<Group> GROUPS = new LinkedList<>();
+    private static final int INVALID_GROUP_PRIORITY = Integer.MAX_VALUE -1;
 
     public static void initialize() {
 
@@ -45,48 +45,36 @@ public class GroupManager {
         });
     }
 
-    public static List<Group> getPlayerGroups(Object player) {
-        final int invalidPriority = Integer.MAX_VALUE -1;
-
-        List<Group> playerGroups = new ArrayList<>(GroupManager.getGroups().stream().filter(group -> group.hasPermission(player)).toList());
-
-        int priority = playerGroups.stream()
-                                .mapToInt(Group::getPriority)
-                                .filter(group -> group <= invalidPriority)
-                                .min().orElse(invalidPriority);
-        
-        playerGroups.removeIf(group -> group.getPriority() > priority);
-
-        return playerGroups;
-    }
-
     public static List<Group> getPlayerGroups(UUID uuid) {
-        final int invalidPriority = Integer.MAX_VALUE -1;
-
         List<Group> playerGroups = new ArrayList<>(GroupManager.getGroups().stream().filter(group -> group.hasPermission(uuid)).toList());
 
         int priority = playerGroups.stream()
                 .mapToInt(Group::getPriority)
-                .filter(group -> group <= invalidPriority)
-                .min().orElse(invalidPriority);
+                .filter(group -> group <= INVALID_GROUP_PRIORITY)
+                .min().orElse(INVALID_GROUP_PRIORITY);
 
         playerGroups.removeIf(group -> group.getPriority() > priority);
 
         return playerGroups;
     }
 
-    public static AccessResult canAccessCommand(Object targetObj, List<Group> groups, String unmodifiedCommand, Storage.Blacklist.BlockType type) {
-        return canAccessCommand(targetObj, groups, unmodifiedCommand, type, null);
+    public static List<Group> getPlayerGroups(CommandSender sender) {
+        List<Group> playerGroups = new ArrayList<>(GroupManager.getGroups().stream().filter(group -> group.hasPermission(sender)).toList());
+
+        int priority = playerGroups.stream()
+                                .mapToInt(Group::getPriority)
+                                .filter(group -> group <= INVALID_GROUP_PRIORITY)
+                                .min().orElse(INVALID_GROUP_PRIORITY);
+
+        playerGroups.removeIf(group -> group.getPriority() > priority);
+        return playerGroups;
     }
 
-    public static AccessResult canAccessCommand(Object targetObj, List<Group> groups, String unmodifiedCommand, Storage.Blacklist.BlockType type, String server) {
-        final CommandSender sender = CommandSenderHandler.from(targetObj);
+    public static AccessResult canAccessCommand(List<Group> groups, String unmodifiedCommand, Storage.Blacklist.BlockType type) {
+        return canAccessCommand(groups, unmodifiedCommand, type, null);
+    }
 
-        if (sender == null) {
-            Logger.warning("Failed to load player! (GroupManager#66)");
-            return AccessResult.UNKNOWN;
-        }
-
+    public static AccessResult canAccessCommand(List<Group> groups, String unmodifiedCommand, Storage.Blacklist.BlockType type, String server) {
         if (groups == null || groups.isEmpty()) {
             return AccessResult.NO_GROUPS;
         }
@@ -130,6 +118,9 @@ public class GroupManager {
 
             }
 
+            if (permitted) {
+                break;
+            }
         }
 
         if (negated) {
@@ -141,8 +132,8 @@ public class GroupManager {
         }
 
         if (!permitted && type != BlockType.BOTH)
-            return canAccessCommand(targetObj, groups, unmodifiedCommand, Storage.Blacklist.BlockType.BOTH, server);
-        
+            return canAccessCommand(groups, unmodifiedCommand, Storage.Blacklist.BlockType.BOTH, server);
+
         return permitted ? AccessResult.ALLOWED : AccessResult.NOT_LISTED;
     }
 
