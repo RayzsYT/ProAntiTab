@@ -44,7 +44,7 @@ public class VelocityPacketAnalyzer {
 
     private static boolean FAILED = false;
 
-    public static void initialize() {
+    static {
         try {
             final String name = "minecraft:ask_server";
 
@@ -57,7 +57,7 @@ public class VelocityPacketAnalyzer {
                     final SuggestionProvider<?> suggestionProvider = (SuggestionProvider<?>) suggestionProviderObj;
 
                     CommandNodeHelper.setDefaultSuggestionProvider(suggestionProvider);
-                    return;
+                    break;
                 }
             }
 
