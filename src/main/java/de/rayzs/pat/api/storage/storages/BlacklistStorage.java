@@ -26,13 +26,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
             return false;
         }
 
-        /*
-        if (!isNegated(command) && commands.contains("*")) {
-            return true;
-        }
-        */
-
-        boolean isNegated = isNegated(command);
+        boolean isNegated = Storage.Blacklist.BlockTypeFetcher.isNegated(command);
 
         if (!isNegated) {
             command = StringUtils.getFirstArg(command);
@@ -132,18 +126,5 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
         }
 
         hiddenCommands = tmpCommands;
-    }
-
-    private boolean isNegated(String command) {
-        if (command.isEmpty()) {
-            return false;
-        }
-
-        boolean negated = command.charAt(0) == '!';
-
-        if (!negated && command.length() > 5)
-            negated = command.charAt(5) == '!';
-
-        return negated;
     }
 }
