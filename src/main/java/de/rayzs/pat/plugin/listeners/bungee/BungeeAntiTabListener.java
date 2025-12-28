@@ -8,6 +8,8 @@ import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.TabCompleteEvent;
@@ -26,6 +28,7 @@ public class BungeeAntiTabListener implements Listener {
         if(!(event.getReceiver() instanceof ProxiedPlayer)) return;
 
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
+        CommandSender sender = CommandSenderHandler.from(player);
 
         ServerInfo serverInfo = player.getServer().getInfo();
         String serverName = serverInfo.getName();
@@ -48,13 +51,13 @@ public class BungeeAntiTabListener implements Listener {
         if (Storage.Blacklist.isDisabledServer(serverName))
             return;
 
-        if (PermissionUtil.hasBypassPermission(player))
+        if (PermissionUtil.hasBypassPermission(sender))
             return;
 
 
 
-        final List<Group> groups = GroupManager.getPlayerGroups(player);
-        final boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(player);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender);
+        final boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender);
         final boolean spaces = cursor.contains(" ");
 
         boolean cancelsBeforeHand = false;
@@ -64,7 +67,7 @@ public class BungeeAntiTabListener implements Listener {
         }
 
         if (!cancelsBeforeHand && !cursor.isEmpty()) {
-            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(player, groups, StringUtils.getFirstArg(cursor), serverName);
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.getFirstArg(cursor), serverName);
         }
 
         if (!cancelsBeforeHand) {
@@ -98,7 +101,7 @@ public class BungeeAntiTabListener implements Listener {
                 return false;
             }
 
-            return !Storage.Blacklist.canPlayerAccessTab(player, groups, cpy, serverName);
+            return !Storage.Blacklist.canPlayerAccessTab(sender, groups, cpy, serverName);
         });
     }
 
