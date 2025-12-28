@@ -51,17 +51,20 @@ public class UpdateList {
                 final List<String> chatInputs = new ArrayList<>(argument.CHAT_ARGUMENTS.getGeneralArgument().getInputs());
                 final List<String> tabInput = new ArrayList<>(argument.TAB_ARGUMENTS.getGeneralArgument().getInputs());
 
+
                 for (String command : chatInputs) {
                     Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
 
-                    if (type != Storage.Blacklist.BlockType.NEGATE)
+                    if (type != Storage.Blacklist.BlockType.NEGATE) {
                         command = Storage.Blacklist.BlockTypeFetcher.modify(command, type);
+                    }
 
-                    argument.CHAT_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
+                    argument.CHAT_ARGUMENTS.buildArguments(command);
                 }
 
                 for (String command : tabInput) {
                     Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
+
 
                     if (type != Storage.Blacklist.BlockType.NEGATE)
                         command = Storage.Blacklist.BlockTypeFetcher.modify(command, type);
@@ -72,8 +75,9 @@ public class UpdateList {
                 for (String command : SubArgsModule.getGroupCommands(uuid, serverName))
                     argument.buildArgumentStacks(command);
 
-                for (String command : SubArgsModule.getServerCommands(uuid))
+                for (String command : SubArgsModule.getServerCommands(uuid)) {
                     argument.buildArgumentStacks(command);
+                }
 
             } else {
                 List<String> groupCommands = SubArgsModule.getGroupCommands(uuid, serverName);
