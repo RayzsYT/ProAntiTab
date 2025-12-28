@@ -11,6 +11,7 @@ import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.configuration.ConfigurationBuilder;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 public class Group implements Serializable {
 
@@ -155,8 +156,12 @@ public class Group implements Serializable {
         this.priority = priority;
     }
 
-    public boolean hasPermission(Object targetObj) {
-        return PermissionUtil.hasPermission(targetObj, "group." + this.groupName);
+    public boolean hasPermission(CommandSender sender) {
+        return PermissionUtil.hasPermission(sender, "group." + this.groupName);
+    }
+
+    public boolean hasPermission(UUID uuid) {
+        return PermissionUtil.hasPermission(uuid, "group." + this.groupName);
     }
 
     public boolean contains(String command) {
