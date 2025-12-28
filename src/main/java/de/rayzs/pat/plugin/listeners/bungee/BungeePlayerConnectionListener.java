@@ -34,7 +34,7 @@ public class BungeePlayerConnectionListener implements Listener {
 
         PermissionUtil.setPlayerPermissions(sender);
 
-        if(Storage.OUTDATED && PermissionUtil.hasPermission(player, "joinupdate")) {
+        if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate")) {
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
                 if (player.isConnected()) {
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getName());
