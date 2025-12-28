@@ -25,6 +25,7 @@ public class BukkitAntiTabListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
         final Player player = event.getPlayer();
+        final CommandSender sender = CommandSenderHandler.from(player);
         final UUID uuid = player.getUniqueId();
 
 
@@ -58,17 +59,15 @@ public class BukkitAntiTabListener implements Listener {
 
         if (!player.isOp() && knownOperators.contains(uuid)) {
             knownOperators.remove(uuid);
-
-            CommandSender sender = CommandSenderHandler.getSenderFromUUID(uuid);
-            PermissionUtil.reloadPermissions(sender);
+            PermissionUtil.reloadPermissions(player.getUniqueId());
         }
 
-        if (PermissionUtil.hasBypassPermission(player)) {
+        if (PermissionUtil.hasBypassPermission(sender)) {
             return;
         }
 
-        final List<Group> groups = GroupManager.getPlayerGroups(player);
-        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), player, groups);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender);
+        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), sender, groups);
         final FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, playerCommands);
 
         event.getCommands().clear();
