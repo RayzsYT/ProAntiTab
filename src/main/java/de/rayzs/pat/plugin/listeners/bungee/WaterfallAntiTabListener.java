@@ -12,6 +12,8 @@ import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import io.github.waterfallmc.waterfall.event.ProxyDefineCommandsEvent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -28,13 +30,14 @@ public class WaterfallAntiTabListener implements Listener {
         }
 
         final ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
+        final CommandSender sender = CommandSenderHandler.from(player);
         final String serverName = player.getServer().getInfo().getName();
 
-        if (Storage.Blacklist.isDisabledServer(serverName) || PermissionUtil.hasBypassPermission(player)) {
+        if (Storage.Blacklist.isDisabledServer(serverName) || PermissionUtil.hasBypassPermission(sender)) {
             return;
         }
 
-        final List<Group> groups = GroupManager.getPlayerGroups(player);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender);
         final Map<String, CommandsCache> cache = Storage.getLoader().getCommandsCacheMap();
 
         if (!cache.containsKey(serverName)) {
@@ -48,7 +51,7 @@ public class WaterfallAntiTabListener implements Listener {
         event.getCommands().forEach((key, value) -> commandsAsString.add(key));
         commandsCache.handleCommands(commandsAsString, serverName);
 
-        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, groups, serverName);
+        List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName);
         event.getCommands().entrySet().removeIf(command -> {
 
             if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command.getKey()) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command.getKey())) {
