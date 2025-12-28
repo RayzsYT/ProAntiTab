@@ -7,6 +7,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 public class CommandsCache {
 
@@ -81,11 +82,11 @@ public class CommandsCache {
         filteredCommands = tmpFilteredCommands;
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, List<Group> groups) {
-        return getPlayerCommands(unfilteredCommands, targetObj, groups, null);
+    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, CommandSender sender, List<Group> groups) {
+        return getPlayerCommands(unfilteredCommands, sender, groups, null);
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, Object targetObj, List<Group> groups, String serverName) {
+    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, CommandSender sender, List<Group> groups, String serverName) {
         List<String> playerCommands = new LinkedList<>(unfilteredCommands);
         List<String> localFilteredCommands = filteredCommands == null ? null : new LinkedList<>();
 
@@ -105,8 +106,8 @@ public class CommandsCache {
         }
 
 
-        if (!PermissionUtil.hasBypassPermission(targetObj)) {
-            boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(targetObj);
+        if (!PermissionUtil.hasBypassPermission(sender)) {
+            boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender);
 
             playerCommands.removeIf(command -> {
                 if (!hasNamespaceBypass && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)) {
@@ -117,12 +118,12 @@ public class CommandsCache {
                     return false;
                 }
 
-                return !Storage.Blacklist.canPlayerAccessTab(targetObj, groups, command, serverName);
+                return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, serverName);
             });
 
         }
 
-        PATEventHandler.callUpdatePlayerCommandsEvents(targetObj, playerCommands, serverName != null);
+        PATEventHandler.callUpdatePlayerCommandsEvents(sender, playerCommands, serverName != null);
 
         return playerCommands.stream().map(command -> {
             command = StringUtils.getFirstArg(command);
@@ -146,7 +147,7 @@ public class CommandsCache {
 
     public void reset() {
         // Removed to reset the change state. Experimental change though
-        //if(change) return;
+        // if(change) return;
         // Prob. gonna change it to: if (CONNECTED_TO_BUNGEE && change) return;
         updateChangeState();
         filteredCommands = null;
