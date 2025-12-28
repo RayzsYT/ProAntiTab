@@ -50,7 +50,7 @@ public class VersionComparer {
             if (shouldAnnounce) {
                 shouldAnnounce = false;
 
-                Logger.info("§8[§fPAT | Bukkit§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
+                Logger.info("§8[§fPAT | " + (Reflection.isProxyServer() ? "Proxy" : "Bukkit") + "§8] §7Please be aware that you are currently using a §bdeveloper §7version of ProAntiTab. Bugs, errors and a lot of debug messages might be included.");
             }
 
             return true;
