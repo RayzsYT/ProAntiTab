@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.sender.impl;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
@@ -20,6 +21,17 @@ public class VelocitySender extends CommandSenderAbstract {
 
     public VelocitySender(Object senderObj) {
         super(senderObj);
+
+        if (senderObj instanceof UUID uuid) {
+            final Player player = VelocityLoader.getServer().getPlayer(uuid).get();
+
+            this.uuid = uuid;
+            this.console = false;
+
+            this.sender = player;
+            this.name = player.getUsername();
+            return;
+        }
 
         if (senderObj instanceof Player player) {
             this.sender = player;

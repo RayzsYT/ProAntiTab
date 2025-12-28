@@ -4,6 +4,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -19,6 +20,17 @@ public class BukkitSender extends CommandSenderAbstract {
 
     public BukkitSender(Object senderObj) {
         super(senderObj);
+
+        if (senderObj instanceof UUID uuid) {
+            final Player player = Bukkit.getPlayer(uuid);
+
+            this.uuid = uuid;
+            this.console = false;
+
+            this.sender = player;
+            this.name = player.getName();
+            return;
+        }
 
         if (senderObj instanceof Player player) {
             this.sender = player;

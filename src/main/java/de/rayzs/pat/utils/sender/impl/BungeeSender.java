@@ -5,6 +5,7 @@ import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.UUID;
@@ -20,6 +21,16 @@ public class BungeeSender extends CommandSenderAbstract {
 
     public BungeeSender(Object senderObj) {
         super(senderObj);
+
+        if (senderObj instanceof UUID uuid) {
+            final ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uuid);
+            this.uuid = uuid;
+            this.console = false;
+
+            this.sender = proxiedPlayer;
+            this.name = proxiedPlayer.getName();
+            return;
+        }
 
         if (senderObj instanceof ProxiedPlayer player) {
             this.sender = player;
