@@ -2,7 +2,7 @@
 
 ##### **![https://www.rayzs.de/proantitab/assets/Banner8.png](https://www.rayzs.de/proantitab/assets/Banner8.png)**
 One of the simplest plugin & command hider!
-Decide what plugins and commands your players should see! ^^
+Decide what plugins and commands your players should see!
 
 **placeholderapi support - free - no dependencies required**
 
