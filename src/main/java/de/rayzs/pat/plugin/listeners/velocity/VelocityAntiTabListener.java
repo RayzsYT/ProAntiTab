@@ -19,6 +19,8 @@ import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.sender.CommandSender;
+import de.rayzs.pat.utils.sender.CommandSenderHandler;
 
 public class VelocityAntiTabListener {
 
@@ -30,7 +32,7 @@ public class VelocityAntiTabListener {
 
     @Subscribe (order = PostOrder.LAST)
     public void onTabComplete(TabCompleteEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
 
         if (!event.getPartialMessage().startsWith("/")) {
             return;
@@ -42,18 +44,20 @@ public class VelocityAntiTabListener {
             return;
         }
 
-        if (PermissionUtil.hasBypassPermission(player) || event.getSuggestions().isEmpty() || player.getCurrentServer().isEmpty()) {
+        final CommandSender sender = CommandSenderHandler.from(player);
+
+        if (PermissionUtil.hasBypassPermission(sender) || event.getSuggestions().isEmpty() || player.getCurrentServer().isEmpty()) {
             return;
         }
 
-        final List<Group> groups = GroupManager.getPlayerGroups(player);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender);
 
         event.getSuggestions().removeIf(command -> {
             if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command)) {
                 return false;
             }
 
-            return !Storage.Blacklist.canPlayerAccessTab(player, groups, command, serverName);
+            return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, serverName);
         });
 
         FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, event.getSuggestions());
@@ -69,7 +73,9 @@ public class VelocityAntiTabListener {
                 return;
             }
 
-            if (PermissionUtil.hasBypassPermission(player)) {
+            final CommandSender sender = CommandSenderHandler.from(player);
+
+            if (PermissionUtil.hasBypassPermission(sender)) {
                 return;
             }
 
@@ -86,7 +92,7 @@ public class VelocityAntiTabListener {
             }
 
             final CommandsCache commandsCache = cache.get(serverName);
-            final List<Group> groups = GroupManager.getPlayerGroups(player);
+            final List<Group> groups = GroupManager.getPlayerGroups(sender);
             final List<String> commandsAsString = new ArrayList<>();
 
             event.getRootNode().getChildren().stream()
@@ -96,7 +102,7 @@ public class VelocityAntiTabListener {
             commandsCache.handleCommands(commandsAsString, serverName);
 
             final boolean newer = player.getProtocolVersion().getProtocol() > 340, argsChildrenExist = event.getRootNode().getChild("args") != null;
-            final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, player, groups, serverName);
+            final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName);
 
             if (event.getRootNode().getChildren().size() == 1
                     && newer && argsChildrenExist
