@@ -3,6 +3,7 @@ package de.rayzs.pat.api.communication.impl;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.CommunicationPackets;
 import com.velocitypowered.api.event.Subscribe;
 import de.rayzs.pat.plugin.VelocityLoader;
@@ -15,6 +16,11 @@ public class VelocityClient implements Client {
     private static final MinecraftChannelIdentifier IDENTIFIER = MinecraftChannelIdentifier.from(CHANNEL_NAME);
 
     public VelocityClient() {
+
+        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) {
+            return;
+        }
+
         SERVER.getChannelRegistrar().register(IDENTIFIER);
         SERVER.getEventManager().register(VelocityLoader.getInstance(), this);
     }

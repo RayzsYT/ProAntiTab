@@ -1,5 +1,6 @@
 package de.rayzs.pat.api.communication.impl;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import de.rayzs.pat.utils.CommunicationPackets;
@@ -13,6 +14,11 @@ public class BukkitClient implements Client, PluginMessageListener {
     private static final Server SERVER = Bukkit.getServer();
 
     public BukkitClient() {
+
+        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+            return;
+        }
+
         SERVER.getMessenger().registerIncomingPluginChannel(BukkitLoader.getPlugin(), CHANNEL_NAME, this);
         SERVER.getMessenger().registerOutgoingPluginChannel(BukkitLoader.getPlugin(), CHANNEL_NAME);
     }

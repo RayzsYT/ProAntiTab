@@ -1,5 +1,6 @@
 package de.rayzs.pat.api.communication.impl;
 
+import de.rayzs.pat.api.storage.Storage;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import de.rayzs.pat.utils.CommunicationPackets;
 import net.md_5.bungee.api.connection.Server;
@@ -15,6 +16,11 @@ public class BungeeClient implements Client, Listener {
     private static final ProxyServer SERVER = ProxyServer.getInstance();
 
     public BungeeClient() {
+
+        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) {
+            return;
+        }
+
         SERVER.registerChannel(CHANNEL_NAME);
         SERVER.getPluginManager().registerListener(BungeeLoader.getPlugin(), this);
     }
