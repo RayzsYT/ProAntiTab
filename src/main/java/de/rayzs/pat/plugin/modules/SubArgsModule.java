@@ -73,13 +73,33 @@ public class SubArgsModule {
         }
 
         ArgumentSource source = arguments.TAB_ARGUMENTS;
-        if (source == null) return;
+        if (source == null) {
+            return;
+        }
 
         List<String> inputs = source.getAllInputs();
         List<String> allEntries = inputs.stream().map(StringUtils::getFirstArg).toList();
 
         helper.removeIf(allEntries::contains);
-        inputs.forEach(input -> helper.add(input, true));
+
+        for (String input : inputs) {
+            final boolean negated = Storage.Blacklist.BlockTypeFetcher.isNegated(input);
+
+            if (!negated) {
+                helper.add(input, true);
+                continue;
+            }
+
+            input = input.substring(1);
+
+            final Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
+            if (type != Storage.Blacklist.BlockType.BOTH && type != Storage.Blacklist.BlockType.TAB) {
+                continue;
+            }
+
+            input = Storage.Blacklist.BlockTypeFetcher.modify(input, type);
+            helper.removeSubArguments(input);
+        }
     }
 
     public static List<String> getServerCommands(UUID uuid) {
@@ -110,7 +130,7 @@ public class SubArgsModule {
         List<Group> groups;
 
         if (Storage.getPermissionPlugin() == PermissionPlugin.NONE) {
-            CommandSender sender = CommandSenderHandler.getSenderFromUUID(uuid);
+            CommandSender sender = CommandSenderHandler.from(uuid);
             groups = GroupManager.getPlayerGroups(sender);
         } else {
             groups = GroupManager.getPlayerGroups(uuid);
