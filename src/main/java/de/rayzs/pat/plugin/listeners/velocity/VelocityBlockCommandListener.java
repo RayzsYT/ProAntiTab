@@ -47,7 +47,7 @@ public class VelocityBlockCommandListener {
 
         final String command = StringUtils.getFirstArg(event.getCommand());
 
-        if (PermissionUtil.hasBypassPermission(player, command) || Storage.Blacklist.isDisabledServer(serverName))
+        if (PermissionUtil.hasBypassPermission(sender, command) || Storage.Blacklist.isDisabledServer(serverName))
             return event;
 
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
@@ -105,9 +105,9 @@ public class VelocityBlockCommandListener {
         }
 
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
-        final List<Group> groups = GroupManager.getPlayerGroups(player);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender);
 
-        boolean allowed = Storage.Blacklist.canPlayerAccessChat(player, groups, command, serverName);
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(sender, groups, command, serverName);
         boolean blockedNamespace = false;
 
 
