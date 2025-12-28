@@ -4,7 +4,6 @@ import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
-import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class AutoLowercaseCommandsSection extends ConfigStorage {
 
@@ -28,9 +27,5 @@ public class AutoLowercaseCommandsSection extends ConfigStorage {
         if(!ENABLED) return false;
 
         return !StringUtils.isLowercased(command);
-    }
-
-    public boolean doesBypass(Object targetObj) {
-        return !ENABLED || PermissionUtil.hasPermission(targetObj, "auto-lowercase");
     }
 }
