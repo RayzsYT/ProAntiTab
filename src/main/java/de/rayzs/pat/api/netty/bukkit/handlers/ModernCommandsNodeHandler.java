@@ -10,7 +10,32 @@ import java.util.*;
 
 public class ModernCommandsNodeHandler implements BukkitPacketHandler {
 
-    @Override
+    /**
+     *
+     * Note for me:
+     *
+     *
+     * This is just the current process to block sub-arguments from commands created with the
+     * Mojang Brigadier Library.
+     *
+     * The code for the proxy (Velocity / Bungeecord) is already working flawlessly.
+     *
+     * This class is solely for Bukkit server.
+     *
+     * Currently, the packet only gets fragmented and rebuild in a more visually operative
+     * design to work with.
+     *
+     * Currently, there is no filtering process.
+     *
+     * I think imma going to reconstruct the packet and send it back to the player.
+     * But I would prefer editing the packet instead and just let it be.
+     *
+     * But the children are in a fixed sized.
+     *
+     * I am thinking of changing the index of the child in question to the index of a
+     * node return nothing back. This way, I would not have to edit much and could just
+     * stop the tab-completion this way.
+     */
     public boolean handleIncomingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
         // Ignored
         return true;
@@ -18,7 +43,6 @@ public class ModernCommandsNodeHandler implements BukkitPacketHandler {
 
     @Override
     public boolean handleOutgoingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
-
         final List<SimpleNode> nodeList = new ArrayList<>();
 
         final Class<?> commandsPacketClazz = packetObj.getClass();
