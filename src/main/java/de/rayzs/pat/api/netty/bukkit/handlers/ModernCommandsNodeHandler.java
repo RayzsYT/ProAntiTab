@@ -44,175 +44,234 @@ public class ModernCommandsNodeHandler implements BukkitPacketHandler {
 
     @Override
     public boolean handleOutgoingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
-        final List<SimpleNode> nodeList = new ArrayList<>();
+        final FilterProcess process = new FilterProcess(packetObj);
 
-        final Class<?> commandsPacketClazz = packetObj.getClass();
-        final Field rootIndexField = commandsPacketClazz.getDeclaredField("rootIndex");
-        rootIndexField.setAccessible(true);
-
-        final int rootIndex = rootIndexField.getInt(packetObj);
-
-        final Field entriesField = commandsPacketClazz.getDeclaredField("entries");
-        entriesField.setAccessible(true);
-
-        final List entries = (List) entriesField.get(packetObj);
-        for (int i = 0; i < entries.size(); i++) {
-            final Object nodeObj = entries.get(i);
-
-            System.out.println(nodeObj);
-
-            final Class<?> entryClass = nodeObj.getClass();
-
-            final Field nodeChildrenField = entryClass.getDeclaredField("children");
-            nodeChildrenField.setAccessible(true);
-
-            int[] children = (int[]) nodeChildrenField.get(nodeObj);
-
-            final Field stubField = entryClass.getDeclaredField("stub");
-            stubField.setAccessible(true);
-
-            String name = null;
-
-            final Object stubObj = stubField.get(nodeObj);
-            if (stubObj != null) {
-                final Class<?> stubClass = stubObj.getClass();
-                final Field idField = stubClass.getDeclaredField("id");
-                idField.setAccessible(true);
-
-                name = idField.get(stubObj).toString();
-            }
-
-            final SimpleNode simpleNode = new SimpleNode(rootIndex, i, children, name);
-            nodeList.add(simpleNode);
-        }
-
-        Node root = createRootNode(rootIndex, nodeList.toArray(new SimpleNode[0]));
-
-        for (Node child : root.getChildren()) {
-            System.out.println(child.getName());
-
-            for (Node childChild : child.getChildren()) {
-                if (childChild.getName() == null) continue;
-
-                System.out.println("  " + childChild.getName());
-                for (Node childChildChild : childChild.getChildren()) {
-                    if (childChildChild.getName() == null) continue;
-
-                    System.out.println("    " + childChildChild.getName());
-                }
-            }
-        }
-
-
-        Node node = root.getChild("f");
-
-        entries.set(node.getChild("allywarp").getIndex(), createEmptyEntry(commandsPacketClazz, 1, 0));
-        entries.set(node.getChild("?").getIndex(), createEmptyEntry(commandsPacketClazz, 1, 0));
-        entries.set(node.getChild("help").getIndex(), createEmptyEntry(commandsPacketClazz, 1, 0));
+        removeSubargument(process, "f admin");
+        removeSubargument(process, "f ahome");
 
         return true;
     }
 
-    private Object createEmptyEntry(Class<?> parentClazz, int flag, int redirect) throws Exception {
-        final String path = parentClazz.getPackage().getName() + "." + parentClazz.getSimpleName();
-
-        final String literalNodeStubPath = path + "$LiteralNodeStub";
-        final String entryPath = path + "$Entry";
-        final String nodeStubPath = path + "$NodeStub";
-
-        final int[] children = {};
-
-        System.out.println("Path: " + path);
-        System.out.println("LiteralNodeStub path: " + literalNodeStubPath);
-        System.out.println("Entry path: " + entryPath);
-
-        final Class<?> nodeStubClazz = Class.forName(nodeStubPath);
-
-        final Class<?> literalNodeClazz = Class.forName(path + "$LiteralNodeStub");
-        final Constructor<?> literalNodeConstructor = literalNodeClazz.getDeclaredConstructor(String.class);
-        literalNodeConstructor.setAccessible(true);
-
-        Object literalNodeObj = literalNodeConstructor.newInstance("");
-
-
-        final Class<?> entryClazz = Class.forName(entryPath);
-        final Constructor<?> entryConstructor = entryClazz.getDeclaredConstructor(nodeStubClazz, int.class, int.class, int[].class);
-        entryConstructor.setAccessible(true);
-
-        return entryConstructor.newInstance(literalNodeObj, flag, redirect, children);
+    public void removeSubargument(FilterProcess process, String command) throws Exception {
+        String[] args = command.split(" ");
+        removeSubargument(process.getRoot(), 0, args);
     }
 
-    public Node createRootNode(int rootIndex, final SimpleNode[] nodes) {
-        return new Node(nodes[rootIndex], nodes);
+    public void removeSubargument(FilterProcess.Node parent, int index, String[] args) throws Exception {
+        final int max = args.length - 1;
+        final int nextIndex = index + 1;
+
+        System.out.println("Current next: " + nextIndex);
+
+        if (index > max || nextIndex > max) {
+            return;
+        }
+
+        final String nextPart = args[nextIndex];
+        System.out.println("Which is: " + nextPart);
+
+        if (nextIndex == max) {
+            System.out.println("Yes, imma gonna remove it");
+            parent.removeChild(nextPart);
+            return;
+        }
+
+        System.out.println("Going to next part actually");
+
+        final FilterProcess.Node nextParent = parent.getChild(nextPart);
+        if (nextParent == null) {
+            System.out.println("Nothing found");
+            return;
+        }
+
+        System.out.println("Recursive");
+        removeSubargument(nextParent, nextIndex + 1, args);
     }
 
-    private static class Node {
+    public class FilterProcess {
 
-        private final int rootIndex, index;
-        private final List<Node> children;
-        private final SimpleNode simpleNode;
+        private final List<SimpleNode> nodeList = new ArrayList<>();
+        private final Object packetObj;
+        private final List entries;
+        private final Node root;
 
-        @Nullable
-        private final String name;
+        public FilterProcess(Object packetObj) throws Exception {
+            this.packetObj = packetObj;
 
-        public Node(SimpleNode node, final SimpleNode[] nodes) {
-            this.simpleNode = node;
+            final Class<?> commandsPacketClazz = packetObj.getClass();
+            final Field rootIndexField = commandsPacketClazz.getDeclaredField("rootIndex");
+            rootIndexField.setAccessible(true);
 
-            this.rootIndex = node.rootIndex;
-            this.index = node.index;
+            final int rootIndex = rootIndexField.getInt(packetObj);
+            rootIndexField.setAccessible(false);
 
-            this.name = node.name;
-            this.children = new ArrayList<>();
 
-            if (!node.isRoot() && name == null) {
-                return;
+            final Field entriesField = commandsPacketClazz.getDeclaredField("entries");
+            entriesField.setAccessible(true);
+
+            entries = (List) entriesField.get(packetObj);
+            for (int i = 0; i < entries.size(); i++) {
+                final Object nodeObj = entries.get(i);
+                final Class<?> entryClass = nodeObj.getClass();
+                final Field nodeChildrenField = entryClass.getDeclaredField("children");
+                nodeChildrenField.setAccessible(true);
+
+
+                int[] children = (int[]) nodeChildrenField.get(nodeObj);
+                nodeChildrenField.setAccessible(false);
+
+
+                final Field stubField = entryClass.getDeclaredField("stub");
+                stubField.setAccessible(true);
+
+                String name = null;
+
+                final Object stubObj = stubField.get(nodeObj);
+                if (stubObj != null) {
+                    final Class<?> stubClass = stubObj.getClass();
+                    final Field idField = stubClass.getDeclaredField("id");
+                    idField.setAccessible(true);
+
+                    name = idField.get(stubObj).toString();
+
+                    idField.setAccessible(false);
+                }
+
+                stubField.setAccessible(false);
+
+                final SimpleNode simpleNode = new SimpleNode(rootIndex, i, children, name);
+                nodeList.add(simpleNode);
             }
 
-            for (int childIndex : node.children()) {
-                if (childIndex == rootIndex) continue;
+            root = createRootNode(this, rootIndex, nodeList.toArray(new SimpleNode[0]));
+        }
 
-                final Node child = new Node(nodes[childIndex], nodes);
-                this.children.add(child);
+        public Node getRoot() {
+            return root;
+        }
+
+        private Object createEmptyEntry() throws Exception {
+            final String path = packetObj.getClass().getPackage().getName() + "." + packetObj.getClass().getSimpleName();
+
+            final String literalNodeStubPath = path + "$LiteralNodeStub";
+            final String entryPath = path + "$Entry";
+            final String nodeStubPath = path + "$NodeStub";
+
+            final int[] children = {};
+
+            final Class<?> nodeStubClazz = Class.forName(nodeStubPath);
+
+            final Class<?> literalNodeClazz = Class.forName(literalNodeStubPath);
+            final Constructor<?> literalNodeConstructor = literalNodeClazz.getDeclaredConstructor(String.class);
+            literalNodeConstructor.setAccessible(true);
+
+            final Object literalNodeObj = literalNodeConstructor.newInstance("");
+
+            final Class<?> entryClazz = Class.forName(entryPath);
+            final Constructor<?> entryConstructor = entryClazz.getDeclaredConstructor(nodeStubClazz, int.class, int.class, int[].class);
+            entryConstructor.setAccessible(true);
+
+            final Object entryObj = entryConstructor.newInstance(literalNodeObj, 1, 0, children);
+
+
+            literalNodeConstructor.setAccessible(false);
+            entryConstructor.setAccessible(false);
+
+
+            return entryObj;
+        }
+
+        private Node createRootNode(FilterProcess process, int rootIndex, final SimpleNode[] nodes) {
+            return new Node(process, nodes[rootIndex], nodes);
+        }
+
+        private static class Node {
+
+            private final int rootIndex, index;
+            private final List<Node> children;
+            private final SimpleNode simpleNode;
+            private final FilterProcess process;
+
+            @Nullable
+            private final String name;
+
+            public Node(FilterProcess process, SimpleNode node, final SimpleNode[] nodes) {
+                this.process = process;
+                this.simpleNode = node;
+
+                this.rootIndex = node.rootIndex;
+                this.index = node.index;
+
+                this.name = node.name;
+                this.children = new ArrayList<>();
+
+                if (!node.isRoot() && name == null) {
+                    return;
+                }
+
+                for (int childIndex : node.children()) {
+                    final Node child = new Node(process, nodes[childIndex], nodes);
+                    this.children.add(child);
+                }
+            }
+
+            public void removeChild(int childIndex) throws Exception {
+                final Node child = getChild(childIndex);
+
+                if (child != null) {
+                    this.children.remove(child);
+                    this.process.entries.set(child.index, this.process.createEmptyEntry());
+                }
+            }
+
+            public void removeChild(String childName) throws Exception {
+                final Node child = getChild(childName);
+
+                if (child != null) {
+                    System.out.println("Found and remove child: " + childName);
+                    this.children.remove(child);
+                    this.process.entries.set(child.index, this.process.createEmptyEntry());
+                } else System.out.println("No such child: " + childName);
+            }
+
+            public SimpleNode getSimpleNode() {
+                return simpleNode;
+            }
+
+            public int getRootIndex() {
+                return rootIndex;
+            }
+
+            public int getIndex() {
+                return index;
+            }
+
+            public boolean isRoot() {
+                return index == rootIndex;
+            }
+
+            public List<Node> getChildren() {
+                return children;
+            }
+
+            public Node getChild(int index) {
+                return children.get(index);
+            }
+
+            public Node getChild(String name) {
+                return this.children.stream().filter(n -> n.getName() != null && n.getName().equals(name)).findFirst().orElse(null);
+            }
+
+            public @Nullable String getName() {
+                return name;
             }
         }
 
-        public SimpleNode getSimpleNode() {
-            return simpleNode;
-        }
 
-        public int getRootIndex() {
-            return rootIndex;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public boolean isRoot() {
-            return index == rootIndex;
-        }
-
-        public List<Node> getChildren() {
-            return children;
-        }
-
-        public Node getChild(int index) {
-            return children.get(index);
-        }
-
-        public Node getChild(String name) {
-            return children.stream().filter(n -> n.getName() == null ? null : n.getName().equals(name)).findFirst().orElse(null);
-        }
-
-        public @Nullable String getName() {
-            return name;
-        }
-    }
-
-
-    private record SimpleNode(int rootIndex, int index, int[] children, @Nullable String name) {
-        public boolean isRoot() {
+        private record SimpleNode(int rootIndex, int index, int[] children, @Nullable String name) {
+            public boolean isRoot() {
                 return index == rootIndex;
             }
         }
+    }
 }
