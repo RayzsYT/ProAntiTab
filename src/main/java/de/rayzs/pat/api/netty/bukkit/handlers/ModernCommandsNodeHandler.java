@@ -5,6 +5,7 @@ import de.rayzs.pat.utils.sender.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -54,9 +55,12 @@ public class ModernCommandsNodeHandler implements BukkitPacketHandler {
         final Field entriesField = commandsPacketClazz.getDeclaredField("entries");
         entriesField.setAccessible(true);
 
-        final List<?> entries = (List<?>) entriesField.get(packetObj);
+        final List entries = (List) entriesField.get(packetObj);
         for (int i = 0; i < entries.size(); i++) {
             final Object nodeObj = entries.get(i);
+
+            System.out.println(nodeObj);
+
             final Class<?> entryClass = nodeObj.getClass();
 
             final Field nodeChildrenField = entryClass.getDeclaredField("children");
@@ -82,8 +86,6 @@ public class ModernCommandsNodeHandler implements BukkitPacketHandler {
             nodeList.add(simpleNode);
         }
 
-
-
         Node root = createRootNode(rootIndex, nodeList.toArray(new SimpleNode[0]));
 
         for (Node child : root.getChildren()) {
@@ -101,7 +103,43 @@ public class ModernCommandsNodeHandler implements BukkitPacketHandler {
             }
         }
 
+
+        Node node = root.getChild("f");
+
+        entries.set(node.getChild("allywarp").getIndex(), createEmptyEntry(commandsPacketClazz, 1, 0));
+        entries.set(node.getChild("?").getIndex(), createEmptyEntry(commandsPacketClazz, 1, 0));
+        entries.set(node.getChild("help").getIndex(), createEmptyEntry(commandsPacketClazz, 1, 0));
+
         return true;
+    }
+
+    private Object createEmptyEntry(Class<?> parentClazz, int flag, int redirect) throws Exception {
+        final String path = parentClazz.getPackage().getName() + "." + parentClazz.getSimpleName();
+
+        final String literalNodeStubPath = path + "$LiteralNodeStub";
+        final String entryPath = path + "$Entry";
+        final String nodeStubPath = path + "$NodeStub";
+
+        final int[] children = {};
+
+        System.out.println("Path: " + path);
+        System.out.println("LiteralNodeStub path: " + literalNodeStubPath);
+        System.out.println("Entry path: " + entryPath);
+
+        final Class<?> nodeStubClazz = Class.forName(nodeStubPath);
+
+        final Class<?> literalNodeClazz = Class.forName(path + "$LiteralNodeStub");
+        final Constructor<?> literalNodeConstructor = literalNodeClazz.getDeclaredConstructor(String.class);
+        literalNodeConstructor.setAccessible(true);
+
+        Object literalNodeObj = literalNodeConstructor.newInstance("");
+
+
+        final Class<?> entryClazz = Class.forName(entryPath);
+        final Constructor<?> entryConstructor = entryClazz.getDeclaredConstructor(nodeStubClazz, int.class, int.class, int[].class);
+        entryConstructor.setAccessible(true);
+
+        return entryConstructor.newInstance(literalNodeObj, flag, redirect, children);
     }
 
     public Node createRootNode(int rootIndex, final SimpleNode[] nodes) {
@@ -131,6 +169,8 @@ public class ModernCommandsNodeHandler implements BukkitPacketHandler {
             }
 
             for (int childIndex : node.children()) {
+                if (childIndex == rootIndex) continue;
+
                 final Node child = new Node(nodes[childIndex], nodes);
                 this.children.add(child);
             }
