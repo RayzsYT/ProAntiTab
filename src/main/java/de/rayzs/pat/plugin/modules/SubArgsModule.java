@@ -4,6 +4,7 @@ import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.modules.events.ExecuteCommand;
 import de.rayzs.pat.plugin.modules.events.TabCompletion;
 import de.rayzs.pat.plugin.modules.events.UpdateList;
+import de.rayzs.pat.utils.node.BukkitCommandNodeHelper;
 import de.rayzs.pat.utils.node.ProxyCommandNodeHelper;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.response.ResponseHandler;
@@ -90,16 +91,61 @@ public class SubArgsModule {
                 continue;
             }
 
-            input = input.substring(1);
-
             final Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
             if (type != Storage.Blacklist.BlockType.BOTH && type != Storage.Blacklist.BlockType.TAB) {
                 continue;
             }
 
-            input = Storage.Blacklist.BlockTypeFetcher.modify(input, type);
+            input = Storage.Blacklist.BlockTypeFetcher.cleanse(input);
             helper.removeSubArguments(input);
         }
+    }
+
+    public static void handleCommandNode(UUID uuid, BukkitCommandNodeHelper helper) throws Exception {
+        if (!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
+            return;
+
+        Arguments arguments = PLAYER_COMMANDS.get(uuid);
+        if (arguments == null) {
+            return;
+        }
+
+        ArgumentSource source = arguments.TAB_ARGUMENTS;
+        if (source == null) {
+            return;
+        }
+
+        List<String> inputs = source.getAllInputs();
+        List<String> argumentsList = new ArrayList<>();
+
+        for (String input : inputs) {
+            final Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
+            if (type != Storage.Blacklist.BlockType.BOTH && type != Storage.Blacklist.BlockType.TAB) {
+                continue;
+            }
+
+            final boolean negated = Storage.Blacklist.BlockTypeFetcher.isNegated(input);
+            input = Storage.Blacklist.BlockTypeFetcher.cleanse(input);
+
+            if (!negated) {
+                argumentsList.add(input);
+                continue;
+            }
+
+            helper.removeSubArguments(input);
+        }
+
+
+        // Now use the argumentsList to have it as a sorta whitelist on what sub-arguments are allowed.
+        // For that, take the base command first and check for the child if it exists.
+        // If yes, you that child and go through the children recursively.
+        //
+        // If the amounts of spaces and the child-indexes is correct, then allow it.
+        // Otherwise, remove the other children.
+        //
+        // Idea for the recursive function:
+        // spareRecursively(List<String>, BukkitCommandNodeHelper, int index)
+
     }
 
     public static List<String> getServerCommands(UUID uuid) {
