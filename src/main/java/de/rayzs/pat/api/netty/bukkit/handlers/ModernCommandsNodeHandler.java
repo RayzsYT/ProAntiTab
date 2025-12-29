@@ -63,30 +63,22 @@ public class ModernCommandsNodeHandler implements BukkitPacketHandler {
         final int max = args.length - 1;
         final int nextIndex = index + 1;
 
-        System.out.println("Current next: " + nextIndex);
-
         if (index > max || nextIndex > max) {
             return;
         }
 
         final String nextPart = args[nextIndex];
-        System.out.println("Which is: " + nextPart);
 
         if (nextIndex == max) {
-            System.out.println("Yes, imma gonna remove it");
             parent.removeChild(nextPart);
             return;
         }
 
-        System.out.println("Going to next part actually");
-
         final FilterProcess.Node nextParent = parent.getChild(nextPart);
         if (nextParent == null) {
-            System.out.println("Nothing found");
             return;
         }
 
-        System.out.println("Recursive");
         removeSubargument(nextParent, nextIndex + 1, args);
     }
 
@@ -230,10 +222,9 @@ public class ModernCommandsNodeHandler implements BukkitPacketHandler {
                 final Node child = getChild(childName);
 
                 if (child != null) {
-                    System.out.println("Found and remove child: " + childName);
                     this.children.remove(child);
                     this.process.entries.set(child.index, this.process.createEmptyEntry());
-                } else System.out.println("No such child: " + childName);
+                }
             }
 
             public SimpleNode getSimpleNode() {
