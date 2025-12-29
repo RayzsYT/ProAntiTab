@@ -22,7 +22,10 @@ public class BukkitPacketAnalyzer {
     private static final ExpireCache<UUID, Object> SENT_PACKET = new ExpireCache<>(2, TimeUnit.SECONDS);
 
     private static final String HANDLER_NAME = "pat-bukkit-handler", PIPELINE_NAME = "packet_handler";
+
     private static final BukkitPacketHandler PACKET_HANDLER = Reflection.getMinor() >= 16 ? new ModernPacketHandler() : new LegacyPacketHandler();
+    private static final BukkitPacketHandler COMMANDS_NODE_HANDLER = new ModernCommandsNodeHandler();
+
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();
 
     public static void injectAll() {
@@ -163,6 +166,13 @@ public class BukkitPacketAnalyzer {
                 }
 
                 String packetName = packetObj.getClass().getSimpleName();
+
+                if (packetName.equals("ClientboundCommandsPacket")) {
+                    COMMANDS_NODE_HANDLER.handleOutgoingPacket(player, sender, packetObj);
+
+                    super.write(channel, packetObj, promise);
+                    return;
+                }
 
                 if (!packetName.equals("PacketPlayOutTabComplete") && !packetName.equals("ClientboundCommandSuggestionsPacket")) {
                     super.write(channel, packetObj, promise);
