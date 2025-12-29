@@ -4,7 +4,7 @@ import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.modules.events.ExecuteCommand;
 import de.rayzs.pat.plugin.modules.events.TabCompletion;
 import de.rayzs.pat.plugin.modules.events.UpdateList;
-import de.rayzs.pat.utils.node.CommandNodeHelper;
+import de.rayzs.pat.utils.node.ProxyCommandNodeHelper;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.api.event.PATEventHandler;
@@ -63,7 +63,7 @@ public class SubArgsModule {
         ResponseHandler.update();
     }
 
-    public static void handleCommandNode(UUID uuid, CommandNodeHelper helper) {
+    public static void handleCommandNode(UUID uuid, ProxyCommandNodeHelper helper) {
         if (!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
             return;
 

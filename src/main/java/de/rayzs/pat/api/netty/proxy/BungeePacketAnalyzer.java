@@ -16,7 +16,7 @@ import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.node.CommandNodeHelper;
+import de.rayzs.pat.utils.node.ProxyCommandNodeHelper;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
@@ -47,7 +47,7 @@ public class BungeePacketAnalyzer {
     private static List<String> PROXY_COMMANDS;
 
     static {
-        CommandNodeHelper.setDefaultSuggestionProvider(Commands.SuggestionRegistry.ASK_SERVER);
+        ProxyCommandNodeHelper.setDefaultSuggestionProvider(Commands.SuggestionRegistry.ASK_SERVER);
         loadProxyCommands();
     }
 
@@ -144,7 +144,7 @@ public class BungeePacketAnalyzer {
 
         final boolean ignore = PermissionUtil.hasBypassPermission(sender) || Storage.Blacklist.isDisabledServer(serverName);
 
-        CommandNodeHelper helper = new CommandNodeHelper<CommandNode>(commands.getRoot());
+        ProxyCommandNodeHelper helper = new ProxyCommandNodeHelper<CommandNode>(commands.getRoot());
 
         List<String> commandsAsString = new ArrayList<>(PROXY_COMMANDS);
         commandsAsString.addAll(helper.getChildrenNames());
@@ -203,7 +203,7 @@ public class BungeePacketAnalyzer {
                 }
             }
 
-            CommandNode dummy = CommandNodeHelper.createDummyCommandNode(command.getKey());
+            CommandNode dummy = ProxyCommandNodeHelper.createDummyCommandNode(command.getKey());
             commands.getRoot().addChild(dummy);
         }
 

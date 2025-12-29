@@ -29,7 +29,7 @@ import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.utils.node.CommandNodeHelper;
+import de.rayzs.pat.utils.node.ProxyCommandNodeHelper;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
@@ -56,7 +56,7 @@ public class VelocityPacketAnalyzer {
                     final Object suggestionProviderObj = clazz.getConstructor(String.class).newInstance(name);
                     final SuggestionProvider<?> suggestionProvider = (SuggestionProvider<?>) suggestionProviderObj;
 
-                    CommandNodeHelper.setDefaultSuggestionProvider(suggestionProvider);
+                    ProxyCommandNodeHelper.setDefaultSuggestionProvider(suggestionProvider);
                     break;
                 }
             }
@@ -165,7 +165,7 @@ public class VelocityPacketAnalyzer {
         String serverName = sender.getServerName();
 
         final boolean ignore = PermissionUtil.hasBypassPermission(sender) || Storage.Blacklist.isDisabledServer(serverName);
-        final CommandNodeHelper<CommandSource> helper = new CommandNodeHelper<>(commands.getRootNode());
+        final ProxyCommandNodeHelper<CommandSource> helper = new ProxyCommandNodeHelper<>(commands.getRootNode());
 
         final List<String> commandsAsString = new ArrayList<>();
         commandsAsString.addAll(helper.getChildrenNames());
