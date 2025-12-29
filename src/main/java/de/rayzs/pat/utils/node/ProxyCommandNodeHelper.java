@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class CommandNodeHelper<T> {
+public class ProxyCommandNodeHelper<T> {
 
     private static final Command DUMMY_COMMAND = (context) -> 0;
 
@@ -46,7 +46,7 @@ public class CommandNodeHelper<T> {
 
     private final RootCommandNode<T> rootNode;
 
-    public CommandNodeHelper(RootCommandNode<T> rootNode) {
+    public ProxyCommandNodeHelper(RootCommandNode<T> rootNode) {
         this.rootNode = rootNode;
     }
 
@@ -54,7 +54,7 @@ public class CommandNodeHelper<T> {
         return rootNode.getChildren().stream().map(CommandNode::getName).collect(Collectors.toList());
     }
 
-    public CommandNodeHelper<T> removeIf(CommandNode<T> node, Predicate<String> predicate) {
+    public ProxyCommandNodeHelper<T> removeIf(CommandNode<T> node, Predicate<String> predicate) {
         if (node != null && node.getRedirect() != null)
             node = node.getRedirect();
 
@@ -78,21 +78,21 @@ public class CommandNodeHelper<T> {
         return this;
     }
 
-    public CommandNodeHelper<T> removeIf(String childName, Predicate<String> predicate) {
+    public ProxyCommandNodeHelper<T> removeIf(String childName, Predicate<String> predicate) {
         CommandNode<T> node = rootNode.getChild(childName);
         return removeIf(node, predicate);
     }
 
-    public CommandNodeHelper<T> removeIf(Predicate<String> predicate) {
+    public ProxyCommandNodeHelper<T> removeIf(Predicate<String> predicate) {
         return removeIf(rootNode, predicate);
     }
 
-    public CommandNodeHelper<T> clear() {
+    public ProxyCommandNodeHelper<T> clear() {
         rootNode.getChildren().clear();
         return this;
     }
 
-    public CommandNodeHelper<T> clear(String childName) {
+    public ProxyCommandNodeHelper<T> clear(String childName) {
         CommandNode child = rootNode.getChild(childName);
 
         if (child != null) {
@@ -103,23 +103,23 @@ public class CommandNodeHelper<T> {
     }
 
 
-    public CommandNodeHelper<T> remove(Object obj) {
+    public ProxyCommandNodeHelper<T> remove(Object obj) {
         rootNode.getChildren().remove(obj);
         return this;
     }
 
-    public CommandNodeHelper<T> remove(CommandNode node, Object obj) {
+    public ProxyCommandNodeHelper<T> remove(CommandNode node, Object obj) {
         node.getChildren().remove(obj);
         return this;
     }
 
-    public CommandNodeHelper<T> add(String original, boolean autoSuggestions) {
+    public ProxyCommandNodeHelper<T> add(String original, boolean autoSuggestions) {
         String[] args = original.split(" ");
         add(original, rootNode, args, 0, autoSuggestions);
         return this;
     }
 
-    public CommandNodeHelper<T> removeSubArguments(String original) {
+    public ProxyCommandNodeHelper<T> removeSubArguments(String original) {
         String[] args = original.split(" ");
         removeSubArguments(rootNode, args, 0);
         return this;
