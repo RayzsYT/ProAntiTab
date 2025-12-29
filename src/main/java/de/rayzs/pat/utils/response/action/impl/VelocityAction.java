@@ -8,7 +8,6 @@ import de.rayzs.pat.utils.response.action.Action;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.StringUtils;
-import net.kyori.adventure.sound.Sound;
 
 import java.util.*;
 
