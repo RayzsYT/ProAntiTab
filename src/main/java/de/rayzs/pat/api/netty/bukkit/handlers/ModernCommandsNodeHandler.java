@@ -53,8 +53,10 @@ public class ModernCommandsNodeHandler implements BukkitPacketHandler {
     }
 
     public void removeSubargument(FilterProcess process, String command) throws Exception {
-        String[] args = command.split(" ");
-        removeSubargument(process.getRoot(), 0, args);
+        final String[] args = command.split(" ");
+        final FilterProcess.Node child = process.getRoot().getChild(args[0]);
+
+        removeSubargument(child, 0, args);
     }
 
     public void removeSubargument(FilterProcess.Node parent, int index, String[] args) throws Exception {
