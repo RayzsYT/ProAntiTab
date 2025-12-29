@@ -3,7 +3,6 @@ package de.rayzs.pat.utils.response.action.impl;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.response.ResponseHandler;
-import net.kyori.adventure.key.Key;
 import de.rayzs.pat.utils.response.action.Action;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.plugin.VelocityLoader;
