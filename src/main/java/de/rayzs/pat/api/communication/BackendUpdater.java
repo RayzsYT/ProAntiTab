@@ -18,7 +18,7 @@ public class BackendUpdater {
     }
 
     public static void start() {
-        if(isRunning()) return;
+        if(isRunning() || !Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
 
         TASK = PATScheduler.createScheduler(() -> {
             if (shouldRun())
