@@ -120,7 +120,7 @@ public class SubArgsModule {
 
         for (String input : inputs) {
             final Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
-            if (type != Storage.Blacklist.BlockType.BOTH && type != Storage.Blacklist.BlockType.TAB) {
+            if (type == Storage.Blacklist.BlockType.CHAT) {
                 continue;
             }
 
