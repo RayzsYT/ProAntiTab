@@ -25,56 +25,85 @@ public class ResponseHandler {
     }
 
     public static String replaceArgsVariables(String input, String command) {
-        final String[] commandSplit = command.contains(" ") ? command.split(" ") : new String[] { command };
-        final String[] inputSplit = input.contains(" ") ? input.split(" ") : new String[] { input };
+        try {
+            final char[] chars = input.toCharArray();
+            final String placeholder = "%args[";
 
-        final StringBuilder output = new StringBuilder();
-        final int commandLength = commandSplit.length;
+            int index = -1;
+            int found = 0;
 
-        for (int i = 0; i < inputSplit.length; i++) {
-            String part = inputSplit[i];
+            for (int i = 0; i < chars.length; i++) {
+                final char c = chars[i];
 
-            if (i > 0) {
-                output.append(" ");
-            }
+                if (c != placeholder.charAt(found)) {
+                    if (found > 0) {
+                        i--;
+                    }
 
-            if (! (part.startsWith("%args[") && part.endsWith("]%"))) {
-                output.append(part);
-                continue;
-            }
-
-            part = part.substring(part.indexOf('[') + 1, part.lastIndexOf(']'));
-
-            int fromIndex, toIndex;
-
-            try {
-                if (part.contains("-")) {
-                    final String[] partSplit = part.split("-");
-                    fromIndex = Integer.parseInt(partSplit[0]);
-                    toIndex = Integer.parseInt(partSplit[1]);
-                } else if (part.startsWith("_")) {
-                    final String[] partSplit = part.split("_");
-                    fromIndex = 0;
-                    toIndex = Integer.parseInt(partSplit[1]);
-                } else if (part.endsWith("_")) {
-                    final String[] partSplit = part.split("_");
-                    fromIndex = Integer.parseInt(partSplit[0]);
-                    toIndex = commandLength + 1;
-                } else {
-                    fromIndex = Integer.parseInt(part);
-                    toIndex = fromIndex;
+                    found = 0;
+                    continue;
                 }
 
-                fromIndex = Math.max(0, fromIndex - 1);
-                toIndex = Math.min(commandLength, toIndex);
+                found++;
 
-                output.append(String.join(" ", Arrays.copyOfRange(commandSplit, fromIndex, toIndex)));
-            } catch (NumberFormatException exception) {
-                Logger.warning("Failed to convert number! (" + part + ")");
+                if (found == placeholder.length()) {
+                    index = i - placeholder.length() + 1;
+                    break;
+                }
             }
+
+            if (index == -1) {
+                return input;
+            }
+
+            String argument = input.substring(index);
+            final int endIndex = argument.substring(2).indexOf(']');
+
+            if (endIndex != -1) {
+                argument = argument.substring(0, endIndex + 4);
+
+                String[] commandSplit = command.split(" ");
+
+                final String argumentInsides = argument.substring(6, argument.length() - 2);
+                int leftNum = -1, rightNum = -1;
+
+                if (argumentInsides.contains("-")) {
+                    final String[] numSplit = argumentInsides.split("-");
+
+                    leftNum = Integer.parseInt(numSplit[0]);
+                    rightNum = Integer.parseInt(numSplit[1]);
+                } else if (argumentInsides.startsWith("_")) {
+                    leftNum = 0;
+                    rightNum = Integer.parseInt(argumentInsides.replace("_", ""));
+                } else if (argumentInsides.endsWith("_")) {
+                    leftNum = Integer.parseInt(argumentInsides.replace("_", ""));
+                    rightNum = commandSplit.length;
+                }
+
+                final StringBuilder replacementCommand = new StringBuilder();
+
+                if (leftNum == -1 && rightNum == -1) {
+                    final int i = Integer.parseInt(argumentInsides) - 1;
+                    replacementCommand.append(commandSplit[Math.min(commandSplit.length - 1, i)]);
+                } else {
+                    final int min = Math.max(0, leftNum + -1);
+                    final int max = Math.min(rightNum, commandSplit.length);
+
+                    for (int i = min; i < max; i++) {
+                        if (i != min) replacementCommand.append(" ");
+                        replacementCommand.append(commandSplit[i]);
+                    }
+                }
+
+                input = input.substring(0, index) + replacementCommand + input.substring(index + endIndex + 4);
+            }
+        } catch (Exception exception) {
+            Logger.warning("Failed to parse and replace %args[...]% parts. Please make sure that the format is correct and that befitting the written numbers.");
+            Logger.warning("Check examples from the custom-responses.yml file for comparison.");
+            return input;
         }
 
-        return output.toString();
+        return replaceArgsVariables(input, command);
     }
 
     public static List<String> getResponse(UUID uuid, String input) {
