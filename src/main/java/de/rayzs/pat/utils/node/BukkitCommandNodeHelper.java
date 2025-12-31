@@ -1,11 +1,11 @@
 package de.rayzs.pat.utils.node;
 
+import de.rayzs.pat.utils.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class BukkitCommandNodeHelper {
 
@@ -70,6 +70,42 @@ public class BukkitCommandNodeHelper {
         final Node child = getRoot().getChild(args[0]);
 
         removeSubArguments(child, 0, args);
+    }
+
+    public void spareRecursively(String string, Node parent, List<String> spares) throws Exception {
+        List<Node> children = new ArrayList<>(parent.getChildren());
+
+        for (final Node child : children) {
+
+            final String currentNodeStr = string + " " + child.getName();
+
+            boolean remove = true;
+            for (String spare : spares) {
+                final String[] currentNodeArgs = currentNodeStr.split(" ");
+                final String[] spareArgs = spare.split(" ");
+
+                for (int i = 0; i < currentNodeArgs.length; i++) {
+                    final String cNode = currentNodeArgs[i];
+                    final String cSpare = spareArgs[i];
+
+                    if (cSpare.startsWith("%") && cSpare.endsWith("%") && cSpare.length() > 1) {
+                        continue;
+                    }
+
+                    if (cNode.equals(cSpare)) {
+                        remove = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!remove) {
+                spareRecursively(currentNodeStr, child, spares);
+                continue;
+            }
+
+            parent.removeChild(child);
+        }
     }
 
     private void removeSubArguments(Node parent, int index, String[] args) throws Exception {
@@ -167,6 +203,13 @@ public class BukkitCommandNodeHelper {
         public void removeChild(int childIndex) throws Exception {
             final Node child = getChild(childIndex);
 
+            if (child != null) {
+                this.children.remove(child);
+                this.process.entries.set(child.index, this.process.createEmptyEntry());
+            }
+        }
+
+        public void removeChild(Node child) throws Exception {
             if (child != null) {
                 this.children.remove(child);
                 this.process.entries.set(child.index, this.process.createEmptyEntry());
