@@ -72,19 +72,24 @@ public class BukkitCommandNodeHelper {
         removeSubArguments(child, 0, args);
     }
 
-    public void spareRecursively(String string, Node parent, List<String> spares) throws Exception {
+    public void spareRecursively(List<String> spares) throws Exception {
+        spareRecursively("", root, spares);
+    }
+
+    private void spareRecursively(String string, Node parent, List<String> spares) throws Exception {
         List<Node> children = new ArrayList<>(parent.getChildren());
 
         for (final Node child : children) {
+            final String currentNodeStr = string + (!parent.isRoot() ? " " : "") + child.getName();
 
-            final String currentNodeStr = string + " " + child.getName();
+            System.out.println("Currently: " + currentNodeStr);
 
             boolean remove = true;
             for (String spare : spares) {
                 final String[] currentNodeArgs = currentNodeStr.split(" ");
                 final String[] spareArgs = spare.split(" ");
 
-                for (int i = 0; i < currentNodeArgs.length; i++) {
+                for (int i = 1; i < currentNodeArgs.length; i++) {
                     final String cNode = currentNodeArgs[i];
                     final String cSpare = spareArgs[i];
 
@@ -92,12 +97,16 @@ public class BukkitCommandNodeHelper {
                         continue;
                     }
 
+                    System.out.println("Compare: \"" + cNode + "\" -> \"" + cSpare + "\"");
+
                     if (cNode.equals(cSpare)) {
                         remove = false;
                         break;
                     }
                 }
             }
+
+            System.out.println("Remove? " + remove);
 
             if (!remove) {
                 spareRecursively(currentNodeStr, child, spares);

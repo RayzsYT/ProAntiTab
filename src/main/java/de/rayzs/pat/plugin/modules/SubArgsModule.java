@@ -145,7 +145,12 @@ public class SubArgsModule {
         //
         // Idea for the recursive function:
         // spareRecursively(List<String>, BukkitCommandNodeHelper, int index)
+        System.out.println("-> " + argumentsList);
+        if (argumentsList.isEmpty()) {
+            return;
+        }
 
+        helper.spareRecursively(argumentsList);
     }
 
     public static List<String> getServerCommands(UUID uuid) {
