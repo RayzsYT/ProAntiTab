@@ -135,17 +135,6 @@ public class SubArguments {
             helper.removeSubArguments(input);
         }
 
-
-        // Now use the argumentsList to have it as a sorta whitelist on what sub-arguments are allowed.
-        // For that, take the base command first and check for the child if it exists.
-        // If yes, you that child and go through the children recursively.
-        //
-        // If the amounts of spaces and the child-indexes is correct, then allow it.
-        // Otherwise, remove the other children.
-        //
-        // Idea for the recursive function:
-        // spareRecursively(List<String>, BukkitCommandNodeHelper, int index)
-        System.out.println("-> " + argumentsList);
         if (argumentsList.isEmpty()) {
             return;
         }
