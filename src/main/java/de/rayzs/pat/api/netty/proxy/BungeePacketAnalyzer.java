@@ -11,7 +11,7 @@ import com.mojang.brigadier.tree.RootCommandNode;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.group.Group;
@@ -215,7 +215,7 @@ public class BungeePacketAnalyzer {
         }
 
         if (!ignore) {
-            SubArgsModule.handleCommandNode(player.getUniqueId(), helper);
+            SubArguments.handleCommandNode(player.getUniqueId(), helper);
         }
     }
 

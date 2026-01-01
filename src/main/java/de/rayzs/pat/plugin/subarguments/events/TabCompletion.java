@@ -1,7 +1,7 @@
-package de.rayzs.pat.plugin.modules.events;
+package de.rayzs.pat.plugin.subarguments.events;
 
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
@@ -22,7 +22,7 @@ public class TabCompletion extends FilteredTabCompletionEvent {
                 ? (UUID) event.getSenderObj()
                 : CommandSenderHandler.from(event.getSenderObj()).getUniqueId();
 
-        final Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, Arguments.ARGUMENTS);
+        final Arguments arguments = SubArguments.PLAYER_COMMANDS.getOrDefault(uuid, Arguments.ARGUMENTS);
 
         List<String> possibilities = event.getCompletion(), result = new ArrayList<>(arguments.getResultTab(cursor));
         final List<String> negated = new ArrayList<>(arguments.getResultTab("!" + cursor));
@@ -67,19 +67,19 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
             if (result.contains("%players%")) {
                 possibilities.remove("%players%");
-                possibilities.addAll(SubArgsModule.getPlayerNames());
+                possibilities.addAll(SubArguments.getPlayerNames());
             }
 
             if (result.contains("%online_players%")) {
                 possibilities.remove("%online_players%");
-                possibilities.addAll(SubArgsModule.getOnlinePlayerNames());
+                possibilities.addAll(SubArguments.getOnlinePlayerNames());
             }
 
             if (result.contains("%hidden_players%")) {
                 possibilities.remove("%hidden_players%");
 
                 possibilities.addAll(event.getCompletion().stream().filter(completion -> {
-                    if (SubArgsModule.getPlayerNames().contains(completion))
+                    if (SubArguments.getPlayerNames().contains(completion))
                         return false;
 
                     return result.contains(completion);
@@ -94,7 +94,7 @@ public class TabCompletion extends FilteredTabCompletionEvent {
                 possibilities.remove("%hidden_online_players%");
 
                 possibilities.addAll(event.getCompletion().stream().filter(completion -> {
-                    if (SubArgsModule.getOnlinePlayerNames().contains(completion))
+                    if (SubArguments.getOnlinePlayerNames().contains(completion))
                         return false;
 
                     return result.contains(completion);
@@ -109,10 +109,10 @@ public class TabCompletion extends FilteredTabCompletionEvent {
                 possibilities.removeIf(NumberUtils::isDigit);
 
             if (result.contains("%players%"))
-                possibilities.removeIf(possibility -> SubArgsModule.getPlayerNames().contains(possibility));
+                possibilities.removeIf(possibility -> SubArguments.getPlayerNames().contains(possibility));
 
             if (result.contains("%online_players%"))
-                possibilities.removeIf(possibility -> SubArgsModule.getOnlinePlayerNames().contains(possibility));
+                possibilities.removeIf(possibility -> SubArguments.getOnlinePlayerNames().contains(possibility));
 
 
             possibilities.removeIf(s -> {
@@ -125,7 +125,7 @@ public class TabCompletion extends FilteredTabCompletionEvent {
         }
 
         String firstCursorArg = StringUtils.getFirstArg(cursor.toLowerCase());
-        if (possibilities.isEmpty() && !SubArgsModule.GENERAL_LIST.contains(firstCursorArg)) {
+        if (possibilities.isEmpty() && !SubArguments.GENERAL_LIST.contains(firstCursorArg)) {
             return;
         }
 

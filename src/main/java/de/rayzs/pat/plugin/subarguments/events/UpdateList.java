@@ -1,6 +1,6 @@
-package de.rayzs.pat.plugin.modules.events;
+package de.rayzs.pat.plugin.subarguments.events;
 
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import de.rayzs.pat.api.event.events.*;
@@ -13,22 +13,22 @@ public class UpdateList {
     public static UpdatePluginEvent UPDATE_PLUGIN_EVENT = new UpdatePluginEvent() {
         @Override
         public void handle(UpdatePluginEvent event) {
-            SubArgsModule.updateMessages();
-            SubArgsModule.updateList();
+            SubArguments.updateMessages();
+            SubArguments.updateList();
         }
     };
 
     public static ServerPlayersChangeEvent SERVER_PLAYERS_CHANGE_EVENT = new ServerPlayersChangeEvent() {
         @Override
         public void handle(ServerPlayersChangeEvent event) {
-            SubArgsModule.updatePlayerNames();
+            SubArguments.updatePlayerNames();
         }
     };
 
     public static ReceiveSyncEvent RECEIVE_SYNC_EVENT = new ReceiveSyncEvent() {
         @Override
         public void handle(ReceiveSyncEvent event) {
-            SubArgsModule.updateList();
+            SubArguments.updateList();
         }
     };
 
@@ -39,7 +39,7 @@ public class UpdateList {
                     ? (UUID) event.getSenderObj()
                     : CommandSenderHandler.from(event.getSenderObj()).getUniqueId();
 
-            final Arguments argument = SubArgsModule.PLAYER_COMMANDS.getOrDefault(uuid, new Arguments());
+            final Arguments argument = SubArguments.PLAYER_COMMANDS.getOrDefault(uuid, new Arguments());
             final String serverName = Storage.getLoader().getPlayerServerName(uuid);
 
             argument.clearArguments();
@@ -72,15 +72,15 @@ public class UpdateList {
                     argument.TAB_ARGUMENTS.buildArguments(command);
                 }
 
-                for (String command : SubArgsModule.getGroupCommands(uuid, serverName))
+                for (String command : SubArguments.getGroupCommands(uuid, serverName))
                     argument.buildArgumentStacks(command);
 
-                for (String command : SubArgsModule.getServerCommands(uuid)) {
+                for (String command : SubArguments.getServerCommands(uuid)) {
                     argument.buildArgumentStacks(command);
                 }
 
             } else {
-                List<String> groupCommands = SubArgsModule.getGroupCommands(uuid, serverName);
+                List<String> groupCommands = SubArguments.getGroupCommands(uuid, serverName);
 
                 for (String command : argument.CHAT_ARGUMENTS.getGeneralArgument().getInputs()) {
                     if (groupCommands.contains(command)) continue;
@@ -95,7 +95,7 @@ public class UpdateList {
                 }
             }
 
-            SubArgsModule.PLAYER_COMMANDS.putIfAbsent(uuid, argument);
+            SubArguments.PLAYER_COMMANDS.putIfAbsent(uuid, argument);
         }
     };
 }

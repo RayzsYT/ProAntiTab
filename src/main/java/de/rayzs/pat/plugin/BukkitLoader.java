@@ -2,7 +2,7 @@ package de.rayzs.pat.plugin;
 
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.plugin.converter.StorageConverter;
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
@@ -23,8 +23,6 @@ import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.response.action.ActionHandler;
-import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -135,7 +133,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         ConfigUpdater.broadcastMissingParts();
 
         ActionHandler.initialize();
-        SubArgsModule.initialize();
+        SubArguments.initialize();
 
         StorageConverter.initialize();
 

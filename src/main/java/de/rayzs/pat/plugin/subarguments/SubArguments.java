@@ -1,9 +1,9 @@
-package de.rayzs.pat.plugin.modules;
+package de.rayzs.pat.plugin.subarguments;
 
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
-import de.rayzs.pat.plugin.modules.events.ExecuteCommand;
-import de.rayzs.pat.plugin.modules.events.TabCompletion;
-import de.rayzs.pat.plugin.modules.events.UpdateList;
+import de.rayzs.pat.plugin.subarguments.events.ExecuteCommand;
+import de.rayzs.pat.plugin.subarguments.events.TabCompletion;
+import de.rayzs.pat.plugin.subarguments.events.UpdateList;
 import de.rayzs.pat.utils.node.BukkitCommandNodeHelper;
 import de.rayzs.pat.utils.node.ProxyCommandNodeHelper;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
@@ -18,7 +18,7 @@ import de.rayzs.pat.utils.group.*;
 import de.rayzs.pat.utils.*;
 import java.util.*;
 
-public class SubArgsModule {
+public class SubArguments {
 
     public static List<String> GENERAL_LIST, BLOCKED_MESSAGE, PLAYER_NAMES, ONLINE_PLAYERS;
     public static HashMap<UUID, Arguments> PLAYER_COMMANDS = new HashMap<>();
@@ -56,7 +56,7 @@ public class SubArgsModule {
         Arguments.ARGUMENTS.clearArguments();
 
         GENERAL_LIST.forEach(command -> Arguments.ARGUMENTS.buildArgumentStacks(command));
-        SubArgsModule.PLAYER_COMMANDS = new HashMap<>();
+        SubArguments.PLAYER_COMMANDS = new HashMap<>();
     }
 
     public static void updateMessages() {

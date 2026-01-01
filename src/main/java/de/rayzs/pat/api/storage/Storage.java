@@ -11,7 +11,7 @@ import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
@@ -219,11 +219,11 @@ public class Storage {
 
                     associatedServers.forEach(s -> {
                         List<UUID> playerIds = Storage.getLoader().getPlayerIdsByServer(s);
-                        List<String> commands = new ArrayList<>(SubArgsModule.getServerCommands(s));
+                        List<String> commands = new ArrayList<>(SubArguments.getServerCommands(s));
 
                         playerIds.forEach(playerId -> {
                             List<String> playerCommands = new ArrayList<>(commands);
-                            playerCommands.addAll(SubArgsModule.getGroupCommands(playerId, s));
+                            playerCommands.addAll(SubArguments.getGroupCommands(playerId, s));
 
                             PATEventHandler.callUpdatePlayerCommandsEvents(playerId, playerCommands, true);
                         });
@@ -239,8 +239,8 @@ public class Storage {
                     List<UUID> playerIds = Storage.getLoader().getPlayerIds();
 
                     playerIds.forEach(playerId -> {
-                        List<String> playerCommands = new ArrayList<>(SubArgsModule.getServerCommands(playerId));
-                        playerCommands.addAll(SubArgsModule.getGroupCommands(playerId));
+                        List<String> playerCommands = new ArrayList<>(SubArguments.getServerCommands(playerId));
+                        playerCommands.addAll(SubArguments.getGroupCommands(playerId));
 
                         PATEventHandler.callUpdatePlayerCommandsEvents(playerId, playerCommands, false);
                     });
@@ -270,7 +270,7 @@ public class Storage {
 
             playerIds.forEach(playerId -> {
                 List<String> playerCommands = new ArrayList<>(commands);
-                playerCommands.addAll(SubArgsModule.getGroupCommands(playerId));
+                playerCommands.addAll(SubArguments.getGroupCommands(playerId));
 
                 PATEventHandler.callUpdatePlayerCommandsEvents(playerId, playerCommands, true);
             });
@@ -281,8 +281,8 @@ public class Storage {
 
     // Quickly updates all player subarguments.
     public static void quickSubArgumentUpdate(UUID uuid) {
-        List<String> playerCommands = new ArrayList<>(SubArgsModule.getServerCommands(uuid));
-        playerCommands.addAll(SubArgsModule.getGroupCommands(uuid));
+        List<String> playerCommands = new ArrayList<>(SubArguments.getServerCommands(uuid));
+        playerCommands.addAll(SubArguments.getGroupCommands(uuid));
 
         PATEventHandler.callUpdatePlayerCommandsEvents(uuid, playerCommands, false);
     }

@@ -21,7 +21,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.plugin.listeners.velocity.VelocityBlockCommandListener;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.utils.PacketUtils;
 import de.rayzs.pat.utils.Reflection;
@@ -201,7 +201,7 @@ public class VelocityPacketAnalyzer {
             Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines().forEach(input -> helper.add(input, false));
         }
 
-        SubArgsModule.handleCommandNode(player.getUniqueId(), helper);
+        SubArguments.handleCommandNode(player.getUniqueId(), helper);
     }
 
     private static class PacketDecoder extends ChannelDuplexHandler {

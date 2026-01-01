@@ -1,7 +1,7 @@
-package de.rayzs.pat.plugin.modules.events;
+package de.rayzs.pat.plugin.subarguments.events;
 
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.api.storage.Storage;
@@ -60,7 +60,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
     }
 
     private boolean isBlocked(CommandSender sender, String command) {
-        final Arguments arguments = SubArgsModule.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Arguments.ARGUMENTS);
+        final Arguments arguments = SubArguments.PLAYER_COMMANDS.getOrDefault(sender.getUniqueId(), Arguments.ARGUMENTS);
         final List<String> commands = new ArrayList<>(arguments.CHAT_ARGUMENTS.getGeneralArgument().getInputs());
         final String firstArgument = StringUtils.getFirstArg(command);
 
@@ -119,7 +119,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
         ).toList();
 
         if (!placeholderCommands.isEmpty()) {
-            command = SubArgsModule.replacePlaceholders(command);
+            command = SubArguments.replacePlaceholders(command);
         }
 
         String cpyCommand;

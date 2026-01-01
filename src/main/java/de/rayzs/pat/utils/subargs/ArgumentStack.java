@@ -1,6 +1,6 @@
 package de.rayzs.pat.utils.subargs;
 
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -19,9 +19,9 @@ public class ArgumentStack {
             current = input.split(" ")[0];
 
             if (suggestions.contains("%online_players%"))
-                current = StringUtils.replaceElementsFromString(current, SubArgsModule.getPlayerNames(), "%online_players%");
+                current = StringUtils.replaceElementsFromString(current, SubArguments.getPlayerNames(), "%online_players%");
             if (suggestions.contains("%hidden_online_players%"))
-                current = StringUtils.replaceElementsFromString(current, SubArgsModule.getPlayerNames(), "%hidden_online_players%");
+                current = StringUtils.replaceElementsFromString(current, SubArguments.getPlayerNames(), "%hidden_online_players%");
 
             input = StringUtils.replaceFirst(input, current, "");
             input = input.startsWith(" ") ? StringUtils.replaceFirst(input, " ", "") : input;
@@ -30,9 +30,9 @@ public class ArgumentStack {
                 if (!entry.getKey().startsWith(current)) continue;
 
                 if (entry.getKey().contains("%online_players%"))
-                    input = StringUtils.replaceElementsFromString(input, SubArgsModule.getPlayerNames(), "%online_players%");
+                    input = StringUtils.replaceElementsFromString(input, SubArguments.getPlayerNames(), "%online_players%");
                 if (entry.getKey().contains("%hidden_online_players%"))
-                    input = StringUtils.replaceElementsFromString(input, SubArgsModule.getPlayerNames(), "%hidden_online_players%");
+                    input = StringUtils.replaceElementsFromString(input, SubArguments.getPlayerNames(), "%hidden_online_players%");
 
                 return entry.getValue().getResult(input);
             }

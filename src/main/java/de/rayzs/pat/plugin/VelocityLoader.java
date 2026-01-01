@@ -8,7 +8,7 @@ import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.netty.proxy.VelocityPacketAnalyzer;
 import de.rayzs.pat.plugin.converter.StorageConverter;
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
@@ -122,7 +122,7 @@ public class VelocityLoader implements PluginLoader {
         ConfigUpdater.broadcastMissingParts();
 
         ActionHandler.initialize();
-        SubArgsModule.initialize();
+        SubArguments.initialize();
 
         StorageConverter.initialize();
 
@@ -144,9 +144,9 @@ public class VelocityLoader implements PluginLoader {
     public static void delayedPlayerReload(UUID uuid) {
         server.getScheduler().buildTask(VelocityLoader.instance, () -> {
             String serverName = Storage.getLoader().getPlayerServerName(uuid);
-            List<String> commands = new ArrayList<>(SubArgsModule.getServerCommands(serverName));
+            List<String> commands = new ArrayList<>(SubArguments.getServerCommands(serverName));
 
-            commands.addAll(SubArgsModule.getGroupCommands(uuid, serverName));
+            commands.addAll(SubArguments.getGroupCommands(uuid, serverName));
 
             PATEventHandler.callUpdatePlayerCommandsEvents(uuid, commands, true);
         }).delay(1, TimeUnit.SECONDS).schedule();

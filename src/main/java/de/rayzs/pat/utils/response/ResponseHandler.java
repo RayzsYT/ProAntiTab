@@ -1,6 +1,6 @@
 package de.rayzs.pat.utils.response;
 
-import de.rayzs.pat.plugin.modules.SubArgsModule;
+import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
@@ -140,7 +140,7 @@ public class ResponseHandler {
 
         public Response(final String key) {
             this.triggers = (List<String>) Storage.Files.CUSTOM_RESPONSES.get(key + ".triggers");
-            this.message = (List<String>) Storage.Files.CUSTOM_RESPONSES.getOrSet(key + ".message", SubArgsModule.BLOCKED_MESSAGE);
+            this.message = (List<String>) Storage.Files.CUSTOM_RESPONSES.getOrSet(key + ".message", SubArguments.BLOCKED_MESSAGE);
             this.actions = (List<String>) Storage.Files.CUSTOM_RESPONSES.getOrSet(key + ".actions", new ArrayList<>());
         }
 
