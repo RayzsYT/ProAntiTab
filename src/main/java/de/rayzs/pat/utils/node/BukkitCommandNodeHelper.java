@@ -76,44 +76,61 @@ public class BukkitCommandNodeHelper {
         spareRecursively("", root, spares);
     }
 
-    private void spareRecursively(String string, Node parent, List<String> spares) throws Exception {
-        List<Node> children = new ArrayList<>(parent.getChildren());
+    private void spareRecursively(String str, Node parent, List<String> spares) throws Exception {
+        final List<Node> children = new ArrayList<>(parent.getChildren());
 
         for (final Node child : children) {
-            final String currentNodeStr = string + (!parent.isRoot() ? " " : "") + child.getName();
 
-            System.out.println("Currently: " + currentNodeStr);
-
-            boolean remove = true;
-            for (String spare : spares) {
-                final String[] currentNodeArgs = currentNodeStr.split(" ");
-                final String[] spareArgs = spare.split(" ");
-
-                for (int i = 1; i < currentNodeArgs.length; i++) {
-                    final String cNode = currentNodeArgs[i];
-                    final String cSpare = spareArgs[i];
-
-                    if (cSpare.startsWith("%") && cSpare.endsWith("%") && cSpare.length() > 1) {
-                        continue;
-                    }
-
-                    System.out.println("Compare: \"" + cNode + "\" -> \"" + cSpare + "\"");
-
-                    if (cNode.equals(cSpare)) {
-                        remove = false;
-                        break;
-                    }
-                }
-            }
-
-            System.out.println("Remove? " + remove);
-
-            if (!remove) {
-                spareRecursively(currentNodeStr, child, spares);
+            if (parent.isRoot()) {
+                spareRecursively(child.getName(), child, spares);
                 continue;
             }
 
-            parent.removeChild(child);
+            final String command = str + " " + child.getName();
+            final String[] commandArgs = command.split(" ");
+
+            boolean found = false;
+            for (String spare : spares) {
+                final String[] spareArgs = spare.split(" ");
+
+                if (!spareArgs[0].equals(commandArgs[0])) {
+                    continue;
+                }
+
+                boolean match = true;
+                for (int i = 1; i < spareArgs.length; i++) {
+                    final String s = spareArgs[i];
+
+                    if (commandArgs.length - 1 < i) {
+                        continue;
+                    }
+
+                    if (commandArgs.length - 1 == i && s.equals("_-")) {
+                        match = false;
+                        break;
+                    }
+
+                    if (s.startsWith("%") && s.endsWith("%")) {
+                        continue;
+                    }
+
+                    if (!s.equals(commandArgs[i])) {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                parent.removeChild(child);
+            } else {
+                spareRecursively(command, child, spares);
+            }
         }
     }
 
