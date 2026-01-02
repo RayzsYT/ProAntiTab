@@ -165,36 +165,35 @@ public class BukkitPacketAnalyzer {
                     return;
                 }
 
-                String packetName = packetObj.getClass().getSimpleName();
+                final String packetName = packetObj.getClass().getSimpleName();
+                final boolean isCommandsPacket = packetName.equals("ClientboundCommandsPacket");
+                final boolean isTabCompletePacket = packetName.equals("PacketPlayOutTabComplete") || packetName.equals("ClientboundCommandSuggestionsPacket");
 
-                if (packetName.equals("ClientboundCommandsPacket")) {
+                if (!isCommandsPacket && !isTabCompletePacket || PermissionUtil.hasBypassPermission(sender)) {
+                    super.write(channel, packetObj, promise);
+                    return;
+                }
+
+                if (isCommandsPacket) {
                     COMMANDS_NODE_HANDLER.handleOutgoingPacket(player, sender, packetObj);
 
                     super.write(channel, packetObj, promise);
                     return;
                 }
 
-                if (!packetName.equals("PacketPlayOutTabComplete") && !packetName.equals("ClientboundCommandSuggestionsPacket")) {
-                    super.write(channel, packetObj, promise);
-                    return;
-                }
+                UUID uuid = player.getUniqueId();
+                Object sentPacketObj = SENT_PACKET.get(uuid);
 
-                if (!PermissionUtil.hasBypassPermission(sender)) {
-
-                    UUID uuid = player.getUniqueId();
-                    Object sentPacketObj = SENT_PACKET.get(uuid);
-
-                    if (sentPacketObj != null) {
-                        if (sentPacketObj == packetObj) {
-                            SENT_PACKET.remove(uuid);
-                            super.write(channel, sentPacketObj, promise);
-                            return;
-                        }
-                    }
-
-                    if (!PACKET_HANDLER.handleOutgoingPacket(player, sender, packetObj))
+                if (sentPacketObj != null) {
+                    if (sentPacketObj == packetObj) {
+                        SENT_PACKET.remove(uuid);
+                        super.write(channel, sentPacketObj, promise);
                         return;
+                    }
                 }
+
+                if (!PACKET_HANDLER.handleOutgoingPacket(player, sender, packetObj))
+                    return;
 
                 super.write(channel, packetObj, promise);
 

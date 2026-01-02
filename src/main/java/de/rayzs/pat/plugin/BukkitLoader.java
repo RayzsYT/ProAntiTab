@@ -288,7 +288,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         }
 
         Player player = Bukkit.getPlayer(packet.getTargetUUID());
-        if (player != null) {
+        if (player != null && Reflection.getMinor() >= 13) {
             player.updateCommands();
         }
     }
