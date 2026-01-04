@@ -22,8 +22,6 @@ public class UpdateCommand extends ProCommand {
     @Override
     public boolean execute(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            PermissionUtil.reloadPermissions();
-
             Storage.getLoader().getOnlinePlayerNames().forEach(name -> {
                 Object playerObj = Storage.getLoader().getPlayerObjByName(name);
 
