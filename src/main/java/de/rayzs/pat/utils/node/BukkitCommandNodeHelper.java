@@ -79,6 +79,14 @@ public class BukkitCommandNodeHelper {
     private void spareRecursively(String str, Node parent, List<String> spares) throws Exception {
         final List<Node> children = new ArrayList<>(parent.getChildren());
 
+        if (!parent.isRoot() && children.size() == 1) {
+            final Node firstChild = children.get(0);
+
+            if (firstChild.getName() != null && firstChild.getName().equalsIgnoreCase("args")) {
+                return;
+            }
+        }
+
         for (final Node child : children) {
 
             if (parent.isRoot()) {
