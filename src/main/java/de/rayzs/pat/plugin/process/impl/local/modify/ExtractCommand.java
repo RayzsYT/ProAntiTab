@@ -16,6 +16,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ExtractCommand extends ProCommand {
 
@@ -26,6 +27,37 @@ public class ExtractCommand extends ProCommand {
         );
     }
 
+    private enum Mode {
+
+        BOTH("both", true), ONLY_COLON("only-colon", true), NON_COLON("non-colon", false);
+
+        private static Mode getMode(final String name) {
+            for (final Mode mode : Mode.values()) {
+                if (mode.getName().equalsIgnoreCase(name)) {
+                    return mode;
+                }
+            }
+
+            return null;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean doesIncludesColons() {
+            return includesColons;
+        }
+
+        private final String name;
+        private final boolean includesColons;
+
+        Mode(final String name, final boolean includesColons) {
+            this.name = name;
+            this.includesColons = includesColons;
+        }
+    }
+
     @Override
     public boolean execute(CommandSender sender, String[] args) {
 
@@ -34,40 +66,26 @@ public class ExtractCommand extends ProCommand {
             return true;
         }
 
+        Mode mode = Mode.NON_COLON;
+
         String pluginName = args[0].toLowerCase();
-        boolean failed = false, useColons = false;
+        boolean failed = false;
         Group group = null;
 
         if (args.length == 2) {
 
             group = GroupManager.getGroupByName(args[1]);
             if (group == null) {
-                useColons = Boolean.parseBoolean(args[1]);
-
-                if (!useColons && !args[1].equalsIgnoreCase("false")) {
-                    failed = true;
-                }
-
-            }
-
-            try {
-                useColons = Boolean.parseBoolean(args[1]);
-            } catch (Exception exception) {
-                group = GroupManager.getGroupByName(args[1]);
-                failed = group == null;
+                mode = Mode.getMode(args[1]);
+                failed = mode == null;
             }
 
         } else if (args.length == 3) {
             group = GroupManager.getGroupByName(args[1]);
+            mode = Mode.getMode(args[2]);
 
-            if (group == null) {
+            if (group == null && mode == null) {
                 failed = true;
-            } else {
-                try {
-                    useColons = Boolean.parseBoolean(args[2]);
-                } catch (Exception exception) {
-                    failed = true;
-                }
             }
         }
 
@@ -94,7 +112,13 @@ public class ExtractCommand extends ProCommand {
             return true;
         }
 
-        List<String> commands = all ? Storage.getLoader().getAllCommands(useColons) : Storage.getLoader().getPluginCommands(args[0], useColons);
+        List<String> commands = all
+                ? Storage.getLoader().getAllCommands(mode.doesIncludesColons())
+                : Storage.getLoader().getPluginCommands(args[0], mode.doesIncludesColons());
+
+        if (mode == Mode.ONLY_COLON) {
+            commands = commands.stream().filter(command -> command.contains(":")).toList();
+        }
 
         BlacklistStorage storage = group == null
                 ? Storage.Blacklist.getBlacklist()
@@ -127,8 +151,7 @@ public class ExtractCommand extends ProCommand {
         List<String> result = new ArrayList<>();
 
         if (length == 2 || length == 3 && GroupManager.getGroupByName(args[1]) != null) {
-            result.add("true");
-            result.add("false");
+            result.addAll(Arrays.stream(Mode.values()).map(Mode::getName).toList());
         }
 
         if (length == 2) {
