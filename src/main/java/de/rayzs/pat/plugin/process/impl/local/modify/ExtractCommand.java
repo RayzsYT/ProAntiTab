@@ -3,20 +3,11 @@ package de.rayzs.pat.plugin.process.impl.local.modify;
 import de.rayzs.pat.api.command.ProCommand;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.storages.BlacklistStorage;
-import de.rayzs.pat.plugin.BukkitLoader;
-import de.rayzs.pat.plugin.converter.Converter;
-import de.rayzs.pat.plugin.converter.StorageConverter;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.sender.CommandSender;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ExtractCommand extends ProCommand {
 
@@ -72,19 +63,22 @@ public class ExtractCommand extends ProCommand {
         boolean failed = false;
         Group group = null;
 
+
         if (args.length == 2) {
 
             group = GroupManager.getGroupByName(args[1]);
+
             if (group == null) {
                 mode = Mode.getMode(args[1]);
                 failed = mode == null;
             }
 
         } else if (args.length == 3) {
+
             group = GroupManager.getGroupByName(args[1]);
             mode = Mode.getMode(args[2]);
 
-            if (group == null && mode == null) {
+            if (group == null || mode == null) {
                 failed = true;
             }
         }
