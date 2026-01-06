@@ -100,18 +100,36 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
 
         commands = (ArrayList<String>) getConfig().getOrSet(getNavigatePath(), commands);
 
-        List<String> tmpCommands = commands != null ? new ArrayList<>(commands) : new ArrayList<>();
-        Set<String> pluginListCommands = new HashSet<>();
+        final List<String> tmpCommands = commands != null ? new ArrayList<>(commands) : new ArrayList<>();
+        final Set<String> pluginListCommands = new HashSet<>(), negatedPluginListCommands = new HashSet<>();
 
         final String pluginCommandPrefix = "plugin=";
+        final String negatedPluginCommandPrefix = Storage.Blacklist.BlockType.NEGATE + pluginCommandPrefix;
 
         for (String command : tmpCommands) {
             if (command.startsWith(pluginCommandPrefix)) {
                 pluginListCommands.add(command);
             }
+
+            if (command.startsWith(negatedPluginCommandPrefix)) {
+                negatedPluginListCommands.add(command);
+            }
         }
 
         tmpCommands.removeAll(pluginListCommands);
+        tmpCommands.removeAll(negatedPluginListCommands);
+
+        for (String negatedPluginCommand : negatedPluginListCommands) {
+            negatedPluginCommand = negatedPluginCommand.substring(negatedPluginCommandPrefix.length());
+
+            List<String> pluginCommands = Storage.getLoader().getPluginCommands(negatedPluginCommand, false);
+
+            for (String pluginCommand : pluginCommands) {
+                tmpCommands.remove(pluginCommand);
+
+                tmpCommands.add(Storage.Blacklist.BlockType.NEGATE + pluginCommand);
+            }
+        }
 
         for (String pluginListCommand : pluginListCommands) {
             pluginListCommand = pluginListCommand.substring(pluginCommandPrefix.length());
@@ -119,7 +137,9 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
             List<String> pluginCommands = Storage.getLoader().getPluginCommands(pluginListCommand, false);
 
             for (String pluginCommand : pluginCommands) {
-                if (!commands.contains(Storage.Blacklist.BlockType.NEGATE + pluginCommand)) {
+                final String negated = Storage.Blacklist.BlockType.NEGATE + pluginCommand;
+
+                if (!commands.contains(negated) && !tmpCommands.contains(negated)) {
                     tmpCommands.add(pluginCommand);
                 }
             }
