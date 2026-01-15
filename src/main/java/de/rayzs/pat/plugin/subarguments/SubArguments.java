@@ -77,14 +77,23 @@ public class SubArguments {
             return;
         }
 
-        List<String> inputs = source.getAllInputs();
+        final List<String> inputs = source.getAllInputs();
 
         if (turn) {
             List<String> allEntries = inputs.stream().map(StringUtils::getFirstArg).toList();
             helper.removeIf(allEntries::contains);
         }
 
-        for (String input : inputs) {
+        final int length = inputs.size();
+        for (int i = 0; i < length; i++) {
+            String input;
+
+            try {
+                input = inputs.get(i);
+            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+                break;
+            }
+
             final boolean negated = Storage.Blacklist.BlockTypeFetcher.isNegated(input);
 
             if (!negated) {
@@ -120,10 +129,19 @@ public class SubArguments {
             return;
         }
 
-        List<String> inputs = source.getAllInputs();
-        List<String> argumentsList = new ArrayList<>();
+        final List<String> inputs = new ArrayList<>(source.getAllInputs());
+        final List<String> argumentsList = new ArrayList<>();
 
-        for (String input : inputs) {
+        final int length = inputs.size();
+        for (int i = 0; i < length; i++) {
+            String input;
+
+            try {
+                input = inputs.get(i);
+            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+                break;
+            }
+
             final Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
             if (type == Storage.Blacklist.BlockType.CHAT) {
                 continue;
