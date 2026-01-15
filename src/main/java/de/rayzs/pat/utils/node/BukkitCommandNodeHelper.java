@@ -73,7 +73,14 @@ public class BukkitCommandNodeHelper {
     }
 
     public void spareRecursively(List<String> spares) throws Exception {
-        spareRecursively("", root, spares);
+        final Set<String> sparesSet = new HashSet<>(spares.stream().map(StringUtils::getFirstArg).toList());
+
+        for (String childName : sparesSet) {
+            Node child = root.getChild(childName);
+            if (child != null) {
+                spareRecursively(child.getName(), child, spares);
+            }
+        }
     }
 
     private void spareRecursively(String str, Node parent, List<String> spares) throws Exception {
@@ -88,12 +95,6 @@ public class BukkitCommandNodeHelper {
         }
 
         for (final Node child : children) {
-
-            if (parent.isRoot()) {
-                spareRecursively(child.getName(), child, spares);
-                continue;
-            }
-
             final String command = str + " " + child.getName();
             final String[] commandArgs = command.split(" ");
 
