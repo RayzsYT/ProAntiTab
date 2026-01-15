@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin.subarguments.events;
 
 import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import de.rayzs.pat.api.event.events.*;
 import de.rayzs.pat.utils.subargs.Arguments;
@@ -80,19 +81,33 @@ public class UpdateList {
                 }
 
             } else {
-                List<String> groupCommands = SubArguments.getGroupCommands(uuid, serverName);
 
-                for (String command : Arguments.ARGUMENTS.CHAT_ARGUMENTS.getGeneralArgument().getInputs()) {
-                    if (groupCommands.contains(command)) continue;
+                final List<String> groupCommands = SubArguments.getGroupCommands(uuid, serverName);
 
-                    argument.CHAT_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
+                if (Reflection.isProxyServer()) {
+
+                    final List<String> commands = SubArguments.getServerCommands(uuid);
+                    commands.removeIf(groupCommands::contains);
+
+                    for (String command : commands) {
+                        argument.buildArgumentStacks(command);
+                    }
+
+                } else {
+
+                    for (String command : Arguments.ARGUMENTS.CHAT_ARGUMENTS.getGeneralArgument().getInputs()) {
+                        if (groupCommands.contains(command)) continue;
+
+                        argument.CHAT_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
+                    }
+
+                    for (String command : Arguments.ARGUMENTS.TAB_ARGUMENTS.getGeneralArgument().getInputs()) {
+                        if (groupCommands.contains(command)) continue;
+
+                        argument.TAB_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
+                    }
                 }
 
-                for (String command : Arguments.ARGUMENTS.TAB_ARGUMENTS.getGeneralArgument().getInputs()) {
-                    if (groupCommands.contains(command)) continue;
-
-                    argument.TAB_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
-                }
             }
 
             SubArguments.PLAYER_COMMANDS.putIfAbsent(uuid, argument);
