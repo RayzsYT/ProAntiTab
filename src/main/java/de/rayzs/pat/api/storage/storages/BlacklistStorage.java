@@ -21,6 +21,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
 
     public boolean isListed(String command, boolean ignoreColons) {
         final boolean caseSensitive = Storage.ConfigSections.Settings.BASE_COMMAND_CASE_SENSITIVE.ENABLED;
+        final boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
 
         if (commands == null || command.isEmpty()) {
             return false;
@@ -28,7 +29,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
 
         boolean isNegated = Storage.Blacklist.BlockTypeFetcher.isNegated(command);
 
-        if (!isNegated) {
+        if (!isNegated == turn) {
             command = StringUtils.getFirstArg(command);
         }
 
@@ -43,7 +44,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
                     command = command.substring(command.indexOf(':'));
             }
 
-            if (!isNegated) {
+            if (!isNegated == turn) {
                 listedCommand = StringUtils.getFirstArg(listedCommand);
             }
 
