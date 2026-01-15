@@ -656,7 +656,7 @@ public class Storage {
                 return !turn;
             }
 
-            return turn != listed; // Shorter version of above's code
+            return turn != listed;
 
         }
 
