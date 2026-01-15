@@ -82,13 +82,13 @@ public class UpdateList {
             } else {
                 List<String> groupCommands = SubArguments.getGroupCommands(uuid, serverName);
 
-                for (String command : argument.CHAT_ARGUMENTS.getGeneralArgument().getInputs()) {
+                for (String command : Arguments.ARGUMENTS.CHAT_ARGUMENTS.getGeneralArgument().getInputs()) {
                     if (groupCommands.contains(command)) continue;
 
                     argument.CHAT_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
                 }
 
-                for (String command : argument.TAB_ARGUMENTS.getGeneralArgument().getInputs()) {
+                for (String command : Arguments.ARGUMENTS.TAB_ARGUMENTS.getGeneralArgument().getInputs()) {
                     if (groupCommands.contains(command)) continue;
 
                     argument.TAB_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
