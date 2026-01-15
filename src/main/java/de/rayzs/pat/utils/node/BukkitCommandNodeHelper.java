@@ -146,7 +146,7 @@ public class BukkitCommandNodeHelper {
         final int max = args.length - 1;
         final int nextIndex = index + 1;
 
-        if (index > max || nextIndex > max) {
+        if (parent == null || index > max || nextIndex > max) {
             return;
         }
 
