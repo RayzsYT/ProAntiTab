@@ -65,8 +65,7 @@ public class SubArguments {
     }
 
     public static void handleCommandNode(UUID uuid, ProxyCommandNodeHelper helper) {
-        if (!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
-            return;
+        final boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
 
         Arguments arguments = PLAYER_COMMANDS.get(uuid);
         if (arguments == null) {
@@ -79,31 +78,37 @@ public class SubArguments {
         }
 
         List<String> inputs = source.getAllInputs();
-        List<String> allEntries = inputs.stream().map(StringUtils::getFirstArg).toList();
 
-        helper.removeIf(allEntries::contains);
+        if (turn) {
+            List<String> allEntries = inputs.stream().map(StringUtils::getFirstArg).toList();
+            helper.removeIf(allEntries::contains);
+        }
 
         for (String input : inputs) {
             final boolean negated = Storage.Blacklist.BlockTypeFetcher.isNegated(input);
 
             if (!negated) {
-                helper.add(input, true);
+
+                if (turn) helper.add(input, true);
+                else helper.removeSubArguments(input);
+
                 continue;
             }
 
             final Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
-            if (type != Storage.Blacklist.BlockType.BOTH && type != Storage.Blacklist.BlockType.TAB) {
+            if (type == Storage.Blacklist.BlockType.CHAT) {
                 continue;
             }
 
             input = Storage.Blacklist.BlockTypeFetcher.cleanse(input);
-            helper.removeSubArguments(input);
+
+            if (turn) helper.removeSubArguments(input);
+            else helper.add(input, true);
         }
     }
 
     public static void handleCommandNode(UUID uuid, BukkitCommandNodeHelper helper) throws Exception {
-        if (!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED)
-            return;
+        final boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
 
         Arguments arguments = PLAYER_COMMANDS.get(uuid);
         if (arguments == null) {
@@ -128,11 +133,15 @@ public class SubArguments {
             input = Storage.Blacklist.BlockTypeFetcher.cleanse(input);
 
             if (!negated) {
-                argumentsList.add(input);
+
+                if (turn) argumentsList.add(input);
+                else helper.removeSubArguments(input);
+
                 continue;
             }
 
-            helper.removeSubArguments(input);
+            if (turn) helper.removeSubArguments(input);
+            else argumentsList.add(input);
         }
 
         if (argumentsList.isEmpty()) {
