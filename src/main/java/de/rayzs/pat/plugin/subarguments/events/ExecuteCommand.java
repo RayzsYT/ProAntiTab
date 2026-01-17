@@ -136,6 +136,24 @@ public class ExecuteCommand extends ExecuteCommandEvent {
                     cpyCommand = StringUtils.replace(command, "%both_players%", "%players%");
             }
 
+            if (c.contains("%offline_players%")) {
+
+                final String[] cSplit = c.split(" ");
+                final String[] cpyCommandSplit = cpyCommand.split(" ");
+
+                for (int i = 0; i < cSplit.length; i++) {
+                    if (i >= cpyCommandSplit.length) {
+                        break;
+                    }
+
+                    if (cSplit[i].equals("%offline_players%") && !cpyCommandSplit[i].endsWith("players%")) {
+                        cpyCommandSplit[i] = "%offline_players%";
+                    }
+                }
+
+                cpyCommand = String.join(" ", cpyCommandSplit);
+            }
+
             boolean ends = c.endsWith("_-");
             if (ends) {
                 c = StringUtils.replace(c, "_-", "");

@@ -75,6 +75,11 @@ public class TabCompletion extends FilteredTabCompletionEvent {
                 possibilities.addAll(SubArguments.getOnlinePlayerNames());
             }
 
+            if (result.contains("%offline_players%")) {
+                possibilities.remove("%offline_players%");
+                possibilities.removeAll(SubArguments.getOnlinePlayerNames());
+            }
+
             if (result.contains("%hidden_players%")) {
                 possibilities.remove("%hidden_players%");
 
@@ -110,6 +115,9 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
             if (result.contains("%players%"))
                 possibilities.removeIf(possibility -> SubArguments.getPlayerNames().contains(possibility));
+
+            if (result.contains("%offline_players%"))
+                possibilities.removeIf(possibility -> !SubArguments.getPlayerNames().contains(possibility));
 
             if (result.contains("%online_players%"))
                 possibilities.removeIf(possibility -> SubArguments.getOnlinePlayerNames().contains(possibility));
