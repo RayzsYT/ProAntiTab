@@ -161,6 +161,8 @@ custom-plugins:
   commands:
     - pl
     - plugins
+    - bukkit:pl
+    - bukkit:plugins
   message:
     - '&fPlugins (0):'
 
@@ -178,6 +180,9 @@ custom-version:
     - about
     - version
     - ver
+    - bukkit:about
+    - bukkit:version
+    - bukkit:ver
   message:
     - '&fThis server is running CraftBukkit version git-NasaSpigot-294 (MC: X)'
 
