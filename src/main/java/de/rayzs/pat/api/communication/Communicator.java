@@ -50,10 +50,7 @@ public class Communicator {
     public static void receiveInformation(String serverName, Object packet) {
         ClientInfo client = getClientByName(serverName);
 
-        if (packet instanceof CommunicationPackets.RequestPacket) {
-
-            CommunicationPackets.RequestPacket requestPacket = (CommunicationPackets.RequestPacket) packet;
-
+        if (packet instanceof CommunicationPackets.RequestPacket requestPacket) {
             if (!requestPacket.isToken(Storage.TOKEN))
                 return;
 
@@ -73,8 +70,9 @@ public class Communicator {
         }
 
         if (packet instanceof CommunicationPackets.NotificationPacket notificationPacket) {
-            if (Reflection.isProxyServer())
+            if (!notificationPacket.isToken(Storage.TOKEN) || Reflection.isProxyServer()) {
                 return;
+            }
 
             BukkitLoader.handleNotificationPacket(notificationPacket);
         }
@@ -226,12 +224,9 @@ public class Communicator {
     }
 
     public static void sendPermissionReset() {
-        if(Reflection.isProxyServer())
+        if (Reflection.isProxyServer()) {
             sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN));
-    }
-
-    public static void sendUpdateCommand() {
-        sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN));
+        }
     }
 
     public static void sendNotificationPacket(CommandSender targetSender, String displayedCommand) {
@@ -246,6 +241,12 @@ public class Communicator {
                 sendPacket(client, new CommunicationPackets.NotificationPacket(Storage.TOKEN, targetSender.getUniqueId(), displayedCommand));
                 return;
             }
+        }
+    }
+
+    public static void sendUpdateCommand() {
+        if (Reflection.isProxyServer()) {
+            sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN));
         }
     }
 
