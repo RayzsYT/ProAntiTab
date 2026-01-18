@@ -280,6 +280,23 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
     }
 
+    public static void handleNotificationPacket(CommunicationPackets.NotificationPacket packet) {
+        if (!Storage.SEND_CONSOLE_NOTIFICATION) { return; }
+
+        final Player player = Bukkit.getPlayer(packet.getTargetUUID());
+        if (player == null) {
+            return;
+        }
+
+        final List<String> notificationMessage = MessageTranslator.replaceMessageList(
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
+                "%player%", player.getName(),
+                "%command%", packet.getDisplayedCommand(),
+                "%world%", player.getWorld().getName());
+
+        Logger.info(notificationMessage);
+    }
+
     public static void handleUpdateCommandsPacket(CommunicationPackets.UpdateCommandsPacket packet) {
 
         if (!packet.hasTargetUUID()) {
