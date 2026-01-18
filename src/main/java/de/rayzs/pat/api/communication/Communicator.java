@@ -21,6 +21,7 @@ import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 public class Communicator {
 
@@ -229,6 +230,17 @@ public class Communicator {
 
     public static void sendUpdateCommand() {
         sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN));
+    }
+
+    public static void sendNotificationPacket(CommandSender targetSender) {
+        final String serverName = targetSender.getServerName();
+
+        for (ClientInfo client : CLIENTS) {
+            if (client.getName().equalsIgnoreCase(serverName)) {
+                sendPacket(client, new CommunicationPackets.NotificationPacket(Storage.TOKEN, targetSender.getUniqueId()));
+                return;
+            }
+        }
     }
 
     public static void sendUpdateCommand(UUID targetUUID) {
