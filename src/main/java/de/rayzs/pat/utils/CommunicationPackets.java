@@ -119,6 +119,25 @@ public class CommunicationPackets {
         }
     }
 
+    public static class NotificationPacket implements Serializable {
+
+        private final String proxyToken;
+        private final UUID targetUUID;
+
+        public NotificationPacket(String proxyToken, UUID targetUUID) {
+            this.proxyToken = proxyToken;
+            this.targetUUID = targetUUID;
+        }
+
+        public UUID getTargetUUID() {
+            return targetUUID;
+        }
+
+        public boolean isToken(String token) {
+            return proxyToken.equals(token);
+        }
+    }
+
     public static class ForcePermissionResetPacket implements Serializable {
 
         private final String proxyToken;
