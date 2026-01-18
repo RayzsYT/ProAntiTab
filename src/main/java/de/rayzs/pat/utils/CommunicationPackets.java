@@ -119,7 +119,7 @@ public class CommunicationPackets {
         }
     }
 
-    public static class NotificationPacket implements Serializable {
+    public static class NotificationPacket implements CommunicationPacket, Serializable {
 
         private final String proxyToken, displayedCommand;
         private final UUID targetUUID;
