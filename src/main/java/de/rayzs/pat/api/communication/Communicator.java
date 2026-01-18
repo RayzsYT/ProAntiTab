@@ -234,12 +234,12 @@ public class Communicator {
         sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN));
     }
 
-    public static void sendNotificationPacket(CommandSender targetSender) {
+    public static void sendNotificationPacket(CommandSender targetSender, String displayedCommand) {
         final String serverName = targetSender.getServerName();
 
         for (ClientInfo client : CLIENTS) {
             if (client.getName().equalsIgnoreCase(serverName)) {
-                sendPacket(client, new CommunicationPackets.NotificationPacket(Storage.TOKEN, targetSender.getUniqueId()));
+                sendPacket(client, new CommunicationPackets.NotificationPacket(Storage.TOKEN, targetSender.getUniqueId(), displayedCommand));
                 return;
             }
         }

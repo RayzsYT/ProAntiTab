@@ -121,16 +121,21 @@ public class CommunicationPackets {
 
     public static class NotificationPacket implements Serializable {
 
-        private final String proxyToken;
+        private final String proxyToken, displayedCommand;
         private final UUID targetUUID;
 
-        public NotificationPacket(String proxyToken, UUID targetUUID) {
+        public NotificationPacket(String proxyToken, UUID targetUUID, String displayedCommand) {
             this.proxyToken = proxyToken;
             this.targetUUID = targetUUID;
+            this.displayedCommand = displayedCommand;
         }
 
         public UUID getTargetUUID() {
             return targetUUID;
+        }
+
+        public String getDisplayedCommand() {
+            return displayedCommand;
         }
 
         public boolean isToken(String token) {
