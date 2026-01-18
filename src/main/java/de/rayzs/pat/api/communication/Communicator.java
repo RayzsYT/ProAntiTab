@@ -72,19 +72,24 @@ public class Communicator {
             return;
         }
 
-        if (packet instanceof CommunicationPackets.UpdateCommandsPacket) {
+        if (packet instanceof CommunicationPackets.NotificationPacket notificationPacket) {
             if (Reflection.isProxyServer())
                 return;
 
-            CommunicationPackets.UpdateCommandsPacket updateCommandsPacket = (CommunicationPackets.UpdateCommandsPacket) packet;
+            BukkitLoader.handleNotificationPacket(notificationPacket);
+        }
+
+        if (packet instanceof CommunicationPackets.UpdateCommandsPacket updateCommandsPacket) {
+            if (Reflection.isProxyServer())
+                return;
+
             BukkitLoader.handleUpdateCommandsPacket(updateCommandsPacket);
         }
 
-        if (packet instanceof CommunicationPackets.ForcePermissionResetPacket) {
+        if (packet instanceof CommunicationPackets.ForcePermissionResetPacket permissionResetPacket) {
             if (Reflection.isProxyServer())
                 return;
 
-            CommunicationPackets.ForcePermissionResetPacket permissionResetPacket = (CommunicationPackets.ForcePermissionResetPacket) packet;
             if (!permissionResetPacket.isToken(Storage.TOKEN))
                 return;
 
@@ -96,8 +101,7 @@ public class Communicator {
             return;
         }
 
-        if (packet instanceof CommunicationPackets.BackendDataPacket) {
-            CommunicationPackets.BackendDataPacket backendDataPacket = (CommunicationPackets.BackendDataPacket) packet;
+        if (packet instanceof CommunicationPackets.BackendDataPacket backendDataPacket) {
             if (!backendDataPacket.isToken(Storage.TOKEN))
                 return;
 
@@ -105,8 +109,7 @@ public class Communicator {
             return;
         }
 
-        if (packet instanceof CommunicationPackets.FeedbackPacket) {
-            CommunicationPackets.FeedbackPacket feedbackPacket = (CommunicationPackets.FeedbackPacket) packet;
+        if (packet instanceof CommunicationPackets.FeedbackPacket feedbackPacket) {
             if (!feedbackPacket.isToken(Storage.TOKEN))
                 return;
 
@@ -135,8 +138,7 @@ public class Communicator {
             return;
         }
 
-        if (packet instanceof CommunicationPackets.PacketBundle) {
-            CommunicationPackets.PacketBundle packetBundle =  (CommunicationPackets.PacketBundle) packet;
+        if (packet instanceof CommunicationPackets.PacketBundle packetBundle) {
             if (!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString()))
                 return;
 
