@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -51,6 +52,8 @@ public class BungeeBlockCommandListener implements Listener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
 
+            Communicator.sendNotificationPacket(sender, displayCommand);
+
             MessageTranslator.send(
                     player,
                     Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
@@ -72,6 +75,8 @@ public class BungeeBlockCommandListener implements Listener {
         }
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
+
+            Communicator.sendNotificationPacket(sender, displayCommand);
 
             MessageTranslator.send(
                     player,
@@ -124,6 +129,8 @@ public class BungeeBlockCommandListener implements Listener {
 
                 if (!executeCommandEvent.doesNotify())
                     return;
+
+                Communicator.sendNotificationPacket(sender, displayCommand);
 
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
                     Logger.info(notificationMessage);
