@@ -18,20 +18,20 @@ public class NotifyCommand extends ProCommand {
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
-
-        boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
-
-        if (backend) {
-            sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
-            return true;
-        }
-
-        boolean enabled = false;
+        boolean enabled;
 
         if (sender.isConsole()) {
             enabled = Storage.SEND_CONSOLE_NOTIFICATION;
             Storage.SEND_CONSOLE_NOTIFICATION = !Storage.SEND_CONSOLE_NOTIFICATION;
         } else {
+
+            boolean backend = Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Reflection.isProxyServer();
+
+            if (backend) {
+                sender.sendMessage(Storage.ConfigSections.Messages.NO_PROXY.MESSAGE);
+                return true;
+            }
+
             enabled = Storage.NOTIFY_PLAYERS.contains(sender.getUniqueId());
 
             if (enabled)
