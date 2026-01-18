@@ -5,54 +5,6 @@ import io.netty.buffer.*;
 
 public class PacketUtils {
 
-    /*
-        Copyright (c) 2012, md_5. All rights reserved.
-        Original code from Bungeecord source:
-        https://github.com/SpigotMC/BungeeCord/blob/master/protocol/src/main/java/net/md_5/bungee/protocol/DefinedPacket.java#L72-L94
-     */
-
-    public static String readString(ByteBuf buf) throws Exception {
-        return readString( buf, Short.MAX_VALUE );
-    }
-
-    public static String readString(ByteBuf byteBuf, int maxLength) throws Exception {
-        int len = readVarInt(byteBuf);
-        if ( len > maxLength * 3 )
-            throw new Exception("Cannot receive string longer than " + maxLength * 3 + " (got " + len + " bytes)" );
-
-        String string = byteBuf.toString(byteBuf.readerIndex(), len, StandardCharsets.UTF_8);
-        byteBuf.readerIndex(byteBuf.readerIndex() + len );
-
-        if (string.length() > maxLength)
-            throw new Exception( "Cannot receive string longer than " + maxLength + " (got " + string.length() + " characters)" );
-
-        return string;
-    }
-
-    /*
-        Copyright (c) 2012, md_5. All rights reserved.
-        Original code from Bungeecord source:
-        https://github.com/SpigotMC/BungeeCord/blob/master/protocol/src/main/java/net/md_5/bungee/protocol/DefinedPacket.java#L233-L261
-     */
-
-    public static int readVarInt(ByteBuf input) throws Exception {
-        return readVarInt(input, 5);
-    }
-
-    public static int readVarInt(ByteBuf input, int maxBytes) throws Exception {
-        int out = 0, bytes = 0;
-        byte in;
-
-        while (true) {
-            in = input.readByte();
-            out |= (in & 0x7F) << (bytes++ * 7);
-            if (bytes > maxBytes) throw new Exception( "VarInt too big (max " + maxBytes + ")" );
-            if ((in & 0x80) != 0x80) break;
-        }
-
-        return out;
-    }
-
    /*
         Copyright (c) 2012, md_5. All rights reserved.
         Original code from Bungeecord source:
