@@ -235,6 +235,10 @@ public class Communicator {
     }
 
     public static void sendNotificationPacket(CommandSender targetSender, String displayedCommand) {
+        if (!Storage.ConfigSections.Settings.FORWARD_CONSOLE_NOTIFICATIONS.ENABLED) {
+            return;
+        }
+
         final String serverName = targetSender.getServerName();
 
         for (ClientInfo client : CLIENTS) {
