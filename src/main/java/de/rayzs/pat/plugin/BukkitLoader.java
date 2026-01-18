@@ -292,6 +292,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
                 Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
                 "%player%", player.getName(),
                 "%command%", packet.getDisplayedCommand(),
+                "%server%", Storage.SERVER_NAME,
                 "%world%", player.getWorld().getName());
 
         Logger.info(notificationMessage);
