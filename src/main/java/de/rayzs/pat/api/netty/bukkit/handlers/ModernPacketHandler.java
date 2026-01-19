@@ -40,6 +40,8 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         }
 
         String text = (String) stringField.get(packetObj);
+        if (!text.isBlank() && text.charAt(0) != '/') text = '/' + text;
+
         if (Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
             MessageTranslator.send(
                     Bukkit.getConsoleSender(),
