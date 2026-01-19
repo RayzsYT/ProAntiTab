@@ -17,6 +17,11 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
         if (event.getCompletion().isEmpty()) return;
 
+        if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(cursor) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(cursor)) {
+            event.setCompletion(List.of());
+            return;
+        }
+
         final boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
         final UUID uuid = event.getSenderObj() instanceof UUID
                 ? (UUID) event.getSenderObj()
