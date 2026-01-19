@@ -19,6 +19,7 @@ public class TabCompletion extends FilteredTabCompletionEvent {
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(cursor) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(cursor)) {
             event.setCompletion(List.of());
+            event.setCancelled(true);
             return;
         }
 
