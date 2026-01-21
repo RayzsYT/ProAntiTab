@@ -57,7 +57,7 @@ base-command-case-sensitive: true
 allow-group-overruling: false
 
 # Enabling this updates player groups on each server switch, meaning you can
-# give an user the permission to a PAT group with a server context to only
+# give a user the permission to a PAT group with a server context to only
 # give the player the PAT group when he's on a certain server.
 #
 # Example command:
