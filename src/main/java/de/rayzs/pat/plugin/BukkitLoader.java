@@ -209,7 +209,10 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     @Override
     public String getPlayerServerName(UUID uuid) {
-        return null;
+        final Player player = Bukkit.getPlayer(uuid);
+        if (player == null) { return null; }
+
+        return player.getWorld().getName();
     }
 
     @Override
