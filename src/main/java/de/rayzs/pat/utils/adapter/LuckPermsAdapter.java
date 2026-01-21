@@ -4,6 +4,7 @@ import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
+import net.luckperms.api.context.ImmutableContextSet;
 import net.luckperms.api.event.sync.PreNetworkSyncEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.plugin.VelocityLoader;
@@ -15,6 +16,8 @@ import net.luckperms.api.event.node.*;
 import de.rayzs.pat.utils.Reflection;
 import net.luckperms.api.node.*;
 import net.luckperms.api.*;
+import net.luckperms.api.query.QueryOptions;
+
 import java.util.*;
 
 public class LuckPermsAdapter {
@@ -44,16 +47,28 @@ public class LuckPermsAdapter {
     }
 
     public static Map<String, Boolean> getPermissions(UUID uuid) {
-        User user = getUser(uuid);
-        if (user == null) return null;
+        final User user = PROVIDER.getUserManager().getUser(uuid);
 
-        return user.getCachedData().getPermissionData().getPermissionMap();
+        if (user == null) {
+            return null;
+        }
+
+        final ImmutableContextSet.Builder builder = ImmutableContextSet.builder();
+
+        if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED || Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_WORLD.ENABLED) {
+            final String contextValue = Storage.getLoader().getPlayerServerName(uuid);
+
+            if (contextValue != null) {
+                builder.add("server", contextValue).add("world", contextValue);
+            }
+        }
+
+        return user.getCachedData().getPermissionData(QueryOptions.contextual(builder.build())).getPermissionMap();
     }
 
     public static void setPermissions(UUID uuid) {
         Map<String, Boolean> permissions = getPermissions(uuid);
         if (permissions == null) return;
-
 
         permissions.forEach((permission, permitted) -> {
 
