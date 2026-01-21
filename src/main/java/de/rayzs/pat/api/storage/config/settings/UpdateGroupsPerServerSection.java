@@ -6,7 +6,6 @@ import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class UpdateGroupsPerServerSection extends ConfigStorage {
 
-    // Disabled for now
     public boolean ENABLED = false;
 
     public UpdateGroupsPerServerSection() {
@@ -17,11 +16,9 @@ public class UpdateGroupsPerServerSection extends ConfigStorage {
     public void load() {
         super.load();
 
-        /*
         if (!Reflection.isProxyServer())
             return;
 
         ENABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
-        */
     }
 }

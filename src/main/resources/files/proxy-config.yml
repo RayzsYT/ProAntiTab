@@ -56,6 +56,14 @@ base-command-case-sensitive: true
 # inside a PAT group.
 allow-group-overruling: false
 
+# Enabling this updates player groups on each server switch, meaning you can
+# give an user the permission to a PAT group with a server context to only
+# give the player the PAT group when he's on a certain server.
+#
+# Example command:
+#   lpv (...) permission set proantitab.group.<group> server=<server>
+update-groups-per-server: false
+
 # Enabling this forwards the notification message to the backend
 # server so it will be displayed there as well. (Only in console)
 forward-console-notification-alerts: false
