@@ -3,6 +3,7 @@ package de.rayzs.pat.plugin.listeners.bukkit;
 import de.rayzs.pat.api.event.events.FilteredSuggestionEvent;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.scheduler.PATScheduler;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.event.player.PlayerCommandSendEvent;
@@ -63,6 +64,13 @@ public class BukkitAntiTabListener implements Listener {
         }
 
         if (PermissionUtil.hasBypassPermission(sender)) {
+            return;
+        }
+
+        if (Reflection.isCraftbukkit() && !Bukkit.getOnlinePlayers().contains(player)) {
+            event.getCommands().clear();
+
+            PATScheduler.createScheduler(player::updateCommands, 10);
             return;
         }
 
