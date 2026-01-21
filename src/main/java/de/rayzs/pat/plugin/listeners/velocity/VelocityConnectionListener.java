@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.proxy.server.ServerInfo;
 import de.rayzs.pat.api.brand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
@@ -33,7 +34,13 @@ public class VelocityConnectionListener {
     public void onServerPreConnect(ServerPreConnectEvent event) {
         final Player player = event.getPlayer();
         final CommandSender sender = CommandSenderHandler.from(player);
+
         sender.updateSenderObject(player);
+
+        if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
+            final ServerInfo serverInfo = event.getOriginalServer().getServerInfo();
+            if (serverInfo != null) Storage.TEMP_PLAYER_SERVER_CACHE.put(player.getUniqueId(), serverInfo.getName());
+        }
 
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
 
@@ -54,7 +61,7 @@ public class VelocityConnectionListener {
 
     @Subscribe
     public void onServerSwitch(ServerConnectedEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
 
         if (!VelocityPacketAnalyzer.isInjected(player)) {
 
@@ -72,8 +79,10 @@ public class VelocityConnectionListener {
         }
 
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
-            CommandSender sender = CommandSenderHandler.from(player);
+            final ServerInfo serverInfo = event.getServer().getServerInfo();
+            if (serverInfo != null) Storage.TEMP_PLAYER_SERVER_CACHE.put(player.getUniqueId(), serverInfo.getName());
 
+            CommandSender sender = CommandSenderHandler.from(player);
             assert sender != null;
             PermissionUtil.reloadPermissions(sender);
         }
