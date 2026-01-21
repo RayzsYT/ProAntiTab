@@ -221,6 +221,11 @@ public class VelocityLoader implements PluginLoader {
 
     @Override
     public String getPlayerServerName(UUID uuid) {
+        final String cachedServerName = Storage.TEMP_PLAYER_SERVER_CACHE.get(uuid);
+        if (cachedServerName != null) {
+            return cachedServerName;
+        }
+
         Optional<Player> optPlayer = server.getPlayer(uuid);
 
         if (optPlayer.isEmpty())
@@ -229,8 +234,9 @@ public class VelocityLoader implements PluginLoader {
         Player player = optPlayer.get();
         Optional<ServerConnection> optConnection = player.getCurrentServer();
 
-        if (optConnection.isEmpty())
+        if (optConnection.isEmpty()) {
             return null;
+        }
 
         ServerConnection connection = optConnection.get();
         return connection.getServer().getServerInfo().getName();

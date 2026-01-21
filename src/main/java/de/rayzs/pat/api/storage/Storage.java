@@ -66,6 +66,8 @@ public class Storage {
     public static boolean USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false, USE_VELOCITY = false, USE_SIMPLECLOUD;
     public static long LAST_SYNC = System.currentTimeMillis();
 
+    public static ExpireCache<UUID, String> TEMP_PLAYER_SERVER_CACHE = new ExpireCache<>(1, TimeUnit.SECONDS);
+
     private static PermissionPlugin PERMISSION_PLUGIN = PermissionPlugin.NONE;
 
     public static void initialize(PluginLoader loader, String currentVersion) {

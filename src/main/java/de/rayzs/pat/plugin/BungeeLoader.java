@@ -178,10 +178,16 @@ public class BungeeLoader extends Plugin implements PluginLoader {
 
     @Override
     public String getPlayerServerName(UUID uuid) {
+        final String cachedServerName = Storage.TEMP_PLAYER_SERVER_CACHE.get(uuid);
+        if (cachedServerName != null) {
+            return cachedServerName;
+        }
+
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
 
-        if (player == null || player.getServer() == null || player.getServer().getInfo() == null)
+        if (player == null || player.getServer() == null || player.getServer().getInfo() == null) {
             return null;
+        }
 
         return player.getServer().getInfo().getName();
     }
