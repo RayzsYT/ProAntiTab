@@ -9,7 +9,7 @@ import java.util.*;
 
 public class Reflection {
 
-    private static boolean legacy, proxy, velocity, paper, folia, weird, oldChannelMethod;
+    private static boolean legacy, proxy, velocity, paper, folia, craftbukkit, weird, oldChannelMethod;
     private static String versionName, fullVersionName, rawVersionName, versionPackageName;
     private static Version version;
     private static int major, minor, release;
@@ -17,13 +17,19 @@ public class Reflection {
     public static void initialize(Object serverObj) {
         try {
             Class.forName("org.bukkit.Server");
+
             loadVersionName(serverObj);
             loadAges();
             loadVersionEnum();
+
             legacy = minor <= 16;
             weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() > 20;
             proxy = false;
-        } catch (Throwable ignored) { proxy = true; }
+
+        } catch (Throwable ignored) {
+            proxy = true;
+            craftbukkit = false;
+        }
 
         if (!proxy) {
             try {
@@ -56,6 +62,17 @@ public class Reflection {
         if (proxy) version = Version.UNKNOWN;
 
         oldChannelMethod = folia || paper && Reflection.isWeird();
+
+
+        if (!proxy && !paper && !folia) {
+            try {
+                Class.forName("org.spigotmc.SpigotConfig");
+                craftbukkit = false;
+            } catch (Throwable throwable) {
+                craftbukkit = true;
+            }
+        }
+
     }
 
     public static void toggleInjectionMethod() {
@@ -74,6 +91,10 @@ public class Reflection {
 
     public static boolean isFoliaServer() {
         return folia;
+    }
+
+    public static boolean isCraftbukkit() {
+        return craftbukkit;
     }
 
     public static boolean isProxyServer() {
@@ -401,8 +422,7 @@ public class Reflection {
         v_1_18_1, v_1_18_2,
         v_1_19, v_1_19_1, v_1_19_2, v_1_19_3, v_1_19_4,
         v_1_20, v_1_20_1, v_1_20_2, v_1_20_3, v_1_20_4, v_1_20_5, v_1_20_6,
-        v_1_21, v_1_21_1, v_1_21_2, v_1_21_3, v_1_21_4, v_1_21_5, v_1_21_6, v_1_21_7, v_1_21_8,
-        v_1_22, v_1_22_1, v_1_22_2
+        v_1_21, v_1_21_1, v_1_21_2, v_1_21_3, v_1_21_4, v_1_21_5, v_1_21_6, v_1_21_7, v_1_21_8, v_1_21_9, v_1_21_10, v_1_21_11
     }
 
     public enum SearchOption { CONTAINS, EQUALS, ENDS, STARTS }
