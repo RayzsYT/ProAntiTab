@@ -24,7 +24,10 @@ public class CommandWhitelistConverter extends Converter {
             List<String> commands = new ArrayList<>();
 
             final List<String> l1 = (ArrayList<String>) config.get("groups." + groupName + ".commands");
-            final List<String> l2 = (ArrayList<String>) config.get("groups." + groupName + ".subcommands");
+            final List<String> l2 = ((ArrayList<String>) config.get("groups." + groupName + ".subcommands"))
+                    .stream()
+                    .map(c -> Storage.Blacklist.BlockType.NEGATE + c)
+                    .toList();
 
             commands.addAll(l1);
             commands.addAll(l2);
