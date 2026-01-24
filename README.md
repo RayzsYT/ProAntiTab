@@ -122,7 +122,7 @@ enabled: false
 
 ######
 # **C**USTOM PLUGINS LIST
-Just blocking the /plugins command is pretty boring after some time. This feature here allows you to make it more interesting by faking a /plugins message with, for example, fake plugins! ^^
+Just blocking the /plugins command is pretty boring. This feature here allows you to make it more interesting by displaying for example fake plugins.
 
 ![https://www.rayzs.de/proantitab/assets/fakeplugins2.PNG](https://www.rayzs.de/proantitab/assets/fakeplugins2.PNG)
 <details>
@@ -146,7 +146,7 @@ message:
 
 ######
 # **C**USTOM VERSION COMMAND
-Who wouldn't like to pretend to own a custom server-jar? Have fun customizing your very own /version command to your personal liking. ^^
+Who wouldn't like to pretend to own a custom server-jar? Have fun customizing your very own /version command to your personal liking.
 
 ![https://www.rayzs.de/proantitab/assets/custom-version.png](https://www.rayzs.de/proantitab/assets/custom-version.png)
 <details>
