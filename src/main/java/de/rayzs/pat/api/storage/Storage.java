@@ -258,6 +258,7 @@ public class Storage {
 
             if (!Reflection.isVelocityServer()) {
                 BungeePacketAnalyzer.sendCommandsPacket();
+                Communicator.sendUpdateCommand();
             }
 
             return;
