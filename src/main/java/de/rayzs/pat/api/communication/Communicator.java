@@ -40,10 +40,12 @@ public class Communicator {
                         LAST_BUKKIT_SYNC = System.currentTimeMillis();
 
     public static void sendPacket(Object packet) {
+        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) return;
         CLIENT.send(packet);
     }
 
     public static void sendPacket(ClientInfo clientInfo, Object packet) {
+        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) return;
         clientInfo.sendBytes(CommunicationPackets.convertToBytes(packet));
     }
 
