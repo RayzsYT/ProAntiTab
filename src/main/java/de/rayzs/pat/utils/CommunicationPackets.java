@@ -85,6 +85,55 @@ public class CommunicationPackets {
         }
     }
 
+    // Proxy to Backend (P2B)
+    public static class P2BMessagePacket implements CommunicationPacket, Serializable {
+        private final String proxyToken, message;
+
+        public P2BMessagePacket(String proxyToken, String message) {
+            this.proxyToken = proxyToken;
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public boolean isToken(String token) {
+            return proxyToken.equals(token);
+        }
+    }
+
+    public static class P2BExecutePacket implements CommunicationPacket, Serializable {
+        private final String proxyToken, command;
+        private final UUID targetUUID;
+
+        public P2BExecutePacket(String proxyToken, UUID targetUUID, String command) {
+            this.proxyToken = proxyToken;
+            this.targetUUID = targetUUID;
+            this.command = command;
+        }
+
+        public String getCommand() {
+            return command;
+        }
+
+        public boolean isConsole() {
+            return !isPlayer();
+        }
+
+        public boolean isPlayer() {
+            return targetUUID != null;
+        }
+
+        public UUID getTargetUUID() {
+            return targetUUID;
+        }
+
+        public boolean isToken(String token) {
+            return proxyToken.equals(token);
+        }
+    }
+
     public static class FeedbackPacket implements CommunicationPacket, Serializable {
         private final String proxyToken, serverId;
 

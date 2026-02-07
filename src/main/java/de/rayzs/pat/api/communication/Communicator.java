@@ -41,11 +41,14 @@ public class Communicator {
 
     public static void sendPacket(Object packet) {
         if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) return;
+
         CLIENT.send(packet);
     }
 
     public static void sendPacket(ClientInfo clientInfo, Object packet) {
         if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) return;
+        if (clientInfo == null) return;
+
         clientInfo.sendBytes(CommunicationPackets.convertToBytes(packet));
     }
 
@@ -84,6 +87,20 @@ public class Communicator {
                 return;
 
             BukkitLoader.handleUpdateCommandsPacket(updateCommandsPacket);
+        }
+
+        if (packet instanceof CommunicationPackets.P2BExecutePacket p2BExecutePacket) {
+            if (Reflection.isProxyServer())
+                return;
+
+            BukkitLoader.handleP2BExecute(p2BExecutePacket);
+        }
+
+        if (packet instanceof CommunicationPackets.P2BMessagePacket p2bMessagePacket) {
+            if (Reflection.isProxyServer())
+                return;
+
+            BukkitLoader.handleP2BMessage(p2bMessagePacket);
         }
 
         if (packet instanceof CommunicationPackets.ForcePermissionResetPacket permissionResetPacket) {
@@ -219,7 +236,7 @@ public class Communicator {
     }
 
     public static void sendRequest() {
-        if(System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
+        if (System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
             LAST_SENT_REQUEST = System.currentTimeMillis();
             sendPacket(new CommunicationPackets.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
         }
@@ -228,6 +245,20 @@ public class Communicator {
     public static void sendPermissionReset() {
         if (Reflection.isProxyServer()) {
             sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN));
+        }
+    }
+
+    public static void sendP2BMessage(String serverName, String message) {
+        if (Reflection.isProxyServer()) {
+            ClientInfo client = getClientByName(serverName);
+            sendPacket(client, new CommunicationPackets.P2BMessagePacket(Storage.TOKEN, message));
+        }
+    }
+
+    public static void sendP2BExecute(String serverName, UUID targetUUID, String command) {
+        if (Reflection.isProxyServer()) {
+            ClientInfo client = getClientByName(serverName);
+            sendPacket(client, new CommunicationPackets.P2BExecutePacket(Storage.TOKEN, targetUUID, command));
         }
     }
 
@@ -253,7 +284,9 @@ public class Communicator {
     }
 
     public static void sendUpdateCommand(UUID targetUUID) {
-        sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN, targetUUID));
+        if (Reflection.isProxyServer()) {
+            sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN, targetUUID));
+        }
     }
 
     public static void sendFeedback() {

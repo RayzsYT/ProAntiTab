@@ -34,13 +34,15 @@ public class ExecuteCommand extends ExecuteCommandEvent {
             return;
 
         UUID uuid = sender.getUniqueId();
+        String serverName = sender.getServerName();
+        String playerName = sender.getName();
 
         if (isBlocked(sender, command)) {
             event.setBlocked(true);
             event.setCancelled(true);
 
             MessageTranslator.send(event.getSenderObj(),
-                    ResponseHandler.getResponse(uuid, event.getCommand()),
+                    ResponseHandler.getResponse(uuid, playerName, serverName, event.getCommand()),
                     "%command%", displayCommand);
 
             return;
@@ -53,7 +55,7 @@ public class ExecuteCommand extends ExecuteCommandEvent {
 
         MessageTranslator.send(
                 event.getSenderObj(),
-                ResponseHandler.getResponse(uuid, event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()),
+                ResponseHandler.getResponse(uuid, playerName, serverName, event.getCommand(), Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()),
                 "%command%", StringUtils.getFirstArg(displayCommand)
         );
 

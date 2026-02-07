@@ -314,6 +314,22 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         }
     }
 
+    public static void handleP2BExecute(CommunicationPackets.P2BExecutePacket packet) {
+        if (packet.isConsole()) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packet.getCommand());
+            return;
+        }
+
+        final Player player = Bukkit.getPlayer(packet.getTargetUUID());
+        if (player == null) return;
+
+        Bukkit.dispatchCommand(player, packet.getCommand());
+    }
+
+    public static void handleP2BMessage(CommunicationPackets.P2BMessagePacket packet) {
+        Logger.info(packet.getMessage());
+    }
+
     public static void synchronize(CommunicationPackets.PacketBundle packetBundle) {
         Storage.LAST_SYNC = System.currentTimeMillis();
         Communicator.sendFeedback();

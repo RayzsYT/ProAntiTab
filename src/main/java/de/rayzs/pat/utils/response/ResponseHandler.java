@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.response;
 
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
@@ -106,11 +107,11 @@ public class ResponseHandler {
         return replaceArgsVariables(input, command);
     }
 
-    public static List<String> getResponse(UUID uuid, String input) {
-        return getResponse(uuid, input, Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE.getLines());
+    public static List<String> getResponse(UUID uuid, String playerName, String serverName, String input) {
+        return getResponse(uuid, playerName, serverName, input, Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE.getLines());
     }
 
-    public static List<String> getResponse(UUID uuid, String input, List<String> defaultMessage) {
+    public static List<String> getResponse(UUID uuid, String playerName, String serverName, String input, List<String> defaultMessage) {
         final String finalInput = input.startsWith("/") && input.length() > 1
                 ? input.substring(1)
                 : input;
@@ -124,7 +125,7 @@ public class ResponseHandler {
         }).findFirst();
 
         if (uuid != null && optionalResponse.isPresent()) {
-            optionalResponse.get().executeAction(uuid, finalInput);
+            optionalResponse.get().executeAction(uuid, playerName, serverName, finalInput);
 
             return new ArrayList<>(optionalResponse.get().message)
                     .stream().map(s -> replaceArgsVariables(s, finalInput))
@@ -144,7 +145,7 @@ public class ResponseHandler {
             this.actions = (List<String>) Storage.Files.CUSTOM_RESPONSES.getOrSet(key + ".actions", new ArrayList<>());
         }
 
-        public void executeAction(UUID uuid, String command) {
+        public void executeAction(UUID uuid, String playerName, String serverName, String command) {
             String[] split;
 
             for (String action : actions) {
@@ -321,6 +322,110 @@ public class ResponseHandler {
                         }
 
                         ActionHandler.sendActionbar(action, uuid, command, split[1]);
+                        continue;
+
+                    case "p2b-message":
+
+                        if (!Reflection.isProxyServer()) {
+                            Logger.warning("! Could not execute action: " + action);
+                            Logger.warning("  > Cannot send p2b-packets on a backend server!");
+                            Logger.warning("  > This only works on proxy servers!");
+                            Logger.warning("  > P2B -> Proxy to Backend");
+                            continue;
+                        }
+
+                        if (serverName == null) {
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Failed to fetch servername player is on!");
+                            continue;
+                        }
+
+                        if (split.length == 1) {
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Action requires 1 arguments but only has " + split.length);
+                            Logger.warning("  > Here's an example to compare with:");
+                            Logger.warning("  > p2b-message::text");
+                            Logger.warning("  > e.g: p2b-message::&cUser %player% is evil!");
+                            continue;
+                        }
+
+                        Communicator.sendP2BMessage(
+                                serverName,
+                                ResponseHandler.replaceArgsVariables(
+                                        StringUtils.replace(split[1], "%player%", playerName),
+                                        command
+                                )
+                        );
+                        continue;
+
+                    case "p2b-execute":
+
+                        if (!Reflection.isProxyServer()) {
+                            Logger.warning("! Could not execute action: " + action);
+                            Logger.warning("  > Cannot send p2b-packets on a backend server!");
+                            Logger.warning("  > This only works on proxy servers!");
+                            Logger.warning("  > P2B -> Proxy to Backend");
+                            continue;
+                        }
+
+                        if (serverName == null) {
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Failed to fetch servername player is on!");
+                            continue;
+                        }
+
+                        if (split.length == 1) {
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Action requires 1 arguments but only has " + split.length);
+                            Logger.warning("  > Here's an example to compare with:");
+                            Logger.warning("  > p2b-execute::command");
+                            Logger.warning("  > e.g: p2b-execute::help");
+                            continue;
+                        }
+
+                        Communicator.sendP2BExecute(
+                                serverName,
+                                uuid,
+                                ResponseHandler.replaceArgsVariables(
+                                        StringUtils.replace(split[1], "%player%", playerName),
+                                        command
+                                )
+                        );
+                        continue;
+
+                    case "p2b-console":
+
+                        if (!Reflection.isProxyServer()) {
+                            Logger.warning("! Could not execute action: " + action);
+                            Logger.warning("  > Cannot send p2b-packets on a backend server!");
+                            Logger.warning("  > This only works on proxy servers!");
+                            Logger.warning("  > P2B -> Proxy to Backend");
+                            continue;
+                        }
+
+                        if (serverName == null) {
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Failed to fetch servername player is on!");
+                            continue;
+                        }
+
+                        if (split.length == 1) {
+                            Logger.warning("! Failed to read action: " + action);
+                            Logger.warning("  > Action requires 1 arguments but only has " + split.length);
+                            Logger.warning("  > Here's an example to compare with:");
+                            Logger.warning("  > p2b-console::command");
+                            Logger.warning("  > e.g: p2b-console::help");
+                            continue;
+                        }
+
+                        Communicator.sendP2BExecute(
+                                serverName,
+                                null,
+                                ResponseHandler.replaceArgsVariables(
+                                        StringUtils.replace(split[1], "%player%", playerName),
+                                        command
+                                )
+                        );
                 }
 
             }

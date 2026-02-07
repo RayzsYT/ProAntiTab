@@ -31,6 +31,15 @@
 #   Play sound: (Available sounds: https://www.digminecraft.com/lists/sound_list_pc.php)
 #        Syntax:  sound::soundName::volume::pitch
 #        Example: sound::entity.ender_dragon.growl::1.0::1.0
+#   Send console message to backend server:
+#        Syntax:  p2b-message::text
+#        Example: p2b-message::&cPlayer &4%player% &cdid something bad.
+#   Execute console command on backend:
+#        Syntax:  p2b-console::command
+#        Example: p2b-console::tp %player% 0 0 0
+#   Execute player command on backend:
+#        Syntax:  p2b-execute::command
+#        Example: p2b-execute::help
 
 #   Possible variable:
 #     %args[from-to]% to get the command arguments
