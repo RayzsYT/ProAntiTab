@@ -262,16 +262,14 @@ public class Communicator {
         }
     }
 
-    public static void sendNotificationPacket(CommandSender targetSender, String displayedCommand) {
+    public static void sendNotificationPacket(UUID targetUUID, String serverName, String displayedCommand) {
         if (!Storage.ConfigSections.Settings.FORWARD_CONSOLE_NOTIFICATIONS.ENABLED) {
             return;
         }
 
-        final String serverName = targetSender.getServerName();
-
         for (ClientInfo client : CLIENTS) {
             if (client.getName().equalsIgnoreCase(serverName)) {
-                sendPacket(client, new CommunicationPackets.NotificationPacket(Storage.TOKEN, targetSender.getUniqueId(), displayedCommand));
+                sendPacket(client, new CommunicationPackets.NotificationPacket(Storage.TOKEN, targetUUID, displayedCommand));
                 return;
             }
         }

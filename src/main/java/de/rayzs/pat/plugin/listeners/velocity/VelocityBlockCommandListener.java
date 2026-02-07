@@ -63,7 +63,7 @@ public class VelocityBlockCommandListener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
 
-            Communicator.sendNotificationPacket(sender, displayCommand);
+            Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
 
             MessageTranslator.send(
                     player,
@@ -87,7 +87,7 @@ public class VelocityBlockCommandListener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
 
-            Communicator.sendNotificationPacket(sender, displayCommand);
+            Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
 
             MessageTranslator.send(
                     player,
@@ -143,7 +143,7 @@ public class VelocityBlockCommandListener {
                 if (!executeCommandEvent.doesNotify())
                     return event;
 
-                Communicator.sendNotificationPacket(sender, displayCommand);
+                Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
 
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
                     MessageTranslator.send(consoleSender, notificationMessage);

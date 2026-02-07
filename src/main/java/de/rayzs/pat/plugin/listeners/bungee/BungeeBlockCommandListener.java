@@ -52,7 +52,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
 
-            Communicator.sendNotificationPacket(sender, displayCommand);
+            Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
 
             MessageTranslator.send(
                     player,
@@ -76,7 +76,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
 
-            Communicator.sendNotificationPacket(sender, displayCommand);
+            Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
 
             MessageTranslator.send(
                     player,
@@ -130,7 +130,7 @@ public class BungeeBlockCommandListener implements Listener {
                 if (!executeCommandEvent.doesNotify())
                     return;
 
-                Communicator.sendNotificationPacket(sender, displayCommand);
+                Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
 
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
                     Logger.info(notificationMessage);
