@@ -149,6 +149,12 @@ public class ResponseHandler {
             String[] split;
 
             for (String action : actions) {
+
+                if (action.equals("alert")) {
+                    ActionHandler.alert(uuid, playerName, serverName, command);
+                    continue;
+                }
+
                 if (!action.contains("::")) {
                     Logger.warning("! Could not recognise action: " + action);
                     Logger.warning("  > Syntax does not match at all. Have you used the splitters (::) correctly?");

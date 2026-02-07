@@ -36,4 +36,8 @@ public class ActionHandler {
     public static void sendActionbar(String action, UUID uuid, String command, String message) {
         ACTION.sendActionbar(action, uuid, command, message);
     }
+
+    public static void alert(UUID uuid, String playerName, String serverName, String command) {
+        ACTION.alert(uuid, playerName, serverName, command);
+    }
 }
