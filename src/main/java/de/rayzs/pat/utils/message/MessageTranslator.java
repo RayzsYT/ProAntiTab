@@ -142,6 +142,7 @@ public class MessageTranslator {
                 "%pat_general_prefix%", Storage.ConfigSections.Messages.PREFIX.PREFIX,
                 "%token%", token,
                 "%sync_server_name%", serverName,
+                "%server%", serverName,
                 "%current_version%", Storage.CURRENT_VERSION,
                 "%newest_version%", Storage.NEWER_VERSION
         );
