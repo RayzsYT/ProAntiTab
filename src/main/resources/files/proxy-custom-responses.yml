@@ -72,9 +72,10 @@
 # Example for all blocked commands.
 # This applies to all commands as well as sub-arguments,
 # unless you have specified another custom response.
-# Make sure to put this custom-responses on the very bottom
-# of all your custom-responses, since PAT iterates through each
-# custom-response by order.
+# (!) Make sure to put this custom-responses on the very bottom of all
+#     your custom-responses, since PAT iterates through each of all
+#     your custom-responses, since PAT iterates through each
+#     custom-response by order.
 #example-with-everything:
 #  triggers:
 #    - "*"
