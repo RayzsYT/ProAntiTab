@@ -291,9 +291,11 @@ public class ResponseHandler {
                             Logger.warning("  > Here's an example to compare with:");
                             Logger.warning("  > console::command");
                             Logger.warning("  > e.g: console::say Hello world!");
+                            continue;
                         }
 
                         ActionHandler.executeConsoleCommand(action, uuid, command, split[1]);
+                        continue;
 
                     case "execute":
                         if (split.length == 1) {
@@ -302,9 +304,11 @@ public class ResponseHandler {
                             Logger.warning("  > Here's an example to compare with:");
                             Logger.warning("  > execute::command");
                             Logger.warning("  > e.g: execute::help");
+                            continue;
                         }
 
                         ActionHandler.executePlayerCommand(action, uuid, command, split[1]);
+                        continue;
 
                     case "actionbar":
                         if (split.length == 1) {
@@ -313,6 +317,7 @@ public class ResponseHandler {
                             Logger.warning("  > Here's an example to compare with:");
                             Logger.warning("  > actionbar::text");
                             Logger.warning("  > e.g: actionbar::I like COOKIES");
+                            continue;
                         }
 
                         ActionHandler.sendActionbar(action, uuid, command, split[1]);
