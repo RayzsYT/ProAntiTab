@@ -9,6 +9,7 @@ import com.mojang.brigadier.tree.CommandNode;
 
 import com.mojang.brigadier.tree.RootCommandNode;
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.subarguments.SubArguments;
@@ -220,6 +221,10 @@ public class BungeePacketAnalyzer {
     }
 
     public static void sendCommandsPacket() {
+        if (Communicator.CLIENTS.isEmpty()) {
+            return;
+        }
+
         for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
             if (player.getPendingConnection().getVersion() < 754)
                 continue;
