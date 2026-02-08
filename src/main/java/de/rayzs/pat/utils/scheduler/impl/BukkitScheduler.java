@@ -3,10 +3,16 @@ package de.rayzs.pat.utils.scheduler.impl;
 import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
 import de.rayzs.pat.plugin.BukkitLoader;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class BukkitScheduler implements PATSchedulerTask {
 
     private int taskId = -1;
+
+    @Override
+    public void getInstance(Runnable runnable, Player player) {
+        getInstance(false, runnable);
+    }
 
     @Override
     public PATSchedulerTask getInstance(boolean async, Runnable runnable, long time, long period) {

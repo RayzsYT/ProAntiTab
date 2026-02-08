@@ -2,8 +2,16 @@ package de.rayzs.pat.utils.scheduler;
 
 import de.rayzs.pat.utils.scheduler.impl.*;
 import de.rayzs.pat.utils.Reflection;
+import org.bukkit.entity.Player;
 
 public class PATScheduler {
+
+    public static void execute(Runnable runnable, Player player) {
+        if (Reflection.isFoliaServer())
+            new FoliaScheduler().getInstance(runnable, player);
+        else
+            new BukkitScheduler().getInstance(runnable, player);
+    }
 
     public static PATSchedulerTask createScheduler(Runnable runnable, long time, long period) {
         return Reflection.isFoliaServer()

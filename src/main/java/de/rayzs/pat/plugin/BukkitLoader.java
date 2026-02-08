@@ -316,17 +316,15 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     public static void handleP2BExecute(CommunicationPackets.P2BExecutePacket packet) {
-        PATScheduler.createScheduler(() -> {
-            if (packet.isConsole()) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packet.getCommand());
+         if (packet.isConsole()) {
+             PATScheduler.execute(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packet.getCommand()), null);
                 return;
             }
 
             final Player player = Bukkit.getPlayer(packet.getTargetUUID());
             if (player == null) return;
 
-            Bukkit.dispatchCommand(player, packet.getCommand());
-        });
+            PATScheduler.execute(() -> Bukkit.dispatchCommand(player, packet.getCommand()), player);
     }
 
     public static void handleP2BMessage(CommunicationPackets.P2BMessagePacket packet) {

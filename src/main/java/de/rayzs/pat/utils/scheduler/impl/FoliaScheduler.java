@@ -4,12 +4,23 @@ import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
 import io.papermc.paper.threadedregions.scheduler.*;
 import de.rayzs.pat.plugin.BukkitLoader;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class FoliaScheduler implements PATSchedulerTask {
 
     private static final GlobalRegionScheduler SCHEDULER = Bukkit.getGlobalRegionScheduler();
 
     private ScheduledTask task;
+
+    @Override
+    public void getInstance(Runnable runnable, Player player) {
+
+        if (player == null) {
+            SCHEDULER.execute(BukkitLoader.getPlugin(), runnable);
+        } else {
+            player.getScheduler().run(BukkitLoader.getPlugin(), scheduledTask -> runnable.run(), null);
+        }
+    }
 
     @Override
     public PATSchedulerTask getInstance(boolean async, Runnable runnable, long time, long period) {
