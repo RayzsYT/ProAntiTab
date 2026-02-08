@@ -302,28 +302,31 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     public static void handleUpdateCommandsPacket(CommunicationPackets.UpdateCommandsPacket packet) {
+        PATScheduler.createScheduler(() -> {
+            if (!packet.hasTargetUUID()) {
+                Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+                return;
+            }
 
-        if (!packet.hasTargetUUID()) {
-            Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
-            return;
-        }
-
-        Player player = Bukkit.getPlayer(packet.getTargetUUID());
-        if (player != null && Reflection.getMinor() >= 13) {
-            player.updateCommands();
-        }
+            Player player = Bukkit.getPlayer(packet.getTargetUUID());
+            if (player != null && Reflection.getMinor() >= 13) {
+                player.updateCommands();
+            }
+        });
     }
 
     public static void handleP2BExecute(CommunicationPackets.P2BExecutePacket packet) {
-        if (packet.isConsole()) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packet.getCommand());
-            return;
-        }
+        PATScheduler.createScheduler(() -> {
+            if (packet.isConsole()) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packet.getCommand());
+                return;
+            }
 
-        final Player player = Bukkit.getPlayer(packet.getTargetUUID());
-        if (player == null) return;
+            final Player player = Bukkit.getPlayer(packet.getTargetUUID());
+            if (player == null) return;
 
-        Bukkit.dispatchCommand(player, packet.getCommand());
+            Bukkit.dispatchCommand(player, packet.getCommand());
+        });
     }
 
     public static void handleP2BMessage(CommunicationPackets.P2BMessagePacket packet) {
