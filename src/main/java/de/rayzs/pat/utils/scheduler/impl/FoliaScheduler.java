@@ -12,7 +12,6 @@ public class FoliaScheduler implements PATSchedulerTask {
 
     private ScheduledTask task;
 
-    @Override
     public void getInstance(Runnable runnable, Player player) {
 
         if (player == null) {

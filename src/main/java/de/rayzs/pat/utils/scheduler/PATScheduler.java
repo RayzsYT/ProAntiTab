@@ -9,8 +9,7 @@ public class PATScheduler {
     public static void execute(Runnable runnable, Player player) {
         if (Reflection.isFoliaServer())
             new FoliaScheduler().getInstance(runnable, player);
-        else
-            new BukkitScheduler().getInstance(runnable, player);
+        else createScheduler(runnable);
     }
 
     public static PATSchedulerTask createScheduler(Runnable runnable, long time, long period) {
