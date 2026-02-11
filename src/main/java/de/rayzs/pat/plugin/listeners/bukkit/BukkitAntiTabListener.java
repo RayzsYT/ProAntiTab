@@ -30,7 +30,12 @@ public class BukkitAntiTabListener implements Listener {
         final UUID uuid = player.getUniqueId();
 
 
-        if (Storage.USE_VELOCITY) {
+        if (!BukkitLoader.isLoaded()) {
+            event.getCommands().clear();
+            return;
+        }
+
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             return;
         }
 
@@ -39,15 +44,6 @@ public class BukkitAntiTabListener implements Listener {
                 knownOperators.add(uuid);
             }
 
-            return;
-        }
-
-        if (!BukkitLoader.isLoaded()) {
-            event.getCommands().clear();
-            return;
-        }
-
-        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             return;
         }
 
@@ -112,7 +108,7 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     public static void updateCommands(Player player) {
-        if (Reflection.getMinor() >= 13 && !notUpdatablePlayer(player.getUniqueId()))
+        if (!notUpdatablePlayer(player.getUniqueId()))
             player.updateCommands();
     }
 

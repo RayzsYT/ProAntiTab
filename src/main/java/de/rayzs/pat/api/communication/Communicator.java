@@ -12,16 +12,10 @@ import de.rayzs.pat.api.communication.impl.BungeeClient;
 import de.rayzs.pat.api.communication.impl.VelocityClient;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
-import de.rayzs.pat.api.storage.blacklist.impl.GroupBlacklist;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.utils.CommunicationPackets;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.group.Group;
-import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.utils.sender.CommandSender;
 
 public class Communicator {
 
@@ -70,7 +64,11 @@ public class Communicator {
             if (!client.compareId(requestPacket.getServerId()))
                 client.setId(requestPacket.getServerId());
 
-            syncData(client.getId());
+
+            final CommunicationPackets.UnknownCommandPacket unknownCommandPacket = new CommunicationPackets.UnknownCommandPacket();
+            final CommunicationPackets.MessagePacket messagePacket = new CommunicationPackets.MessagePacket();
+
+            syncData(client.getId(), unknownCommandPacket, messagePacket);
             return;
         }
 
@@ -159,17 +157,19 @@ public class Communicator {
             if (!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString()))
                 return;
 
-            Storage.USE_VELOCITY = packetBundle.isVelocity();
             LAST_BUKKIT_SYNC = System.currentTimeMillis();
             BukkitLoader.synchronize(packetBundle);
         }
     }
 
     public static void syncData() {
-        syncData(null);
+        final CommunicationPackets.UnknownCommandPacket unknownCommandPacket = new CommunicationPackets.UnknownCommandPacket();
+        final CommunicationPackets.MessagePacket messagePacket = new CommunicationPackets.MessagePacket();
+
+        syncData(null, unknownCommandPacket, messagePacket);
     }
 
-    public static void syncData(String serverId) {
+    public static void syncData(String serverId, CommunicationPackets.UnknownCommandPacket unknownCommandPacket, CommunicationPackets.MessagePacket messagePacket) {
         if (!Reflection.isProxyServer() || Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
             return;
 
@@ -178,7 +178,7 @@ public class Communicator {
 
         if(serverId == null) {
             SERVER_DATA_SYNC_COUNT = 0;
-            CLIENTS.forEach(currentClient -> syncData(currentClient.getId()));
+            CLIENTS.forEach(currentClient -> syncData(currentClient.getId(), unknownCommandPacket, messagePacket));
             return;
 
         } else {
@@ -190,46 +190,11 @@ public class Communicator {
             SERVER_DATA_SYNC_COUNT = Math.max(0, SERVER_DATA_SYNC_COUNT -1);
         }
 
-        CommunicationPackets.CommandsPacket commandsPacket = new CommunicationPackets.CommandsPacket();
-        CommunicationPackets.GroupsPacket groupsPacket;
-        CommunicationPackets.PacketBundle bundle;
-        List<String> commands = new ArrayList<>();
-        String tempServerName = "";
+        final String serverName = clientInfo != null && clientInfo.getName() != null
+                ? clientInfo.getName()
+                : "";
 
-        if (clientInfo != null && clientInfo.getName() != null) {
-            tempServerName = clientInfo.getName();
-
-            if (!Storage.Blacklist.isIgnoredServer(tempServerName))
-                commands.addAll(Storage.Blacklist.getBlacklist().getCommands());
-
-            List<GeneralBlacklist> serverBlacklists = Storage.Blacklist.getServerBlacklists(clientInfo.getName());
-            serverBlacklists.stream().filter(serverBlacklist ->
-                    serverBlacklist != null && serverBlacklist.getCommands() != null
-            ).forEach(serverBlacklist ->
-                    commands.addAll(serverBlacklist.getCommands())
-            );
-        }
-
-        final String serverName = tempServerName;
-        List<TinyGroup> groups = new ArrayList<>();
-
-        TinyGroup tinyGroup;
-        for (Group group : GroupManager.getGroups()) {
-            if (groups.stream().anyMatch(cTG -> cTG.getGroupName().equals(group.getGroupName())))
-                continue;
-
-            tinyGroup = new TinyGroup(group.getGroupName(), group.getPriority(), group.getAllCommands(serverName));
-            for (GroupBlacklist groupBlacklist : group.getAllServerGroupBlacklist(serverName))
-                tinyGroup.addAll(groupBlacklist.getCommands());
-
-            groups.add(tinyGroup);
-        }
-
-        groupsPacket = new CommunicationPackets.GroupsPacket(groups);
-        commandsPacket.setTurnBlacklistToWhitelist(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
-        commandsPacket.setCommands(commands);
-
-        bundle = new CommunicationPackets.PacketBundle(Storage.TOKEN, serverId, commandsPacket, groupsPacket);
+        CommunicationPackets.PacketBundle bundle = new CommunicationPackets.PacketBundle(Storage.TOKEN, serverId, unknownCommandPacket, messagePacket);
         clientInfo.sendBytes(CommunicationPackets.convertToBytes(bundle));
 
         PATEventHandler.callSentSyncEvents(bundle, serverName);

@@ -1,7 +1,6 @@
 package de.rayzs.pat.utils;
 
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
-import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.api.storage.Storage;
 import java.util.*;
 import java.io.*;
@@ -221,27 +220,20 @@ public class CommunicationPackets {
 
     public static class PacketBundle implements CommunicationPacket, Serializable {
 
-        private final CommandsPacket commandsPacket;
-        private final GroupsPacket groupsPacket;
         private final UnknownCommandPacket unknownCommandPacket;
-        private final NamespaceCommandsPacket namespaceCommandsPacket;
         private final MessagePacket messagePacket;
-        private final String proxyToken, serverId;
-        private final boolean velocity;
 
-        public PacketBundle(String proxyToken, String serverId, CommandsPacket commandsPacket, GroupsPacket groupsPacket) {
+        private final String proxyToken, serverId;
+        private final boolean autoLowercaseCommands;
+
+        public PacketBundle(String proxyToken, String serverId, UnknownCommandPacket unknownCommandPacket, MessagePacket messagePacket) {
             this.proxyToken = proxyToken;
             this.serverId = serverId;
-            this.commandsPacket = commandsPacket;
-            this.groupsPacket = groupsPacket;
-            this.unknownCommandPacket = new UnknownCommandPacket();
-            this.namespaceCommandsPacket = new NamespaceCommandsPacket();
-            this.messagePacket = new MessagePacket();
-            this.velocity = Reflection.isVelocityServer();
-        }
 
-        public boolean isVelocity() {
-            return velocity;
+            this.unknownCommandPacket = unknownCommandPacket;
+            this.messagePacket = messagePacket;
+
+            this.autoLowercaseCommands = Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.ENABLED;
         }
 
         public boolean isToken(String token) {
@@ -256,61 +248,31 @@ public class CommunicationPackets {
             return serverId == null;
         }
 
-        public CommandsPacket getCommandsPacket() {
-            return commandsPacket;
+        public UnknownCommandPacket getUnknownCommandPacket() {
+            return unknownCommandPacket;
         }
-
-        public GroupsPacket getGroupsPacket() {
-            return groupsPacket;
-        }
-
-        public UnknownCommandPacket getUnknownCommandPacket() { return unknownCommandPacket; }
 
         public MessagePacket getMessagePacket() {
             return messagePacket;
         }
 
-        public NamespaceCommandsPacket getNamespaceCommandsPacket() {
-            return namespaceCommandsPacket;
+        public boolean isAutoLowercaseCommandsEnabled() {
+            return autoLowercaseCommands;
         }
     }
 
     public static class MessagePacket implements Serializable {
 
         private final String prefix;
-        private final MultipleMessagesHelper baseBlockedMessage, subBlockedMessage;
 
         public MessagePacket() {
             prefix = Storage.ConfigSections.Messages.PREFIX.PREFIX;
-            baseBlockedMessage = Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE;
-            subBlockedMessage = Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE;
         }
 
         public String getPrefix() {
             return prefix;
         }
 
-        public MultipleMessagesHelper getBaseBlockedMessage() {
-            return baseBlockedMessage;
-        }
-
-        public MultipleMessagesHelper getSubBlockedMessage() {
-            return subBlockedMessage;
-        }
-
-    }
-
-    public static class NamespaceCommandsPacket implements Serializable {
-
-        private final boolean enabled;
-
-        public NamespaceCommandsPacket() {
-            enabled = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED;
-        }
-
-        public boolean isEnabled() {
-            return enabled;
-        }
     }
 
     public static class UnknownCommandPacket implements Serializable {
@@ -329,41 +291,6 @@ public class CommunicationPackets {
 
         public boolean isEnabled() {
             return enabled;
-        }
-    }
-
-    public static class CommandsPacket implements Serializable {
-
-        private List<String> commands;
-        private boolean turnBlacklistToWhitelist;
-
-        public void setCommands(List<String> commands) {
-            this.commands = commands;
-        }
-
-        public void setTurnBlacklistToWhitelist(boolean turnBlacklistToWhitelist) {
-            this.turnBlacklistToWhitelist = turnBlacklistToWhitelist;
-        }
-
-        public boolean turnBlacklistToWhitelistEnabled() {
-            return turnBlacklistToWhitelist;
-        }
-
-        public List<String> getCommands() {
-            return commands;
-        }
-    }
-
-    public static class GroupsPacket implements Serializable {
-
-        private final List<TinyGroup> groups;
-
-        public GroupsPacket(List<TinyGroup> groups) {
-            this.groups = groups;
-        }
-
-        public List<TinyGroup> getGroups() {
-            return groups;
         }
     }
 }

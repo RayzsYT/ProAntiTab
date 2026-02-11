@@ -9,7 +9,6 @@ import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.utils.adapter.GroupManagerAdapter;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.group.TinyGroup;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
@@ -302,16 +301,21 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     public static void handleUpdateCommandsPacket(CommunicationPackets.UpdateCommandsPacket packet) {
+        if (Reflection.getMinor() < 13) {
+            return;
+        }
+
         PATScheduler.createScheduler(() -> {
             if (!packet.hasTargetUUID()) {
-                Bukkit.getOnlinePlayers().forEach(Player::updateCommands);
+                BukkitAntiTabListener.updateCommands();
                 return;
             }
 
             Player player = Bukkit.getPlayer(packet.getTargetUUID());
-            if (player != null && Reflection.getMinor() >= 13) {
-                player.updateCommands();
+            if (player != null) {
+                BukkitAntiTabListener.updateCommands(player);
             }
+
         });
     }
 
@@ -336,55 +340,12 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         Communicator.sendFeedback();
 
         CommunicationPackets.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
-        CommunicationPackets.CommandsPacket commandsPacket = packetBundle.getCommandsPacket();
-        CommunicationPackets.GroupsPacket groupsPacket = packetBundle.getGroupsPacket();
-        CommunicationPackets.NamespaceCommandsPacket namespaceCommandsPacket = packetBundle.getNamespaceCommandsPacket();
         CommunicationPackets.MessagePacket messagePacket = packetBundle.getMessagePacket();
 
-        boolean updatedList = false;
-
-        if (!messagePacket.getBaseBlockedMessage().getLines().isEmpty())
-            Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE = messagePacket.getBaseBlockedMessage();
-
-        if (!messagePacket.getSubBlockedMessage().getLines().isEmpty())
-            Storage.ConfigSections.Settings.CANCEL_COMMAND.SUB_COMMAND_RESPONSE = messagePacket.getSubBlockedMessage();
+        Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.ENABLED = packetBundle.isAutoLowercaseCommandsEnabled();
 
         if (!messagePacket.getPrefix().isEmpty())
             Storage.ConfigSections.Messages.PREFIX.PREFIX = messagePacket.getPrefix();
-
-        if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED != namespaceCommandsPacket.isEnabled())
-            Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.ENABLED = namespaceCommandsPacket.isEnabled();
-
-        if (commandsPacket.getCommands() == null || commandsPacket.getCommands().isEmpty())
-            Storage.Blacklist.getBlacklist().setList(new ArrayList<>());
-
-        else if (!ArrayUtils.compareStringArrays(Storage.Blacklist.getBlacklist().getCommands(), commandsPacket.getCommands())) {
-            updatedList = true;
-            Storage.Blacklist.getBlacklist().setList(commandsPacket.getCommands());
-        }
-
-        if (Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED != commandsPacket.turnBlacklistToWhitelistEnabled())
-            Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED = commandsPacket.turnBlacklistToWhitelistEnabled();
-
-        Map<String, List<String>> cpyCache = new HashMap<>();
-        GroupManager.getGroups().forEach(group -> {
-            cpyCache.put(group.getGroupName(), group.getCommands());
-        });
-
-        GroupManager.clearAllGroups();
-
-        for (TinyGroup group : groupsPacket.getGroups()) {
-            List<String> currentExistingList = cpyCache.get(group.getGroupName());
-            if (
-                    !updatedList
-                    && currentExistingList != null
-                    && !ArrayUtils.compareStringArrays(currentExistingList, group.getCommands())
-            ) {
-                updatedList = true;
-            }
-
-            GroupManager.setGroup(group.getGroupName(), group.getPriority(), group.getCommands());
-        }
 
         Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
         if (Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
@@ -392,10 +353,9 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         if (!loaded) {
             loaded = true;
-        }
 
-        if (Reflection.getMinor() >= 13 && updatedList) {
-            BukkitAntiTabListener.updateCommands();
+            if (Reflection.getMinor() >= 13)
+                BukkitAntiTabListener.updateCommands();
         }
 
         PATEventHandler.callReceiveSyncEvents(packetBundle);

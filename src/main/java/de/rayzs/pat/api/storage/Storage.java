@@ -63,7 +63,7 @@ public class Storage {
     public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
     public static Object PLUGIN_OBJECT;
-    public static boolean USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false, USE_VELOCITY = false, USE_SIMPLECLOUD;
+    public static boolean USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false, USE_SIMPLECLOUD;
     public static long LAST_SYNC = System.currentTimeMillis();
 
     public static ExpireCache<UUID, String> TEMP_PLAYER_SERVER_CACHE = new ExpireCache<>(1, TimeUnit.SECONDS);
@@ -188,6 +188,10 @@ public class Storage {
             Storage.handleChange();
         }
 
+        if (proxy) {
+            Communicator.syncData();
+        }
+
         ConfigUpdater.broadcastMissingParts();
         Storage.getLoader().handleReload();
     }
@@ -251,16 +255,15 @@ public class Storage {
             }
 
             GroupManager.clearServerGroupBlacklists();
-            Communicator.syncData();
 
             Storage.getLoader().updateCommandCache();
             Communicator.sendPermissionReset();
 
             if (!Reflection.isVelocityServer()) {
                 BungeePacketAnalyzer.sendCommandsPacket();
-                Communicator.sendUpdateCommand();
             }
 
+            Communicator.sendUpdateCommand();
             return;
         }
 
