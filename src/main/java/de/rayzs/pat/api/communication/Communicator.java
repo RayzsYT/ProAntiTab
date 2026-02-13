@@ -73,7 +73,7 @@ public class Communicator {
         }
 
         if (packet instanceof CommunicationPackets.NotificationPacket notificationPacket) {
-            if (!notificationPacket.isToken(Storage.TOKEN) || Reflection.isProxyServer()) {
+            if (Reflection.isProxyServer() || !notificationPacket.isToken(Storage.TOKEN)) {
                 return;
             }
 
@@ -88,24 +88,21 @@ public class Communicator {
         }
 
         if (packet instanceof CommunicationPackets.P2BExecutePacket p2BExecutePacket) {
-            if (Reflection.isProxyServer())
+            if (Reflection.isProxyServer() || !p2BExecutePacket.isToken(Storage.TOKEN))
                 return;
 
             BukkitLoader.handleP2BExecute(p2BExecutePacket);
         }
 
         if (packet instanceof CommunicationPackets.P2BMessagePacket p2bMessagePacket) {
-            if (Reflection.isProxyServer())
+            if (Reflection.isProxyServer() || !p2bMessagePacket.isToken(Storage.TOKEN))
                 return;
 
             BukkitLoader.handleP2BMessage(p2bMessagePacket);
         }
 
         if (packet instanceof CommunicationPackets.ForcePermissionResetPacket permissionResetPacket) {
-            if (Reflection.isProxyServer())
-                return;
-
-            if (!permissionResetPacket.isToken(Storage.TOKEN))
+            if (Reflection.isProxyServer() || !permissionResetPacket.isToken(Storage.TOKEN))
                 return;
 
             if (permissionResetPacket.hasTarget())
