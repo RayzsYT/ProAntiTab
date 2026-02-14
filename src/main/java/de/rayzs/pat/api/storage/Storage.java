@@ -60,7 +60,7 @@ public class Storage {
 
     public static final List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
 
-    public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
+    public static String TOKEN = "", CENSORED_TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
     public static Object PLUGIN_OBJECT;
     public static boolean USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false;
@@ -101,8 +101,8 @@ public class Storage {
 
         if (TOKEN != null && !TOKEN.isEmpty()) {
             int tokenLength = TOKEN.length(), cutIndex = Math.max(1, tokenLength - 3);
-            String censoredTokenDisplay = "*".repeat(cutIndex) + TOKEN.substring(cutIndex);
-            Logger.info("Token found! (" + censoredTokenDisplay + ")");
+            CENSORED_TOKEN = "*".repeat(cutIndex) + TOKEN.substring(cutIndex);
+            Logger.info("Token found! (" + CENSORED_TOKEN + ")");
         }
 
         if (loadBlacklist) Blacklist.loadAll();
