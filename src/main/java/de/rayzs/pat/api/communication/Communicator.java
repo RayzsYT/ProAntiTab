@@ -1,267 +1,352 @@
 package de.rayzs.pat.api.communication;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.api.communication.client.impl.BungeeClientInfo;
 import de.rayzs.pat.api.communication.client.impl.VelocityClientInfo;
-import de.rayzs.pat.api.communication.impl.BukkitClient;
-import de.rayzs.pat.api.communication.impl.BungeeClient;
-import de.rayzs.pat.api.communication.impl.VelocityClient;
-import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.CommunicationPackets;
+import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class Communicator {
 
-    private static final Client CLIENT =
-            Reflection.isVelocityServer() ? new VelocityClient()
-            : Reflection.isProxyServer() ? new BungeeClient()
-            : new BukkitClient();
 
-    private static final UUID SERVER_ID = UUID.randomUUID();
+    private static Communicator instance = null;
 
-    public static final List<ClientInfo> CLIENTS = new ArrayList<>();
+    public static void initialize(final Client client) {
+        if (instance != null) {
+            Logger.warning("Communicator instance is already initialized!");
+            return;
+        }
 
-    public static int SERVER_DATA_SYNC_COUNT = 0;
-    public static long LAST_DATA_UPDATE = System.currentTimeMillis(),
-                        LAST_SENT_REQUEST = 0,
-                        LAST_BUKKIT_SYNC = System.currentTimeMillis();
-
-    public static void sendPacket(Object packet) {
-        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) return;
-
-        CLIENT.send(packet);
+        instance = new Communicator(client);
     }
 
-    public static void sendPacket(ClientInfo clientInfo, Object packet) {
-        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) return;
-        if (clientInfo == null) return;
-
-        clientInfo.sendBytes(CommunicationPackets.convertToBytes(packet));
+    public static Communicator get() {
+        return instance;
     }
 
-    public static void receiveInformation(String serverName, Object packet) {
-        ClientInfo client = getClientByName(serverName);
 
-        if (packet instanceof CommunicationPackets.RequestPacket requestPacket) {
-            if (!requestPacket.isToken(Storage.TOKEN))
+    public static class Backend2Proxy {
+
+        private Backend2Proxy() {}
+
+        public static void sendIdentityRequest() {
+            get().send2Proxy(
+                    new CommunicationPackets.Backend2Proxy.IdentityRequestPacket(get().getId())
+            );
+        }
+
+        public static void sendKeepAliveRequest() {
+            get().send2Proxy(
+                    new CommunicationPackets.Backend2Proxy.KeepAlivePacket()
+            );
+        }
+
+    }
+
+    public static class Proxy2Backend {
+
+        private Proxy2Backend() {}
+
+        // Update commands for all players
+        public static void sendUpdateCommand() {
+            get().send2AllClients(
+                    new CommunicationPackets.Proxy2Backend.UpdatePacket(null)
+            );
+        }
+
+        // Update commands for a certain player.
+        public static void sendUpdateCommand(UUID playerId, String serverName) {
+            final ClientInfo clientInfo = get().clients.get(serverName);
+            if (clientInfo == null) return;
+
+            clientInfo.send(
+                    new CommunicationPackets.Proxy2Backend.UpdatePacket(playerId)
+            );
+        }
+
+        public static void sendDataSync() {
+            Communicator.get().lastSync = System.currentTimeMillis();
+
+            Communicator.get().send2AllClients(
+                    Communicator.get().constructDataSyncPacket()
+            );
+        }
+
+        // Sync data for one server
+        public static void sendDataSync(String serverName) {
+            final ClientInfo clientInfo = get().clients.get(serverName);
+            if (clientInfo == null) return;
+
+            clientInfo.send(
+                    Communicator.get().constructDataSyncPacket()
+            );
+        }
+
+        // Sync data for all registered clients.
+        public static void sendConsoleMessage(String serverName, String message) {
+            final ClientInfo clientInfo = get().clients.get(serverName);
+            if (clientInfo == null) return;
+
+            clientInfo.send(
+                    new CommunicationPackets.Proxy2Backend.ConsoleMessagePacket(message)
+            );
+        }
+
+        public static void sendExecutePlayerCommand(String serverName, UUID playerId, String command) {
+            final ClientInfo clientInfo = get().clients.get(serverName);
+            if (clientInfo == null) return;
+
+            clientInfo.send(
+                    new CommunicationPackets.Proxy2Backend.ExecutePlayerCommandPacket(playerId, command)
+            );
+        }
+
+        public static void sendExecuteConsoleCommand(String serverName, String command) {
+            final ClientInfo clientInfo = get().clients.get(serverName);
+            if (clientInfo == null) return;
+
+            clientInfo.send(
+                    new CommunicationPackets.Proxy2Backend.ExecuteConsoleCommandPacket(command)
+            );
+        }
+
+        public static void sendNotification(UUID playerId, String serverName, String command) {
+            if (!Storage.ConfigSections.Settings.FORWARD_CONSOLE_NOTIFICATIONS.ENABLED) {
                 return;
-
-            if (client == null) {
-                client = Reflection.isVelocityServer()
-                        ? new VelocityClientInfo(requestPacket.getServerId(), serverName)
-                        : new BungeeClientInfo(requestPacket.getServerId(), serverName);
-
-                CLIENTS.add(client);
             }
 
-            if (!client.compareId(requestPacket.getServerId()))
-                client.setId(requestPacket.getServerId());
+            final ClientInfo clientInfo = get().clients.get(serverName);
+            if (clientInfo == null) return;
+
+            clientInfo.send(
+                    new CommunicationPackets.Proxy2Backend.NotificationPacket(playerId, command)
+            );
+        }
+    }
 
 
-            final CommunicationPackets.UnknownCommandPacket unknownCommandPacket = new CommunicationPackets.UnknownCommandPacket();
-            final CommunicationPackets.MessagePacket messagePacket = new CommunicationPackets.MessagePacket();
+    private final Client client;
+    private final UUID id = UUID.randomUUID();
 
-            syncData(client.getId(), unknownCommandPacket, messagePacket);
+    // Server name, ClientInfo
+    private final Map<String, ClientInfo> clients = new HashMap<>();
+    private final ExpireCache<String, ClientInfo> pendingClients = new ExpireCache<>(2, TimeUnit.SECONDS);
+
+
+    private long lastReceivedKeepAliveResponse = System.currentTimeMillis();
+    private long lastSync = System.currentTimeMillis();
+
+
+    private Communicator(final Client client) {
+        this.client = client;
+    }
+
+
+    // BACKEND -> PROXY
+    public void handleB2PPacket(String serverName, CommunicationPackets.PATPacket incomingPacket) {
+        if (!incomingPacket.tokenMatches(Storage.TOKEN)) {
             return;
         }
 
-        if (packet instanceof CommunicationPackets.NotificationPacket notificationPacket) {
-            if (Reflection.isProxyServer() || !notificationPacket.isToken(Storage.TOKEN)) {
-                return;
+        if (incomingPacket instanceof CommunicationPackets.Backend2Proxy.KeepAlivePacket packet) {
+            final ClientInfo clientInfo = clients.get(serverName);
+            if (clientInfo == null) return;
+
+            clientInfo.updateKeepAliveTime();
+            clientInfo.send(new CommunicationPackets.Proxy2Backend.KeepAliveResponsePacket());
+
+            return;
+        }
+
+        if (incomingPacket instanceof CommunicationPackets.Backend2Proxy.IdentityRequestPacket packet) {
+            final ClientInfo registeredClientInfo = clients.get(serverName);
+
+            final boolean exist = registeredClientInfo != null;
+            final boolean same = exist && registeredClientInfo.getId().equals(packet.serverId());
+
+            if (!same) {
+                final ClientInfo clientInfo = Reflection.isVelocityServer()
+                        ? new VelocityClientInfo(packet.serverId(), serverName)
+                        : new BungeeClientInfo(packet.serverId(), serverName);
+
+                pendingClients.put(serverName, clientInfo);
+                clientInfo.send(new CommunicationPackets.Proxy2Backend.IdentityPacket(packet.serverId(), serverName));
+            } else {
+                registeredClientInfo.send(new CommunicationPackets.Proxy2Backend.KeepAliveResponsePacket());
+                registeredClientInfo.send(new CommunicationPackets.Proxy2Backend.IdentityPacket(packet.serverId(), serverName));
             }
 
-            BukkitLoader.handleNotificationPacket(notificationPacket);
-        }
-
-        if (packet instanceof CommunicationPackets.UpdateCommandsPacket updateCommandsPacket) {
-            if (Reflection.isProxyServer())
-                return;
-
-            BukkitLoader.handleUpdateCommandsPacket(updateCommandsPacket);
-        }
-
-        if (packet instanceof CommunicationPackets.P2BExecutePacket p2BExecutePacket) {
-            if (Reflection.isProxyServer() || !p2BExecutePacket.isToken(Storage.TOKEN))
-                return;
-
-            BukkitLoader.handleP2BExecute(p2BExecutePacket);
-        }
-
-        if (packet instanceof CommunicationPackets.P2BMessagePacket p2bMessagePacket) {
-            if (Reflection.isProxyServer() || !p2bMessagePacket.isToken(Storage.TOKEN))
-                return;
-
-            BukkitLoader.handleP2BMessage(p2bMessagePacket);
-        }
-
-        if (packet instanceof CommunicationPackets.ForcePermissionResetPacket permissionResetPacket) {
-            if (Reflection.isProxyServer() || !permissionResetPacket.isToken(Storage.TOKEN))
-                return;
-
-            if (permissionResetPacket.hasTarget())
-                PermissionUtil.setPlayerPermissions(permissionResetPacket.getTargetUUID());
-            else
-                PermissionUtil.reloadPermissions();
-
             return;
         }
 
-        if (packet instanceof CommunicationPackets.BackendDataPacket backendDataPacket) {
-            if (!backendDataPacket.isToken(Storage.TOKEN))
-                return;
+        if (incomingPacket instanceof CommunicationPackets.Backend2Proxy.IdentityResponsePacket packet) {
+            final ClientInfo clientInfo = pendingClients.get(serverName);
 
-            Storage.SERVER_NAME = backendDataPacket.getServerName();
-            return;
-        }
+            if (clientInfo != null && clientInfo.getId().equals(packet.serverId())) {
+                clientInfo.setId(packet.serverId());
 
-        if (packet instanceof CommunicationPackets.FeedbackPacket feedbackPacket) {
-            if (!feedbackPacket.isToken(Storage.TOKEN))
-                return;
 
-            String serverId = feedbackPacket.getServerId();
+                pendingClients.remove(serverName);
+                clients.put(serverName, clientInfo);
 
-            if (client == null) {
-                client = Reflection.isVelocityServer()
-                        ? new VelocityClientInfo(feedbackPacket.getServerId(), serverName)
-                        : new BungeeClientInfo(feedbackPacket.getServerId(), serverName);
 
-                CLIENTS.add(client);
+                clientInfo.send(new CommunicationPackets.Proxy2Backend.KeepAliveResponsePacket());
+                clientInfo.send( constructDataSyncPacket() );
+
+                clientInfo.updateSyncTime();
             }
 
-            if (!client.compareId(feedbackPacket.getServerId()))
-                client.setId(feedbackPacket.getServerId());
-
-            if (client.hasSentFeedback())
-                return;
-
-            client.setFeedback(true);
-            client.syncTime();
-            SERVER_DATA_SYNC_COUNT++;
-
-            CommunicationPackets.BackendDataPacket backendDataPacket = new CommunicationPackets.BackendDataPacket(Storage.TOKEN, serverId, serverName);
-            sendPacket(client, backendDataPacket);
             return;
         }
 
-        if (packet instanceof CommunicationPackets.PacketBundle packetBundle) {
-            if (!packetBundle.isToken(Storage.TOKEN) || !packetBundle.isId(SERVER_ID.toString()))
-                return;
+        if (incomingPacket instanceof CommunicationPackets.Backend2Proxy.DataSyncReceivedPacket packet) {
+            final ClientInfo clientInfo = clients.get(serverName);
+            if (clientInfo == null) return;
 
-            LAST_BUKKIT_SYNC = System.currentTimeMillis();
-            BukkitLoader.synchronize(packetBundle);
-        }
-    }
-
-    public static void syncData() {
-        final CommunicationPackets.UnknownCommandPacket unknownCommandPacket = new CommunicationPackets.UnknownCommandPacket();
-        final CommunicationPackets.MessagePacket messagePacket = new CommunicationPackets.MessagePacket();
-
-        syncData(null, unknownCommandPacket, messagePacket);
-    }
-
-    public static void syncData(String serverId, CommunicationPackets.UnknownCommandPacket unknownCommandPacket, CommunicationPackets.MessagePacket messagePacket) {
-        if (!Reflection.isProxyServer() || Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
-            return;
-
-        LAST_DATA_UPDATE = System.currentTimeMillis();
-        ClientInfo clientInfo;
-
-        if(serverId == null) {
-            SERVER_DATA_SYNC_COUNT = 0;
-            CLIENTS.forEach(currentClient -> syncData(currentClient.getId(), unknownCommandPacket, messagePacket));
-            return;
-
-        } else {
-            clientInfo = getClientById(serverId);
-
-            if (clientInfo != null)
-                clientInfo.setFeedback(false);
-
-            SERVER_DATA_SYNC_COUNT = Math.max(0, SERVER_DATA_SYNC_COUNT -1);
+            clientInfo.updateSyncTime();
         }
 
-        final String serverName = clientInfo != null && clientInfo.getName() != null
-                ? clientInfo.getName()
-                : "";
-
-        CommunicationPackets.PacketBundle bundle = new CommunicationPackets.PacketBundle(Storage.TOKEN, serverId, unknownCommandPacket, messagePacket);
-        clientInfo.sendBytes(CommunicationPackets.convertToBytes(bundle));
-
-        PATEventHandler.callSentSyncEvents(bundle, serverName);
     }
 
-    public static void sendRequest() {
-        if (System.currentTimeMillis() - LAST_SENT_REQUEST >= 5000) {
-            LAST_SENT_REQUEST = System.currentTimeMillis();
-            sendPacket(new CommunicationPackets.RequestPacket(Storage.TOKEN, SERVER_ID.toString()));
-        }
-    }
-
-    public static void sendPermissionReset() {
-        if (Reflection.isProxyServer()) {
-            sendPacket(new CommunicationPackets.ForcePermissionResetPacket(Storage.TOKEN));
-        }
-    }
-
-    public static void sendP2BMessage(String serverName, String message) {
-        if (Reflection.isProxyServer()) {
-            ClientInfo client = getClientByName(serverName);
-            sendPacket(client, new CommunicationPackets.P2BMessagePacket(Storage.TOKEN, message));
-        }
-    }
-
-    public static void sendP2BExecute(String serverName, UUID targetUUID, String command) {
-        if (Reflection.isProxyServer()) {
-            ClientInfo client = getClientByName(serverName);
-            sendPacket(client, new CommunicationPackets.P2BExecutePacket(Storage.TOKEN, targetUUID, command));
-        }
-    }
-
-    public static void sendNotificationPacket(UUID targetUUID, String serverName, String displayedCommand) {
-        if (!Storage.ConfigSections.Settings.FORWARD_CONSOLE_NOTIFICATIONS.ENABLED) {
+    // PROXY -> BACKEND
+    public void handleP2BPacket(CommunicationPackets.PATPacket incomingPacket) {
+        if (!incomingPacket.tokenMatches(Storage.TOKEN)) {
             return;
         }
 
-        for (ClientInfo client : CLIENTS) {
-            if (client.getName().equalsIgnoreCase(serverName)) {
-                sendPacket(client, new CommunicationPackets.NotificationPacket(Storage.TOKEN, targetUUID, displayedCommand));
-                return;
-            }
+        if (incomingPacket instanceof CommunicationPackets.Proxy2Backend.KeepAliveResponsePacket packet) {
+
+            lastReceivedKeepAliveResponse = System.currentTimeMillis();
+            BackendUpdater.receivedKeepAlivePacket();
+
+            return;
+        }
+
+        if (incomingPacket instanceof CommunicationPackets.Proxy2Backend.IdentityPacket packet) {
+            Storage.SERVER_NAME = packet.serverName();
+
+            send2Proxy(new CommunicationPackets.Backend2Proxy.IdentityResponsePacket(id));
+            return;
+        }
+
+        if (incomingPacket instanceof CommunicationPackets.Proxy2Backend.DataSyncPacket packet) {
+            lastSync = System.currentTimeMillis();
+
+            send2Proxy(new CommunicationPackets.Backend2Proxy.DataSyncReceivedPacket());
+            BukkitLoader.handleDataSyncPacket(packet);
+            return;
+        }
+
+        if (incomingPacket instanceof CommunicationPackets.Proxy2Backend.UpdatePacket packet) {
+            BukkitLoader.handleUpdateCommandsPacket(packet);
+            return;
+        }
+
+        if (incomingPacket instanceof CommunicationPackets.Proxy2Backend.NotificationPacket packet) {
+            BukkitLoader.handleNotificationPacket(packet);
+            return;
+        }
+
+        if (incomingPacket instanceof CommunicationPackets.Proxy2Backend.ConsoleMessagePacket packet) {
+            BukkitLoader.handleConsoleMessagePacket(packet);
+            return;
+        }
+
+        if (incomingPacket instanceof CommunicationPackets.Proxy2Backend.ExecutePlayerCommandPacket packet) {
+            BukkitLoader.handlePlayerExecuteCommandPacket(packet);
+            return;
+        }
+
+        if (incomingPacket instanceof CommunicationPackets.Proxy2Backend.ExecuteConsoleCommandPacket packet) {
+            BukkitLoader.handleConsoleExecuteCommandPacket(packet);
+            return;
         }
     }
 
-    public static void sendUpdateCommand() {
+    private void send2Proxy(CommunicationPackets.PATPacket packet) {
         if (Reflection.isProxyServer()) {
-            sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN));
+            Logger.warning("Cannot send B2P packet as proxy!");
+            return;
         }
+
+        client.send(packet);
     }
 
-    public static void sendUpdateCommand(UUID targetUUID) {
-        if (Reflection.isProxyServer()) {
-            sendPacket(new CommunicationPackets.UpdateCommandsPacket(Storage.TOKEN, targetUUID));
+    private void send2Client(ClientInfo clientInfo, CommunicationPackets.PATPacket packet) {
+        if (!Reflection.isProxyServer()) {
+            Logger.warning("Cannot send P2B packet as backend!");
+            return;
         }
+
+        if (clientInfo == null || Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) {
+            return;
+        }
+
+        clientInfo.send(packet);
     }
 
-    public static void sendFeedback() {
-        sendPacket(new CommunicationPackets.FeedbackPacket(Storage.TOKEN, SERVER_ID.toString()));
+    private void send2AllClients(CommunicationPackets.PATPacket packet) {
+        if (!Reflection.isProxyServer()) {
+            Logger.warning("Cannot send P2B packet as backend!");
+            return;
+        }
+
+        if (Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED) {
+            return;
+        }
+
+        getClients().forEach(clientInfo -> {
+            clientInfo.send(packet);
+        });
     }
 
-    public static Client getClient() {
-        return CLIENT;
+    private CommunicationPackets.Proxy2Backend.DataSyncPacket constructDataSyncPacket() {
+        return new CommunicationPackets.Proxy2Backend.DataSyncPacket(
+                new CommunicationPackets.Proxy2Backend.DataSyncPacket.Messages(
+                        Storage.ConfigSections.Messages.PREFIX.PREFIX
+                ),
+                new CommunicationPackets.Proxy2Backend.DataSyncPacket.AutoLowerCase(
+                        Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.ENABLED
+                ),
+                new CommunicationPackets.Proxy2Backend.DataSyncPacket.UnknownCommand(
+                        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED,
+                        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE
+                )
+        );
     }
 
-    public static ClientInfo getClientById(String id) {
-        return CLIENTS.isEmpty() ? null : CLIENTS.stream().filter(client -> client != null && client.compareId(id)).findFirst().orElse(null);
+    public UUID getClientId(String serverName) {
+        final ClientInfo clientInfo = clients.get(serverName);
+        if (clientInfo == null) return null;
+
+        return clientInfo.getId();
     }
 
-    public static ClientInfo getClientByName(String name) {
-        return CLIENTS.isEmpty() ? null : CLIENTS.stream().filter(client -> client != null && client.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    public boolean hasConnectedClients() {
+        return !clients.isEmpty();
     }
+
+    public Set<ClientInfo> getClients() {
+        return new HashSet<>(clients.values());
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public long getLastReceivedKeepAliveResponse() {
+        return lastReceivedKeepAliveResponse;
+    }
+
+    public long getLastSync() {
+        return lastSync;
+    }
+
 }

@@ -1,58 +1,62 @@
 package de.rayzs.pat.api.communication.client;
 
+import de.rayzs.pat.utils.CommunicationPackets;
 import de.rayzs.pat.utils.TimeConverter;
+
+import java.util.UUID;
 
 public abstract class ClientInfo {
 
-    private String id, name;
+    private UUID id;
+    private String serverName;
 
-    private boolean sentFeedback = false;
-    private long syncTime = System.currentTimeMillis();
+    private long syncTime = System.currentTimeMillis(),
+                 keepAliveTime = System.currentTimeMillis();
 
-    public ClientInfo(String serverId) {
-        this.id = serverId;
+    public ClientInfo(UUID id) {
+        this.id = id;
     }
 
-    public ClientInfo(String serverId, String name) {
-        this.id = serverId;
-        this.name = name;
+    public ClientInfo(UUID id, String name) {
+        this.id = id;
+        this.serverName = name;
     }
 
-    public abstract void sendBytes(byte[] bytes);
+    public abstract void send(CommunicationPackets.PATPacket packet);
 
-    public void setName(String name) {
-        this.name = name;
+    public void setServerName(String name) {
+        this.serverName = name;
     }
 
-    public void setId(String serverId) {
-        this.id = serverId;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getServerName() {
+        return serverName;
     }
 
-    public boolean compareId(String id) {
-        return this.id.equals(id);
-    }
-
-    public void syncTime() {
+    public void updateSyncTime() {
         syncTime = System.currentTimeMillis();
     }
 
-    public String getSyncTime() {
+    public void updateKeepAliveTime() {
+        keepAliveTime = System.currentTimeMillis();
+    }
+
+    public boolean isAlive() {
+        return System.currentTimeMillis() - keepAliveTime > 5000;
+    }
+
+    public String getFormattedSyncTime() {
         return TimeConverter.calcAndGetTime(syncTime);
     }
 
-    public void setFeedback(boolean state) {
-        this.sentFeedback = state;
+    public String getFormattedLastReceivedKeepAlivePacketTime() {
+        return TimeConverter.calcAndGetTime(keepAliveTime);
     }
 
-    public boolean hasSentFeedback() {
-        return sentFeedback;
-    }
-
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 }

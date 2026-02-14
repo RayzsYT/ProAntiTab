@@ -1,25 +1,36 @@
 package de.rayzs.pat.api.communication.client.impl;
 
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.rayzs.pat.api.communication.impl.VelocityClient;
 import de.rayzs.pat.api.communication.client.ClientInfo;
 import de.rayzs.pat.plugin.VelocityLoader;
+import de.rayzs.pat.utils.CommunicationPackets;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class VelocityClientInfo extends ClientInfo {
 
-    public VelocityClientInfo(String serverId) {
-        super(serverId);
+    public VelocityClientInfo(UUID id) {
+        super(id);
     }
 
-    public VelocityClientInfo(String serverId, String name) {
-        super(serverId, name);
+    public VelocityClientInfo(UUID id, String name) {
+        super(id, name);
     }
 
     @Override
-    public void sendBytes(byte[] bytes) {
-        VelocityLoader.getServer().getAllServers().stream().filter(server ->
-                server.getServerInfo().getName().equalsIgnoreCase(getName())
-        ).forEach(server ->
-                server.sendPluginMessage(VelocityClient.getIdentifier(), bytes)
-        );
+    public void send(CommunicationPackets.PATPacket packet) {
+        final byte[] preparedPacket = CommunicationPackets.preparePacket(packet, getId());
+
+        if (preparedPacket == null) {
+            return;
+        }
+
+        final Optional<RegisteredServer> optServer = VelocityLoader.getServer().getServer(getServerName());
+
+        optServer.ifPresent(registeredServer -> {
+            registeredServer.sendPluginMessage(VelocityClient.getIdentifier(), preparedPacket);
+        });
     }
 }

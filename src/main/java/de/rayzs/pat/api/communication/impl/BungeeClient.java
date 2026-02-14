@@ -11,6 +11,8 @@ import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.api.communication.*;
 import net.md_5.bungee.api.ProxyServer;
 
+import java.util.UUID;
+
 public class BungeeClient implements Client, Listener {
 
     private static final ProxyServer SERVER = ProxyServer.getInstance();
@@ -26,15 +28,19 @@ public class BungeeClient implements Client, Listener {
     }
 
     @Override
-    public void send(Object packet) {
+    public void send(CommunicationPackets.PATPacket packet) {
+        final byte[] preparedPacket = CommunicationPackets.preparePacket(packet);
+
+        if (preparedPacket == null) {
+            return;
+        }
+
+
         for (ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
-
             try {
-
-                serverInfo.sendData(CHANNEL_NAME, CommunicationPackets.convertToBytes(packet));
-
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
+                serverInfo.sendData(CHANNEL_NAME, preparedPacket);
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
 
         }
@@ -42,18 +48,26 @@ public class BungeeClient implements Client, Listener {
 
     @EventHandler
     public void onQueryReceive(PluginMessageEvent event) {
-        if (!event.getTag().equalsIgnoreCase(CHANNEL_NAME))
+        if (!event.getTag().equalsIgnoreCase(CHANNEL_NAME)) {
             return;
+        }
+
+        final Server server = (Server) event.getSender();
+        final String serverName = server.getInfo().getName();
+        final UUID clientId = Communicator.get().getClientId(serverName);
+
+        if (!CommunicationPackets.isInitialPacket(event.getData()) && clientId == null) {
+            return;
+        }
 
         try {
 
-            Object packetObj = CommunicationPackets.buildFromBytes(event.getData());
-
-            if (!CommunicationPackets.isPacket(packetObj))
+            Object packetObj = CommunicationPackets.readPacket(event.getData(), clientId);
+            if (!CommunicationPackets.isB2PPacket(packetObj)) {
                 return;
+            }
 
-            Server server = (Server) event.getSender();
-            Communicator.receiveInformation(server.getInfo().getName(), packetObj);
+            Communicator.get().handleB2PPacket(serverName, (CommunicationPackets.PATPacket) packetObj);
 
         } catch (Throwable throwable) {
             throwable.printStackTrace();

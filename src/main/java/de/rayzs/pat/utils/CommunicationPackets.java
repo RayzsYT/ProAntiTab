@@ -1,296 +1,194 @@
 package de.rayzs.pat.utils;
 
-import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
+
 import java.util.*;
 import java.io.*;
 
 public class CommunicationPackets {
 
-    public static byte[] convertToBytes(Object obj) {
-        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+
+    private static final byte INIT_PACKET = 0;
+    private static final byte NOT_INIT_PACKET = 1;
+
+
+    public static byte[] preparePacket(Object object) {
+        return preparePacket(object, Communicator.get().getId());
+    }
+
+    public static byte[] preparePacket(Object object, UUID id) {
+        if (!isValidPacket(object)) {
+            return null;
+        }
+
+        final boolean isInitialPacket = isInitialPacket(object);
+        final ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+
         try (ObjectOutputStream outputStream = new ObjectOutputStream(arrayOutputStream)) {
-            outputStream.writeObject(obj);
+            outputStream.writeObject(object);
             outputStream.flush();
-            return arrayOutputStream.toByteArray();
+
+            final byte[] encryptedBytes = xor(arrayOutputStream.toByteArray(), isInitialPacket
+                    ? Storage.TOKEN
+                    : id.toString()
+            );
+
+            final byte[] bytes = new byte[encryptedBytes.length + 1];
+
+            bytes[0] = isInitialPacket ? INIT_PACKET : NOT_INIT_PACKET;
+            System.arraycopy(encryptedBytes, 0, bytes, 1, bytes.length - 1);
+
+            return bytes;
+
         } catch (Exception ignored) { }
 
         return null;
     }
 
-    public static Object buildFromBytes(byte[] bytes) {
-        ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(bytes);
+    public static Object readPacket(byte[] bytes) {
+        return readPacket(bytes, Communicator.get().getId());
+    }
+
+    public static Object readPacket(byte[] bytes, UUID id) {
+        if (bytes.length == 0) {
+            return null;
+        }
+
+        final byte init = bytes[0];
+        bytes = Arrays.copyOfRange(bytes, 1, bytes.length);
+
+        bytes = xor(bytes, isInitialPacket(init)
+                ? Storage.TOKEN
+                : id.toString()
+        );
+
+        final ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(bytes);
+
         try (ObjectInput input = new ObjectInputStream(arrayInputStream)) {
-            Object object = input.readObject();
-            if (object.getClass() == null) return null;
+            final Object object = input.readObject();
+
+            if (object.getClass() == null || !isValidPacket(object)) {
+                return null;
+            }
+
             return object;
-        } catch (Throwable ignored) { }
+        } catch (Exception ignored) { }
 
         return null;
     }
 
-    public static boolean isPacket(Object object) {
-        return object instanceof CommunicationPacket;
+    // Yes, I am aware that xor is not the best encryption out there,
+    // but it will suffice for now since the encryption shouldn't be too heavy.
+    private static byte[] xor(byte[] bytes, String key) {
+        final byte[] output = new byte[bytes.length];
+        final byte[] secret = key.getBytes();
+
+        int pos = 0;
+
+        for (int i = 0; i < bytes.length; i++) {
+            output[i] = (byte) (bytes[i] ^ secret[pos]);
+            pos += 1;
+
+            if (pos >= secret.length) {
+                pos = 0;
+            }
+        }
+
+        return output;
     }
 
-    public interface CommunicationPacket {}
-
-    public static class BackendDataPacket implements CommunicationPacket, Serializable {
-        private final String proxyToken, serverName, serverId;
-
-        public BackendDataPacket(String proxyToken, String serverId, String serverName) {
-            this.proxyToken = proxyToken;
-            this.serverId = serverId;
-            this.serverName = serverName;
-        }
-
-        public String getServerId() {
-            return serverId;
-        }
-
-        public String getServerName() {
-            return serverName;
-        }
-
-        public boolean isToken(String token) {
-            return proxyToken.equals(token);
-        }
+    public static boolean isValidPacket(Object object) {
+        return object instanceof PATPacket;
     }
 
-    public static class UpdateCommandsPacket implements CommunicationPacket, Serializable {
-        private final String proxyToken;
-        private final UUID targetUUID;
+    public static boolean isP2BPacket(Object object) {
+        return object instanceof P2BPacket;
+    }
 
-        public UpdateCommandsPacket(String proxyToken) {
-            this.proxyToken = proxyToken;
-            this.targetUUID = null;
-        }
+    public static boolean isB2PPacket(Object object) {
+        return object instanceof B2PPacket;
+    }
 
-        public UpdateCommandsPacket(String proxyToken, UUID targetUUID) {
-            this.proxyToken = proxyToken;
-            this.targetUUID = targetUUID;
-        }
+    public static boolean isInitialPacket(Object object) {
+        return object instanceof InitialPacket;
+    }
 
-        public boolean hasTargetUUID() {
-            return targetUUID != null;
-        }
+    public static boolean isInitialPacket(byte[] bytes) {
+        return bytes.length > 0 && isInitialPacket(bytes[0]);
+    }
 
-        public UUID getTargetUUID() {
-            return targetUUID;
-        }
+    public static boolean isInitialPacket(byte b) {
+        return b == INIT_PACKET;
+    }
 
-        public boolean isToken(String token) {
-            return proxyToken.equals(token);
+    public interface PATPacket extends Serializable {
+        String token = Storage.TOKEN;
+
+        default boolean tokenMatches(String token) {
+            return PATPacket.token.equals(token);
         }
     }
 
-    // Proxy to Backend (P2B)
-    public static class P2BMessagePacket implements CommunicationPacket, Serializable {
-        private final String proxyToken, message;
 
-        public P2BMessagePacket(String proxyToken, String message) {
-            this.proxyToken = proxyToken;
-            this.message = message;
+    private interface InitialPacket extends PATPacket {}
+    private interface Synchronizable extends Serializable {}
+
+    private interface P2BPacket extends PATPacket {}
+    private interface B2PPacket extends PATPacket {}
+
+
+    public static class Proxy2Backend {
+
+        private Proxy2Backend() { }
+
+        public record UpdatePacket(UUID playerId) implements P2BPacket {
+            public boolean forEveryone() { return playerId == null; }
         }
 
-        public String getMessage() {
-            return message;
-        }
+        public record IdentityPacket(UUID targetServerId, String serverName) implements InitialPacket, P2BPacket { }
 
-        public boolean isToken(String token) {
-            return proxyToken.equals(token);
-        }
-    }
+        public record NotificationPacket(UUID playerId, String command) implements P2BPacket { }
 
-    public static class P2BExecutePacket implements CommunicationPacket, Serializable {
-        private final String proxyToken, command;
-        private final UUID targetUUID;
+        public record ExecuteConsoleCommandPacket(String command) implements P2BPacket { }
 
-        public P2BExecutePacket(String proxyToken, UUID targetUUID, String command) {
-            this.proxyToken = proxyToken;
-            this.targetUUID = targetUUID;
-            this.command = command;
-        }
+        public record ExecutePlayerCommandPacket(UUID playerId, String command) implements P2BPacket { }
 
-        public String getCommand() {
-            return command;
-        }
+        public record ConsoleMessagePacket(String message) implements P2BPacket { }
 
-        public boolean isConsole() {
-            return !isPlayer();
-        }
+        public record KeepAliveResponsePacket() implements P2BPacket { }
 
-        public boolean isPlayer() {
-            return targetUUID != null;
-        }
+        public record DataSyncPacket(
+                Messages messages,
+                AutoLowerCase autoLowerCase,
+                UnknownCommand unknownCommand
+        ) implements P2BPacket {
 
-        public UUID getTargetUUID() {
-            return targetUUID;
-        }
+            public record Messages(String prefix)
+                    implements Synchronizable {}
 
-        public boolean isToken(String token) {
-            return proxyToken.equals(token);
-        }
-    }
+            public record AutoLowerCase(boolean enabled)
+                    implements Synchronizable {}
 
-    public static class FeedbackPacket implements CommunicationPacket, Serializable {
-        private final String proxyToken, serverId;
+            public record UnknownCommand(boolean enabled, MultipleMessagesHelper message)
+                    implements Synchronizable {}
 
-        public FeedbackPacket(String proxyToken, String serverId) {
-            this.proxyToken = proxyToken;
-            this.serverId = serverId;
-        }
-
-        public String getServerId() {
-            return serverId;
-        }
-
-        public boolean isToken(String token) {
-            return proxyToken.equals(token);
-        }
-    }
-
-    public static class RequestPacket implements CommunicationPacket, Serializable {
-        private final String proxyToken, serverId;
-
-        public RequestPacket(String proxyToken, String serverId) {
-            this.proxyToken = proxyToken;
-            this.serverId = serverId;
-        }
-
-        public String getServerId() {
-            return serverId;
-        }
-
-        public boolean isToken(String token) {
-            return proxyToken.equals(token);
-        }
-    }
-
-    public static class NotificationPacket implements CommunicationPacket, Serializable {
-
-        private final String proxyToken, displayedCommand;
-        private final UUID targetUUID;
-
-        public NotificationPacket(String proxyToken, UUID targetUUID, String displayedCommand) {
-            this.proxyToken = proxyToken;
-            this.targetUUID = targetUUID;
-            this.displayedCommand = displayedCommand;
-        }
-
-        public UUID getTargetUUID() {
-            return targetUUID;
-        }
-
-        public String getDisplayedCommand() {
-            return displayedCommand;
-        }
-
-        public boolean isToken(String token) {
-            return proxyToken.equals(token);
-        }
-    }
-
-    public static class ForcePermissionResetPacket implements Serializable {
-
-        private final String proxyToken;
-        private UUID targetUUID = null;
-
-        public ForcePermissionResetPacket(String proxyToken) {
-            this.proxyToken = proxyToken;
-        }
-
-        public ForcePermissionResetPacket(String proxyToken, UUID targetUUID) {
-            this.proxyToken = proxyToken;
-            this.targetUUID = targetUUID;
-        }
-
-        public UUID getTargetUUID() {
-            return targetUUID;
-        }
-
-        public boolean hasTarget() {
-            return targetUUID != null;
-        }
-
-        public boolean isToken(String token) {
-            return proxyToken.equals(token);
-        }
-    }
-
-    public static class PacketBundle implements CommunicationPacket, Serializable {
-
-        private final UnknownCommandPacket unknownCommandPacket;
-        private final MessagePacket messagePacket;
-
-        private final String proxyToken, serverId;
-        private final boolean autoLowercaseCommands;
-
-        public PacketBundle(String proxyToken, String serverId, UnknownCommandPacket unknownCommandPacket, MessagePacket messagePacket) {
-            this.proxyToken = proxyToken;
-            this.serverId = serverId;
-
-            this.unknownCommandPacket = unknownCommandPacket;
-            this.messagePacket = messagePacket;
-
-            this.autoLowercaseCommands = Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.ENABLED;
-        }
-
-        public boolean isToken(String token) {
-            return proxyToken.equals(token);
-        }
-
-        public boolean isId(String id) {
-            return idIgnored() || serverId.equals(id);
-        }
-
-        public boolean idIgnored() {
-            return serverId == null;
-        }
-
-        public UnknownCommandPacket getUnknownCommandPacket() {
-            return unknownCommandPacket;
-        }
-
-        public MessagePacket getMessagePacket() {
-            return messagePacket;
-        }
-
-        public boolean isAutoLowercaseCommandsEnabled() {
-            return autoLowercaseCommands;
-        }
-    }
-
-    public static class MessagePacket implements Serializable {
-
-        private final String prefix;
-
-        public MessagePacket() {
-            prefix = Storage.ConfigSections.Messages.PREFIX.PREFIX;
-        }
-
-        public String getPrefix() {
-            return prefix;
         }
 
     }
 
-    public static class UnknownCommandPacket implements Serializable {
+    public static class Backend2Proxy {
 
-        private final MultipleMessagesHelper message;
-        private final boolean enabled;
+        private Backend2Proxy() { }
 
-        public UnknownCommandPacket() {
-            enabled = Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED;
-            message = Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE;
-        }
+        public record IdentityRequestPacket(UUID serverId) implements InitialPacket, B2PPacket { }
 
-        public MultipleMessagesHelper getMessage() {
-            return message;
-        }
+        public record IdentityResponsePacket(UUID serverId) implements InitialPacket, B2PPacket { }
 
-        public boolean isEnabled() {
-            return enabled;
-        }
+        public record DataSyncReceivedPacket() implements B2PPacket { }
+
+        public record KeepAlivePacket() implements B2PPacket { }
+
     }
 }

@@ -9,6 +9,7 @@ import com.velocitypowered.api.event.Subscribe;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.api.communication.*;
 import com.velocitypowered.api.proxy.*;
+import java.util.UUID;
 
 public class VelocityClient implements Client {
 
@@ -26,15 +27,20 @@ public class VelocityClient implements Client {
     }
 
     @Override
-    public void send(Object packet) {
+    public void send(CommunicationPackets.PATPacket packet) {
+        final byte[] preparedPacket = CommunicationPackets.preparePacket(packet);
+
+        if (preparedPacket == null) {
+            return;
+        }
+
+
         for (RegisteredServer registeredServer : SERVER.getAllServers()) {
 
             try {
-
-                registeredServer.sendPluginMessage(IDENTIFIER, CommunicationPackets.convertToBytes(packet));
-
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
+                registeredServer.sendPluginMessage(IDENTIFIER, preparedPacket);
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
 
         }
@@ -42,16 +48,26 @@ public class VelocityClient implements Client {
 
     @Subscribe
     public void onQueryReceive(PluginMessageEvent event) {
-        if (event.getIdentifier() != IDENTIFIER)
+        if (event.getIdentifier() != IDENTIFIER) {
             return;
+        }
 
-        Object packetObj = CommunicationPackets.buildFromBytes(event.getData());
+        final ServerConnection server = (ServerConnection) event.getSource();
+        final String serverName = server.getServerInfo().getName();
+        final UUID clientId = Communicator.get().getClientId(serverName);
 
-        if (!CommunicationPackets.isPacket(packetObj))
+        if (!CommunicationPackets.isInitialPacket(event.getData()) && clientId == null) {
             return;
+        }
 
-        ServerConnection server = (ServerConnection) event.getSource();
-        Communicator.receiveInformation(server.getServerInfo().getName(), packetObj);
+        Object packetObj = CommunicationPackets.readPacket(event.getData(), clientId);
+
+        if (!CommunicationPackets.isB2PPacket(packetObj)) {
+            return;
+        }
+
+        Communicator.get().handleB2PPacket(serverName, (CommunicationPackets.PATPacket) packetObj);
+
     }
 
     public static MinecraftChannelIdentifier getIdentifier() {
