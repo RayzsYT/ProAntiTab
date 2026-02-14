@@ -175,6 +175,11 @@ block-namespace-commands:
   # 'cancel-blocked-commands' is enabled or not.
   always-block-command: true
 
+# Auto lowercase all commands when being executed,
+# such that something like /PAY turns into /pay.
+auto-lowercase-commands:
+  enabled: false
+
 # Patches a small exploit which causes the server to lag.
 # Due to the fact that PAT interacts directly with Tab-Completions and their packets,
 # it would be a waste not to provide some simple patches like these. ^^
@@ -309,13 +314,13 @@ info:
     - '&7  Proxy sync-token: &e%token%'
 
 stats:
-  fail: '&cThis command works on Bungeecord/Velocity servers only!'
   no-server: '&cNone!'
   message:
     splitter: '&7, '
-    server: '&f%servername% &8(%updated%)'
+    server: '&f%servername% &8(&a%last_alive_response% &8/ &2%updated%&8)'
     statistic:
-      - '&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)'
+      - '&7Format: &eserver (last alive packet / last sync packet)'
+      - '&7Last sync sent to &f%server_count% &7server(s) &e%last_sync_time% &7ago:'
       - '&7Sent to servers: &f%servers%'
 
 server-list:
