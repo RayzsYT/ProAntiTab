@@ -7,7 +7,9 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.sender.CommandSender;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class StatsCommand extends ProCommand {
 
@@ -29,26 +31,28 @@ public class StatsCommand extends ProCommand {
             return true;
         }
 
-        final int length = Communicator.CLIENTS.size() - 1;
-        boolean tmpFound = false;
+        final Set<ClientInfo> clients = Communicator.get().getClients();
+        final Iterator<ClientInfo> iterator = clients.iterator();
 
+        boolean tmpFound = false;
         StringBuilder statsBuilder = new StringBuilder();
 
-        for (int i = 0; i < Communicator.CLIENTS.size(); i++) {
-            ClientInfo client = Communicator.CLIENTS.get(i);
+        while (iterator.hasNext()) {
+            ClientInfo client = iterator.next();
 
-            if (!client.hasSentFeedback())
-                continue;
-
-            if (!tmpFound)
+            if (!tmpFound) {
                 tmpFound = true;
+            }
 
             statsBuilder.append(StringUtils.replace(Storage.ConfigSections.Messages.STATS.SERVER,
-                    "%updated%", client.getSyncTime(), "%servername%", client.getName()
+                    "%updated%", client.getFormattedSyncTime(),
+                    "%servername%", client.getServerName(),
+                    "%last_alive_response%", client.getFormattedLastReceivedKeepAlivePacketTime()
             ));
 
-            if (i <= length)
+            if (iterator.hasNext()) {
                 statsBuilder.append(Storage.ConfigSections.Messages.STATS.SPLITTER);
+            }
         }
 
         final boolean found = tmpFound;
@@ -56,8 +60,9 @@ public class StatsCommand extends ProCommand {
         Storage.ConfigSections.Messages.STATS.STATISTIC.getLines().forEach(message -> {
 
             message = StringUtils.replace(message,
-                    "%server_count%", String.valueOf(Communicator.SERVER_DATA_SYNC_COUNT),
-                    "%last_sync_time%", TimeConverter.calcAndGetTime(Communicator.LAST_DATA_UPDATE),
+                    "%server_count%", String.valueOf(Communicator.get().getClients().size()),
+                    "%last_sync_time%", TimeConverter.calcAndGetTime(Communicator.get().getLastSync()),
+                    "%last_alive_response_time%", TimeConverter.calcAndGetTime(Communicator.get().getLastReceivedKeepAliveResponse()),
                     "%servers%", found ? statsBuilder.toString() : Storage.ConfigSections.Messages.STATS.NO_SERVER
             );
 
