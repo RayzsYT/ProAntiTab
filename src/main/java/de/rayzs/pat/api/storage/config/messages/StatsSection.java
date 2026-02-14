@@ -18,12 +18,17 @@ public class StatsSection extends ConfigStorage {
     @Override
     public void load() {
         super.load();
-        if(!Reflection.isProxyServer()) return;
+
+        if (!Reflection.isProxyServer()) {
+            return;
+        }
+
         NO_SERVER = new ConfigSectionHelper<String>(this, "no-server", "&cNone!").getOrSet();
         SPLITTER = new ConfigSectionHelper<String>(this, "message.splitter", "&7, ").getOrSet();
-        SERVER = new ConfigSectionHelper<String>(this, "message.server", "&f%servername% &8(%updated%)").getOrSet();
+        SERVER = new ConfigSectionHelper<String>(this, "message.server", "&f%servername% &8(&a%last_alive_response% &8/ &2%updated%&8)").getOrSet();
         STATISTIC = new MultipleMessagesHelper(this, "message.statistic", Arrays.asList(
-                "&7Last sync sent to &f%server_count% &7servers. &8&o(%last_sync_time% ago)",
+                "&7Format: &eserver (last alive packet / last sync packet)",
+                "&7Last sync sent to &f%server_count% &7server(s) &e%last_sync_time% &7ago:",
                 "&7Sent to servers: &f%servers%"
                 ));
     }
