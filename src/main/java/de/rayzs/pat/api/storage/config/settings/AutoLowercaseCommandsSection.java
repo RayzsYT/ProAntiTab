@@ -17,9 +17,6 @@ public class AutoLowercaseCommandsSection extends ConfigStorage {
     public void load() {
         super.load();
 
-        if (Reflection.isProxyServer())
-            return;
-
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();
     }
 
