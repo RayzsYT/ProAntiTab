@@ -131,7 +131,11 @@ public class Logger {
                     .append("\n");
 
             builder.append("last-received-sync: ")
-                    .append(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED ? TimeConverter.calcAndGetTime(Storage.LAST_SYNC) : "Deactivated")
+                    .append(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED ? TimeConverter.calcAndGetTime(Communicator.get().getLastSync()) : "Deactivated")
+                    .append("\n");
+
+            builder.append("last-received-alive-response-packet: ")
+                    .append(Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED ? TimeConverter.calcAndGetTime(Communicator.get().getLastReceivedKeepAliveResponse()) : "Deactivated")
                     .append("\n");
         }
 
@@ -145,13 +149,22 @@ public class Logger {
                     .append("\n");
 
             builder.append("last-sent-sync: ")
-                    .append(Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED ? "Deactivated" : (TimeConverter.calcAndGetTime(Storage.LAST_SYNC)))
+                    .append(Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED ? "Deactivated" : (TimeConverter.calcAndGetTime(Communicator.get().getLastSync())))
                     .append("\n\n");
 
-            for (ClientInfo client : Communicator.CLIENTS) {
+            Iterator<ClientInfo> iterator = Communicator.get().getClients().iterator();
+            while (iterator.hasNext()) {
+                ClientInfo clientInfo = iterator.next();
+
                 builder.append("synced-server: ")
-                        .append(client.getName() + " (" + client.getSyncTime() + ")")
-                        .append(", ");
+                        .append(clientInfo.getServerName())
+                        .append(" (")
+                        .append(clientInfo.getFormattedLastReceivedKeepAlivePacketTime() + " / " + clientInfo.getFormattedSyncTime())
+                        .append(")");
+
+                if (iterator.hasNext()) {
+                    builder.append(", ");
+                }
             }
 
             builder.append("\n\n");
