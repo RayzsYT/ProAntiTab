@@ -84,8 +84,6 @@ public class BackendUpdater {
     private static void disconnect() {
         CONNECTED = false;
         WAITING = false;
-
-        Logger.warning("Disconnected! Attempting to reconnect...");
     }
 
     private static boolean isRunning() {
