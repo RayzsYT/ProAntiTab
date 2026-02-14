@@ -105,7 +105,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 if ((input.isEmpty() || cancelsBeforeHand) && Reflection.isWeird())
                     return false;
 
-                if (spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
+                if (spaces >= 1 && cancelsBeforeHand) {
                     suggestions.clear();
                     return true;
                 }
@@ -178,7 +178,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             return false;
         }
 
-        if(spaces >= 1 && cancelsBeforeHand || !BukkitLoader.isLoaded()) {
+        if(spaces >= 1 && cancelsBeforeHand) {
             suggestions.getList().clear();
             return true;
         }
