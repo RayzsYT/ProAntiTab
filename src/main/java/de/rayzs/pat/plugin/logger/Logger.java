@@ -22,7 +22,10 @@ public class Logger {
     private static final String LOG_HEADER;
 
     static {
-        final String software = Reflection.getSoftware().name();
+        final String software = Reflection.getSoftware().isProxySoftware()
+                ? Reflection.getSoftware().toString()
+                : Reflection.getVersionName();
+
         final String version = Reflection.isProxyServer() ? "" : " " + Reflection.getRawVersionName().replace("_", ".");
 
         LOG_HEADER = "> ProAntiTab v" + Storage.CURRENT_VERSION + " [" + software + version + "]";
@@ -78,6 +81,12 @@ public class Logger {
 
     private static String createInfo() {
         StringBuilder builder = new StringBuilder();
+
+        if (!Reflection.isProxyServer()) {
+            builder.append("Detected Software-API: ")
+                    .append(Reflection.getSoftware().toString())
+                    .append("\n\n");
+        }
 
         builder.append("Updated: ")
                 .append(!Storage.OUTDATED)
