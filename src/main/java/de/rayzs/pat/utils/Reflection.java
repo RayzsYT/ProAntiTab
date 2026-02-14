@@ -20,17 +20,19 @@ public class Reflection {
 
         if (doesClassExist("org.bukkit.Server")) {
             try {
+
+                software = doesClassExist("io.papermc.paper.threadedregions.RegionizedServer")
+                        ? Software.FOLIA : doesClassExist("com.destroystokyo.paper.Metrics")
+                        ? Software.PAPER : doesClassExist("org.spigotmc.SpigotConfig")
+                        ? Software.SPIGOT : Software.BUKKIT;
+
+
                 loadVersionName(serverObj);
                 loadAges();
                 loadVersionEnum();
 
                 legacy = minor <= 16;
                 weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() > 20;
-
-                software = doesClassExist("io.papermc.paper.threadedregions.RegionizedServer")
-                        ? Software.FOLIA : doesClassExist("com.destroystokyo.paper.Metrics")
-                        ? Software.PAPER : doesClassExist("org.spigotmc.SpigotConfig")
-                        ? Software.SPIGOT : Software.BUKKIT;
 
                 oldChannelMethod = software.isPaperBased() && weird;
             } catch (Exception exception) {
