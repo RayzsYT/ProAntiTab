@@ -39,7 +39,7 @@ public class VelocityConnectionListener {
 
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
             final ServerInfo serverInfo = event.getOriginalServer().getServerInfo();
-            if (serverInfo != null) Storage.TEMP_PLAYER_SERVER_CACHE.put(player.getUniqueId(), serverInfo.getName());
+            if (serverInfo != null) Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
         }
 
         PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
@@ -80,7 +80,7 @@ public class VelocityConnectionListener {
 
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
             final ServerInfo serverInfo = event.getServer().getServerInfo();
-            if (serverInfo != null) Storage.TEMP_PLAYER_SERVER_CACHE.put(player.getUniqueId(), serverInfo.getName());
+            if (serverInfo != null) Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
 
             CommandSender sender = CommandSenderHandler.from(player);
             assert sender != null;

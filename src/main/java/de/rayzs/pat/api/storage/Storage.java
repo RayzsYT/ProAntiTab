@@ -63,11 +63,9 @@ public class Storage {
     public static String TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
     public static Object PLUGIN_OBJECT;
-    public static boolean USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false, USE_SIMPLECLOUD;
-    public static long LAST_SYNC = System.currentTimeMillis();
+    public static boolean USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false;
 
-    public static ExpireCache<UUID, String> TEMP_PLAYER_SERVER_CACHE = new ExpireCache<>(1, TimeUnit.SECONDS);
-
+    private final static ExpireCache<UUID, String> TEMP_PLAYER_SERVER_CACHE = new ExpireCache<>(1, TimeUnit.SECONDS);
     private static PermissionPlugin PERMISSION_PLUGIN = PermissionPlugin.NONE;
 
     public static void initialize(PluginLoader loader, String currentVersion) {
@@ -82,6 +80,7 @@ public class Storage {
 
         PERMISSION_PLUGIN = permissionPlugin;
     }
+
 
     public static void broadcastPermissionsPluginNotice() {
         if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
@@ -180,8 +179,7 @@ public class Storage {
         GroupManager.initialize();
 
         if (!proxy) {
-            BackendUpdater.stop();
-            BackendUpdater.start();
+            BackendUpdater.restart();
         }
 
         if (!backend) {
@@ -189,7 +187,7 @@ public class Storage {
         }
 
         if (proxy) {
-            Communicator.syncData();
+            Communicator.Proxy2Backend.sendDataSync();
         }
 
         ConfigUpdater.broadcastMissingParts();
@@ -257,13 +255,12 @@ public class Storage {
             GroupManager.clearServerGroupBlacklists();
 
             Storage.getLoader().updateCommandCache();
-            Communicator.sendPermissionReset();
 
             if (!Reflection.isVelocityServer()) {
                 BungeePacketAnalyzer.sendCommandsPacket();
             }
 
-            Communicator.sendUpdateCommand();
+            Communicator.Proxy2Backend.sendUpdateCommand();
             return;
         }
 
@@ -283,6 +280,18 @@ public class Storage {
         } else {
             BukkitAntiTabListener.handleTabCompletion();
         }
+    }
+
+    public static void tempCachePlayerToServer(UUID playerId, String server) {
+        TEMP_PLAYER_SERVER_CACHE.put(playerId, server);
+    }
+
+    public static void getTempCachedPlayerToServer(UUID playerId, String server) {
+        TEMP_PLAYER_SERVER_CACHE.put(playerId, server);
+    }
+
+    public static String getCachedPlayerServername(UUID playerId) {
+        return TEMP_PLAYER_SERVER_CACHE.get(playerId);
     }
 
     // Quickly updates all player subarguments.

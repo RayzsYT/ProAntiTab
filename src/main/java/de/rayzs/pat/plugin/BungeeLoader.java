@@ -51,11 +51,10 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         plugin = this;
         logger = getLogger();
 
-        CommandProcess.initialize();
         Reflection.initialize(getProxy());
-        ConfigUpdater.initialize();
 
-        Storage.USE_SIMPLECLOUD = Reflection.doesClassExist("eu.thesimplecloud.plugin.startup.CloudPlugin");
+        CommandProcess.initialize();
+        ConfigUpdater.initialize();
 
         Storage.initialize(this, getDescription().getVersion());
         VersionComparer.get().setCurrentVersion(Storage.CURRENT_VERSION);
@@ -89,9 +88,6 @@ public class BungeeLoader extends Plugin implements PluginLoader {
             Storage.USE_PAPIPROXYBRIDGE = true;
             Logger.info("Successfully hooked into PAPIProxyBridge!");
         }
-
-        if(Storage.USE_SIMPLECLOUD)
-            Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
         BungeePacketAnalyzer.injectAll();
 
@@ -178,7 +174,7 @@ public class BungeeLoader extends Plugin implements PluginLoader {
 
     @Override
     public String getPlayerServerName(UUID uuid) {
-        final String cachedServerName = Storage.TEMP_PLAYER_SERVER_CACHE.get(uuid);
+        final String cachedServerName = Storage.getCachedPlayerServername(uuid);
         if (cachedServerName != null) {
             return cachedServerName;
         }

@@ -70,8 +70,9 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         loadCommandMap();
 
-        CommandProcess.initialize();
         Reflection.initialize(getServer());
+
+        CommandProcess.initialize();
         ConfigUpdater.initialize();
 
         Storage.initialize(this, getDescription().getVersion());
@@ -119,11 +120,8 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             }
         }
 
-        if (getServer().getPluginManager().getPlugin("ViaVersion") != null)
+        if (getServer().getPluginManager().getPlugin("ViaVersion") != null) {
             ViaVersionAdapter.initialize();
-
-        if (Storage.USE_SIMPLECLOUD) {
-            Logger.warning("Detected SimpleCloud. Therefore, MiniMessages are disabled!");
         }
 
         Storage.broadcastPermissionsPluginNotice();

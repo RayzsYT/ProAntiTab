@@ -22,10 +22,7 @@ public class Logger {
     private static final String LOG_HEADER;
 
     static {
-        final String software = Reflection.isProxyServer()
-                ? Reflection.isVelocityServer() ? "Velocity" : "Bungeecord"
-                : (Reflection.isPaper() ? "Paper" : Reflection.isFoliaServer() ? "Folia" : "Spigot/Bukkit");
-
+        final String software = Reflection.getSoftware().name();
         final String version = Reflection.isProxyServer() ? "" : " " + Reflection.getRawVersionName().replace("_", ".");
 
         LOG_HEADER = "> ProAntiTab v" + Storage.CURRENT_VERSION + " [" + software + version + "]";

@@ -80,11 +80,11 @@ public class VelocityLoader implements PluginLoader {
         Configurator.createResourcedFile("files\\proxy-placeholders.yml", "placeholders.yml", false);
         Configurator.createResourcedFile("files\\proxy-custom-responses.yml", "custom-responses.yml", false);
 
-        CommandProcess.initialize();
         Reflection.initialize(server);
+
+        CommandProcess.initialize();
         ConfigUpdater.initialize();
 
-        Storage.USE_SIMPLECLOUD = Reflection.doesClassExist("eu.thesimplecloud.plugin.startup.CloudPlugin");
         Storage.initialize(this, pluginContainer.getDescription().getVersion().get());
         VersionComparer.get().setCurrentVersion(Storage.CURRENT_VERSION);
 
@@ -112,9 +112,6 @@ public class VelocityLoader implements PluginLoader {
             Storage.USE_PAPIPROXYBRIDGE = true;
             Logger.info("Successfully hooked into PAPIProxyBridge!");
         }
-
-        if (Storage.USE_SIMPLECLOUD)
-            Logger.warning("Detected SimpleCloud and therefore MiniMessages by Kyori are disabled!");
 
         Storage.broadcastPermissionsPluginNotice();
         ConfigUpdater.broadcastMissingParts();
@@ -221,7 +218,7 @@ public class VelocityLoader implements PluginLoader {
 
     @Override
     public String getPlayerServerName(UUID uuid) {
-        final String cachedServerName = Storage.TEMP_PLAYER_SERVER_CACHE.get(uuid);
+        final String cachedServerName = Storage.getCachedPlayerServername(uuid);
         if (cachedServerName != null) {
             return cachedServerName;
         }

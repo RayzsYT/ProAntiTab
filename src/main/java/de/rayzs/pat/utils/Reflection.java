@@ -9,70 +9,40 @@ import java.util.*;
 
 public class Reflection {
 
-    private static boolean legacy, proxy, velocity, paper, folia, craftbukkit, weird, oldChannelMethod;
-    private static String versionName, fullVersionName, rawVersionName, versionPackageName;
-    private static Version version;
+    private static boolean legacy, weird, oldChannelMethod;
+    private static String versionName, rawVersionName, versionPackageName;
     private static int major, minor, release;
 
+    private static Software software;
+    private static Version version;
+
     public static void initialize(Object serverObj) {
-        try {
-            Class.forName("org.bukkit.Server");
 
-            loadVersionName(serverObj);
-            loadAges();
-            loadVersionEnum();
-
-            legacy = minor <= 16;
-            weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() > 20;
-            proxy = false;
-
-        } catch (Throwable ignored) {
-            proxy = true;
-            craftbukkit = false;
-        }
-
-        if (!proxy) {
+        if (doesClassExist("org.bukkit.Server")) {
             try {
-                Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
-                folia = true;
-            } catch (Throwable throwable) {
-                folia = false;
+                loadVersionName(serverObj);
+                loadAges();
+                loadVersionEnum();
+
+                legacy = minor <= 16;
+                weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() > 20;
+
+                software = doesClassExist("io.papermc.paper.threadedregions.RegionizedServer")
+                        ? Software.FOLIA : doesClassExist("com.destroystokyo.paper.Metrics")
+                        ? Software.PAPER : doesClassExist("org.spigotmc.SpigotConfig")
+                        ? Software.SPIGOT : Software.BUKKIT;
+
+                oldChannelMethod = software.isPaperBased() && weird;
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
+
+            return;
         }
 
-        try {
-            Class.forName("com.destroystokyo.paper.Metrics");
-            paper = true;
-        } catch (Throwable throwable) {
-            try {
-                Class.forName("io.github.waterfallmc.waterfall.QueryResult");
-                paper = true;
-            } catch (Throwable throwable1) {
-                paper = false;
-            }
-        }
-
-        if (proxy) {
-            try {
-                Class.forName("com.velocitypowered.api.proxy.ProxyServer");
-                velocity = true;
-            } catch (ClassNotFoundException ignored) { velocity = false; }
-        }
-
-        if (proxy) version = Version.UNKNOWN;
-
-        oldChannelMethod = folia || paper && Reflection.isWeird();
-
-
-        if (!proxy && !paper && !folia) {
-            try {
-                Class.forName("org.spigotmc.SpigotConfig");
-                craftbukkit = false;
-            } catch (Throwable throwable) {
-                craftbukkit = true;
-            }
-        }
-
+        software = doesClassExist("com.velocitypowered.api.proxy.ProxyServer")
+                ? Software.VELOCITY : doesClassExist("io.github.waterfallmc.waterfall.QueryResult")
+                ? Software.WATERFALL : Software.BUNGEECORD;
     }
 
     public static void toggleInjectionMethod() {
@@ -89,21 +59,27 @@ public class Reflection {
     public static boolean isLegacy() { return legacy; }
     public static boolean isWeird() { return weird; }
 
+    public static Software getSoftware() {
+        return software;
+    }
+
     public static boolean isFoliaServer() {
-        return folia;
+        return software == Software.FOLIA;
     }
 
     public static boolean isCraftbukkit() {
-        return craftbukkit;
+        return software == Software.BUKKIT;
     }
 
     public static boolean isProxyServer() {
-        return proxy;
+        return software.isProxySoftware();
     }
     public static boolean isVelocityServer() {
-        return velocity;
+        return software == Software.VELOCITY;
     }
-    public static boolean isPaper() { return paper; }
+    public static boolean isPaper() {
+        return software == Software.PAPER;
+    }
 
     public static Class<?> getClass(String clazzPath) {
         Class<?> clazz = null;
@@ -373,9 +349,8 @@ public class Reflection {
 
 
     private static void loadVersionName(Object serverObject) throws Exception {
-        versionName = proxy ? ProxyServer.getInstance().getName() : Bukkit.getName();
+        versionName = software.proxySoftware ? ProxyServer.getInstance().getName() : Bukkit.getName();
         rawVersionName = (String) serverObject.getClass().getMethod("getBukkitVersion").invoke(serverObject);
-        fullVersionName = rawVersionName;
         rawVersionName = rawVersionName.split("-")[0].replace(".", "_");
         versionPackageName = serverObject.getClass().getPackage().getName();
         versionPackageName = versionPackageName.substring(versionPackageName.lastIndexOf('.') + 1);
@@ -406,6 +381,30 @@ public class Reflection {
     public static int getMajor() { return major; }
     public static int getMinor() { return minor; }
     public static int getRelease() { return release; }
+
+    public enum Software {
+        BUKKIT(false, false),
+        SPIGOT(false, false),
+        PAPER(true, false), FOLIA(true, false),
+
+        BUNGEECORD(false, true),
+        WATERFALL(true, true),
+        VELOCITY(true, true);
+
+        private boolean paperBased, proxySoftware;
+        Software(final boolean paperBased, final boolean proxySoftware) {
+            this.paperBased = paperBased;
+            this.proxySoftware = proxySoftware;
+        }
+
+        public boolean isPaperBased() {
+            return paperBased;
+        }
+
+        public boolean isProxySoftware() {
+            return proxySoftware;
+        }
+    }
 
     public enum Version {
         UNKNOWN, UNSUPPORTED,
