@@ -179,6 +179,7 @@ public class Storage {
         GroupManager.initialize();
 
         if (!proxy) {
+            Communicator.get().reload();
             BackendUpdater.restart();
         }
 
