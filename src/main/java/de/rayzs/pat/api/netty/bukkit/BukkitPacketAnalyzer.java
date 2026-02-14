@@ -65,14 +65,10 @@ public class BukkitPacketAnalyzer {
             BukkitPacketAnalyzer.INJECTED_PLAYERS.put(player.getUniqueId(), channel);
         } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
             Reflection.toggleInjectionMethod();
-
-            Logger.info("Injection failed. Switching to secondary injection method.");
             boolean success = inject(player);
 
-            if (success) {
-                Logger.info("Secondary injection method was successful.");
-            } else {
-                Logger.warning("Secondary injection method failed!");
+            if (!success) {
+                Logger.warning("Both injection methods failed! Please report this back to me on my Discord! (https://www.rayzs.de/discord)");
             }
 
             return success;
