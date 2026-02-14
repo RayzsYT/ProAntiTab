@@ -30,11 +30,6 @@ public class BukkitAntiTabListener implements Listener {
         final UUID uuid = player.getUniqueId();
 
 
-        if (!BukkitLoader.isLoaded()) {
-            event.getCommands().clear();
-            return;
-        }
-
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             return;
         }
