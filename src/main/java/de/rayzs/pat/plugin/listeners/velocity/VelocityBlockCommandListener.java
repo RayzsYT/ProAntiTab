@@ -46,7 +46,12 @@ public class VelocityBlockCommandListener {
                 ? player.getCurrentServer().get().getServerInfo().getName()
                 : "unknown";
 
-        final String command = StringUtils.getFirstArg(event.getCommand());
+        String tmpCommand = StringUtils.getFirstArg(event.getCommand());
+        if (Communicator.get().hasConnectedClients() && Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.isCommand(tmpCommand)) {
+            tmpCommand = tmpCommand.toLowerCase();
+        }
+
+        final String command = tmpCommand;
 
         if (PermissionUtil.hasBypassPermission(sender, command) || Storage.Blacklist.isDisabledServer(serverName))
             return event;
@@ -63,7 +68,7 @@ public class VelocityBlockCommandListener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
 
-            Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
+            Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
             MessageTranslator.send(
                     player,
@@ -87,7 +92,7 @@ public class VelocityBlockCommandListener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
 
-            Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
+            Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
             MessageTranslator.send(
                     player,
@@ -143,7 +148,7 @@ public class VelocityBlockCommandListener {
                 if (!executeCommandEvent.doesNotify())
                     return event;
 
-                Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
+                Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
                     MessageTranslator.send(consoleSender, notificationMessage);

@@ -107,10 +107,11 @@ public class LuckPermsAdapter {
         if (event.isUser() && event.getTarget() instanceof User) {
             User user = (User) event.getTarget();
             UUID uuid = user.getUniqueId();
+            String serverName = Storage.getLoader().getPlayerServerName(uuid);
 
             if (Reflection.isProxyServer()) {
                 PermissionUtil.reloadPermissions(user.getUniqueId());
-                Communicator.sendUpdateCommand(uuid);
+                Communicator.Proxy2Backend.sendUpdateCommand(uuid, serverName);
 
                 if (Reflection.isVelocityServer()) {
                     VelocityLoader.delayedPlayerReload(uuid);

@@ -1,6 +1,8 @@
 package de.rayzs.pat.plugin;
 
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.communication.impl.BukkitClient;
+import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.plugin.converter.StorageConverter;
 import de.rayzs.pat.plugin.subarguments.SubArguments;
 import de.rayzs.pat.plugin.process.CommandProcess;
@@ -17,7 +19,6 @@ import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
 import de.rayzs.pat.plugin.commands.BukkitCommand;
 import de.rayzs.pat.utils.hooks.PlaceholderHook;
 import de.rayzs.pat.plugin.listeners.bukkit.*;
-import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
@@ -44,7 +45,6 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
-    private static boolean loaded = false, suggestions = false;
     private static Map<String, Command> commandsMap = null;
     private PATSchedulerTask updaterTask;
 
@@ -89,7 +89,6 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         PluginManager manager = getServer().getPluginManager();
 
         if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
-            loaded = true;
             GroupManager.initialize();
             BukkitPacketAnalyzer.injectAll();
         } else BackendUpdater.handle();
@@ -98,7 +97,6 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         manager.registerEvents(new BukkitBlockCommandListener(), this);
 
         if (Reflection.getMinor() >= 13) {
-            suggestions = true;
             manager.registerEvents(new BukkitAntiTabListener(), this);
         }
 
@@ -135,6 +133,8 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         SubArguments.initialize();
 
         StorageConverter.initialize();
+
+        Communicator.initialize(new BukkitClient());
 
         PATScheduler.createScheduler(() -> {
             Storage.reload();
@@ -282,10 +282,10 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
     }
 
-    public static void handleNotificationPacket(CommunicationPackets.NotificationPacket packet) {
+    public static void handleNotificationPacket(CommunicationPackets.Proxy2Backend.NotificationPacket packet) {
         if (!Storage.SEND_CONSOLE_NOTIFICATION) { return; }
 
-        final Player player = Bukkit.getPlayer(packet.getTargetUUID());
+        final Player player = Bukkit.getPlayer(packet.playerId());
         if (player == null) {
             return;
         }
@@ -293,25 +293,25 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         final List<String> notificationMessage = MessageTranslator.replaceMessageList(
                 Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
                 "%player%", player.getName(),
-                "%command%", packet.getDisplayedCommand(),
+                "%command%", packet.command(),
                 "%server%", Storage.SERVER_NAME,
                 "%world%", player.getWorld().getName());
 
         Logger.info(notificationMessage);
     }
 
-    public static void handleUpdateCommandsPacket(CommunicationPackets.UpdateCommandsPacket packet) {
+    public static void handleUpdateCommandsPacket(CommunicationPackets.Proxy2Backend.UpdatePacket packet) {
         if (Reflection.getMinor() < 13) {
             return;
         }
 
         PATScheduler.createScheduler(() -> {
-            if (!packet.hasTargetUUID()) {
+            if (packet.forEveryone()) {
                 BukkitAntiTabListener.updateCommands();
                 return;
             }
 
-            Player player = Bukkit.getPlayer(packet.getTargetUUID());
+            Player player = Bukkit.getPlayer(packet.playerId());
             if (player != null) {
                 BukkitAntiTabListener.updateCommands(player);
             }
@@ -319,46 +319,44 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         });
     }
 
-    public static void handleP2BExecute(CommunicationPackets.P2BExecutePacket packet) {
-         if (packet.isConsole()) {
-             PATScheduler.execute(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packet.getCommand()), null);
-                return;
-            }
+    public static void handlePlayerExecuteCommandPacket(CommunicationPackets.Proxy2Backend.ExecutePlayerCommandPacket packet) {
+        if (isP2BDisabled()) return;
 
-            final Player player = Bukkit.getPlayer(packet.getTargetUUID());
-            if (player == null) return;
+        final Player player = Bukkit.getPlayer(packet.playerId());
+        if (player == null) return;
 
-            PATScheduler.execute(() -> Bukkit.dispatchCommand(player, packet.getCommand()), player);
+        PATScheduler.execute(() -> Bukkit.dispatchCommand(player, packet.command()), player);
     }
 
-    public static void handleP2BMessage(CommunicationPackets.P2BMessagePacket packet) {
-        Logger.info(packet.getMessage());
+    public static void handleConsoleExecuteCommandPacket(CommunicationPackets.Proxy2Backend.ExecuteConsoleCommandPacket packet) {
+        if (isP2BDisabled()) return;
+
+        PATScheduler.execute(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packet.command()), null);
     }
 
-    public static void synchronize(CommunicationPackets.PacketBundle packetBundle) {
-        Storage.LAST_SYNC = System.currentTimeMillis();
-        Communicator.sendFeedback();
+    public static void handleConsoleMessagePacket(CommunicationPackets.Proxy2Backend.ConsoleMessagePacket packet) {
+        if (isP2BDisabled()) return;
 
-        CommunicationPackets.UnknownCommandPacket unknownCommandPacket = packetBundle.getUnknownCommandPacket();
-        CommunicationPackets.MessagePacket messagePacket = packetBundle.getMessagePacket();
+        Logger.info(packet.message());
+    }
 
-        Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.ENABLED = packetBundle.isAutoLowercaseCommandsEnabled();
-
-        if (!messagePacket.getPrefix().isEmpty())
-            Storage.ConfigSections.Messages.PREFIX.PREFIX = messagePacket.getPrefix();
-
-        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = unknownCommandPacket.getMessage();
-        if (Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED != unknownCommandPacket.isEnabled())
-            Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = unknownCommandPacket.isEnabled();
-
-        if (!loaded) {
-            loaded = true;
-
-            if (Reflection.getMinor() >= 13)
-                BukkitAntiTabListener.updateCommands();
+    private static boolean isP2BDisabled() {
+        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ALLOW_P2B_PACKETS) {
+            Logger.warning("P2B actions are currently disabled! You need to enable them manually.");
+            Logger.warning("For that, go to your 'plugins/ProAntiTab/config.yml' file and enable 'handle-through-proxy -> allow-p2b-packets'.");
+            return true;
         }
 
-        PATEventHandler.callReceiveSyncEvents(packetBundle);
+        return false;
+    }
+
+    public static void handleDataSyncPacket(CommunicationPackets.Proxy2Backend.DataSyncPacket packet) {
+        Storage.ConfigSections.Messages.PREFIX.PREFIX = packet.messages().prefix();
+        Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.ENABLED = packet.autoLowerCase().enabled();
+        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = packet.unknownCommand().enabled();
+        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = packet.unknownCommand().message();
+
+        PATEventHandler.callReceiveSyncEvents(packet);
     }
 
     public static List<String> getAllCommands() {
@@ -499,19 +497,11 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         return commandsMap;
     }
 
-    public static boolean useSuggestions() {
-        return suggestions;
-    }
-
     public static Plugin getPlugin() {
         return plugin;
     }
 
     public static java.util.logging.Logger getPluginLogger() {
         return logger;
-    }
-
-    public static boolean isLoaded() {
-        return loaded;
     }
 }

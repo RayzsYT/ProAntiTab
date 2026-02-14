@@ -221,7 +221,7 @@ public class BungeePacketAnalyzer {
     }
 
     public static void sendCommandsPacket() {
-        if (Communicator.CLIENTS.isEmpty()) {
+        if (!Communicator.get().hasConnectedClients()) {
             return;
         }
 

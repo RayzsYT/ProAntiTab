@@ -88,8 +88,8 @@ public class PATEventHandler {
         return event;
     }
 
-    public static SentSyncEvent callSentSyncEvents(CommunicationPackets.PacketBundle packetBundle, String serverName) {
-        SentSyncEvent event = EmptyEvent.createEmptySentSyncEvent(packetBundle, serverName);
+    public static SentSyncEvent callSentSyncEvents(CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket, String serverName) {
+        SentSyncEvent event = EmptyEvent.createEmptySentSyncEvent(dataSyncPacket, serverName);
 
         for (PATEvent patEvent : EVENTS) {
             if(patEvent instanceof SentSyncEvent) {
@@ -101,8 +101,8 @@ public class PATEventHandler {
         return event;
     }
 
-    public static ReceiveSyncEvent callReceiveSyncEvents(CommunicationPackets.PacketBundle packetBundle) {
-        ReceiveSyncEvent event = EmptyEvent.createEmptyReceiveSyncEvent(packetBundle);
+    public static ReceiveSyncEvent callReceiveSyncEvents(CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket) {
+        ReceiveSyncEvent event = EmptyEvent.createEmptyReceiveSyncEvent(dataSyncPacket);
 
         for (PATEvent patEvent : EVENTS) {
             if(patEvent instanceof ReceiveSyncEvent) {
@@ -133,8 +133,8 @@ public class PATEventHandler {
             };
         }
 
-        public static SentSyncEvent createEmptySentSyncEvent(CommunicationPackets.PacketBundle packetBundle, String serverName) {
-            return new SentSyncEvent(null, packetBundle, serverName) {
+        public static SentSyncEvent createEmptySentSyncEvent(CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket, String serverName) {
+            return new SentSyncEvent(null, dataSyncPacket, serverName) {
                 @Override
                 public void handle(SentSyncEvent event) {
 
@@ -142,8 +142,8 @@ public class PATEventHandler {
             };
         }
 
-        public static ReceiveSyncEvent createEmptyReceiveSyncEvent(CommunicationPackets.PacketBundle packetBundle) {
-            return new ReceiveSyncEvent(null, packetBundle) {
+        public static ReceiveSyncEvent createEmptyReceiveSyncEvent(CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket) {
+            return new ReceiveSyncEvent(null, dataSyncPacket) {
                 @Override
                 public void handle(ReceiveSyncEvent event) {
 

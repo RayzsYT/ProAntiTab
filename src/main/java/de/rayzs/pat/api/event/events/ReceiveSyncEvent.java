@@ -5,19 +5,19 @@ import de.rayzs.pat.api.event.PATEvent;
 
 public abstract class ReceiveSyncEvent extends PATEvent<ReceiveSyncEvent> {
 
-    private final CommunicationPackets.PacketBundle packetBundle;
+    private final CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket;
 
     public ReceiveSyncEvent() {
         super(null);
-        this.packetBundle = null;
+        this.dataSyncPacket = null;
     }
 
-    public ReceiveSyncEvent(Object senderObj, CommunicationPackets.PacketBundle packetBundle) {
+    public ReceiveSyncEvent(Object senderObj, CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket) {
         super(senderObj);
-        this.packetBundle = packetBundle;
+        this.dataSyncPacket = dataSyncPacket;
     }
 
-    public CommunicationPackets.PacketBundle getPacketBundle() {
-        return packetBundle;
+    public CommunicationPackets.Proxy2Backend.DataSyncPacket getDataSyncPacket() {
+        return dataSyncPacket;
     }
 }

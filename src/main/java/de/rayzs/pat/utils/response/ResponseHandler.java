@@ -355,7 +355,7 @@ public class ResponseHandler {
                             continue;
                         }
 
-                        Communicator.sendP2BMessage(
+                        Communicator.Proxy2Backend.sendConsoleMessage(
                                 serverName,
                                 ResponseHandler.replaceArgsVariables(
                                         StringUtils.replace(split[1], "%player%", playerName),
@@ -389,7 +389,7 @@ public class ResponseHandler {
                             continue;
                         }
 
-                        Communicator.sendP2BExecute(
+                        Communicator.Proxy2Backend.sendExecutePlayerCommand(
                                 serverName,
                                 uuid,
                                 ResponseHandler.replaceArgsVariables(
@@ -397,6 +397,7 @@ public class ResponseHandler {
                                         command
                                 )
                         );
+
                         continue;
 
                     case "p2b-console":
@@ -424,9 +425,8 @@ public class ResponseHandler {
                             continue;
                         }
 
-                        Communicator.sendP2BExecute(
+                        Communicator.Proxy2Backend.sendExecuteConsoleCommand(
                                 serverName,
-                                null,
                                 ResponseHandler.replaceArgsVariables(
                                         StringUtils.replace(split[1], "%player%", playerName),
                                         command

@@ -41,6 +41,10 @@ public class BungeeBlockCommandListener implements Listener {
         command = command.startsWith("/") ? command.substring(1) : command;
         command = StringUtils.getFirstArg(command);
 
+        if (Communicator.get().hasConnectedClients() && Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.isCommand(command)) {
+            command = command.toLowerCase();
+        }
+
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
 
@@ -52,7 +56,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
 
-            Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
+            Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
             MessageTranslator.send(
                     player,
@@ -76,7 +80,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
 
-            Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
+            Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
             MessageTranslator.send(
                     player,
@@ -130,7 +134,7 @@ public class BungeeBlockCommandListener implements Listener {
                 if (!executeCommandEvent.doesNotify())
                     return;
 
-                Communicator.sendNotificationPacket(player.getUniqueId(), serverName, displayCommand);
+                Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
                     Logger.info(notificationMessage);

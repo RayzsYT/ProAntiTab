@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.process.impl.local.system;
 
+import de.rayzs.pat.api.communication.Communicator;
 import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -35,6 +36,8 @@ public class UpdateCommand extends ProCommand {
 
             if (!Reflection.isProxyServer() && Reflection.getMinor() >= 13) {
                 BukkitAntiTabListener.handleTabCompletion();
+            } else if (Reflection.isProxyServer()) {
+                Communicator.Proxy2Backend.sendUpdateCommand();
             }
 
             sender.sendMessage(Storage.ConfigSections.Messages.UPDATE_PERMISSIONS.UPDATE_ALL);
@@ -64,6 +67,8 @@ public class UpdateCommand extends ProCommand {
 
             if (!Reflection.isProxyServer() && Reflection.getMinor() >= 13) {
                 BukkitAntiTabListener.handleTabCompletion(uuid);
+            } else if (Reflection.isProxyServer()) {
+                Communicator.Proxy2Backend.sendUpdateCommand(uuid, targetSender.getServerName());
             }
 
         }

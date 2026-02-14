@@ -5,18 +5,18 @@ import de.rayzs.pat.api.event.PATEvent;
 
 public abstract class SentSyncEvent extends PATEvent<SentSyncEvent> {
 
-    private final CommunicationPackets.PacketBundle packetBundle;
+    private final CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket;
     private final String serverName;
 
     public SentSyncEvent() {
         super(null);
-        this.packetBundle = null;
+        this.dataSyncPacket = null;
         this.serverName = null;
     }
 
-    public SentSyncEvent(Object senderObj, CommunicationPackets.PacketBundle packetBundle, String serverName) {
+    public SentSyncEvent(Object senderObj, CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket, String serverName) {
         super(senderObj);
-        this.packetBundle = packetBundle;
+        this.dataSyncPacket = dataSyncPacket;
         this.serverName = serverName;
     }
 
@@ -24,7 +24,7 @@ public abstract class SentSyncEvent extends PATEvent<SentSyncEvent> {
         return serverName;
     }
 
-    public CommunicationPackets.PacketBundle getPacketBundle() {
-        return packetBundle;
+    public CommunicationPackets.Proxy2Backend.DataSyncPacket getDataSyncPacket() {
+        return dataSyncPacket;
     }
 }
