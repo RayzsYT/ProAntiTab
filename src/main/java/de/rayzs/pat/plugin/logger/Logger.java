@@ -152,12 +152,12 @@ public class Logger {
                     .append(Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED ? "Deactivated" : (TimeConverter.calcAndGetTime(Communicator.get().getLastSync())))
                     .append("\n\n");
 
+            builder.append("synced-server: ");
             Iterator<ClientInfo> iterator = Communicator.get().getClients().iterator();
             while (iterator.hasNext()) {
                 ClientInfo clientInfo = iterator.next();
 
-                builder.append("synced-server: ")
-                        .append(clientInfo.getServerName())
+                builder.append(clientInfo.getServerName())
                         .append(" (")
                         .append(clientInfo.getFormattedLastReceivedKeepAlivePacketTime() + " / " + clientInfo.getFormattedSyncTime())
                         .append(")");
