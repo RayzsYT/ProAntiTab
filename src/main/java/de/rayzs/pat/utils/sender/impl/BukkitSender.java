@@ -1,6 +1,7 @@
 package de.rayzs.pat.utils.sender.impl;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
 import de.rayzs.pat.utils.sender.CommandSenderHandler;
@@ -105,6 +106,17 @@ public class BukkitSender extends CommandSenderAbstract {
     public void sendMessage(String message) {
         if (MessageTranslator.isSupported()) {
             MessageTranslator.send(sender, message);
+            return;
+        }
+
+        // To prevent color-code overlapping on Bukkit consoles.
+        if (Reflection.isCraftbukkit() && isConsole()) {
+            String[] lines = message.split("\n");
+
+            for (String line : lines) {
+                sender.sendMessage(MessageTranslator.replaceMessage(sender, line));
+            }
+
             return;
         }
 
