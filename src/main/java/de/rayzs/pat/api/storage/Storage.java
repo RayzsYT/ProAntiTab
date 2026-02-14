@@ -100,8 +100,8 @@ public class Storage {
         loadToken();
 
         if (TOKEN != null && !TOKEN.isEmpty()) {
-            int tokenLength = TOKEN.length(), cutIndex = Math.max(1, tokenLength - 3);
-            CENSORED_TOKEN = "*".repeat(cutIndex) + TOKEN.substring(cutIndex);
+            int tokenLength = TOKEN.length(), cutIndex = Math.max(1, tokenLength - 2);
+            CENSORED_TOKEN = TOKEN.charAt(0) + "*".repeat(cutIndex) + TOKEN.substring(cutIndex);
             Logger.info("Token found! (" + CENSORED_TOKEN + ")");
         }
 
