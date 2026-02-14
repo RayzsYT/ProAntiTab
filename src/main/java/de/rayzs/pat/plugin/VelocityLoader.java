@@ -5,6 +5,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.communication.impl.VelocityClient;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.netty.proxy.VelocityPacketAnalyzer;
 import de.rayzs.pat.plugin.converter.StorageConverter;
@@ -102,9 +103,6 @@ public class VelocityLoader implements PluginLoader {
 
         startUpdaterTask();
 
-        if (!Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
-            server.getScheduler().buildTask(this, () -> Communicator.syncData()).delay(5, TimeUnit.SECONDS).schedule();
-
         Storage.PLUGIN_OBJECT = this;
 
         if (server.getPluginManager().getPlugin("luckperms").isPresent())
@@ -125,6 +123,8 @@ public class VelocityLoader implements PluginLoader {
         SubArguments.initialize();
 
         StorageConverter.initialize();
+
+        Communicator.initialize(new VelocityClient());
 
         VelocityPacketAnalyzer.injectAll();
     }

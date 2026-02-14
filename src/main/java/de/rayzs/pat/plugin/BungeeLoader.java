@@ -2,6 +2,7 @@ package de.rayzs.pat.plugin;
 
 
 import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.api.communication.impl.BungeeClient;
 import de.rayzs.pat.plugin.converter.StorageConverter;
 import de.rayzs.pat.plugin.process.CommandProcess;
 import de.rayzs.pat.plugin.subarguments.SubArguments;
@@ -79,9 +80,6 @@ public class BungeeLoader extends Plugin implements PluginLoader {
 
         startUpdaterTask();
 
-        if (!Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED)
-            ProxyServer.getInstance().getScheduler().schedule(this, Communicator::syncData, 5, TimeUnit.SECONDS);
-
         Storage.PLUGIN_OBJECT = this;
 
         if (manager.getPlugin("LuckPerms") != null)
@@ -104,6 +102,8 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         SubArguments.initialize();
 
         StorageConverter.initialize();
+
+        Communicator.initialize(new BungeeClient());
 
         // Reload proxy commands after 1, 5, and 15 seconds.
         for (int i : new Integer[] { 1, 5, 15 }) {
@@ -137,7 +137,7 @@ public class BungeeLoader extends Plugin implements PluginLoader {
             PermissionUtil.reloadPermissions();
             Storage.getLoader().updateCommandCache();
 
-            Communicator.sendRequest();
+            Communicator.Proxy2Backend.sendUpdateCommand();
         }, 1, TimeUnit.SECONDS);
     }
 
