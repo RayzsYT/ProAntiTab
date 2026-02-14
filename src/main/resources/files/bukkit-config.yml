@@ -41,6 +41,14 @@ handle-through-proxy:
   enabled: false
   token: insert-token-of-proxy-here
 
+  # Enabling this allows you to remotely execute
+  # console/player commands and send console messages from
+  # the proxy to a backend server.
+  #
+  # It's only for all the p2b actions inside the custom-responses.yml
+  # and is disabled by default as a security measurement.
+  allow-p2b-packets: false
+
   # Advanced option:
   # Loads the token from an ENV variable instead.
   # (!) Warning: Do NOT enable this option, unless you know what you're doing!
