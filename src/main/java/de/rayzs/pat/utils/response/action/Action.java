@@ -31,7 +31,7 @@ public interface Action {
                 "%command%", displayCommand,
                 "%server%", serverName);
 
-        Communicator.sendNotificationPacket(uuid, serverName, displayCommand);
+        Communicator.Proxy2Backend.sendNotification(uuid, serverName, displayCommand);
 
         if (Storage.SEND_CONSOLE_NOTIFICATION)
             Logger.info(notificationMessage);
