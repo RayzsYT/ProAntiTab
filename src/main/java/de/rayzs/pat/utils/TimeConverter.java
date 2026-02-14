@@ -34,12 +34,32 @@ public class TimeConverter {
         }
 
         StringBuilder uptimeText = new StringBuilder();
-        if (weeks > 0) uptimeText.append(weeks + "w, ");
-        else if (days > 0) uptimeText.append(days + "d, ");
-        else if (hours > 0) uptimeText.append(hours + "h, ");
-        else if (minutes > 0) uptimeText.append(minutes + "m, ");
-        else if (seconds > 0) uptimeText.append(seconds + "s");
-        else uptimeText.append(ms + "ms");
+
+        if (weeks > 0) {
+            uptimeText.append(weeks).append("w");
+        }
+        
+        if (days > 0) {
+            if (weeks > 0) uptimeText.append(", ");
+            uptimeText.append(days).append("d");
+        }
+
+        if (hours > 0) {
+            if (days > 0) uptimeText.append(", ");
+            uptimeText.append(hours).append("h");
+        }
+
+        if (minutes > 0) {
+            if (hours > 0) uptimeText.append(", ");
+            uptimeText.append(minutes).append("m");
+        }
+
+        if (seconds > 0) {
+            if (minutes > 0) uptimeText.append(", ");
+            uptimeText.append(seconds).append("s");
+        } else {
+            uptimeText.append(ms).append("ms");
+        }
 
         return uptimeText.toString();
     }
