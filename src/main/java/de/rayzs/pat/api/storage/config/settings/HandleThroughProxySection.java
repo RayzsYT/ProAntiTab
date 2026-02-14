@@ -6,7 +6,7 @@ import de.rayzs.pat.utils.Reflection;
 
 public class HandleThroughProxySection extends ConfigStorage {
 
-    public boolean ENABLED, ALLOW_P2B_PACKETS;
+    public boolean ENABLED, ALLOW_P2B_ACTIONS;
 
     public boolean LOAD_FROM_ENV;
     public String ENV_NAME;
@@ -25,7 +25,7 @@ public class HandleThroughProxySection extends ConfigStorage {
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", false).getOrSet();
         TOKEN = new ConfigSectionHelper<String>(this, "token", "insert-token-of-proxy-here").getOrSet();
 
-        ALLOW_P2B_PACKETS = new ConfigSectionHelper<Boolean>(this, "allow-p2b-packets", false).getOrSet();
+        ALLOW_P2B_ACTIONS = new ConfigSectionHelper<Boolean>(this, "allow-p2b-actions", false).getOrSet();
 
         LOAD_FROM_ENV = new ConfigSectionHelper<Boolean>(this, "load-from-env.enabled", false).getOrSet();
         ENV_NAME = new ConfigSectionHelper<String>(this, "load-from-env.name", "PAT_TOKEN").getOrSet();

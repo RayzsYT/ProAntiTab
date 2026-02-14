@@ -47,7 +47,7 @@ handle-through-proxy:
   #
   # It's only for all the p2b actions inside the custom-responses.yml
   # and is disabled by default as a security measurement.
-  allow-p2b-packets: false
+  allow-p2b-actions: false
 
   # Advanced option:
   # Loads the token from an ENV variable instead.

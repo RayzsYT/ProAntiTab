@@ -339,9 +339,9 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     private static boolean isP2BDisabled() {
-        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ALLOW_P2B_PACKETS) {
+        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ALLOW_P2B_ACTIONS) {
             Logger.warning("P2B actions are currently disabled! You need to enable them manually.");
-            Logger.warning("For that, go to your 'plugins/ProAntiTab/config.yml' file and enable 'handle-through-proxy -> allow-p2b-packets'.");
+            Logger.warning("For that, go to your 'plugins/ProAntiTab/config.yml' file and enable 'handle-through-proxy -> allow-p2b-actions'.");
             return true;
         }
 
