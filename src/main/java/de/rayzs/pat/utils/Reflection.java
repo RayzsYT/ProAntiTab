@@ -387,16 +387,24 @@ public class Reflection {
     public enum Software {
         BUKKIT(false, false),
         SPIGOT(false, false),
-        PAPER(true, false), FOLIA(true, false),
+        PAPER(true, false),
+        FOLIA(true, false),
 
         BUNGEECORD(false, true),
         WATERFALL(true, true),
         VELOCITY(true, true);
 
-        private boolean paperBased, proxySoftware;
+        private final boolean paperBased, proxySoftware;
+        private final String name;
         Software(final boolean paperBased, final boolean proxySoftware) {
             this.paperBased = paperBased;
             this.proxySoftware = proxySoftware;
+            this.name = Character.toUpperCase(this.name().charAt(0)) + this.name().substring(1).toLowerCase();
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
 
         public boolean isPaperBased() {
