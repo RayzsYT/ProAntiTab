@@ -51,7 +51,12 @@ public class BukkitAntiTabListener implements Listener {
 
         if (!player.isOp() && knownOperators.contains(uuid)) {
             knownOperators.remove(uuid);
-            PermissionUtil.reloadPermissions(player.getUniqueId());
+
+            if (Reflection.isCraftbukkit() && sender != null) {
+                PermissionUtil.reloadPermissions(sender);
+            } else {
+                PermissionUtil.reloadPermissions(uuid);
+            }
         }
 
         if (PermissionUtil.hasBypassPermission(sender)) {
