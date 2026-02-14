@@ -28,6 +28,9 @@ public class BungeeClient implements Client, Listener {
     }
 
     @Override
+    public void reload() {}
+
+    @Override
     public void send(CommunicationPackets.PATPacket packet) {
         final byte[] preparedPacket = CommunicationPackets.preparePacket(packet);
 

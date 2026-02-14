@@ -27,6 +27,9 @@ public class VelocityClient implements Client {
     }
 
     @Override
+    public void reload() {}
+
+    @Override
     public void send(CommunicationPackets.PATPacket packet) {
         final byte[] preparedPacket = CommunicationPackets.preparePacket(packet);
 

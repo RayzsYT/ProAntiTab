@@ -322,6 +322,10 @@ public class Communicator {
         );
     }
 
+    public void reload() {
+        this.client.reload();
+    }
+
     public UUID getClientId(String serverName) {
         final ClientInfo clientInfo = clients.get(serverName);
         if (clientInfo == null) return null;

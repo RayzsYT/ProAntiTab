@@ -12,15 +12,40 @@ import org.bukkit.*;
 public class BukkitClient implements Client, PluginMessageListener {
 
     private static final Server SERVER = Bukkit.getServer();
+    private boolean registered = false;
 
     public BukkitClient() {
+        reload();
+    }
 
+    @Override
+    public void reload() {
         if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+
+            if (registered) {
+                unregister();
+            }
+
             return;
         }
 
+        if (!registered) {
+            register();
+        }
+    }
+
+    private void register() {
+        registered = true;
+
         SERVER.getMessenger().registerIncomingPluginChannel(BukkitLoader.getPlugin(), CHANNEL_NAME, this);
         SERVER.getMessenger().registerOutgoingPluginChannel(BukkitLoader.getPlugin(), CHANNEL_NAME);
+    }
+
+    private void unregister() {
+        registered = false;
+
+        SERVER.getMessenger().unregisterIncomingPluginChannel(BukkitLoader.getPlugin(), CHANNEL_NAME, this);
+        SERVER.getMessenger().unregisterOutgoingPluginChannel(BukkitLoader.getPlugin(), CHANNEL_NAME);
     }
 
     @Override
