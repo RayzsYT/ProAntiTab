@@ -129,7 +129,7 @@ public class MessageTranslator {
                 : sender.getName();
 
         String token = (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED || Reflection.isProxyServer())
-                ? Storage.TOKEN
+                ? Storage.CENSORED_TOKEN
                 : "/";
 
         String serverName = Storage.SERVER_NAME == null ? "/" : Storage.SERVER_NAME;
