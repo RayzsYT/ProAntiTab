@@ -21,22 +21,19 @@
 #        Example: alert
 #   Execute console command:
 #        Syntax:  console::command
-#        Example: console::say %player% is an evil player
+#        Example: console::send %player% lobby
 #   Execute player command:
 #        Syntax:  execute::command
-#        Example: execute::help
+#        Example: execute::server lobby
 #   Send actionbar:
 #        Syntax:  actionbar::text
 #        Example: actionbar::&cThis is not cool %player%!
 #   Send title:
 #        Syntax:  title::title::subtitle::5::20::5
 #        Example: title::&aTest title::&cHello %player%!
-#   Play sound: (Available sounds: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html)
+#   Play sound: (Available sounds: https://www.digminecraft.com/lists/sound_list_pc.php)
 #        Syntax:  sound::soundName::volume::pitch
-#        Example: sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0
-#   Give potion effect:
-#        Syntax:  effect::potionEffect::duration::amplifier
-#        Example: effect::BLINDNESS::45::1
+#        Example: sound::entity.ender_dragon.growl::1.0::1.0
 #   Send console message to backend server:
 #        Syntax:  p2b-message::text
 #        Example: p2b-message::&cPlayer &4%player% &cdid something bad.
@@ -125,7 +122,6 @@
 #    - "&cThis sub-command does not exist. Please type: &e/ah help"
 #  actions:
 #    - "console::say That's not nice %player%!"
-#    - "effect::BLINDNESS::45::1"
-#    - "sound::ENTITY_ENDER_DRAGON_GROWL::1.0::1.0"
+#    - "sound::entity.ender_dragon.growl::1.0::1.0"
 #    - "title::&cHey!::&cYou can't do that %player%!::5::20::5"
 #    - "actionbar::&cNop, sorry %player%"
