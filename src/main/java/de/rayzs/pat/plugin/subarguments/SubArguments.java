@@ -78,6 +78,7 @@ public class SubArguments {
         }
 
         final List<String> inputs = source.getAllInputs();
+        final List<String> actuallyExistingCommands = helper.getChildrenNames();
 
         if (turn) {
             List<String> allEntries = inputs.stream().map(StringUtils::getFirstArg).toList();
@@ -98,8 +99,9 @@ public class SubArguments {
 
             if (!negated) {
 
-                if (turn) helper.add(input, true);
-                else helper.removeSubArguments(input);
+                if (turn && actuallyExistingCommands.contains(StringUtils.getFirstArg(input))) {
+                    helper.add(input, true);
+                } else helper.removeSubArguments(input);
 
                 continue;
             }
@@ -112,7 +114,9 @@ public class SubArguments {
             input = Storage.Blacklist.BlockTypeFetcher.cleanse(input);
 
             if (turn) helper.removeSubArguments(input);
-            else helper.add(input, true);
+            else if (actuallyExistingCommands.contains(StringUtils.getFirstArg(input))) {
+                helper.add(input, true);
+            }
         }
     }
 

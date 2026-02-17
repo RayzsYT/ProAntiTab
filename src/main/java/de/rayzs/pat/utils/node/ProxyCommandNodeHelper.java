@@ -150,8 +150,13 @@ public class ProxyCommandNodeHelper<T> {
 
         String part = args[index];
 
-        if (index == 0)
+        if (index == 0) {
             part = Storage.Blacklist.BlockTypeFetcher.modify(Storage.Blacklist.BlockTypeFetcher.modify(part));
+        }
+
+        if (part.length() > 1 && part.startsWith("%") && part.endsWith("%")) {
+            return;
+        }
 
         String next = index + 1 >= args.length ? null : args[index + 1];
         CommandNode<T> childNode = parent.getChild(part);
