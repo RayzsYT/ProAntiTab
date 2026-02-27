@@ -66,12 +66,23 @@ public class VelocityConnectionListener {
         if (!VelocityPacketAnalyzer.isInjected(player)) {
 
             if (!VelocityPacketAnalyzer.inject(player)) {
-                Logger.warning("Attempting delayed injection for " + player.getUsername());
                 server.getScheduler().buildTask(loader, () -> {
-
                     if (!VelocityPacketAnalyzer.inject(player)) {
-                        Logger.warning("Second injection for " + player.getUsername() + " failed as well!");
-                        player.disconnect(Component.text("Failed to inject player!"));
+
+                        if (Storage.ConfigSections.Settings.INJECTION_FAILED.ENABLED) {
+
+                            Logger.info(MessageTranslator.replaceMessage(
+                                    player,
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE.get()
+                            ));
+
+                            player.disconnect(Component.text(
+                                    MessageTranslator.replaceMessage(
+                                            player,
+                                            Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE.get()
+                                    )
+                            ));
+                        }
                     }
 
                 }).delay(1, TimeUnit.SECONDS).schedule();

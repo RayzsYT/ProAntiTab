@@ -7,6 +7,7 @@ import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.api.communication.BackendUpdater;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.permission.PermissionUtil;
@@ -63,8 +64,19 @@ public class BukkitPlayerListener implements Listener {
             PATScheduler.createScheduler(() -> {
                 if (player.isOnline()) {
                     if (!BukkitPacketAnalyzer.inject(player)) {
-                        Logger.warning("Failed to inject into player! (" + player.getName() + ")" );
-                        player.kickPlayer("Failed to inject player!");
+
+                        if (Storage.ConfigSections.Settings.INJECTION_FAILED.ENABLED) {
+
+                            Logger.info(MessageTranslator.replaceMessage(
+                                    sender,
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE.get()
+                            ));
+
+                            player.kickPlayer(MessageTranslator.replaceMessage(
+                                    sender,
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE.get()
+                            ));
+                        }
                     }
                 }
             }, 10);
