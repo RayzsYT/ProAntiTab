@@ -363,6 +363,7 @@ public class Storage {
             public static AutoLowercaseCommandsSection AUTO_LOWERCASE_COMMANDS = new AutoLowercaseCommandsSection();
             public static BlockNamespaceCommandsSection BLOCK_NAMESPACE_COMMANDS = new BlockNamespaceCommandsSection();
             public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
+            public static InjectionFailedSection INJECTION_FAILED = new InjectionFailedSection();
             public static PatchExploitSection PATCH_EXPLOITS = new PatchExploitSection();
             public static CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
             public static CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
