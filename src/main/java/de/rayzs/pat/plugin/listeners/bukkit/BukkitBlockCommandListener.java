@@ -2,10 +2,11 @@ package de.rayzs.pat.plugin.listeners.bukkit;
 
 import java.util.List;
 
+import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
+import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -27,7 +28,7 @@ public class BukkitBlockCommandListener implements Listener {
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onUnknownCommandRecognition(PlayerCommandPreprocessEvent event) {
         final Player player = event.getPlayer();
-        final CommandSender sender = CommandSenderHandler.from(player);
+        final CommandSender sender = CommandSender.from(player);
         final World world = player.getWorld();
 
         String rawCommand = StringUtils.getFirstArg(event.getMessage()),
@@ -51,7 +52,7 @@ public class BukkitBlockCommandListener implements Listener {
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
         final Player player = event.getPlayer();
-        final CommandSender sender = CommandSenderHandler.from(player);
+        final CommandSender sender = CommandSender.from(player);
 
         final String commandFirstArg = StringUtils.getFirstArg(event.getMessage());
 
@@ -76,6 +77,8 @@ public class BukkitBlockCommandListener implements Listener {
                 worldName = world.getName();
 
         command = command.substring(1);
+        final String commandWithArguments = command;
+
         command = StringUtils.getFirstArg(command);
 
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
@@ -158,7 +161,7 @@ public class BukkitBlockCommandListener implements Listener {
 
         if (!allowed) {
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
-                    player,
+                    sender,
                     event.getMessage(),
                     true,
                     !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED
@@ -166,6 +169,17 @@ public class BukkitBlockCommandListener implements Listener {
 
             if (executeCommandEvent.isBlocked()) {
                 event.setCancelled(true);
+
+                MessageTranslator.send(
+                        sender,
+                        ResponseHandler.getResponse(
+                                sender.getUniqueId(),
+                                sender.getName(),
+                                sender.getServerName(),
+                                event.getMessage(),
+                                Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()
+                        ), "%command%", StringUtils.getFirstArg(displayCommand)
+                );
 
                 if (!executeCommandEvent.doesNotify())
                     return;
@@ -184,8 +198,30 @@ public class BukkitBlockCommandListener implements Listener {
                 return;
         }
 
-        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getMessage(), false, false);
-        if (executeCommandEvent.isBlocked())
+        ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
+                sender,
+                event.getMessage(),
+                SubArgument.get().getExecuteHandler().handleCommandExecution(sender, event.getMessage()),
+                false
+        );
+
+        if (executeCommandEvent.isBlocked()) {
             event.setCancelled(true);
+
+            MessageTranslator.send(
+                    sender,
+                    ResponseHandler.getResponse(
+                            sender.getUniqueId(),
+                            sender.getName(),
+                            sender.getServerName(),
+                            event.getMessage()
+                    ),
+                    "%command%",
+                    StringUtils.replaceTriggers(
+                            commandWithArguments, "",
+                            "\\", "<", ">", "&"
+                    )
+            );
+        }
     }
 }

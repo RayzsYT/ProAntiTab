@@ -2,7 +2,7 @@ package de.rayzs.pat.api.event;
 
 import de.rayzs.pat.api.event.events.*;
 import de.rayzs.pat.utils.CommunicationPackets;
-import de.rayzs.pat.utils.Reflection;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 import java.util.*;
 
@@ -10,12 +10,11 @@ public class PATEventHandler {
 
     private static List<PATEvent> EVENTS = new ArrayList<>();
 
-    public static ExecuteCommandEvent callExecuteCommandEvents(Object senderObj, String command, boolean blocked, boolean notify) {
-        ExecuteCommandEvent event = EmptyEvent.createEmptyExecuteCommandEvent(senderObj, command, blocked, notify);
+    public static ExecuteCommandEvent callExecuteCommandEvents(CommandSender player, String command, boolean blocked, boolean notify) {
+        ExecuteCommandEvent event = EmptyEvent.createEmptyExecuteCommandEvent(player, command, blocked, notify);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof ExecuteCommandEvent) {
-                ExecuteCommandEvent executeCommandEvent = (ExecuteCommandEvent) patEvent;
+            if (patEvent instanceof ExecuteCommandEvent executeCommandEvent) {
                 executeCommandEvent.handle(event);
             }
         }
@@ -23,38 +22,35 @@ public class PATEventHandler {
         return event;
     }
 
-    public static FilteredSuggestionEvent callFilteredSuggestionEvents(Object senderObj, List<String> suggestions) {
-        FilteredSuggestionEvent event = EmptyEvent.createEmptyFilteredSuggestionEvent(senderObj, suggestions);
+    public static FilteredSuggestionEvent callFilteredSuggestionEvents(CommandSender player, List<String> suggestions) {
+        FilteredSuggestionEvent event = EmptyEvent.createEmptyFilteredSuggestionEvent(player, suggestions);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof FilteredSuggestionEvent) {
-                FilteredSuggestionEvent filteredSuggestion = (FilteredSuggestionEvent) patEvent;
-                filteredSuggestion.handle(event);
+            if (patEvent instanceof FilteredSuggestionEvent filteredSuggestionEvent) {
+                filteredSuggestionEvent.handle(event);
             }
         }
 
         return event;
     }
 
-    public static FilteredTabCompletionEvent callFilteredTabCompletionEvents(Object senderObj, String cursor, List<String> completion) {
-        FilteredTabCompletionEvent event = EmptyEvent.createEmptyFilteredTabCompletion(senderObj, cursor, completion);
+    public static FilteredTabCompletionEvent callFilteredTabCompletionEvents(CommandSender player, String cursor, List<String> completion) {
+        FilteredTabCompletionEvent event = EmptyEvent.createEmptyFilteredTabCompletion(player, cursor, completion);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof FilteredTabCompletionEvent) {
-                FilteredTabCompletionEvent filteredTabCompletion = (FilteredTabCompletionEvent) patEvent;
-                filteredTabCompletion.handle(event);
+            if (patEvent instanceof FilteredTabCompletionEvent filteredTabCompletionEvent) {
+                filteredTabCompletionEvent.handle(event);
             }
         }
 
         return event;
     }
 
-    public static ServerPlayersChangeEvent callServerPlayersChangeEvents(Object senderObj, ServerPlayersChangeEvent.Type type) {
-        ServerPlayersChangeEvent event = EmptyEvent.createEmptyServerPlayersChangeEvent(senderObj, type);
+    public static ServerPlayersChangeEvent callServerPlayersChangeEvents(CommandSender player, ServerPlayersChangeEvent.Type type) {
+        ServerPlayersChangeEvent event = EmptyEvent.createEmptyServerPlayersChangeEvent(player, type);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof ServerPlayersChangeEvent) {
-                ServerPlayersChangeEvent serverPlayersChangeEvent = (ServerPlayersChangeEvent) patEvent;
+            if (patEvent instanceof ServerPlayersChangeEvent serverPlayersChangeEvent) {
                 serverPlayersChangeEvent.handle(event);
             }
         }
@@ -66,8 +62,7 @@ public class PATEventHandler {
         UpdatePluginEvent event = EmptyEvent.createEmptyUpdatePluginEvent();
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof UpdatePluginEvent) {
-                UpdatePluginEvent updatePluginEvent = (UpdatePluginEvent) patEvent;
+            if (patEvent instanceof UpdatePluginEvent updatePluginEvent) {
                 updatePluginEvent.handle(event);
             }
         }
@@ -75,12 +70,11 @@ public class PATEventHandler {
         return event;
     }
 
-    public static UpdatePlayerCommandsEvent callUpdatePlayerCommandsEvents(Object playerObj, List<String> commands, boolean serverBased) {
-        UpdatePlayerCommandsEvent event = EmptyEvent.createEmptyUpdatePlayerCommandsEvent(playerObj, commands, serverBased);
+    public static UpdatePlayerCommandsEvent callUpdatePlayerCommandsEvents(CommandSender player, List<String> commands, boolean serverBased) {
+        UpdatePlayerCommandsEvent event = EmptyEvent.createEmptyUpdatePlayerCommandsEvent(player, commands, serverBased);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof UpdatePlayerCommandsEvent) {
-                UpdatePlayerCommandsEvent updatePlayerCommandsEvent = (UpdatePlayerCommandsEvent) patEvent;
+            if (patEvent instanceof UpdatePlayerCommandsEvent updatePlayerCommandsEvent) {
                 updatePlayerCommandsEvent.handle(event);
             }
         }
@@ -92,8 +86,7 @@ public class PATEventHandler {
         SentSyncEvent event = EmptyEvent.createEmptySentSyncEvent(dataSyncPacket, serverName);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof SentSyncEvent) {
-                SentSyncEvent sentSyncEvent = (SentSyncEvent) patEvent;
+            if (patEvent instanceof SentSyncEvent sentSyncEvent) {
                 sentSyncEvent.handle(event);
             }
         }
@@ -105,9 +98,8 @@ public class PATEventHandler {
         ReceiveSyncEvent event = EmptyEvent.createEmptyReceiveSyncEvent(dataSyncPacket);
 
         for (PATEvent patEvent : EVENTS) {
-            if(patEvent instanceof ReceiveSyncEvent) {
-                ReceiveSyncEvent proxySyncEvent = (ReceiveSyncEvent) patEvent;
-                proxySyncEvent.handle(event);
+            if (patEvent instanceof ReceiveSyncEvent receiveSyncEvent) {
+                receiveSyncEvent.handle(event);
             }
         }
 
@@ -124,8 +116,8 @@ public class PATEventHandler {
 
     public static class EmptyEvent {
 
-        public static ServerPlayersChangeEvent createEmptyServerPlayersChangeEvent(Object senderObj, ServerPlayersChangeEvent.Type type) {
-            return new ServerPlayersChangeEvent(senderObj, type) {
+        public static ServerPlayersChangeEvent createEmptyServerPlayersChangeEvent(CommandSender player, ServerPlayersChangeEvent.Type type) {
+            return new ServerPlayersChangeEvent(player, type) {
                 @Override
                 public void handle(ServerPlayersChangeEvent event) {
 
@@ -151,8 +143,8 @@ public class PATEventHandler {
             };
         }
 
-        public static UpdatePlayerCommandsEvent createEmptyUpdatePlayerCommandsEvent(Object playerObj, List<String> commands, boolean serverBased) {
-            return new UpdatePlayerCommandsEvent(playerObj, commands, serverBased) {
+        public static UpdatePlayerCommandsEvent createEmptyUpdatePlayerCommandsEvent(CommandSender player, List<String> commands, boolean serverBased) {
+            return new UpdatePlayerCommandsEvent(player, commands, serverBased) {
                 @Override
                 public void handle(UpdatePlayerCommandsEvent event) {
 
@@ -169,8 +161,8 @@ public class PATEventHandler {
             };
         }
 
-        public static ExecuteCommandEvent createEmptyExecuteCommandEvent(Object senderObj, String command, boolean blocked, boolean notify) {
-            return new ExecuteCommandEvent(senderObj, command, blocked, notify) {
+        public static ExecuteCommandEvent createEmptyExecuteCommandEvent(CommandSender player, String command, boolean blocked, boolean notify) {
+            return new ExecuteCommandEvent(player, command, blocked, notify) {
                 @Override
                 public void handle(ExecuteCommandEvent event) {
 
@@ -178,8 +170,8 @@ public class PATEventHandler {
             };
         }
 
-        public static FilteredSuggestionEvent createEmptyFilteredSuggestionEvent(Object senderObj, List<String> suggestions) {
-            return new FilteredSuggestionEvent(senderObj, suggestions) {
+        public static FilteredSuggestionEvent createEmptyFilteredSuggestionEvent(CommandSender player, List<String> suggestions) {
+            return new FilteredSuggestionEvent(player, suggestions) {
                 @Override
                 public void handle(FilteredSuggestionEvent event) {
 
@@ -187,8 +179,8 @@ public class PATEventHandler {
             };
         }
 
-        public static FilteredTabCompletionEvent createEmptyFilteredTabCompletion(Object senderObj, String cursor, List<String> completion) {
-            return new FilteredTabCompletionEvent(senderObj, cursor, completion) {
+        public static FilteredTabCompletionEvent createEmptyFilteredTabCompletion(CommandSender player, String cursor, List<String> completion) {
+            return new FilteredTabCompletionEvent(player, cursor, completion) {
                 @Override
                 public void handle(FilteredTabCompletionEvent event) {
 

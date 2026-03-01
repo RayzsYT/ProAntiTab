@@ -1,6 +1,9 @@
 package de.rayzs.pat.utils.response.action;
 
-import de.rayzs.pat.utils.response.action.impl.*;
+import de.rayzs.pat.utils.response.action.impl.BungeeAction;
+import de.rayzs.pat.utils.response.action.impl.ModernBukkitAction;
+import de.rayzs.pat.utils.response.action.impl.OldBukkitAction;
+import de.rayzs.pat.utils.response.action.impl.VelocityAction;
 import de.rayzs.pat.utils.Reflection;
 import java.util.UUID;
 

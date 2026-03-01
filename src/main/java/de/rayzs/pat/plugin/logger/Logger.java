@@ -1,7 +1,7 @@
 package de.rayzs.pat.plugin.logger;
 
-import de.rayzs.pat.api.communication.Communicator;
-import de.rayzs.pat.api.communication.client.ClientInfo;
+import de.rayzs.pat.plugin.system.communication.Communicator;
+import de.rayzs.pat.plugin.system.communication.client.Client;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.api.storage.blacklist.impl.GeneralBlacklist;
 import de.rayzs.pat.plugin.logger.impl.*;
@@ -97,7 +97,7 @@ public class Logger {
                 .append("\n");
 
         builder.append("Installed plugins: \n  ")
-                .append(String.join("\n  ", Storage.getLoader().getPluginNames("%n (%v)")))
+                .append(String.join("\n  ", Storage.getLoader().getFormattedPluginNames("%n (%v)")))
                 .append("\n\n");
 
         builder.append("Detected supported plugins:")
@@ -145,13 +145,13 @@ public class Logger {
                     .append("\n");
 
             builder.append("last-sent-sync: ")
-                    .append(Storage.ConfigSections.Settings.DISABLE_SYNC.DISABLED ? "Deactivated" : (TimeConverter.calcAndGetTime(Communicator.get().getLastSync())))
+                    .append(Storage.ConfigSections.Settings.DISABLE_SYNC.ENABLED ? "Deactivated" : (TimeConverter.calcAndGetTime(Communicator.get().getLastSync())))
                     .append("\n\n");
 
             builder.append("synced-server: ");
-            Iterator<ClientInfo> iterator = Communicator.get().getClients().iterator();
+            Iterator<Client> iterator = Communicator.get().getClients().iterator();
             while (iterator.hasNext()) {
-                ClientInfo clientInfo = iterator.next();
+                Client clientInfo = iterator.next();
 
                 builder.append(clientInfo.getServerName())
                         .append(" (")

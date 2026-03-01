@@ -6,7 +6,6 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 
 import java.util.UUID;
 
@@ -46,24 +45,13 @@ public class VelocitySender extends CommandSenderAbstract {
 
         if (sender != null) {
             this.name = "";
-            this.uuid = CommandSenderHandler.CONSOLE_UUID;
+            this.uuid = CONSOLE_UUID;
         } else {
             this.name = null;
             this.uuid = null;
         }
 
         this.console = true;
-    }
-
-    @Override
-    public void updateSenderObject(Object senderObj) {
-        super.updateSenderObject(senderObj);
-
-        if (senderObj instanceof Player player) {
-            sender = player;
-        } else if (senderObj instanceof CommandSource commandSource) {
-            sender = commandSource;
-        }
     }
 
     @Override

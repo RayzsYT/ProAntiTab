@@ -3,7 +3,6 @@ package de.rayzs.pat.utils.sender.impl;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -45,24 +44,13 @@ public class BungeeSender extends CommandSenderAbstract {
 
         if (sender != null) {
             this.name = sender.getName();
-            this.uuid = CommandSenderHandler.CONSOLE_UUID;
+            this.uuid = CONSOLE_UUID;
         } else {
             this.name = null;
             this.uuid = null;
         }
 
         this.console = true;
-    }
-
-    @Override
-    public void updateSenderObject(Object senderObj) {
-        super.updateSenderObject(senderObj);
-
-        if (senderObj instanceof ProxiedPlayer player) {
-            sender = player;
-        } else if (senderObj instanceof CommandSender commandSender) {
-            sender = commandSender;
-        }
     }
 
     @Override

@@ -188,6 +188,16 @@ patch-exploits:
   alert-message: '%prefix% &4%player% &ctried to crash/lag the server.'
   kick-message: '&cFailed to read packet! Please reconnect.'
 
+# Small extra option on how to respond to players who failed
+# the injection process. ONLY necessary for those who are using
+# a "spoofer plugins" which creates fake players with a corrupt
+# pipeline and does not provide any information on if a player is
+# spoofed or not.
+injection-failed:
+  kick-on-failure: true
+  kick-message: '&cInjection process failed! Please reconnect.'
+  console-message: '&cInjection process failed! (%player%)'
+
 # This feature allows you to customize your server brand you see when you press F3.
 # Normally there is something like 'Purpur', or 'Spigot'.
 # With this feature, you are able to change and even animate it.

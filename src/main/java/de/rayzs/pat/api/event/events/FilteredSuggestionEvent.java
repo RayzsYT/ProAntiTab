@@ -1,6 +1,8 @@
 package de.rayzs.pat.api.event.events;
 
 import de.rayzs.pat.api.event.PATEvent;
+import de.rayzs.pat.utils.sender.CommandSender;
+
 import java.util.*;
 
 public abstract class FilteredSuggestionEvent extends PATEvent<FilteredSuggestionEvent> {
@@ -12,8 +14,9 @@ public abstract class FilteredSuggestionEvent extends PATEvent<FilteredSuggestio
         this.suggestions = null;
     }
 
-    public FilteredSuggestionEvent(Object senderObj, List<String> suggestions) {
-        super(senderObj);
+    public FilteredSuggestionEvent(CommandSender player, List<String> suggestions) {
+        super(player);
+
         this.suggestions = suggestions;
     }
 

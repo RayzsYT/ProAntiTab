@@ -5,10 +5,9 @@ import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
 import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
+import de.rayzs.pat.utils.hooks.ViaVersionHook;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -20,13 +19,13 @@ import java.util.*;
 
 public class BukkitAntiTabListener implements Listener {
 
-    private static final CommandsCache COMMANDS_CACHE = new CommandsCache();
-    private static final List<UUID> knownOperators = new ArrayList<>();
+    private final List<UUID> knownOperators = new ArrayList<>();
+
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
         final Player player = event.getPlayer();
-        final CommandSender sender = CommandSenderHandler.from(player);
+        final CommandSender sender = CommandSender.from(player);
         final UUID uuid = player.getUniqueId();
 
 
@@ -46,17 +45,14 @@ public class BukkitAntiTabListener implements Listener {
             return;
         }
 
-        List<String> allCommands = getCommands();
-        COMMANDS_CACHE.handleCommands(allCommands);
+        Storage.getLoader().getBukkitCommandsCacheMap().handleCommands(Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED
+                ? Storage.Blacklist.getBlacklist().getCommands()
+                : BukkitLoader.getAllCommands()
+        );
 
         if (!player.isOp() && knownOperators.contains(uuid)) {
             knownOperators.remove(uuid);
-
-            if (Reflection.isCraftbukkit() && sender != null) {
-                PermissionUtil.reloadPermissions(sender);
-            } else {
-                PermissionUtil.reloadPermissions(uuid);
-            }
+            PermissionUtil.reloadPermissions(sender);
         }
 
         if (PermissionUtil.hasBypassPermission(sender)) {
@@ -71,8 +67,8 @@ public class BukkitAntiTabListener implements Listener {
         }
 
         final List<Group> groups = GroupManager.getPlayerGroups(sender);
-        final List<String> playerCommands = COMMANDS_CACHE.getPlayerCommands(new ArrayList<>(event.getCommands()), sender, groups);
-        final FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(player, playerCommands);
+        final List<String> playerCommands = Storage.getLoader().getBukkitCommandsCacheMap().getPlayerCommands(new ArrayList<>(event.getCommands()), sender, groups);
+        final FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(sender, playerCommands);
 
         event.getCommands().clear();
 
@@ -91,57 +87,12 @@ public class BukkitAntiTabListener implements Listener {
         }
     }
 
-    public static List<String> getCommands() {
-        return Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED
-                ? Storage.Blacklist.getBlacklist().getCommands() : BukkitLoader.getAllCommands();
-    }
-
     private static boolean notUpdatablePlayer(UUID uuid) {
-        return Storage.USE_VIAVERSION && Reflection.getMinor() >= 16 && ViaVersionAdapter.getPlayerProtocol(uuid) < 754;
+        return Storage.USE_VIAVERSION && Reflection.getMinor() >= 16 && ViaVersionHook.getPlayerProtocol(uuid) < 754;
     }
 
-
-    // --------------- LUCKPERMS SECTIONS --------------- //
-
-    public static void updateCommands() {
-        Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::updateCommands);
-    }
-
-    public static void updateCommands(Player player) {
+    public void updateCommands(Player player) {
         if (!notUpdatablePlayer(player.getUniqueId()))
             player.updateCommands();
     }
-
-
-    // --------------- UPDATE SECTIONS --------------- //
-
-    public static void handleTabCompletion() {
-        COMMANDS_CACHE.reset();
-        Bukkit.getOnlinePlayers().forEach(BukkitAntiTabListener::handleTabCompletion);
-    }
-
-    public static void handleTabCompletion(UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
-
-        if (player == null) {
-            return;
-        }
-
-        handleTabCompletion(player, getCommands());
-    }
-
-    public static void handleTabCompletion(Player player) {
-        handleTabCompletion(player, getCommands());
-    }
-
-    public static void handleTabCompletion(Player player, List<String> commands) {
-        if (notUpdatablePlayer(player.getUniqueId()))
-            return;
-
-        List<String> dummy = new ArrayList<>(commands);
-        PlayerCommandSendEvent event = new PlayerCommandSendEvent(player, dummy);
-        Bukkit.getPluginManager().callEvent(event);
-        updateCommands(player);
-    }
-
 }

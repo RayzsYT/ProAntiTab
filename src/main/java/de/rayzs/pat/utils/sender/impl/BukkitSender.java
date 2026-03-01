@@ -4,7 +4,6 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -47,24 +46,13 @@ public class BukkitSender extends CommandSenderAbstract {
 
         if (sender != null) {
             this.name = sender.getName();
-            this.uuid = CommandSenderHandler.CONSOLE_UUID;
+            this.uuid = CONSOLE_UUID;
         } else {
             this.name = null;
             this.uuid = null;
         }
 
         this.console = true;
-    }
-
-    @Override
-    public void updateSenderObject(Object senderObj) {
-        super.updateSenderObject(senderObj);
-
-        if (senderObj instanceof Player player) {
-            this.sender = player;
-        } else if (senderObj instanceof CommandSender commandSender) {
-            this.sender = commandSender;
-        }
     }
 
     @Override

@@ -2,11 +2,12 @@ package de.rayzs.pat.plugin.listeners.velocity;
 
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.proxy.server.ServerInfo;
-import de.rayzs.pat.api.brand.CustomServerBrand;
+import de.rayzs.pat.plugin.system.serverbrand.CustomServerBrand;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
-import de.rayzs.pat.api.netty.proxy.VelocityPacketAnalyzer;
+import de.rayzs.pat.plugin.packetanalyzer.proxy.VelocityPacketAnalyzer;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.api.event.Subscribe;
@@ -15,7 +16,6 @@ import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.api.storage.Storage;
 import com.velocitypowered.api.proxy.*;
 import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import net.kyori.adventure.text.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -33,20 +33,19 @@ public class VelocityConnectionListener {
     @Subscribe
     public void onServerPreConnect(ServerPreConnectEvent event) {
         final Player player = event.getPlayer();
-        final CommandSender sender = CommandSenderHandler.from(player);
-
-        sender.updateSenderObject(player);
+        final CommandSender sender = CommandSender.from(player);
 
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
             final ServerInfo serverInfo = event.getOriginalServer().getServerInfo();
             if (serverInfo != null) Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
         }
 
-        PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.JOINED);
+        PATEventHandler.callServerPlayersChangeEvents(sender, ServerPlayersChangeEvent.Type.JOINED);
+        SubArgument.get().updateCachedPlayerNames();
 
-        if(CustomServerBrand.isEnabled())
+        if(CustomServerBrand.get().isEnabled())
             server.getScheduler().buildTask(loader, () -> {
-                if (player.isActive()) CustomServerBrand.sendBrandToPlayer(player);
+                if (player.isActive()) CustomServerBrand.get().sendBrandToPlayer(player);
             }).delay(500, TimeUnit.MILLISECONDS).schedule();
 
         PermissionUtil.setPlayerPermissions(sender);
@@ -66,12 +65,22 @@ public class VelocityConnectionListener {
         if (!VelocityPacketAnalyzer.isInjected(player)) {
 
             if (!VelocityPacketAnalyzer.inject(player)) {
-                Logger.warning("Attempting delayed injection for " + player.getUsername());
                 server.getScheduler().buildTask(loader, () -> {
-
                     if (!VelocityPacketAnalyzer.inject(player)) {
-                        Logger.warning("Second injection for " + player.getUsername() + " failed as well!");
-                        player.disconnect(Component.text("Failed to inject player!"));
+                        if (Storage.ConfigSections.Settings.INJECTION_FAILED.ENABLED) {
+
+                            Logger.info(MessageTranslator.replaceMessage(
+                                    player,
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE.get()
+                            ));
+
+                            player.disconnect(Component.text(
+                                    MessageTranslator.replaceMessage(
+                                            player,
+                                            Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE.get()
+                                    )
+                            ));
+                        }
                     }
 
                 }).delay(1, TimeUnit.SECONDS).schedule();
@@ -82,7 +91,7 @@ public class VelocityConnectionListener {
             final ServerInfo serverInfo = event.getServer().getServerInfo();
             if (serverInfo != null) Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
 
-            CommandSender sender = CommandSenderHandler.from(player);
+            CommandSender sender = CommandSender.from(player);
             assert sender != null;
             PermissionUtil.reloadPermissions(sender);
         }
@@ -91,13 +100,16 @@ public class VelocityConnectionListener {
             return;
         }
 
-        CustomServerBrand.sendBrandToPlayer(player);
+        CustomServerBrand.get().sendBrandToPlayer(player);
     }
 
     @Subscribe
     public void onDisconnect(DisconnectEvent event) {
-        Player player = event.getPlayer();
-        PATEventHandler.callServerPlayersChangeEvents(player, ServerPlayersChangeEvent.Type.LEFT);
+        final Player player = event.getPlayer();
+        final CommandSender sender = CommandSender.from(player);
+
+        PATEventHandler.callServerPlayersChangeEvents(sender, ServerPlayersChangeEvent.Type.LEFT);
+        SubArgument.get().updateCachedPlayerNames();
 
         PermissionUtil.resetPermissions(player.getUniqueId());
         VelocityPacketAnalyzer.uninject(player);

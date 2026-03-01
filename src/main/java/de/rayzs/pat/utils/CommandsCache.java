@@ -5,6 +5,7 @@ import java.util.*;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
@@ -123,7 +124,20 @@ public class CommandsCache {
 
         }
 
-        PATEventHandler.callUpdatePlayerCommandsEvents(sender, playerCommands, serverName != null);
+        final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
+
+        SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(
+                sender,
+                serverCommands,
+                serverCommands,
+                Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName)
+        );
+
+        PATEventHandler.callUpdatePlayerCommandsEvents(
+                sender,
+                playerCommands,
+                serverName != null
+        );
 
         return playerCommands.stream().map(command -> {
             command = StringUtils.getFirstArg(command);

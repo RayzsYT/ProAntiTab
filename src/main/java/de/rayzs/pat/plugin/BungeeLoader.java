@@ -1,21 +1,25 @@
 package de.rayzs.pat.plugin;
 
 
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.impl.BungeeClient;
-import de.rayzs.pat.plugin.converter.StorageConverter;
-import de.rayzs.pat.plugin.process.CommandProcess;
-import de.rayzs.pat.plugin.subarguments.SubArguments;
-import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
+import de.rayzs.pat.plugin.system.communication.cph.impl.BungeeCommunicationHandler;
+import de.rayzs.pat.plugin.system.serverbrand.CustomServerBrand;
+import de.rayzs.pat.plugin.system.communication.pmc.impl.BungeePluginMessageClient;
+import de.rayzs.pat.plugin.system.converter.StorageConverter;
+import de.rayzs.pat.plugin.command.CommandProcess;
+import de.rayzs.pat.plugin.system.serverbrand.impl.BungeeServerBrand;
+import de.rayzs.pat.plugin.packetanalyzer.proxy.BungeePacketAnalyzer;
+import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
-import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.utils.hooks.LuckPermsHook;
+import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.response.action.ActionHandler;
+import de.rayzs.pat.utils.sender.CommandSender;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-import de.rayzs.pat.plugin.commands.BungeeCommand;
+import de.rayzs.pat.plugin.command.impl.BungeeCommand;
 import de.rayzs.pat.plugin.listeners.bungee.*;
 import de.rayzs.pat.utils.group.GroupManager;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -62,8 +66,8 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         Storage.loadAll(true);
 
         MessageTranslator.initialize();
-        CustomServerBrand.initialize();
         GroupManager.initialize();
+
         bStats.initialize(this);
         PluginManager manager = ProxyServer.getInstance().getPluginManager();
 
@@ -82,7 +86,7 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         Storage.PLUGIN_OBJECT = this;
 
         if (manager.getPlugin("LuckPerms") != null)
-            LuckPermsAdapter.initialize();
+            LuckPermsHook.initialize();
 
         if(manager.getPlugin("PAPIProxyBridge") != null) {
             Storage.USE_PAPIPROXYBRIDGE = true;
@@ -95,11 +99,14 @@ public class BungeeLoader extends Plugin implements PluginLoader {
         ConfigUpdater.broadcastMissingParts();
 
         ActionHandler.initialize();
-        SubArguments.initialize();
+        SubArgument.initialize();
+
+        ResponseHandler.update();
 
         StorageConverter.initialize();
 
-        Communicator.initialize(new BungeeClient());
+        CustomServerBrand.initialize(new BungeeServerBrand());
+        Communicator.initialize(new BungeePluginMessageClient(), new BungeeCommunicationHandler());
 
         // Reload proxy commands after 1, 5, and 15 seconds.
         for (int i : new Integer[] { 1, 5, 15 }) {
@@ -123,6 +130,16 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     @Override
+    public void updateCommands() {
+        Communicator.Proxy2Backend.sendUpdateCommand();
+    }
+
+    @Override
+    public void updateCommands(CommandSender sender) {
+        Communicator.Proxy2Backend.sendUpdateCommand(sender.getUniqueId(), sender.getServerName());
+    }
+
+    @Override
     public void handleReload() {
         BungeePacketAnalyzer.loadProxyCommands();
     }
@@ -131,9 +148,17 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     public void delayedPermissionsReload() {
         getProxy().getScheduler().schedule(this, () -> {
             PermissionUtil.reloadPermissions();
-            Storage.getLoader().updateCommandCache();
+            Storage.getLoader().resetCommandsCache();
 
             Communicator.Proxy2Backend.sendUpdateCommand();
+        }, 1, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void delayedPermissionsReload(CommandSender sender) {
+        getProxy().getScheduler().schedule(this, () -> {
+            PermissionUtil.reloadPermissions(sender.getUniqueId());
+            Communicator.Proxy2Backend.sendUpdateCommand(sender.getUniqueId(), sender.getServerName());
         }, 1, TimeUnit.SECONDS);
     }
 
@@ -163,12 +188,17 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     @Override
-    public HashMap<String, CommandsCache> getCommandsCacheMap() {
+    public HashMap<String, CommandsCache> getPerServerCommandsCacheMap() {
         return commandsCacheMap;
     }
 
     @Override
-    public void updateCommandCache() {
+    public CommandsCache getBukkitCommandsCacheMap() {
+        return null;
+    }
+
+    @Override
+    public void resetCommandsCache() {
         new ArrayList<>(commandsCacheMap.values()).forEach(CommandsCache::reset);
     }
 
@@ -266,7 +296,7 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     }
 
     @Override
-    public List<String> getPluginNames(String format) {
+    public List<String> getFormattedPluginNames(String format) {
         List<String> pluginNames = new ArrayList<>();
 
         for (Plugin plugin : ProxyServer.getInstance().getPluginManager().getPlugins()) {

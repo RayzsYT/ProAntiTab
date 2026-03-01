@@ -1,12 +1,14 @@
 package de.rayzs.pat.api.event;
 
+import de.rayzs.pat.utils.sender.CommandSender;
+
 public abstract class PATEvent<T> {
 
-    private final Object senderObj;
+    private final CommandSender player;
     private boolean cancelled = false;
 
-    public PATEvent(Object senderObj) {
-        this.senderObj = senderObj;
+    public PATEvent(CommandSender player) {
+        this.player = player;
     }
 
     public abstract void handle(T t);
@@ -14,8 +16,8 @@ public abstract class PATEvent<T> {
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
-    public Object getSenderObj() {
-        return senderObj;
+    public CommandSender getPlayer() {
+        return player;
     }
 
     public boolean isCancelled() {

@@ -6,7 +6,6 @@ import de.rayzs.pat.utils.message.translators.*;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 
 import java.util.*;
 
@@ -101,7 +100,7 @@ public class MessageTranslator {
 
             CommandSender sender = target instanceof CommandSender
                     ? (CommandSender) target
-                    : CommandSenderHandler.from(target);
+                    : CommandSender.from(target);
 
             if (!PlaceholderReplacer.process(sender, text, sender::sendMessage))
                 sender.sendMessage(text);
@@ -109,9 +108,14 @@ public class MessageTranslator {
             return;
         }
 
-        if (PlaceholderReplacer.process(target, text, result -> translator.send(target, result))) return;
+        final Object tmpTarget = target instanceof CommandSender sender
+                ? sender.getSenderObject() : target;
 
-        translator.send(target, text);
+        if (PlaceholderReplacer.process(target, text, result -> translator.send(tmpTarget, result))) {
+            return;
+        }
+
+        translator.send(tmpTarget, text);
     }
 
     public static String replaceMessage(String text) {
@@ -122,7 +126,7 @@ public class MessageTranslator {
         CommandSender sender = targetObj == null ? null
                 : targetObj instanceof CommandSender
                 ? (CommandSender) targetObj
-                : CommandSenderHandler.from(targetObj);
+                : CommandSender.from(targetObj);
 
         String executorName = (sender == null || sender.isConsole())
                 ? ""

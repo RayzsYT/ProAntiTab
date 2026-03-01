@@ -56,20 +56,20 @@ public class PacketUtils {
         public BrandManipulate(String brand) {
             this.brand = brand;
             this.capacity = brand.getBytes(StandardCharsets.UTF_8).length + 1;
-            bytes = buildBytes(true);
+            this.bytes = buildBytes(true);
         }
 
-        public BrandManipulate(String brand, boolean releases) {
+        public BrandManipulate(String brand, boolean releaseBuffer) {
             this.brand = brand;
             this.capacity = brand.getBytes(StandardCharsets.UTF_8).length + 1;
-            bytes = buildBytes(releases);
+            this.bytes = buildBytes(releaseBuffer);
         }
 
         public byte[] getBytes() {
             return bytes;
         }
 
-        private byte[] buildBytes(boolean release) {
+        private byte[] buildBytes(boolean releaseBuffer) {
             byteBuf = Unpooled.buffer(this.capacity);
 
             try {
@@ -79,7 +79,7 @@ public class PacketUtils {
             }
 
             byte[] bytes = byteBuf.array();
-            if(release) byteBuf.release();
+            if (releaseBuffer) byteBuf.release();
 
             return bytes;
         }

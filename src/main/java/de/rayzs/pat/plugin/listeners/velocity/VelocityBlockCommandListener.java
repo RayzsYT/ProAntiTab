@@ -3,8 +3,10 @@ package de.rayzs.pat.plugin.listeners.velocity;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.command.CommandSource;
-import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
+import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -13,8 +15,8 @@ import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.api.event.*;
+import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 
 import java.util.List;
 
@@ -41,10 +43,12 @@ public class VelocityBlockCommandListener {
             return event;
 
         final Player player = (Player) commandSource;
-        final CommandSender sender = CommandSenderHandler.from(player);
+        final CommandSender sender = CommandSender.from(player);
         final String serverName = player.getCurrentServer().isPresent()
                 ? player.getCurrentServer().get().getServerInfo().getName()
                 : "unknown";
+
+        final String commandWithArguments = event.getCommand().startsWith("/") ? event.getCommand().substring(1) : event.getCommand();
 
         String tmpCommand = StringUtils.getFirstArg(event.getCommand());
         if (Communicator.get().hasConnectedClients() && Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.isCommand(tmpCommand)) {
@@ -136,14 +140,27 @@ public class VelocityBlockCommandListener {
 
 
         if (!allowed) {
+
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
-                    player,
+                    sender,
                     event.getCommand(),
                     true,
-                    !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED);
+                    !Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED
+            );
 
             if (executeCommandEvent.isBlocked()) {
                 event.setResult(CommandExecuteEvent.CommandResult.denied());
+
+                MessageTranslator.send(
+                        sender,
+                        ResponseHandler.getResponse(
+                                sender.getUniqueId(),
+                                sender.getName(),
+                                serverName,
+                                event.getCommand(),
+                                Storage.ConfigSections.Settings.CANCEL_COMMAND.BASE_COMMAND_RESPONSE.getLines()
+                        ), "%command%", StringUtils.getFirstArg(displayCommand)
+                );
 
                 if (!executeCommandEvent.doesNotify())
                     return event;
@@ -166,10 +183,31 @@ public class VelocityBlockCommandListener {
         }
 
 
-        final ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(player, event.getCommand(), false, false);
+        final ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
+                sender,
+                event.getCommand(),
+                SubArgument.get().getExecuteHandler().handleCommandExecution(sender, event.getCommand()),
+                false
+        );
 
         if (executeCommandEvent.isBlocked()) {
             event.setResult(CommandExecuteEvent.CommandResult.denied());
+
+            MessageTranslator.send(
+                    sender,
+                    ResponseHandler.getResponse(
+                            sender.getUniqueId(),
+                            sender.getName(),
+                            serverName,
+                            event.getCommand()
+                    ),
+                    "%command%",
+                    StringUtils.replaceTriggers(
+                            commandWithArguments, "",
+                            "\\", "<", ">", "&"
+                    )
+            );
+
         }
 
         return event;

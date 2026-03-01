@@ -3,18 +3,18 @@ package de.rayzs.pat.api.storage;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.BackendUpdater;
-import de.rayzs.pat.api.communication.Communicator;
-import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
+import de.rayzs.pat.plugin.system.serverbrand.CustomServerBrand;
+import de.rayzs.pat.plugin.system.communication.BackendUpdater;
+import de.rayzs.pat.plugin.system.communication.Communicator;
+import de.rayzs.pat.plugin.packetanalyzer.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.config.messages.*;
 import de.rayzs.pat.api.storage.config.settings.*;
-import de.rayzs.pat.plugin.listeners.bukkit.BukkitAntiTabListener;
 import de.rayzs.pat.plugin.logger.Logger;
-import de.rayzs.pat.plugin.subarguments.SubArguments;
+import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
+import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.sender.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -174,13 +174,14 @@ public class Storage {
         ConfigUpdater.initialize();
         Storage.loadAll(Reflection.isProxyServer() || !backend);
 
-        CustomServerBrand.initialize();
+        CustomServerBrand.get().refreshTask();
+
         GroupManager.clearAllGroups();
         GroupManager.initialize();
 
         if (!proxy) {
             Communicator.get().reload();
-            BackendUpdater.restart();
+            BackendUpdater.get().restart();
         }
 
         if (!backend) {
@@ -190,6 +191,9 @@ public class Storage {
         if (proxy) {
             Communicator.Proxy2Backend.sendDataSync();
         }
+
+        Storage.Files.CUSTOM_RESPONSES.reload();
+        ResponseHandler.update();
 
         ConfigUpdater.broadcastMissingParts();
         Storage.getLoader().handleReload();
@@ -203,14 +207,12 @@ public class Storage {
 
         if (Reflection.isProxyServer()) {
 
-            boolean isVelocity = Reflection.isVelocityServer();
-
             if (server != null) {
 
                 Storage.Blacklist.clearServerBlacklists(server);
                 Storage.Blacklist.loadCachedServerBlacklists(server);
 
-                List<String> associatedServers = getServers()
+                final List<String> associatedServers = getServers()
                         .stream()
                         .filter(s -> !s.equals(server) && isServer(server, s))
                         .toList();
@@ -220,42 +222,45 @@ public class Storage {
                     Storage.Blacklist.loadCachedServerBlacklists(s);
                 });
 
-                if (isVelocity) {
+                associatedServers.forEach(serverName -> {
+                    final List<UUID> playerIds = Storage.getLoader().getPlayerIdsByServer(serverName);
+                    final List<String> commands = Blacklist.Collector.collectAllServerCommands(serverName);
 
-                    associatedServers.forEach(s -> {
-                        List<UUID> playerIds = Storage.getLoader().getPlayerIdsByServer(s);
-                        List<String> commands = new ArrayList<>(SubArguments.getServerCommands(s));
+                    playerIds.forEach(playerId -> {
+                        final CommandSender sender = CommandSender.from(playerId);
 
-                        playerIds.forEach(playerId -> {
-                            List<String> playerCommands = new ArrayList<>(commands);
-                            playerCommands.addAll(SubArguments.getGroupCommands(playerId, s));
+                        final List<String> playerCommands = new ArrayList<>(commands);
+                        final List<String> groupCommands = Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
 
-                            PATEventHandler.callUpdatePlayerCommandsEvents(playerId, playerCommands, true);
-                        });
+                        playerCommands.addAll(groupCommands);
 
+                        SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, commands, groupCommands);
+                        PATEventHandler.callUpdatePlayerCommandsEvents(sender, playerCommands, true);
                     });
-                }
+                });
 
             } else {
 
                 Storage.Blacklist.Experimental.forceCacheReset();
+                final List<UUID> playerIds = Storage.getLoader().getPlayerIds();
 
-                if (isVelocity) {
-                    List<UUID> playerIds = Storage.getLoader().getPlayerIds();
+                playerIds.forEach(playerId -> {
+                    final CommandSender sender = CommandSender.from(playerId);
 
-                    playerIds.forEach(playerId -> {
-                        List<String> playerCommands = new ArrayList<>(SubArguments.getServerCommands(playerId));
-                        playerCommands.addAll(SubArguments.getGroupCommands(playerId));
+                    final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(sender.getServerName());
+                    final List<String> playerCommands = new ArrayList<>(serverCommands);
+                    final List<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, sender.getServerName());
 
-                        PATEventHandler.callUpdatePlayerCommandsEvents(playerId, playerCommands, false);
-                    });
-                }
+                    playerCommands.addAll(groupCommands);
+
+                    SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);
+                    PATEventHandler.callUpdatePlayerCommandsEvents(sender, playerCommands, false);
+                });
 
             }
 
             GroupManager.clearServerGroupBlacklists();
-
-            Storage.getLoader().updateCommandCache();
+            Storage.getLoader().resetCommandsCache();
 
             if (!Reflection.isVelocityServer()) {
                 BungeePacketAnalyzer.sendCommandsPacket();
@@ -268,39 +273,20 @@ public class Storage {
         getLoader().handleReload();
         PermissionUtil.reloadPermissions();
 
-        if (Reflection.getMinor() < 13) {
-            final List<UUID> playerIds = Storage.getLoader().getPlayerIds();
-            final List<String> commands = new ArrayList<>(Blacklist.BLACKLIST.getCommands());
-
-            playerIds.forEach(playerId -> {
-                List<String> playerCommands = new ArrayList<>(commands);
-                playerCommands.addAll(SubArguments.getGroupCommands(playerId));
-
-                PATEventHandler.callUpdatePlayerCommandsEvents(playerId, playerCommands, true);
-            });
-        } else {
-            BukkitAntiTabListener.handleTabCompletion();
-        }
+        Storage.getLoader().resetCommandsCache();
+        Storage.getLoader().updateCommands();
     }
 
     public static void tempCachePlayerToServer(UUID playerId, String server) {
         TEMP_PLAYER_SERVER_CACHE.put(playerId, server);
     }
 
-    public static void getTempCachedPlayerToServer(UUID playerId, String server) {
-        TEMP_PLAYER_SERVER_CACHE.put(playerId, server);
+    public static String getTempCachedPlayerToServer(UUID playerId, String server) {
+        return TEMP_PLAYER_SERVER_CACHE.get(playerId);
     }
 
     public static String getCachedPlayerServername(UUID playerId) {
         return TEMP_PLAYER_SERVER_CACHE.get(playerId);
-    }
-
-    // Quickly updates all player subarguments.
-    public static void quickSubArgumentUpdate(UUID uuid) {
-        List<String> playerCommands = new ArrayList<>(SubArguments.getServerCommands(uuid));
-        playerCommands.addAll(SubArguments.getGroupCommands(uuid));
-
-        PATEventHandler.callUpdatePlayerCommandsEvents(uuid, playerCommands, false);
     }
 
     public static PluginLoader getLoader() {
@@ -359,23 +345,24 @@ public class Storage {
 
         public static class Settings {
 
-            public static AllowGroupOverrulingSection ALLOW_GROUP_OVERRULING = new AllowGroupOverrulingSection();
-            public static AutoLowercaseCommandsSection AUTO_LOWERCASE_COMMANDS = new AutoLowercaseCommandsSection();
-            public static BlockNamespaceCommandsSection BLOCK_NAMESPACE_COMMANDS = new BlockNamespaceCommandsSection();
-            public static HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
-            public static PatchExploitSection PATCH_EXPLOITS = new PatchExploitSection();
-            public static CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
-            public static CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
-            public static CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
-            public static CustomVersionSection CUSTOM_VERSION = new CustomVersionSection();
-            public static DisableSyncSection DISABLE_SYNC = new DisableSyncSection();
-            public static ForwardConsoleNotificationAlertsSection FORWARD_CONSOLE_NOTIFICATIONS = new ForwardConsoleNotificationAlertsSection();
-            public static CustomProtocolPingSection CUSTOM_PROTOCOL_PING = new CustomProtocolPingSection();
-            public static CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
-            public static TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
-            public static BaseCommandCaseSensitiveSection BASE_COMMAND_CASE_SENSITIVE = new BaseCommandCaseSensitiveSection();
-            public static UpdateGroupsPerWorldSection UPDATE_GROUPS_PER_WORLD = new UpdateGroupsPerWorldSection();
-            public static UpdateGroupsPerServerSection UPDATE_GROUPS_PER_SERVER = new UpdateGroupsPerServerSection();
+            public static final AllowGroupOverrulingSection ALLOW_GROUP_OVERRULING = new AllowGroupOverrulingSection();
+            public static final AutoLowercaseCommandsSection AUTO_LOWERCASE_COMMANDS = new AutoLowercaseCommandsSection();
+            public static final BlockNamespaceCommandsSection BLOCK_NAMESPACE_COMMANDS = new BlockNamespaceCommandsSection();
+            public static final HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
+            public static final InjectionFailedSection INJECTION_FAILED = new InjectionFailedSection();
+            public static final PatchExploitSection PATCH_EXPLOITS = new PatchExploitSection();
+            public static final CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
+            public static final CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();
+            public static final CustomPluginsSection CUSTOM_PLUGIN = new CustomPluginsSection();
+            public static final CustomVersionSection CUSTOM_VERSION = new CustomVersionSection();
+            public static final DisableSyncSection DISABLE_SYNC = new DisableSyncSection();
+            public static final ForwardConsoleNotificationAlertsSection FORWARD_CONSOLE_NOTIFICATIONS = new ForwardConsoleNotificationAlertsSection();
+            public static final CustomProtocolPingSection CUSTOM_PROTOCOL_PING = new CustomProtocolPingSection();
+            public static final CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
+            public static final TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
+            public static final BaseCommandCaseSensitiveSection BASE_COMMAND_CASE_SENSITIVE = new BaseCommandCaseSensitiveSection();
+            public static final UpdateGroupsPerWorldSection UPDATE_GROUPS_PER_WORLD = new UpdateGroupsPerWorldSection();
+            public static final UpdateGroupsPerServerSection UPDATE_GROUPS_PER_SERVER = new UpdateGroupsPerServerSection();
 
             public static UpdateSection UPDATE = new UpdateSection();
 
@@ -463,7 +450,62 @@ public class Storage {
 
     public static class Blacklist {
 
-        public static class Experimental {
+        public static class Collector {
+
+
+            /**
+             * Collects all commands from the global section and
+             * that certain server.
+             *
+             * @param serverName Target server name.
+             * @return List of collected commands.
+             */
+            public static List<String> collectAllServerCommands(String serverName) {
+                List<String> commands = new ArrayList<>(Storage.Blacklist.getBlacklist().getCommands());
+                if (!Reflection.isProxyServer())
+                    return commands;
+
+                if (serverName == null)
+                    return commands;
+
+                List<GeneralBlacklist> blacklists = Storage.Blacklist.getServerBlacklists(serverName);
+                for (GeneralBlacklist blacklist : blacklists)
+                    commands.addAll(blacklist.getCommands());
+
+                return commands;
+            }
+
+            /**
+             * Get a list of all available commands for a player
+             * based on the PAT groups the player is in.
+             *
+             * @param sender Target player.
+             * @param serverName Target server name.
+             * @return List of collected commands.
+             */
+            public static List<String> collectAllPlayerGroupCommands(CommandSender sender, String serverName) {
+                final List<String> commands = new ArrayList<>();
+                final List<Group> groups = GroupManager.getPlayerGroups(sender);
+
+                if (serverName == null) {
+                    groups.forEach(group -> commands.addAll(group.getCommands()));
+                    return commands;
+                }
+
+                groups.forEach(group -> {
+                    commands.addAll(group.getCommands());
+
+                    group.getBlacklistServerNames(serverName).forEach(s -> {
+                        commands.addAll(group.getCommands(s));
+                    });
+                });
+
+                return commands;
+            }
+
+        }
+
+        private static class Experimental {
 
             public static void forceCacheReset() {
                 for (Object o : CACHED_SERVER_BLACKLIST.getCache().asMap().keySet()) {
@@ -506,7 +548,7 @@ public class Storage {
         // Temporary list for all servers (e.g: server-1)
         private static final ExpireCache<String, List<GeneralBlacklist>> CACHED_SERVER_BLACKLIST = new ExpireCache<>(1, TimeUnit.HOURS);
 
-        public static void loadAll() {
+        private static void loadAll() {
             CACHED_SERVER_BLACKLIST.clear();
             SERVER_BLACKLISTS.clear();
             BLACKLIST.load();

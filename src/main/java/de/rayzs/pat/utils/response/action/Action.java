@@ -1,6 +1,6 @@
 package de.rayzs.pat.utils.response.action;
 
-import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;

@@ -1,28 +1,31 @@
 package de.rayzs.pat.plugin;
 
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.impl.BukkitClient;
-import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.plugin.converter.StorageConverter;
-import de.rayzs.pat.plugin.subarguments.SubArguments;
-import de.rayzs.pat.plugin.process.CommandProcess;
-import de.rayzs.pat.api.netty.bukkit.BukkitPacketAnalyzer;
-import de.rayzs.pat.api.communication.BackendUpdater;
-import de.rayzs.pat.utils.adapter.GroupManagerAdapter;
+import de.rayzs.pat.plugin.system.communication.cph.impl.BukkitCommunicationHandler;
+import de.rayzs.pat.plugin.system.serverbrand.CustomServerBrand;
+import de.rayzs.pat.plugin.system.communication.pmc.impl.BukkitPluginMessageClient;
+import de.rayzs.pat.plugin.system.converter.StorageConverter;
+import de.rayzs.pat.plugin.system.serverbrand.impl.BukkitServerBrand;
+import de.rayzs.pat.plugin.command.CommandProcess;
+import de.rayzs.pat.plugin.packetanalyzer.bukkit.BukkitPacketAnalyzer;
+import de.rayzs.pat.plugin.system.communication.BackendUpdater;
+import de.rayzs.pat.plugin.system.subargument.SubArgument;
+import de.rayzs.pat.utils.hooks.GroupManagerHook;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.utils.adapter.ViaVersionAdapter;
-import de.rayzs.pat.api.communication.Communicator;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
-import de.rayzs.pat.plugin.commands.BukkitCommand;
+import de.rayzs.pat.utils.hooks.ViaVersionHook;
+import de.rayzs.pat.plugin.system.communication.Communicator;
+import de.rayzs.pat.utils.hooks.LuckPermsHook;
+import de.rayzs.pat.plugin.command.impl.BukkitCommand;
 import de.rayzs.pat.utils.hooks.PlaceholderHook;
 import de.rayzs.pat.plugin.listeners.bukkit.*;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.plugin.metrics.bStats;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.response.action.ActionHandler;
+import de.rayzs.pat.utils.sender.CommandSender;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -45,10 +48,15 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
-    private static Map<String, Command> commandsMap = null;
-    private PATSchedulerTask updaterTask;
 
+    private final CommandsCache commandsCache = new CommandsCache();
     private final List<String> offlinePlayerNames = new ArrayList<>();
+
+    private Map<String, Command> commandsMap = null;
+
+    private BukkitAntiTabListener bukkitAntiTabListener = null;
+
+    private PATSchedulerTask updaterTask;
     private long lastCommandsLoad = -1;
 
     @Override
@@ -84,7 +92,10 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             new PlaceholderHook().register();
 
         MessageTranslator.initialize();
-        CustomServerBrand.initialize();
+
+        Communicator.initialize(new BukkitPluginMessageClient(), new BukkitCommunicationHandler());
+        BackendUpdater.initialize();
+
         bStats.initialize(this);
 
         PluginManager manager = getServer().getPluginManager();
@@ -92,13 +103,14 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             GroupManager.initialize();
             BukkitPacketAnalyzer.injectAll();
-        } else BackendUpdater.handle();
+        } else BackendUpdater.get().handle();
 
         manager.registerEvents(new BukkitPlayerListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
 
         if (Reflection.getMinor() >= 13) {
-            manager.registerEvents(new BukkitAntiTabListener(), this);
+            bukkitAntiTabListener = new BukkitAntiTabListener();
+            manager.registerEvents(bukkitAntiTabListener, this);
         }
 
         if (Reflection.isPaper() && Reflection.getMinor() >= 12)
@@ -110,29 +122,31 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         Storage.PLUGIN_OBJECT = this;
 
         if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
-            LuckPermsAdapter.initialize();
+            LuckPermsHook.initialize();
             Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
         } else {
             final Plugin groupManagerPlugin = getServer().getPluginManager().getPlugin("GroupManager");
             if (groupManagerPlugin != null) {
-                GroupManagerAdapter.initialize(groupManagerPlugin);
+                GroupManagerHook.initialize(groupManagerPlugin);
                 Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
             }
         }
 
         if (getServer().getPluginManager().getPlugin("ViaVersion") != null) {
-            ViaVersionAdapter.initialize();
+            ViaVersionHook.initialize();
         }
 
         Storage.broadcastPermissionsPluginNotice();
         ConfigUpdater.broadcastMissingParts();
 
         ActionHandler.initialize();
-        SubArguments.initialize();
+        SubArgument.initialize();
+
+        ResponseHandler.update();
 
         StorageConverter.initialize();
 
-        Communicator.initialize(new BukkitClient());
+        CustomServerBrand.initialize(new BukkitServerBrand());
 
         PATScheduler.createScheduler(() -> {
             Storage.reload();
@@ -142,7 +156,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
     @Override
     public void onDisable() {
-        BackendUpdater.stop();
+        BackendUpdater.get().stop();
         BukkitPacketAnalyzer.uninjectAll();
         MessageTranslator.closeAudiences();
     }
@@ -153,6 +167,25 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             PluginCommand pluginCommand = getCommand(commandName);
             pluginCommand.setExecutor(command);
             pluginCommand.setTabCompleter(command);
+        }
+    }
+
+    @Override
+    public void updateCommands() {
+        if (bukkitAntiTabListener == null) return;
+
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            bukkitAntiTabListener.updateCommands(player);
+        });
+    }
+
+    @Override
+    public void updateCommands(CommandSender sender) {
+        final Player player = Bukkit.getPlayer(sender.getUniqueId());
+
+        if (bukkitAntiTabListener != null) {
+            assert player != null;
+            bukkitAntiTabListener.updateCommands(player);
         }
     }
 
@@ -187,11 +220,18 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     @Override
-    public void updateCommandCache() {}
+    public void resetCommandsCache() {
+        commandsCache.reset();
+    }
 
     @Override
-    public HashMap<String, CommandsCache> getCommandsCacheMap() {
+    public HashMap<String, CommandsCache> getPerServerCommandsCacheMap() {
         return null;
+    }
+
+    @Override
+    public CommandsCache getBukkitCommandsCacheMap() {
+        return commandsCache;
     }
 
     @Override
@@ -268,6 +308,13 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         PATScheduler.createScheduler(PermissionUtil::reloadPermissions, 40);
     }
 
+    @Override
+    public void delayedPermissionsReload(CommandSender sender) {
+        PATScheduler.createScheduler(() -> {
+            PermissionUtil.reloadPermissions(sender);
+        }, 40);
+    }
+
     public void startUpdaterTask() {
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED)
             return;
@@ -278,83 +325,6 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
                 updaterTask.cancelTask();
 
         }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
-    }
-
-    public static void handleNotificationPacket(CommunicationPackets.Proxy2Backend.NotificationPacket packet) {
-        if (!Storage.SEND_CONSOLE_NOTIFICATION) { return; }
-
-        final Player player = Bukkit.getPlayer(packet.playerId());
-        if (player == null) {
-            return;
-        }
-
-        final List<String> notificationMessage = MessageTranslator.replaceMessageList(
-                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
-                "%player%", player.getName(),
-                "%command%", packet.command(),
-                "%server%", Storage.SERVER_NAME,
-                "%world%", player.getWorld().getName());
-
-        Logger.info(notificationMessage);
-    }
-
-    public static void handleUpdateCommandsPacket(CommunicationPackets.Proxy2Backend.UpdatePacket packet) {
-        if (Reflection.getMinor() < 13) {
-            return;
-        }
-
-        PATScheduler.createScheduler(() -> {
-            if (packet.forEveryone()) {
-                BukkitAntiTabListener.updateCommands();
-                return;
-            }
-
-            Player player = Bukkit.getPlayer(packet.playerId());
-            if (player != null) {
-                BukkitAntiTabListener.updateCommands(player);
-            }
-
-        });
-    }
-
-    public static void handlePlayerExecuteCommandPacket(CommunicationPackets.Proxy2Backend.ExecutePlayerCommandPacket packet) {
-        if (isP2BDisabled()) return;
-
-        final Player player = Bukkit.getPlayer(packet.playerId());
-        if (player == null) return;
-
-        PATScheduler.execute(() -> Bukkit.dispatchCommand(player, packet.command()), player);
-    }
-
-    public static void handleConsoleExecuteCommandPacket(CommunicationPackets.Proxy2Backend.ExecuteConsoleCommandPacket packet) {
-        if (isP2BDisabled()) return;
-
-        PATScheduler.execute(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), packet.command()), null);
-    }
-
-    public static void handleConsoleMessagePacket(CommunicationPackets.Proxy2Backend.ConsoleMessagePacket packet) {
-        if (isP2BDisabled()) return;
-
-        Logger.info(packet.message());
-    }
-
-    private static boolean isP2BDisabled() {
-        if (!Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ALLOW_P2B_ACTIONS) {
-            Logger.warning("P2B actions are currently disabled! You need to enable them manually.");
-            Logger.warning("For that, go to your 'plugins/ProAntiTab/config.yml' file and enable 'handle-through-proxy -> allow-p2b-actions'.");
-            return true;
-        }
-
-        return false;
-    }
-
-    public static void handleDataSyncPacket(CommunicationPackets.Proxy2Backend.DataSyncPacket packet) {
-        Storage.ConfigSections.Messages.PREFIX.PREFIX = packet.messages().prefix();
-        Storage.ConfigSections.Settings.AUTO_LOWERCASE_COMMANDS.ENABLED = packet.autoLowerCase().enabled();
-        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED = packet.unknownCommand().enabled();
-        Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE = packet.unknownCommand().message();
-
-        PATEventHandler.callReceiveSyncEvents(packet);
     }
 
     public static List<String> getAllCommands() {
@@ -370,7 +340,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     @Override
-    public List<String> getPluginNames(String format) {
+    public List<String> getFormattedPluginNames(String format) {
         List<String> pluginNames = new ArrayList<>();
 
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
@@ -389,7 +359,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     public List<String> getAllCommands(boolean useColons) {
         List<String> commands = new ArrayList<>();
 
-        for (Map.Entry<String, Command> entry : BukkitLoader.getCommandsMap().entrySet()) {
+        for (Map.Entry<String, Command> entry : commandsMap.entrySet()) {
             if (entry.getKey().toLowerCase().contains(":")) {
                 String command = entry.getKey().substring(entry.getKey().lastIndexOf(":") + 1);
 
@@ -412,7 +382,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
         pluginName = pluginName.toLowerCase();
 
-        for (Map.Entry<String, Command> entry : BukkitLoader.getCommandsMap().entrySet()) {
+        for (Map.Entry<String, Command> entry : commandsMap.entrySet()) {
             if (entry.getKey().toLowerCase().startsWith(pluginName + ":")) {
                 String command = entry.getKey().substring(pluginName.length() + 1);
 
@@ -489,10 +459,6 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         BukkitLoader.commands = result;
         BukkitLoader.allowedCommands = allowedCommands;
         BukkitLoader.disallowedCommands = commands.stream().filter(command -> !allowedCommands.contains(command)).toList();
-    }
-
-    public static Map<String, Command> getCommandsMap() {
-        return commandsMap;
     }
 
     public static Plugin getPlugin() {

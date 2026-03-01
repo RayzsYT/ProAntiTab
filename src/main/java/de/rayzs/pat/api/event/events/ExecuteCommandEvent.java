@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.event.events;
 
 import de.rayzs.pat.api.event.PATEvent;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 public abstract class ExecuteCommandEvent extends PATEvent<ExecuteCommandEvent> {
 
@@ -9,13 +10,15 @@ public abstract class ExecuteCommandEvent extends PATEvent<ExecuteCommandEvent> 
 
     public ExecuteCommandEvent() {
         super(null);
+
         this.blocked = false;
         this.notify = false;
         this.command = null;
     }
 
-    public ExecuteCommandEvent(Object senderObj, String command, boolean blocked, boolean notify) {
-        super(senderObj);
+    public ExecuteCommandEvent(CommandSender player, String command, boolean blocked, boolean notify) {
+        super(player);
+
         this.blocked = blocked;
         this.command = command;
         this.notify = notify;
