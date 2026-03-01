@@ -62,7 +62,6 @@ public class Storage {
 
     public static String TOKEN = "", CENSORED_TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
-    public static Object PLUGIN_OBJECT;
     public static boolean USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false;
 
     private final static ExpireCache<UUID, String> TEMP_PLAYER_SERVER_CACHE = new ExpireCache<>(1, TimeUnit.SECONDS);
