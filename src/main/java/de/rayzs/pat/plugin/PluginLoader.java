@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public interface PluginLoader {
 
+    Object getPluginObj();
+
     void handleReload();
     boolean doesCommandExist(String command);
 

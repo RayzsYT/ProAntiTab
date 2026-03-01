@@ -105,8 +105,6 @@ public class VelocityLoader implements PluginLoader {
 
         startUpdaterTask();
 
-        Storage.PLUGIN_OBJECT = this;
-
         if (server.getPluginManager().getPlugin("luckperms").isPresent())
             LuckPermsHook.initialize();
 
@@ -133,6 +131,11 @@ public class VelocityLoader implements PluginLoader {
 
     public static org.slf4j.Logger getPluginLogger() {
         return logger;
+    }
+
+    @Override
+    public Object getPluginObj() {
+        return instance;
     }
 
     @Override

@@ -83,8 +83,6 @@ public class BungeeLoader extends Plugin implements PluginLoader {
 
         startUpdaterTask();
 
-        Storage.PLUGIN_OBJECT = this;
-
         if (manager.getPlugin("LuckPerms") != null)
             LuckPermsHook.initialize();
 
@@ -127,6 +125,11 @@ public class BungeeLoader extends Plugin implements PluginLoader {
             BungeeCommand command = new BungeeCommand(commandName);
             ProxyServer.getInstance().getPluginManager().registerCommand(plugin, command);
         }
+    }
+
+    @Override
+    public Object getPluginObj() {
+        return plugin;
     }
 
     @Override

@@ -30,8 +30,17 @@ public class LuckPermsHook {
         PROVIDER = LuckPermsProvider.get();
         EventBus eventBus = PROVIDER.getEventBus();
 
-        eventBus.subscribe(Storage.PLUGIN_OBJECT, NodeMutateEvent.class, LuckPermsHook::onNoteMutate);
-        eventBus.subscribe(Storage.PLUGIN_OBJECT, PreNetworkSyncEvent.class, event -> Storage.getLoader().delayedPermissionsReload());
+        eventBus.subscribe(
+                Storage.getLoader().getPluginObj(),
+                NodeMutateEvent.class,
+                LuckPermsHook::onNoteMutate
+        );
+
+        eventBus.subscribe(
+                Storage.getLoader().getPluginObj(),
+                PreNetworkSyncEvent.class,
+                event -> Storage.getLoader().delayedPermissionsReload()
+        );
     }
 
 

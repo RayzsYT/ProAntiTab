@@ -119,8 +119,6 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         registerCommand("proantitab", "pat");
         startUpdaterTask();
 
-        Storage.PLUGIN_OBJECT = this;
-
         if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
             LuckPermsHook.initialize();
             Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
@@ -168,6 +166,11 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
             pluginCommand.setExecutor(command);
             pluginCommand.setTabCompleter(command);
         }
+    }
+
+    @Override
+    public Object getPluginObj() {
+        return plugin;
     }
 
     @Override
