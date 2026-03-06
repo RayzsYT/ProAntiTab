@@ -105,11 +105,6 @@ public class SubArgument {
             final boolean isOnline = Storage.getLoader().isPlayerOnline(s);
             final boolean doesExist = Storage.getLoader().doesPlayerExist(s);
 
-            if (isNumber) {
-                split[i] = "%numbers%";
-                continue;
-            }
-
             if (isOnline && doesExist) {
                 split[i] = "%both_players%";
                 continue;
@@ -120,8 +115,14 @@ public class SubArgument {
                 continue;
             }
 
-            if (doesExist)
+            if (isNumber) {
+                split[i] = "%numbers%";
+                continue;
+            }
+
+            if (doesExist) {
                 split[i] = "%players%";
+            }
         }
 
         return String.join(" ", split);
