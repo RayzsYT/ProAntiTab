@@ -74,7 +74,10 @@ public class BukkitPacketAnalyzer {
             return success;
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
+                exception.printStackTrace();
+            }
+
             return false;
 
         }

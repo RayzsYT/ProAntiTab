@@ -118,8 +118,11 @@ public class VelocityPacketAnalyzer {
             Logger.warning("Failed to find 'handler' inside player pipeline! (name=" + player.getUsername() + ", uuid=" + player.getUniqueId() + ", version=" + player.getProtocolVersion() + ", brand=" + player.getClientBrand() + " )");
             return false;
 
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (Exception exception) {
+            if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
+                exception.printStackTrace();
+            }
+
             return false;
         }
 

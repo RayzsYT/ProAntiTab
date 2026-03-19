@@ -225,6 +225,7 @@ patch-exploits:
 # spoofed or not.
 injection-failed:
   kick-on-failure: true
+  suppress-exceptions: false
   kick-message: '&cInjection process failed! Please reconnect.'
   console-message: '&cInjection process failed! (%player%)'
 
