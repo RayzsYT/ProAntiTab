@@ -124,7 +124,10 @@ public class VelocityPacketAnalyzer {
             return false;
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
+                exception.printStackTrace();
+            }
+
             return false;
         }
 

@@ -185,6 +185,7 @@ auto-lowercase-commands:
 # it would be a waste not to provide some simple patches like these. ^^
 patch-exploits:
   enabled: true
+  suppress-exceptions: false
   alert-message: '%prefix% &4%player% &ctried to crash/lag the server.'
   kick-message: '&cFailed to read packet! Please reconnect.'
 

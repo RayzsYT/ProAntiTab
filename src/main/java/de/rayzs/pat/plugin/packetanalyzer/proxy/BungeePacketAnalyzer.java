@@ -101,8 +101,11 @@ public class BungeePacketAnalyzer {
             channel.pipeline().addAfter(BungeePacketAnalyzer.PIPELINE_NAME, BungeePacketAnalyzer.HANDLER_NAME, new PacketDecoder(player));
             BungeePacketAnalyzer.INJECTED_PLAYERS.put(player, channel);
 
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (Exception exception) {
+            if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
+                exception.printStackTrace();
+            }
+
             return false;
 
         }
