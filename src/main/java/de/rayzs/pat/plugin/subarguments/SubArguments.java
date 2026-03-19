@@ -236,11 +236,6 @@ public class SubArguments {
                     online = Storage.getLoader().isPlayerOnline(s),
                     general = Storage.getLoader().doesPlayerExist(s);
 
-            if (number) {
-                split[i] = "%numbers%";
-                continue;
-            }
-
             if (online && general) {
                 split[i] = "%both_players%";
                 continue;
@@ -251,8 +246,14 @@ public class SubArguments {
                 continue;
             }
 
-            if (general)
+            if (general) {
                 split[i] = "%players%";
+                continue;
+            }
+
+            if (number) {
+                split[i] = "%numbers%";
+            }
         }
 
         return String.join(" ", split);
