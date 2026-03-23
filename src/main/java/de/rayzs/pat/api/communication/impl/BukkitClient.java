@@ -8,6 +8,7 @@ import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.api.communication.*;
 import org.bukkit.entity.Player;
 import org.bukkit.*;
+import java.util.Iterator;
 
 public class BukkitClient implements Client, PluginMessageListener {
 
@@ -56,12 +57,22 @@ public class BukkitClient implements Client, PluginMessageListener {
             return;
         }
 
-
-        try {
-            SERVER.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, preparedPacket);
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        final Player carrier = selectCarrier();
+        if (carrier == null) {
+            return;
         }
+
+        PATScheduler.execute(() -> {
+            if (!carrier.isOnline()) {
+                return;
+            }
+
+            try {
+                carrier.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, preparedPacket);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        }, carrier);
     }
 
     @Override
@@ -83,5 +94,10 @@ public class BukkitClient implements Client, PluginMessageListener {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+    }
+
+    private Player selectCarrier() {
+        final Iterator<? extends Player> iterator = SERVER.getOnlinePlayers().iterator();
+        return iterator.hasNext() ? iterator.next() : null;
     }
 }
