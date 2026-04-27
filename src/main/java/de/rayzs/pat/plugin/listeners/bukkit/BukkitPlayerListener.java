@@ -52,7 +52,7 @@ public class BukkitPlayerListener implements Listener {
                         PermissionUtil.reloadPermissions(sender);
                     }
 
-                    if (Reflection.getMinor() >= 13) {
+                    if (Reflection.isAtLeast(1, 13)) {
                         BukkitAntiTabListener.handleTabCompletion(player);
                     }
                 }, 20);
@@ -83,7 +83,7 @@ public class BukkitPlayerListener implements Listener {
         }
 
         // Update sub arguments for <1.12.2 servers.
-        if (Reflection.getMinor() < 13) {
+        if (Reflection.isBefore(1, 13)) {
             Storage.quickSubArgumentUpdate(uuid);
         }
 
@@ -119,7 +119,7 @@ public class BukkitPlayerListener implements Listener {
             assert sender != null;
             PermissionUtil.reloadPermissions(sender);
 
-            if (Reflection.getMinor() >= 13) {
+            if (Reflection.isAtLeast(1, 13)) {
                 BukkitAntiTabListener.handleTabCompletion(player);
             }
         }

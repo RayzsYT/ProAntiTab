@@ -30,7 +30,7 @@ public class BukkitServerBrand implements ServerBrand {
 
         if (Reflection.isWeird()) {
 
-            NO_PREP_CHANNELS = Reflection.getMinor() >= 22 || (Reflection.getMinor() == 21 && Reflection.getRelease() >= 7);
+            NO_PREP_CHANNELS = Reflection.isAtLeast(1, 21, 7);
 
             if (brandPayloadClass == null)
                 brandPayloadClass = Reflection.getClass("net.minecraft.network.protocol.common.custom.BrandPayload");

@@ -31,8 +31,8 @@ public class Reflection {
                 loadAges();
                 loadVersionEnum();
 
-                legacy = minor <= 16;
-                weird = Reflection.getMinor() == 20 && Reflection.getRelease() >= 6 || Reflection.getMinor() > 20;
+                legacy = isAtMost(1, 16);
+                weird = isAtLeast(1, 20, 6);
 
                 oldChannelMethod = software.isPaperBased() && weird;
             } catch (Exception exception) {
@@ -300,7 +300,7 @@ public class Reflection {
     }
 
     public static Object getPlayerNetworkManager(Object playerConnection) throws Exception {
-        Optional<Field> optional = getFieldsByType(Reflection.getMinor() == 20 && Reflection.getRelease() > 2 || Reflection.getMinor() > 20 ? playerConnection.getClass().getSuperclass() : playerConnection.getClass(), "NetworkManager", SearchOption.ENDS).stream().findFirst();
+        Optional<Field> optional = getFieldsByType(Reflection.isAfter(1, 20, 2) ? playerConnection.getClass().getSuperclass() : playerConnection.getClass(), "NetworkManager", SearchOption.ENDS).stream().findFirst();
         if(!optional.isPresent()) return null;
         return optional.get().get(playerConnection);
     }
@@ -377,12 +377,52 @@ public class Reflection {
         String[] versionArgs = rawVersionName.split("_");
         major = Integer.parseInt(versionArgs[0]);
         minor = Integer.parseInt(versionArgs[1]);
-        release = versionArgs.length > 2 ? Integer.parseInt(versionArgs[2]) : 0;
+        if (versionArgs.length <= 2) {
+            release = 0;
+        } else {
+            try {
+                release = Integer.parseInt(versionArgs[2]);
+            } catch (NumberFormatException exception) {
+                release = 0;
+            }
+        }
     }
 
     public static int getMajor() { return major; }
     public static int getMinor() { return minor; }
     public static int getRelease() { return release; }
+
+    public static boolean isAtLeast(int major, int minor) {
+        return Reflection.getMajor() > major || (Reflection.getMajor() == major && Reflection.getMinor() >= minor);
+    }
+
+    public static boolean isAtLeast(int major, int minor, int release) {
+        return Reflection.getMajor() > major || (Reflection.getMajor() == major && Reflection.getMinor() > minor) || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() >= release);
+    }
+
+    public static boolean isAtMost(int major, int minor) {
+        return Reflection.getMajor() < major || (Reflection.getMajor() == major && Reflection.getMinor() <= minor);
+    }
+
+    public static boolean isAtMost(int major, int minor, int release) {
+        return Reflection.getMajor() < major || (Reflection.getMajor() == major && Reflection.getMinor() < minor) || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() <= release);
+    }
+
+    public static boolean isAfter(int major, int minor) {
+        return Reflection.getMajor() > major || (Reflection.getMajor() == major && Reflection.getMinor() > minor);
+    }
+
+    public static boolean isAfter(int major, int minor, int release) {
+        return Reflection.getMajor() > major || (Reflection.getMajor() == major && Reflection.getMinor() > minor) || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() > release);
+    }
+
+    public static boolean isBefore(int major, int minor) {
+        return Reflection.getMajor() < major || (Reflection.getMajor() == major && Reflection.getMinor() < minor);
+    }
+
+    public static boolean isBefore(int major, int minor, int release) {
+        return Reflection.getMajor() < major || (Reflection.getMajor() == major && Reflection.getMinor() < minor) || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() < release);
+    }
 
     public enum Software {
         BUKKIT(false, false),

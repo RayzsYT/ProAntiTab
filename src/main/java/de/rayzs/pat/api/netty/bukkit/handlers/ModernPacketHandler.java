@@ -156,7 +156,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         }
 
 
-        if (Reflection.getMinor() < 17) {
+        if (Reflection.isBefore(1, 17)) {
             Field suggestionsField = Reflection.getFieldsByType(packetObj.getClass(), "Suggestions", Reflection.SearchOption.ENDS).get(0);
             if (suggestionsField == null) return false;
             suggestionObj = suggestionsField.get(packetObj);

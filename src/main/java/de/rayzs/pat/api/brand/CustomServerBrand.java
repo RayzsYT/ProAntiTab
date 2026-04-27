@@ -7,7 +7,7 @@ import de.rayzs.pat.utils.Reflection;
 
 public class CustomServerBrand {
 
-    public static final String CHANNEL_NAME = Reflection.getMinor() < 13 ? "MC|Brand" : "minecraft:brand";
+    public static final String CHANNEL_NAME = Reflection.isBefore(1, 13) ? "MC|Brand" : "minecraft:brand";
     private static final ServerBrand SERVER_BRAND = Reflection.isVelocityServer() ? new VelocityServerBrand() : Reflection.isProxyServer() ? new BungeeServerBrand() : new BukkitServerBrand();
 
     public static void initialize() { refreshTask(); }

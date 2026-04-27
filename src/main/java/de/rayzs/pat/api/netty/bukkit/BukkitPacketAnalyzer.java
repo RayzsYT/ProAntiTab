@@ -23,7 +23,7 @@ public class BukkitPacketAnalyzer {
 
     private static final String HANDLER_NAME = "pat-bukkit-handler", PIPELINE_NAME = "packet_handler";
 
-    private static final BukkitPacketHandler PACKET_HANDLER = Reflection.getMinor() >= 16 ? new ModernPacketHandler() : new LegacyPacketHandler();
+    private static final BukkitPacketHandler PACKET_HANDLER = Reflection.isAtLeast(1, 16) ? new ModernPacketHandler() : new LegacyPacketHandler();
     private static final BukkitPacketHandler COMMANDS_NODE_HANDLER = new ModernCommandsNodeHandler();
 
     private static final HashMap<Player, String> PLAYER_INPUT_CACHE = new HashMap<>();

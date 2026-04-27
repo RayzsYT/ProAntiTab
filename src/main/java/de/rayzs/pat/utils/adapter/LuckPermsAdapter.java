@@ -82,7 +82,7 @@ public class LuckPermsAdapter {
             return;
         }
 
-        if (Reflection.getMinor() >= 13)
+        if (Reflection.isAtLeast(1, 13))
             BukkitAntiTabListener.handleTabCompletion(uuid);
     }
 
