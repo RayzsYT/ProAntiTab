@@ -88,7 +88,7 @@ public class BukkitAntiTabListener implements Listener {
     }
 
     private static boolean notUpdatablePlayer(UUID uuid) {
-        return Storage.USE_VIAVERSION && Reflection.getMinor() >= 16 && ViaVersionHook.getPlayerProtocol(uuid) < 754;
+        return Storage.USE_VIAVERSION && Reflection.isAtLeast(1, 16) && ViaVersionHook.getPlayerProtocol(uuid) < 754;
     }
 
     public void updateCommands(Player player) {

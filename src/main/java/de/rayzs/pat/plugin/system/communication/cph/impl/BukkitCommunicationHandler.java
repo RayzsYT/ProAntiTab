@@ -68,7 +68,7 @@ public class BukkitCommunicationHandler implements CommunicationPacketHandler {
     }
 
     private void handleUpdateCommandsPacket(CommunicationPackets.Proxy2Backend.UpdatePacket packet) {
-        if (Reflection.getMinor() < 13) {
+        if (Reflection.isBefore(1, 13)) {
             return;
         }
 

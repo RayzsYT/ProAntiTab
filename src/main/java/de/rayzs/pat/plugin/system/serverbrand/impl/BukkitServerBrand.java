@@ -20,7 +20,7 @@ public class BukkitServerBrand implements ServerBrand {
 
     private static final Server SERVER = Bukkit.getServer();
 
-    private static final String CHANNEL_NAME = Reflection.getMinor() < 13 ? "MC|Brand" : "minecraft:brand";
+    private static final String CHANNEL_NAME = Reflection.isBefore(1, 13) ? "MC|Brand" : "minecraft:brand";
 
     private static String BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0);
     private static PATSchedulerTask TASK;
@@ -35,7 +35,7 @@ public class BukkitServerBrand implements ServerBrand {
 
         if (Reflection.isWeird()) {
 
-            NO_PREP_CHANNELS = Reflection.getMinor() >= 22 || (Reflection.getMinor() == 21 && Reflection.getRelease() >= 7);
+            NO_PREP_CHANNELS = Reflection.isAtLeast(1, 21, 7);;
 
             if (brandPayloadClass == null)
                 brandPayloadClass = Reflection.getClass("net.minecraft.network.protocol.common.custom.BrandPayload");

@@ -108,13 +108,14 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         manager.registerEvents(new BukkitPlayerListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
 
-        if (Reflection.getMinor() >= 13) {
+        if (Reflection.isAtLeast(1, 13)) {
             bukkitAntiTabListener = new BukkitAntiTabListener();
             manager.registerEvents(bukkitAntiTabListener, this);
         }
 
-        if (Reflection.isPaper() && Reflection.getMinor() >= 12)
+        if (Reflection.isPaper() && Reflection.isAtLeast(1, 12)) {
             manager.registerEvents(new PaperServerListPing(), this);
+        }
 
         registerCommand("proantitab", "pat");
         startUpdaterTask();
