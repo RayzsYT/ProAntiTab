@@ -97,11 +97,11 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         manager.registerEvents(new BukkitPlayerListener(), this);
         manager.registerEvents(new BukkitBlockCommandListener(), this);
 
-        if (Reflection.getMinor() >= 13) {
+        if (Reflection.isAtLeast(1, 13)) {
             manager.registerEvents(new BukkitAntiTabListener(), this);
         }
 
-        if (Reflection.isPaper() && Reflection.getMinor() >= 12)
+        if (Reflection.isPaper() && Reflection.isAtLeast(1, 12))
             manager.registerEvents(new PaperServerListPing(), this);
 
         registerCommand("proantitab", "pat");
@@ -299,7 +299,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     public static void handleUpdateCommandsPacket(CommunicationPackets.Proxy2Backend.UpdatePacket packet) {
-        if (Reflection.getMinor() < 13) {
+        if (Reflection.isBefore(1, 13)) {
             return;
         }
 

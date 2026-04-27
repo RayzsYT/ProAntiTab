@@ -25,7 +25,7 @@ public class CustomProtocolPingSection extends ConfigStorage {
     public void load() {
         super.load();
 
-        if (!Reflection.isProxyServer() && (!Reflection.isPaper() || Reflection.getMinor() < 12))
+        if (!Reflection.isProxyServer() && (!Reflection.isPaper() || Reflection.isBefore(1, 12)))
             return;
 
         ENABLED = new ConfigSectionHelper<Boolean>(this, "enabled", true).getOrSet();

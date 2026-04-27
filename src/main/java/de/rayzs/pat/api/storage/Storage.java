@@ -268,7 +268,7 @@ public class Storage {
         getLoader().handleReload();
         PermissionUtil.reloadPermissions();
 
-        if (Reflection.getMinor() < 13) {
+        if (Reflection.isBefore(1, 13)) {
             final List<UUID> playerIds = Storage.getLoader().getPlayerIds();
             final List<String> commands = new ArrayList<>(Blacklist.BLACKLIST.getCommands());
 

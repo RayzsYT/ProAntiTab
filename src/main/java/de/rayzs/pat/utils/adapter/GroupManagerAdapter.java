@@ -46,7 +46,7 @@ public class GroupManagerAdapter implements Listener {
                 .filter(permission -> permission.startsWith("proantitab."))
                 .forEach(permission -> PermissionUtil.setPermission(uuid, permission, true));
 
-        if (Reflection.getMinor() >= 13) {
+        if (Reflection.isAtLeast(1, 13)) {
             BukkitAntiTabListener.handleTabCompletion(uuid);
         }
     }
