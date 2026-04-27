@@ -69,12 +69,12 @@ public class BukkitPlayerListener implements Listener {
 
                             Logger.info(MessageTranslator.replaceMessage(
                                     sender,
-                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE.get()
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE
                             ));
 
                             player.kickPlayer(MessageTranslator.replaceMessage(
                                     sender,
-                                    Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE.get()
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE
                             ));
                         }
                     }
