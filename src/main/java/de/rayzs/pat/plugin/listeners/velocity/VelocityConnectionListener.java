@@ -71,13 +71,13 @@ public class VelocityConnectionListener {
 
                             Logger.info(MessageTranslator.replaceMessage(
                                     player,
-                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE.get()
+                                    Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE
                             ));
 
                             player.disconnect(Component.text(
                                     MessageTranslator.replaceMessage(
                                             player,
-                                            Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE.get()
+                                            Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE
                                     )
                             ));
                         }
