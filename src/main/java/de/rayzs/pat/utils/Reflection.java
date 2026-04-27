@@ -14,7 +14,6 @@ public class Reflection {
     private static int major, minor, release;
 
     private static Software software;
-    private static Version version;
 
     public static void initialize(Object serverObj) {
 
@@ -29,7 +28,6 @@ public class Reflection {
 
                 loadVersionName(serverObj);
                 loadAges();
-                loadVersionEnum();
 
                 legacy = isAtMost(1, 16);
                 weird = isAtLeast(1, 20, 6);
@@ -56,7 +54,6 @@ public class Reflection {
     public static int[] getAges() { return new int[]{major, minor, release}; }
     public static String getVersionName() { return versionName; }
     public static String getRawVersionName() { return rawVersionName; }
-    public static Version getVersion() { return version; }
     public static boolean isModern() { return !legacy; }
     public static boolean isLegacy() { return legacy; }
     public static boolean isWeird() { return weird; }
@@ -358,34 +355,22 @@ public class Reflection {
         versionPackageName = versionPackageName.substring(versionPackageName.lastIndexOf('.') + 1);
     }
 
-    private static void loadVersionEnum() {
-        try {
-            final String primaryVersionName, fullVersionName;
-            StringBuilder builder = new StringBuilder("v_");
-            builder.append(major).append("_").append(minor);
-            primaryVersionName = builder.toString();
-            if (release != 0) builder.append("_").append(release);
-            fullVersionName = builder.toString();
-            boolean couldFindOriginalVersion = Arrays.stream(Version.values()).anyMatch(searchingVersion -> searchingVersion.toString().equals(fullVersionName));
-            version = Version.valueOf(couldFindOriginalVersion ? fullVersionName : primaryVersionName);
-        } catch (Exception exception) {
-            version = Version.UNSUPPORTED;
-        }
-    }
-
     private static void loadAges() {
-        String[] versionArgs = rawVersionName.split("_");
+        final String[] versionArgs = rawVersionName.split("_");
+
         major = Integer.parseInt(versionArgs[0]);
         minor = Integer.parseInt(versionArgs[1]);
-        if (versionArgs.length <= 2) {
-            release = 0;
-        } else {
+
+        if (versionArgs.length >= 3) {
+
             try {
                 release = Integer.parseInt(versionArgs[2]);
-            } catch (NumberFormatException exception) {
-                release = 0;
-            }
+                return;
+            } catch (NumberFormatException ignored) {}
+
         }
+
+        release = 0;
     }
 
     public static int getMajor() { return major; }
@@ -442,8 +427,9 @@ public class Reflection {
         WATERFALL(true, true),
         VELOCITY(true, true);
 
-        private final boolean paperBased, proxySoftware;
         private final String name;
+        private final boolean paperBased, proxySoftware;
+
         Software(final boolean paperBased, final boolean proxySoftware) {
             this.paperBased = paperBased;
             this.proxySoftware = proxySoftware;
@@ -462,24 +448,6 @@ public class Reflection {
         public boolean isProxySoftware() {
             return proxySoftware;
         }
-    }
-
-    public enum Version {
-        UNKNOWN, UNSUPPORTED,
-        v_1_8, v_1_8_8,
-        v_1_9, v_1_9_4,
-        v_1_10, v_1_10_2,
-        v_1_11, v_1_11_2,
-        v_1_12, v_1_12_2,
-        v_1_13, v_1_13_2,
-        v_1_14, v_1_14_4,
-        v_1_15, v_1_15_2,
-        v_1_16, v_1_16_4, v_1_16_5,
-        v_1_17, v_1_17_1, v_1_18,
-        v_1_18_1, v_1_18_2,
-        v_1_19, v_1_19_1, v_1_19_2, v_1_19_3, v_1_19_4,
-        v_1_20, v_1_20_1, v_1_20_2, v_1_20_3, v_1_20_4, v_1_20_5, v_1_20_6,
-        v_1_21, v_1_21_1, v_1_21_2, v_1_21_3, v_1_21_4, v_1_21_5, v_1_21_6, v_1_21_7, v_1_21_8, v_1_21_9, v_1_21_10, v_1_21_11
     }
 
     public enum SearchOption { CONTAINS, EQUALS, ENDS, STARTS }
