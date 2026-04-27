@@ -397,7 +397,9 @@ public class Reflection {
     }
 
     public static boolean isAtLeast(int major, int minor, int release) {
-        return Reflection.getMajor() > major || (Reflection.getMajor() == major && Reflection.getMinor() > minor) || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() >= release);
+        return Reflection.getMajor() > major
+                || (Reflection.getMajor() == major && Reflection.getMinor() > minor)
+                || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() >= release);
     }
 
     public static boolean isAtMost(int major, int minor) {
@@ -405,7 +407,9 @@ public class Reflection {
     }
 
     public static boolean isAtMost(int major, int minor, int release) {
-        return Reflection.getMajor() < major || (Reflection.getMajor() == major && Reflection.getMinor() < minor) || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() <= release);
+        return Reflection.getMajor() < major
+                || (Reflection.getMajor() == major && Reflection.getMinor() < minor)
+                || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() <= release);
     }
 
     public static boolean isAfter(int major, int minor) {
@@ -413,7 +417,9 @@ public class Reflection {
     }
 
     public static boolean isAfter(int major, int minor, int release) {
-        return Reflection.getMajor() > major || (Reflection.getMajor() == major && Reflection.getMinor() > minor) || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() > release);
+        return Reflection.getMajor() > major
+                || (Reflection.getMajor() == major && Reflection.getMinor() > minor)
+                || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() > release);
     }
 
     public static boolean isBefore(int major, int minor) {
@@ -421,7 +427,9 @@ public class Reflection {
     }
 
     public static boolean isBefore(int major, int minor, int release) {
-        return Reflection.getMajor() < major || (Reflection.getMajor() == major && Reflection.getMinor() < minor) || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() < release);
+        return Reflection.getMajor() < major
+                || (Reflection.getMajor() == major && Reflection.getMinor() < minor)
+                || (Reflection.getMajor() == major && Reflection.getMinor() == minor && Reflection.getRelease() < release);
     }
 
     public enum Software {
