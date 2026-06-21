@@ -5,8 +5,6 @@ import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.sender.CommandSender;
 import net.luckperms.api.context.ImmutableContextSet;
-import net.luckperms.api.event.LuckPermsEvent;
-import net.luckperms.api.event.sync.PreNetworkSyncEvent;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.luckperms.api.model.PermissionHolder;
 import net.luckperms.api.model.user.User;
@@ -49,11 +47,24 @@ public class LuckPermsHook {
                 event -> handleNodesChange(event.getTarget(), event.getNodes())
         );
 
+/*      Probably not required anymore, since
+        commands and permissions are already reloaded, in case
+        the player updates some kind of PAT related permission.
+
+        This here only reload permissions and even updates player commands
+        for all unnecessarily since why updating EVERYTHING for just
+        one tiny group change or anything, which may not even be related
+        to any PAT changes?
+
+        At least, so the thought. Therefore to be on the save side, it's disabled for now.
+        This should also save some server memory.
+
         eventBus.subscribe(
                 Storage.getLoader().getPluginObj(),
-                PreNetworkSyncEvent.class,
-                event -> Storage.getLoader().delayedPermissionsReload()
+                PostNetworkSyncEvent.class,
+                event -> PermissionUtil.reloadPermissions()
         );
+ */
     }
 
     public static Map<String, Boolean> getPermissions(UUID uuid) {
