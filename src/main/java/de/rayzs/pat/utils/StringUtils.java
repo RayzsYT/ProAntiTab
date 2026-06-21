@@ -1,8 +1,44 @@
 package de.rayzs.pat.utils;
 
+import de.rayzs.pat.utils.message.MessageTranslator;
+
 import java.util.*;
 
 public class StringUtils {
+
+    public static void centralize(List<String> lines) {
+        final Map<Integer, Integer> sizes = new HashMap<>();
+        final String centerVariable = "%center%";
+
+        int biggestSize = 0;
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+
+            if (line.startsWith(centerVariable)) {
+                line = MessageTranslator.colorless(line.substring(centerVariable.length()));
+
+                int size = line.length();
+                sizes.put(i, size);
+                biggestSize = Math.max(biggestSize, size);
+            }
+        }
+
+        if (sizes.isEmpty()) return;
+
+        for (int i = 0; i < lines.size(); i++) {
+            final int size = sizes.getOrDefault(i, -1);
+
+            if (size != -1) {
+                final int diff = biggestSize - size;
+                final int left = diff / 2;
+                final int right = diff - left;
+
+                lines.set(i,
+                        " ".repeat(left) + lines.get(i).substring(centerVariable.length()) + " ".repeat(right)
+                );
+            }
+        }
+    }
 
     public static String replaceFirst(String input, String trigger, String replacement) {
 
@@ -109,13 +145,34 @@ public class StringUtils {
         return replaceTriggers(input, "", targets);
     }
 
-    public static int countMatches(Character character, String string) {
+    public static int countMatches(Character searching, String source) {
         int count = 0;
-        for (char c : string.toCharArray()) {
-            if (character == c) count++;
+        for (char c : source.toCharArray()) {
+            if (searching == c) count++;
         }
 
         return count;
+    }
+
+    public static int countMatches(final String searching, final String source) {
+        char[] sourceChars = source.toCharArray();
+
+        int matches = 0, success = 0;
+        for (char character : sourceChars) {
+            if (success == searching.length()) {
+                matches++;
+                success = 0;
+            }
+
+            if (character != searching.charAt(success)) {
+                success = 0;
+                continue;
+            }
+
+            success++;
+        }
+
+        return matches;
     }
 
     public static boolean isLowercased(String str) {

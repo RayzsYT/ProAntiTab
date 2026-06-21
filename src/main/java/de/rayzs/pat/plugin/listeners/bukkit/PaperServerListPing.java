@@ -86,35 +86,7 @@ public class PaperServerListPing implements Listener {
                 }
 
                 if (Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_CENTER_VARIABLE) {
-
-                    int biggestLine = 0;
-                    for (int i = 0; i < lines.size(); i++) {
-                        String line = replaceString(lines.get(i), online, onlineExtend, max);
-                        lines.set(i, line);
-
-                        if (line.startsWith("%center%")) {
-                            biggestLine = Math.max(biggestLine, Math.max(0, line.length() - 8));
-                        }
-                    }
-
-                    for (int i = 0; i < lines.size(); i++) {
-                        String line = lines.get(i);
-
-                        if (line.startsWith("%center%")) {
-                            int length = Math.max(0, line.length() - 8);
-                            int diff = biggestLine - length;
-
-                            int left = diff / 2;
-                            int right = diff - left;
-
-                            line = " ".repeat(left)
-                                    + line.substring(8)
-                                    + " ".repeat(right);
-
-                            lines.set(i, line);
-                        }
-                    }
-
+                    StringUtils.centralize(lines);
                 }
 
                 lines.forEach(line -> {

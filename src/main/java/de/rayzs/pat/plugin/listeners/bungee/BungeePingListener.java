@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.StringUtils;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import de.rayzs.pat.api.storage.Storage;
@@ -20,13 +21,15 @@ public class BungeePingListener implements Listener {
         ProxyServer proxyServer = BungeeLoader.getPlugin().getProxy();
         int online = proxyServer.getOnlineCount(),
                 onlineExtend = online + Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.EXTEND_COUNT,
-                max = -1;
+                tmpMax = -1;
 
         try {
-            max = proxyServer.getConfigurationAdapter().getListeners().iterator().next().getMaxPlayers();
+            tmpMax = proxyServer.getConfigurationAdapter().getListeners().iterator().next().getMaxPlayers();
         } catch (Throwable throwable) {
             Logger.warning("Failed to read max-players count for %max% placeholder! Using -1 as default value instead.");
         }
+
+        final int max = tmpMax;
 
         ServerPing serverPing = event.getResponse();
 
@@ -55,32 +58,11 @@ public class BungeePingListener implements Listener {
             } else {
                 List<String> cpyLines = new ArrayList<>(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines());
 
-                int biggestLine = 0;
-                for (int i = 0; i < cpyLines.size(); i++) {
-                    String line = replaceString(cpyLines.get(i), online, onlineExtend, max);
-                    cpyLines.set(i, line);
-
-                    if (line.startsWith("%center%")) {
-                        biggestLine = Math.max(biggestLine, Math.max(0, line.length() - 8));
-                    }
-                }
+                cpyLines.replaceAll(string -> replaceString(string, online, onlineExtend, max));
+                StringUtils.centralize(cpyLines);
 
                 for (int i = 0; i < cpyLines.size(); i++) {
-                    String line = cpyLines.get(i);
-
-                    if (line.startsWith("%center%")) {
-                        int length = Math.max(0, line.length() - 8);
-                        int diff = biggestLine - length;
-
-                        int left = diff / 2;
-                        int right = diff - left;
-
-                        line = " ".repeat(left)
-                                + line.substring(8)
-                                + " ".repeat(right);
-                    }
-
-                    playerInfos[i] = new ServerPing.PlayerInfo(line, "");
+                    playerInfos[i] = new ServerPing.PlayerInfo(cpyLines.get(i), "");
                 }
             }
 
