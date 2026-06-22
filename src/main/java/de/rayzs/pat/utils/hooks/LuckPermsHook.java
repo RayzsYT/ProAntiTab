@@ -106,24 +106,16 @@ public class LuckPermsHook {
     }
 
     private static void handleNodesChange(PermissionHolder holder, Set<Node> nodes) {
-        boolean relevant = false;
-
         for (Node node : nodes) {
             if (node.getType() != NodeType.PERMISSION) {
                 continue;
             }
 
             if (isRelevantPermission(node)) {
-                relevant = true;
+                handleAfterNodeChange(holder);
                 break;
             }
         }
-
-        if (!relevant) {
-            return;
-        }
-
-        handleAfterNodeChange(holder);
     }
 
     private static void handleNodeChange(PermissionHolder holder, Node node) {
