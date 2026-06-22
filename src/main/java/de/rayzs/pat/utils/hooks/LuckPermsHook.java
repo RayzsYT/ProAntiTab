@@ -7,6 +7,7 @@ import de.rayzs.pat.utils.sender.CommandSender;
 import net.luckperms.api.context.ImmutableContextSet;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import net.luckperms.api.model.PermissionHolder;
+import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.api.storage.Storage;
@@ -33,18 +34,22 @@ public class LuckPermsHook {
         eventBus.subscribe(
                 Storage.getLoader().getPluginObj(),
                 NodeAddEvent.class,
-                event -> handleNodeChange(event.getTarget(), event.getNode()));
+                event ->
+                        handleNodeChange(event.getTarget(), event.getNode())
+        );
 
         eventBus.subscribe(
                 Storage.getLoader().getPluginObj(),
                 NodeRemoveEvent.class,
-                event -> handleNodeChange(event.getTarget(), event.getNode())
+                event ->
+                        handleNodeChange(event.getTarget(), event.getNode())
         );
 
         eventBus.subscribe(
                 Storage.getLoader().getPluginObj(),
                 NodeClearEvent.class,
-                event -> handleNodesChange(event.getTarget(), event.getNodes())
+                event ->
+                        handleNodesChange(event.getTarget(), event.getNodes())
         );
 
 /*      Probably not required anymore, since
@@ -132,7 +137,18 @@ public class LuckPermsHook {
 
     private static void handleAfterNodeChange(PermissionHolder holder) {
         if (! (holder instanceof User user)) {
-            Storage.getLoader().delayedPermissionsReload();
+
+            if (holder instanceof Group group) {
+                Storage.getLoader().getPlayerIds().forEach(id -> {
+                    final User user = PROVIDER.getUserManager().getUser(id);
+
+                    if (user != null) {
+                        final boolean result = user.getCachedData().getPermissionData().checkPermission("group." + group.getName()).asBoolean();
+                        if (result) handleAfterNodeChange(user);
+                    }
+                });
+            }
+
             return;
         }
 
@@ -144,6 +160,9 @@ public class LuckPermsHook {
 
         final String serverName = sender.getServerName();
 
+
+        PermissionUtil.reloadPermissions(sender);
+
         if (Reflection.isProxyServer()) {
             final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
             final List<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
@@ -154,8 +173,6 @@ public class LuckPermsHook {
             SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);
             Communicator.Proxy2Backend.sendUpdateCommand(user.getUniqueId(), serverName);
         }
-
-        Storage.getLoader().delayedPermissionsReload(sender);
     }
 
     private static boolean isRelevantPermission(Node node) {
