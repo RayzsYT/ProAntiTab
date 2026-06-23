@@ -17,7 +17,6 @@ import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.plugin.command.impl.VelocityCommand;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.plugin.system.communication.Communicator;
@@ -152,25 +151,6 @@ public class VelocityLoader implements PluginLoader {
     @Override
     public void updateCommands(CommandSender sender) {
         Communicator.Proxy2Backend.sendUpdateCommand(sender.getUniqueId(), sender.getServerName());
-    }
-
-    @Override
-    public void delayedPermissionsReload() {
-        server.getScheduler().buildTask(VelocityLoader.instance, () -> {
-            PermissionUtil.reloadPermissions();
-            resetCommandsCache();
-
-            Communicator.Proxy2Backend.sendUpdateCommand();
-        }).delay(1, TimeUnit.SECONDS).schedule();
-    }
-
-    @Override
-    public void delayedPermissionsReload(CommandSender sender) {
-        server.getScheduler().buildTask(VelocityLoader.instance, () -> {
-            PermissionUtil.reloadPermissions(sender);
-
-            Communicator.Proxy2Backend.sendUpdateCommand(sender.getUniqueId(), sender.getServerName());
-        }).delay(1, TimeUnit.SECONDS).schedule();
     }
 
     @Override

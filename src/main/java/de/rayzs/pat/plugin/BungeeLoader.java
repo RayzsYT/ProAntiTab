@@ -14,7 +14,6 @@ import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.hooks.LuckPermsHook;
 import de.rayzs.pat.plugin.system.communication.Communicator;
-import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.response.action.ActionHandler;
 import de.rayzs.pat.utils.sender.CommandSender;
@@ -151,24 +150,6 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     @Override
     public void handleReload() {
         BungeePacketAnalyzer.loadProxyCommands();
-    }
-
-    @Override
-    public void delayedPermissionsReload() {
-        getProxy().getScheduler().schedule(this, () -> {
-            PermissionUtil.reloadPermissions();
-            Storage.getLoader().resetCommandsCache();
-
-            Communicator.Proxy2Backend.sendUpdateCommand();
-        }, 1, TimeUnit.SECONDS);
-    }
-
-    @Override
-    public void delayedPermissionsReload(CommandSender sender) {
-        getProxy().getScheduler().schedule(this, () -> {
-            PermissionUtil.reloadPermissions(sender.getUniqueId());
-            Communicator.Proxy2Backend.sendUpdateCommand(sender.getUniqueId(), sender.getServerName());
-        }, 1, TimeUnit.SECONDS);
     }
 
     @Override

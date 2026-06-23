@@ -337,18 +337,6 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         return List.of();
     }
 
-    @Override
-    public void delayedPermissionsReload() {
-        PATScheduler.createScheduler(PermissionUtil::reloadPermissions, 40);
-    }
-
-    @Override
-    public void delayedPermissionsReload(CommandSender sender) {
-        PATScheduler.createScheduler(() -> {
-            PermissionUtil.reloadPermissions(sender);
-        }, 40);
-    }
-
     public void startUpdaterTask() {
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED)
             return;

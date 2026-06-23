@@ -34,10 +34,6 @@ public interface PluginLoader {
     HashMap<String, CommandsCache> getPerServerCommandsCacheMap();
     CommandsCache getBukkitCommandsCacheMap();
 
-    void delayedPermissionsReload();
-
-    void delayedPermissionsReload(CommandSender sender);
-
     void resetCommandsCache();
 
     List<String> getServerNames();
