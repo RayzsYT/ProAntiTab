@@ -80,6 +80,13 @@ public class BukkitPacketAnalyzer {
 
             return success;
 
+        } catch (NoSuchFieldException noSuchFieldException) {
+            Logger.warning("Failed to inject into " + player.getName() + " and kicked the player as result, to avoid any security risks.");
+            Logger.warning("You can read more about it here: https://www.rayzs.de/products/proantitab/pkafi");
+            Logger.warning("Error details: " + noSuchFieldException.getMessage());
+
+            return false;
+
         } catch (Exception exception) {
             if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
                 exception.printStackTrace();
