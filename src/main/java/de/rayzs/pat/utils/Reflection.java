@@ -26,10 +26,6 @@ public class Reflection {
                         ? Software.PAPER : doesClassExist("org.spigotmc.SpigotConfig")
                         ? Software.SPIGOT : Software.BUKKIT;
 
-
-                System.out.println("-> " + (doesClassExist("io.izzel.arclight.i18n.ArclightConfig")));
-
-
                 loadVersionName(serverObj);
                 loadAges();
 
