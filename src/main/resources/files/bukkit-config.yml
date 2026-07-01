@@ -10,7 +10,7 @@
 # Well... that's basically the whole reason for this one here. xd
 updater:
   enabled: true
-  period: 10000
+  period: 900
 
   announce-missing-parts: true
 
