@@ -341,12 +341,15 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         if (!Storage.ConfigSections.Settings.UPDATE.ENABLED)
             return;
 
-        updaterTask = PATScheduler.createAsyncScheduler(() -> {
 
+        final long second = Reflection.isFoliaServer() ? 1000 : 20;
+
+
+        updaterTask = PATScheduler.createAsyncScheduler(() -> {
             if (VersionComparer.get().computeComparison())
                 updaterTask.cancelTask();
 
-        }, 20L, 20L * Storage.ConfigSections.Settings.UPDATE.PERIOD);
+        }, second, second * Storage.ConfigSections.Settings.UPDATE.PERIOD);
     }
 
     public static List<String> getAllCommands() {
