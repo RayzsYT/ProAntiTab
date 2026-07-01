@@ -72,13 +72,14 @@ public class BukkitServerBrand implements ServerBrand {
         if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
             BRAND = Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0) + "§r";
 
-            final long timeAdjustment = Reflection.isFoliaServer() ? 50 : 1;
-
             PATScheduler.createAsyncScheduler(() -> {
                 Bukkit.getOnlinePlayers().forEach(this::send);
-            }, timeAdjustment, timeAdjustment);
+            }, 1, 1);
 
         } else {
+
+
+            final long timeAdjustment = Reflection.isFoliaServer() ? 50 : 1;
 
             TASK = PATScheduler.createAsyncScheduler(new Runnable() {
 
@@ -93,7 +94,7 @@ public class BukkitServerBrand implements ServerBrand {
                     Bukkit.getOnlinePlayers().forEach(player -> send(player));
                 }
 
-            }, 1, Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY);
+            }, timeAdjustment, timeAdjustment * Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY);
         }
     }
 
