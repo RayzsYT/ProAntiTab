@@ -315,7 +315,7 @@ public class BungeeLoader extends Plugin implements PluginLoader {
             if (VersionComparer.get().computeComparison())
                 getProxy().getScheduler().cancel(updaterTask);
 
-        }, 20L, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.MILLISECONDS);
+        }, 1, Storage.ConfigSections.Settings.UPDATE.PERIOD, TimeUnit.SECONDS);
     }
 
     public static String getServerNameByPlayerUUID(UUID uuid) {
