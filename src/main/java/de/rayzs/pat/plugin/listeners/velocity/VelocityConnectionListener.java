@@ -18,6 +18,8 @@ import com.velocitypowered.api.proxy.*;
 import de.rayzs.pat.utils.sender.CommandSender;
 import net.kyori.adventure.text.Component;
 
+import java.util.Objects;
+
 import java.util.concurrent.TimeUnit;
 
 public class VelocityConnectionListener {
@@ -92,7 +94,7 @@ public class VelocityConnectionListener {
             if (serverInfo != null) Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
 
             CommandSender sender = CommandSender.from(player);
-            assert sender != null;
+            Objects.requireNonNull(sender);
             PermissionUtil.reloadPermissions(sender);
         }
 

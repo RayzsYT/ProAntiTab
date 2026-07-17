@@ -17,6 +17,8 @@ import org.bukkit.event.player.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 
+import java.util.Objects;
+
 public class BukkitPlayerListener implements Listener {
 
     @EventHandler
@@ -108,7 +110,7 @@ public class BukkitPlayerListener implements Listener {
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_WORLD.ENABLED) {
             CommandSender sender = CommandSender.from(player);
 
-            assert sender != null;
+            Objects.requireNonNull(sender);
             PermissionUtil.reloadPermissions(sender);
             Storage.getLoader().updateCommands(sender);
         }

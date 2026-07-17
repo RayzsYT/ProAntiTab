@@ -218,7 +218,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         final Player player = Bukkit.getPlayer(sender.getUniqueId());
 
         if (bukkitAntiTabListener != null) {
-            assert player != null;
+            Objects.requireNonNull(player);
             bukkitAntiTabListener.updateCommands(player);
         }
     }

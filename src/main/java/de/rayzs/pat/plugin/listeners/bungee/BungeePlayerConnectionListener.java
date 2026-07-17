@@ -9,6 +9,8 @@ import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.sender.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.Objects;
 import net.md_5.bungee.api.plugin.Listener;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BungeeLoader;
@@ -52,7 +54,7 @@ public class BungeePlayerConnectionListener implements Listener {
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
             CommandSender sender = CommandSender.from(player);
 
-            assert sender != null;
+            Objects.requireNonNull(sender);
             PermissionUtil.reloadPermissions(sender);
         }
 

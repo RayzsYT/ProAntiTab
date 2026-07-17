@@ -25,7 +25,7 @@ public class UpdateCommand extends ProCommand {
                 if (playerObj != null) {
                     CommandSender s = CommandSender.from(playerObj);
 
-                    assert s != null;
+                    Objects.requireNonNull(s);
                     PermissionUtil.reloadPermissions(s);
                 }
             });
