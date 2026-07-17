@@ -17,7 +17,7 @@ public class YamlConfiguration extends ConfigurationProvider {
         https://github.com/SpigotMC/BungeeCord/blob/master/config/src/main/java/net/md_5/bungee/config/YamlConfiguration.java
      */
 
-    private final ThreadLocal<Yaml> yaml = new ThreadLocal<Yaml>()
+    private final ThreadLocal<Yaml> yaml = new ThreadLocal<Yaml>() /* BungeeCord library code */
     {
         @Override
         protected Yaml initialValue()
@@ -83,7 +83,7 @@ public class YamlConfiguration extends ConfigurationProvider {
     @SuppressWarnings("unchecked")
     public Configuration load(Reader reader, Configuration defaults)
     {
-        Map<String, Object> map = yaml.get().loadAs( reader, LinkedHashMap.class );
+        Map<String, Object> map = yaml.get().loadAs( reader, (Class<Map<String, Object>>) (Class<?>) LinkedHashMap.class );
         if ( map == null )
         {
             map = new LinkedHashMap<>();
@@ -101,7 +101,7 @@ public class YamlConfiguration extends ConfigurationProvider {
     @SuppressWarnings("unchecked")
     public Configuration load(InputStream is, Configuration defaults)
     {
-        Map<String, Object> map = yaml.get().loadAs( is, LinkedHashMap.class );
+        Map<String, Object> map = yaml.get().loadAs( is, (Class<Map<String, Object>>) (Class<?>) LinkedHashMap.class );
         if ( map == null )
         {
             map = new LinkedHashMap<>();
@@ -119,7 +119,7 @@ public class YamlConfiguration extends ConfigurationProvider {
     @SuppressWarnings("unchecked")
     public Configuration load(String string, Configuration defaults)
     {
-        Map<String, Object> map = yaml.get().loadAs( string, LinkedHashMap.class );
+        Map<String, Object> map = yaml.get().loadAs( string, (Class<Map<String, Object>>) (Class<?>) LinkedHashMap.class );
         if ( map == null )
         {
             map = new LinkedHashMap<>();

@@ -25,7 +25,7 @@ public class BungeePingListener implements Listener {
 
         try {
             tmpMax = proxyServer.getConfigurationAdapter().getListeners().iterator().next().getMaxPlayers();
-        } catch (Throwable throwable) {
+        } catch (Exception throwable) {
             Logger.warning("Failed to read max-players count for %max% placeholder! Using -1 as default value instead.");
         }
 

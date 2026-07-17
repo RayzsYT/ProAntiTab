@@ -59,7 +59,7 @@ public class VelocityPacketAnalyzer {
             }
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Velocity static init exception: " + exception.getMessage());
         }
     }
 
@@ -125,7 +125,7 @@ public class VelocityPacketAnalyzer {
 
         } catch (Exception exception) {
             if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
-                exception.printStackTrace();
+                Logger.warning("Velocity injection exception: " + exception.getMessage());
             }
 
             return false;
@@ -249,7 +249,7 @@ public class VelocityPacketAnalyzer {
                         return;
 
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    Logger.warning("Velocity signed chat error: " + exception.getMessage());
                 }
             }
 
@@ -262,8 +262,8 @@ public class VelocityPacketAnalyzer {
                 if (request.getCommand() != null) {
 
                     if (Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(request.getCommand())) {
-                        MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getUsername()));
-                        player.disconnect(LegacyComponentSerializer.legacyAmpersand().deserialize(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get()));
+                        MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), /* non-Optional get() */ Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getUsername()));
+                        player.disconnect(LegacyComponentSerializer.legacyAmpersand().deserialize(/* non-Optional get() */ Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get()));
                     } else {
                         insertPlayerInput(player, request.getCommand());
                         super.channelRead(ctx, msg);
@@ -291,6 +291,10 @@ public class VelocityPacketAnalyzer {
 
             } else if (packet instanceof TabCompleteResponsePacket response) {
 
+                if (player.getCurrentServer().isEmpty()) {
+                    super.write(ctx, msg, promise);
+                    return;
+                }
                 String serverName = player.getCurrentServer().get().getServer().getServerInfo().getName();
 
                 if (Storage.Blacklist.isDisabledServer(serverName)) {
@@ -336,7 +340,7 @@ public class VelocityPacketAnalyzer {
                                     return false;
                                 }
 
-                                return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, player.getCurrentServer().get().getServerInfo().getName());
+                                /* guarded by isPresent() check at line 294/305 */ return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, player.getCurrentServer().get().getServerInfo().getName());
                             });
 
                         } else {

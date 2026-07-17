@@ -1,6 +1,7 @@
 package de.rayzs.pat.utils;
 
 import java.nio.charset.StandardCharsets;
+import de.rayzs.pat.plugin.logger.Logger;
 import io.netty.buffer.*;
 
 public class PacketUtils {
@@ -73,7 +74,7 @@ public class PacketUtils {
             try {
                 writeString(brand, byteBuf);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.warning("BrandManipulate buildBytes error: " + exception.getMessage());
             }
 
             byte[] bytes = byteBuf.array();

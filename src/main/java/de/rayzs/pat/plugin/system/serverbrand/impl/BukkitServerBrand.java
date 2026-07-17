@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.system.serverbrand.impl;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.packetanalyzer.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.plugin.system.serverbrand.ServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -56,7 +57,7 @@ public class BukkitServerBrand implements ServerBrand {
                 SERVER.getMessenger().registerOutgoingPluginChannel(BukkitLoader.getPlugin(), CHANNEL_NAME);
                 INITIALIZED = true;
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.warning("BukkitServerBrand init error: " + exception.getMessage());
             }
         }
 
@@ -117,7 +118,7 @@ public class BukkitServerBrand implements ServerBrand {
             Reflection.closeAccess(channelsField);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("BukkitServerBrand preparePlayer error: " + exception.getMessage());
         }
 
     }
@@ -167,7 +168,7 @@ public class BukkitServerBrand implements ServerBrand {
             channel.pipeline().writeAndFlush(customPacketPayloadPacket);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("BukkitServerBrand send error: " + exception.getMessage());
         }
     }
 

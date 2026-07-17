@@ -52,6 +52,7 @@ public class PaperServerListPing implements Listener {
             } else {
 
                 final List<String> lines = new ArrayList<>();
+                final List<String> additionalLines = new ArrayList<>();
 
                 for (String line : Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines()) {
                     if (line.contains("%players%")) {
@@ -78,12 +79,14 @@ public class PaperServerListPing implements Listener {
                                     ? Arrays.copyOfRange(nameSplit, 0, 30)
                                     : nameSplit;
 
-                            lines.addAll(Arrays.asList(nameSplit));
+                            additionalLines.addAll(Arrays.asList(nameSplit));
                         } else {
-                            lines.add(playerName);
+                            additionalLines.add(playerName);
                         }
                     }
                 }
+
+                lines.addAll(additionalLines);
 
                 if (Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_CENTER_VARIABLE) {
                     StringUtils.centralize(lines);

@@ -87,10 +87,10 @@ public class BukkitPacketAnalyzer {
 
             return false;
 
-        } catch (Exception exception) {
-            if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
-                exception.printStackTrace();
-            }
+            } catch (Exception exception) {
+                if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
+                    Logger.warning("Injection exception: " + exception.getMessage());
+                }
 
             return false;
 
@@ -166,7 +166,7 @@ public class BukkitPacketAnalyzer {
 
 
                 super.channelRead(channel, packetObj);
-            } catch (Throwable exception) { exception.printStackTrace(); }
+            } catch (Exception exception) { Logger.warning("PacketAnalyzer error: " + exception.getMessage()); }
         }
 
         @Override
@@ -210,8 +210,8 @@ public class BukkitPacketAnalyzer {
 
                 super.write(channel, packetObj, promise);
 
-            } catch (Throwable exception) {
-                exception.printStackTrace();
+            } catch (Exception exception) {
+                Logger.warning("PacketAnalyzer write error: " + exception.getMessage());
             }
         }
     }

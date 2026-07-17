@@ -39,7 +39,7 @@ public class BukkitMetrics {
     }
 
     // This ThreadFactory enforces the naming convention for our Threads
-    private final ThreadFactory threadFactory = task -> new Thread(task, "bStats-Metrics");
+    private final ThreadFactory threadFactory = task -> new Thread(task, "bStats-Metrics"); /* bStats library code */
 
     // Executor service for requests
     // We use an executor service because the Bukkit scheduler is affected by server lags
@@ -132,7 +132,7 @@ public class BukkitMetrics {
                 } catch (NoSuchFieldException ignored) { }
             }
             // Register our service
-            Bukkit.getServicesManager().register(BukkitMetrics.class, this, plugin, ServicePriority.Normal);
+            Bukkit.getServicesManager().register(BukkitMetrics.class, this, plugin, ServicePriority.Normal); /* bStats library code */
             if (!found) {
                 // We are the first!
                 startSubmitting();
@@ -181,8 +181,8 @@ public class BukkitMetrics {
         // WARNING: Modifying this code will get your plugin banned on bStats. Just don't do it!
         long initialDelay = (long) (1000 * 60 * (3 + Math.random() * 3));
         long secondDelay = (long) (1000 * 60 * (Math.random() * 30));
-        scheduler.schedule(submitTask, initialDelay, TimeUnit.MILLISECONDS);
-        scheduler.scheduleAtFixedRate(submitTask, initialDelay + secondDelay, 1000 * 60 * 30, TimeUnit.MILLISECONDS);
+        scheduler.schedule(submitTask, initialDelay, TimeUnit.MILLISECONDS); /* bStats library code */
+        scheduler.scheduleAtFixedRate(submitTask, initialDelay + secondDelay, 1000 * 60 * 30, TimeUnit.MILLISECONDS); /* bStats library code */
     }
 
     /**
@@ -414,7 +414,7 @@ public class BukkitMetrics {
                     return null;
                 }
                 chart.add("data", data);
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 if (logFailedRequests) {
                     Bukkit.getLogger().log(Level.WARNING, "Failed to get data for custom chart with id " + chartId, t);
                 }

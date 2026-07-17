@@ -75,6 +75,7 @@ public class VelocityLoader implements PluginLoader {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        if (server.getPluginManager().getPlugin("proantitab").isEmpty()) return;
         PluginContainer pluginContainer = server.getPluginManager().getPlugin("proantitab").get();
 
         Configurator.createResourcedFile("files\\proxy-config.yml", "config.yml", false);
@@ -87,7 +88,7 @@ public class VelocityLoader implements PluginLoader {
         CommandProcess.initialize();
         ConfigUpdater.initialize();
 
-        Storage.initialize(this, pluginContainer.getDescription().getVersion().get());
+        Storage.initialize(this, pluginContainer.getDescription().getVersion().orElse("unknown"));
         VersionComparer.get().setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
@@ -173,12 +174,16 @@ public class VelocityLoader implements PluginLoader {
 
     @Override
     public Object getPlayerObjByName(String name) {
-        return server.getPlayer(name).orElse(null);
+        var player = server.getPlayer(name);
+        if (player.isEmpty()) return null;
+        return player.get();
     }
 
     @Override
     public Object getPlayerObjByUUID(UUID uuid) {
-        return server.getPlayer(uuid).orElse(null);
+        var player = server.getPlayer(uuid);
+        if (player.isEmpty()) return null;
+        return player.get();
     }
 
     @Override
@@ -284,14 +289,16 @@ public class VelocityLoader implements PluginLoader {
 
     @Override
     public String getNameByUUID(UUID uuid) {
-        Player player = server.getPlayer(uuid).orElse(null);
-        return player != null ? player.getUsername() : "";
+        var player = server.getPlayer(uuid);
+        if (player.isEmpty()) return "";
+        return player.get().getUsername();
     }
 
     @Override
     public UUID getUUIDByName(String playerName) {
-        Player player = server.getPlayer(playerName).orElse(null);
-        return player != null ? player.getUniqueId() : null;
+        var player = server.getPlayer(playerName);
+        if (player.isEmpty()) return null;
+        return player.get().getUniqueId();
     }
 
     @Override

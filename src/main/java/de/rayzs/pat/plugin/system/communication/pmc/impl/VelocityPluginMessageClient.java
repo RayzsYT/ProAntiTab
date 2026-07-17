@@ -3,6 +3,7 @@ package de.rayzs.pat.plugin.system.communication.pmc.impl;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.plugin.system.communication.pmc.PluginMessageClient;
 import de.rayzs.pat.api.storage.Storage;
@@ -68,7 +69,7 @@ public class VelocityPluginMessageClient implements PluginMessageClient {
             try {
                 registeredServer.sendPluginMessage(IDENTIFIER, preparedPacket);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.warning("VelocityPluginMessageClient send error: " + exception.getMessage());
             }
 
         }

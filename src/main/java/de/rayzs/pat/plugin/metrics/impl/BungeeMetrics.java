@@ -185,9 +185,9 @@ public class BungeeMetrics {
         // WARNING: Modifying this code will get your plugin banned on bStats. Just don't do it!
         long initialDelay = (long) (1000 * 60 * (3 + Math.random() * 3));
         long secondDelay = (long) (1000 * 60 * (Math.random() * 30));
-        plugin.getProxy().getScheduler().schedule(plugin, this::submitData, initialDelay, TimeUnit.MILLISECONDS);
+        plugin.getProxy().getScheduler().schedule(plugin, this::submitData, initialDelay, TimeUnit.MILLISECONDS); /* bStats library code */
         plugin.getProxy().getScheduler().schedule(
-                plugin, this::submitData, initialDelay + secondDelay, 1000 * 60 * 30, TimeUnit.MILLISECONDS);
+                plugin, this::submitData, initialDelay + secondDelay, 1000 * 60 * 30, TimeUnit.MILLISECONDS); /* bStats library code */
     }
 
     /**
@@ -447,7 +447,7 @@ public class BungeeMetrics {
                     return null;
                 }
                 chart.add("data", data);
-            } catch (Throwable t) {
+            } catch (Exception t) { /* bStats library code */
                 if (logFailedRequests) {
                     logger.log(Level.WARNING, "Failed to get data for custom chart with id " + chartId, t);
                 }

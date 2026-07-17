@@ -218,7 +218,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         final Player player = Bukkit.getPlayer(sender.getUniqueId());
 
         if (bukkitAntiTabListener != null) {
-            assert player != null;
+            Objects.requireNonNull(player);
             bukkitAntiTabListener.updateCommands(player);
         }
     }
@@ -432,7 +432,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
                 knownCommandsField.setAccessible(true);
                 commandsMap = (Map<String, Command>) knownCommandsField.get(simpleCommandMap);
             }
-        } catch (Throwable ignored) { }
+        } catch (Throwable ignored) { Logger.warning("Failed to load command map: " + ignored.getMessage()); }
 
         if (commandsMap == null) {
             Logger.warning("Failed to get server commands!");

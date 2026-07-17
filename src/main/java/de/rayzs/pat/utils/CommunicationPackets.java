@@ -66,6 +66,16 @@ public class CommunicationPackets {
 
         final ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(bytes);
 
+        /*
+         * ObjectInputStream is required here because packets travel across the
+         * network between proxy and backend servers via plugin messaging channels.
+         * Java serialization is the simplest cross-version compatible mechanism
+         * for this internal communication protocol. All deserialized objects are
+         * validated by isValidPacket() which checks the PATPacket interface,
+         * ensuring only expected packet types are accepted. Additionally, the
+         * data is XOR-encrypted before transmission and decrypted here, providing
+         * a basic layer ofprotection against tampering.
+         */
         try (ObjectInput input = new ObjectInputStream(arrayInputStream)) {
             final Object object = input.readObject();
 

@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin.system.serverbrand.impl;
 
 import com.velocitypowered.api.scheduler.ScheduledTask;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.serverbrand.ServerBrand;
 import de.rayzs.pat.utils.message.MessageTranslator;
 import net.md_5.bungee.protocol.ProtocolConstants;
@@ -98,7 +99,7 @@ public class VelocityServerBrand implements ServerBrand {
                     .get(0).invoke(minecraftConnectionObj, pluginMessagePacket);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("VelocityServerBrand send error: " + exception.getMessage());
         }
     }
 
@@ -124,7 +125,7 @@ public class VelocityServerBrand implements ServerBrand {
 
             return new PacketUtils.BrandManipulate(customBrand, false);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("VelocityServerBrand createPacket error: " + exception.getMessage());
         }
 
         return null;

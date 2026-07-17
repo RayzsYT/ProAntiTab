@@ -3,6 +3,7 @@ package de.rayzs.pat.utils.permission;
 import java.util.*;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.hooks.GroupManagerHook;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -11,13 +12,14 @@ import de.rayzs.pat.utils.hooks.LuckPermsHook;
 
 public class PermissionUtil {
 
-    private static final HashMap<UUID, PermissionMap> MAP = new HashMap<>();
+    private static final HashMap<UUID, PermissionMap> MAP = new HashMap<>(); /* managed - stale entries purged in reloadPermissions() */
 
     public static void resetPermissions() {
         MAP.forEach((key, value) -> value.clear());
     }
 
     public static void reloadPermissions() {
+        MAP.values().removeIf(permissionMap -> Storage.getLoader().getPlayerObjByUUID(permissionMap.getUUID()) == null);
         List<UUID> uuids = new ArrayList<>(MAP.keySet());
         uuids.forEach(PermissionUtil::reloadPermissions);
     }
@@ -117,7 +119,7 @@ public class PermissionUtil {
                 try {
                     throw new Exception("Unknown sender!");
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    Logger.warning("PermissionUtil error: " + exception.getMessage());
                 }
 
                 return true;

@@ -63,7 +63,8 @@ public class PlHidePro extends Converter {
                 commands.add("[CMD]" + s);
             }
 
-            commands.addAll(tabCompletion.stream().map(s -> "[TAB]" + s).toList());
+            List<String> tabMapped = tabCompletion.stream().map(s -> "[TAB]" + s).toList();
+            commands.addAll(tabMapped);
             commands = commands.stream().map(this::translate).toList();
 
             BlacklistStorage storage;

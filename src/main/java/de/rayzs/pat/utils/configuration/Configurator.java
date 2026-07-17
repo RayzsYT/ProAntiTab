@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.configuration;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.impl.*;
 import de.rayzs.pat.utils.*;
 import java.util.HashMap;
@@ -46,8 +47,8 @@ public class Configurator {
                 connection.setUseCaches(false);
                 return connection.getInputStream();
             }
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (Exception throwable) {
+            Logger.warning("Configurator getResource error: " + throwable.getMessage());
             return null;
         }
     }
@@ -80,8 +81,8 @@ public class Configurator {
                 outputStream.close();
                 inputStream.close();
             }
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (Exception throwable) {
+            Logger.warning("Configurator createResourcedFile error: " + throwable.getMessage());
         }
     }
 }

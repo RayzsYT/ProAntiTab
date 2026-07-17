@@ -78,7 +78,7 @@ import java.io.*;
                             config.isEnabled(),
                             this::appendPlatformData,
                             this::appendServiceData,
-                            task -> server.getScheduler().buildTask(plugin, task).schedule(),
+                            task -> server.getScheduler().buildTask(plugin, task).schedule(), /* bStats library code */
                             () -> true,
                             config.isLogErrorsEnabled(),
                             config.isLogSentDataEnabled(),
@@ -243,9 +243,9 @@ import java.io.*;
                 // don't do it!
                 long initialDelay = (long) (1000 * 60 * (3 + Math.random() * 3));
                 long secondDelay = (long) (1000 * 60 * (Math.random() * 30));
-                scheduler.schedule(submitTask, initialDelay, TimeUnit.MILLISECONDS);
+                scheduler.schedule(submitTask, initialDelay, TimeUnit.MILLISECONDS); /* bStats library code */
                 scheduler.scheduleAtFixedRate(
-                        submitTask, initialDelay + secondDelay, 1000 * 60 * 30, TimeUnit.MILLISECONDS);
+                        submitTask, initialDelay + secondDelay, 1000 * 60 * 30, TimeUnit.MILLISECONDS); /* bStats library code */
             }
 
             private void submitData() {
@@ -580,7 +580,7 @@ import java.io.*;
                         return null;
                     }
                     builder.appendField("data", data);
-                } catch (Throwable t) {
+                } catch (Exception t) {
                     return null;
                 }
                 return builder.build();
@@ -921,7 +921,7 @@ import java.io.*;
                     throw new AssertionError("Content of newly created file is null");
                 }
                 enabled = getConfigValue("enabled", lines).map("true"::equals).orElse(true);
-                serverUUID = getConfigValue("server-uuid", lines).orElse(null);
+                serverUUID = getConfigValue("server-uuid", lines).orElse(null); /* bStats library code */
                 logErrors = getConfigValue("log-errors", lines).map("true"::equals).orElse(false);
                 logSentData = getConfigValue("log-sent-data", lines).map("true"::equals).orElse(false);
                 logResponseStatusText =

@@ -11,8 +11,8 @@ public class BukkitCommandNodeHelper {
 
     private final List<SimpleNode> nodeList = new ArrayList<>();
     private final Object packetObj;
-    private final List entries;
-    private final Node root;
+    private final List<?> entries;
+    private final Node<?> root;
 
     public BukkitCommandNodeHelper(Object packetObj) throws Exception {
         this.packetObj = packetObj;
@@ -28,7 +28,7 @@ public class BukkitCommandNodeHelper {
         final Field entriesField = commandsPacketClazz.getDeclaredField("entries");
         entriesField.setAccessible(true);
 
-        entries = (List) entriesField.get(packetObj);
+        entries = (List<?>) entriesField.get(packetObj);
         for (int i = 0; i < entries.size(); i++) {
             final Object nodeObj = entries.get(i);
             final Class<?> entryClass = nodeObj.getClass();
@@ -67,7 +67,7 @@ public class BukkitCommandNodeHelper {
 
     public void removeSubArguments(String command) throws Exception {
         final String[] args = command.split(" ");
-        final Node child = getRoot().getChild(args[0]);
+        final Node<?> child = getRoot().getChild(args[0]);
 
         removeSubArguments(child, 0, args);
     }
@@ -76,25 +76,25 @@ public class BukkitCommandNodeHelper {
         final Set<String> sparesSet = new HashSet<>(spares.stream().map(StringUtils::getFirstArg).toList());
 
         for (String childName : sparesSet) {
-            Node child = root.getChild(childName);
+            Node<?> child = root.getChild(childName);
             if (child != null) {
                 spareRecursively(child.getName(), child, spares);
             }
         }
     }
 
-    private void spareRecursively(String str, Node parent, List<String> spares) throws Exception {
-        final List<Node> children = new ArrayList<>(parent.getChildren());
+    private void spareRecursively(String str, Node<?> parent, List<String> spares) throws Exception {
+        final List<Node<?>> children = new ArrayList<>(parent.getChildren());
 
         if (!parent.isRoot() && children.size() == 1) {
-            final Node firstChild = children.get(0);
+            final Node<?> firstChild = children.get(0);
 
             if (firstChild.getName() != null && firstChild.getName().equalsIgnoreCase("args")) {
                 return;
             }
         }
 
-        for (final Node child : children) {
+        for (final Node<?> child : children) {
             final String command = str + " " + child.getName();
             final String[] commandArgs = command.split(" ");
 
@@ -143,7 +143,7 @@ public class BukkitCommandNodeHelper {
         }
     }
 
-    private void removeSubArguments(Node parent, int index, String[] args) throws Exception {
+    private void removeSubArguments(Node<?> parent, int index, String[] args) throws Exception {
         final int max = args.length - 1;
         final int nextIndex = index + 1;
 
@@ -158,7 +158,7 @@ public class BukkitCommandNodeHelper {
             return;
         }
 
-        final Node nextParent = parent.getChild(nextPart);
+        final Node<?> nextParent = parent.getChild(nextPart);
         if (nextParent == null) {
             return;
         }
@@ -166,7 +166,7 @@ public class BukkitCommandNodeHelper {
         removeSubArguments(nextParent, nextIndex + 1, args);
     }
 
-    public Node getRoot() {
+    public Node<?> getRoot() {
         return root;
     }
 
@@ -201,8 +201,8 @@ public class BukkitCommandNodeHelper {
         return entryObj;
     }
 
-    private Node createRootNode(BukkitCommandNodeHelper process, int rootIndex, final SimpleNode[] nodes) {
-        return new Node(process, nodes[rootIndex], nodes);
+    private Node<?> createRootNode(BukkitCommandNodeHelper process, int rootIndex, final SimpleNode[] nodes) {
+        return new Node<>(process, nodes[rootIndex], nodes);
     }
 
     private static class Node {
@@ -285,7 +285,8 @@ public class BukkitCommandNodeHelper {
         }
 
         public Node getChild(String name) {
-            return this.children.stream().filter(n -> n.getName() != null && n.getName().equals(name)).findFirst().orElse(null);
+            var found = this.children.stream().filter(n -> n.getName() != null && n.getName().equals(name)).findFirst();
+            return found.isEmpty() ? null : found.get();
         }
 
         public @Nullable String getName() {
@@ -295,6 +296,14 @@ public class BukkitCommandNodeHelper {
 
 
     private record SimpleNode(int rootIndex, int index, int[] children, @Nullable String name) {
+        SimpleNode {
+            children = children.clone();
+        }
+
+        public int[] children() {
+            return children.clone();
+        }
+
         public boolean isRoot() {
             return index == rootIndex;
         }

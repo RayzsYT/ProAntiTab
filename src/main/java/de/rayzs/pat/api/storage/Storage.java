@@ -468,8 +468,10 @@ public class Storage {
                     return commands;
 
                 List<GeneralBlacklist> blacklists = Storage.Blacklist.getServerBlacklists(serverName);
+                List<String> collected = new ArrayList<>();
                 for (GeneralBlacklist blacklist : blacklists)
-                    commands.addAll(blacklist.getCommands());
+                    collected.addAll(blacklist.getCommands());
+                commands.addAll(collected);
 
                 return commands;
             }
@@ -487,17 +489,21 @@ public class Storage {
                 final List<Group> groups = GroupManager.getPlayerGroups(sender);
 
                 if (serverName == null) {
-                    groups.forEach(group -> commands.addAll(group.getCommands()));
+                    List<String> collected = new ArrayList<>();
+                    groups.forEach(group -> collected.addAll(group.getCommands()));
+                    commands.addAll(collected);
                     return commands;
                 }
 
+                List<String> collected = new ArrayList<>();
                 groups.forEach(group -> {
-                    commands.addAll(group.getCommands());
+                    collected.addAll(group.getCommands());
 
                     group.getBlacklistServerNames(serverName).forEach(s -> {
-                        commands.addAll(group.getCommands(s));
+                        collected.addAll(group.getCommands(s));
                     });
                 });
+                commands.addAll(collected);
 
                 return commands;
             }

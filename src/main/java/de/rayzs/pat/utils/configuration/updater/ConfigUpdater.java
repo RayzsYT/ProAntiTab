@@ -97,7 +97,7 @@ public class ConfigUpdater {
             Files.write(outdatedConfig.toPath(), input);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("ConfigUpdater broadcast error: " + exception.getMessage());
         }
 
         Logger.warning(" ");

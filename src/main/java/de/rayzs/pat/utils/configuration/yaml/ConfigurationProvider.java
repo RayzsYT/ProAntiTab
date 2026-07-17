@@ -16,10 +16,10 @@ public abstract class ConfigurationProvider {
     static {
         try {
             providers.put(YamlConfiguration.class, new YamlConfiguration());
-        } catch (NoClassDefFoundError noClassDefFoundError) {}
+        } catch (NoClassDefFoundError ignored) { /* YAML provider not available */ }
         try {
             providers.put(JsonConfiguration.class, new JsonConfiguration());
-        } catch (NoClassDefFoundError noClassDefFoundError) {}
+        } catch (NoClassDefFoundError ignored) { /* JSON provider not available */ }
     }
 
     public abstract Configuration load(String paramString, Configuration paramConfiguration);

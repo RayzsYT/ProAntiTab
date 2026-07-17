@@ -71,8 +71,9 @@ public class Logger {
 
         outputStream = new DataOutputStream(connection.getOutputStream());
         outputStream.write(textInBytes);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        response = reader.readLine();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            response = reader.readLine();
+        }
 
         if (response == null || !response.contains("\"key\"")) return null;
         response = response.substring(response.indexOf(":") + 2, response.length() - 2);

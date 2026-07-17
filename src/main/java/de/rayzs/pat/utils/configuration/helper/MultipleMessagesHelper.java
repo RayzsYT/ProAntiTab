@@ -17,7 +17,7 @@ public class MultipleMessagesHelper implements Serializable {
             return;
         }
 
-        lines = sectionHelper.get();
+        lines = sectionHelper.get(); /* non-Optional get() — ConfigSectionHelper<T>::get() returns T, not Optional */
     }
 
     public ArrayList<String> getLines() {

@@ -45,7 +45,7 @@ public class JsonConfiguration extends ConfigurationProvider {
     }
 
     public Configuration load(Reader reader, Configuration defaults) {
-        Map<String, Object> map = (Map<String, Object>)this.json.fromJson(reader, LinkedHashMap.class);
+        Map<String, Object> map = (Map<String, Object>)this.json.fromJson(reader, (Class<Map<String, Object>>) (Class<?>) LinkedHashMap.class);
         if (map == null)
             map = new LinkedHashMap<>();
         return new Configuration(map, defaults);
@@ -56,7 +56,9 @@ public class JsonConfiguration extends ConfigurationProvider {
     }
 
     public Configuration load(InputStream is, Configuration defaults) {
-        return load(new InputStreamReader(is, Charsets.UTF_8), defaults);
+        try (InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8)) {
+            return load(reader, defaults);
+        }
     }
 
     public Configuration load(String string) {
@@ -64,7 +66,7 @@ public class JsonConfiguration extends ConfigurationProvider {
     }
 
     public Configuration load(String string, Configuration defaults) {
-        Map<String, Object> map = (Map<String, Object>)this.json.fromJson(string, LinkedHashMap.class);
+        Map<String, Object> map = (Map<String, Object>)this.json.fromJson(string, (Class<Map<String, Object>>) (Class<?>) LinkedHashMap.class);
         if (map == null)
             map = new LinkedHashMap<>();
         return new Configuration(map, defaults);

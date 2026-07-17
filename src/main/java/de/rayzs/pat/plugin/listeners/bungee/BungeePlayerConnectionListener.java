@@ -16,6 +16,7 @@ import net.md_5.bungee.api.ProxyServer;
 import java.util.concurrent.TimeUnit;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.event.*;
+import java.util.Objects;
 
 public class BungeePlayerConnectionListener implements Listener {
 
@@ -52,7 +53,7 @@ public class BungeePlayerConnectionListener implements Listener {
         if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
             CommandSender sender = CommandSender.from(player);
 
-            assert sender != null;
+            Objects.requireNonNull(sender);
             PermissionUtil.reloadPermissions(sender);
         }
 

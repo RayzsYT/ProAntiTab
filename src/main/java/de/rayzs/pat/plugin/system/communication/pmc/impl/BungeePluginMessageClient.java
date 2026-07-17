@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.system.communication.pmc.impl;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.plugin.system.communication.pmc.PluginMessageClient;
 import de.rayzs.pat.api.storage.Storage;
@@ -68,7 +69,7 @@ public class BungeePluginMessageClient implements PluginMessageClient, Listener 
             try {
                 serverInfo.sendData(CHANNEL_NAME, preparedPacket);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.warning("BungeePluginMessageClient send error: " + exception.getMessage());
             }
 
         }
@@ -97,8 +98,8 @@ public class BungeePluginMessageClient implements PluginMessageClient, Listener 
 
             Communicator.get().handleB2PPacket(serverName, (CommunicationPackets.PATPacket) packetObj);
 
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (Exception throwable) {
+            Logger.warning("BungeePluginMessageClient receive error: " + throwable.getMessage());
         }
 
     }

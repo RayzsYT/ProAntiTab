@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.*;
 import java.util.*;
+import de.rayzs.pat.plugin.logger.Logger;
 
 public class Reflection {
 
@@ -34,7 +35,7 @@ public class Reflection {
 
                 oldChannelMethod = software.isPaperBased() && weird;
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.warning("Reflection initialize error: " + exception.getMessage());
             }
 
             return;
@@ -89,7 +90,7 @@ public class Reflection {
         try {
             clazz = Class.forName(clazzPath);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Reflection getClass error: " + exception.getMessage());
         }
         return clazz;
     }
@@ -141,7 +142,7 @@ public class Reflection {
 
         for (Field[] fields : fieldLists)
             for(Field field : fields)
-                result.addAll(Collections.singletonList(field));
+                result.add(field);
         return result;
     }
 
@@ -155,7 +156,7 @@ public class Reflection {
 
         for (Method[] methods : fieldLists)
             for(Method method : methods)
-                result.addAll(Collections.singletonList(method));
+                result.add(method);
         return result;
     }
 

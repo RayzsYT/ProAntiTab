@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class ResponseHandler {
 
-    private static List<Response> RESPONSES = new ArrayList<>();
+    private static List<Response> RESPONSES = new ArrayList<>(); /* managed - replaced in update() */
 
     public static void update() {
         RESPONSES = new ArrayList<>();

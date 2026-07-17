@@ -103,7 +103,7 @@ public class BungeePacketAnalyzer {
 
         } catch (Exception exception) {
             if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
-                exception.printStackTrace();
+                Logger.warning("Bungee injection exception: " + exception.getMessage());
             }
 
             return false;

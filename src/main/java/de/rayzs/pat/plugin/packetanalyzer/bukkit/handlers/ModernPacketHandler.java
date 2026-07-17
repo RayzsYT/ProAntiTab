@@ -45,12 +45,12 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         if (Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
             MessageTranslator.send(
                     Bukkit.getConsoleSender(),
-                    Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getName())
+                    /* non-Optional get() */ Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getName())
             );
 
             PATScheduler.createScheduler(() ->
                     player.kickPlayer(
-                            StringUtils.replace(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get(), "&", "§")
+                            /* non-Optional get() */ StringUtils.replace(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get(), "&", "§")
                     )
             );
 
@@ -151,8 +151,8 @@ public class ModernPacketHandler implements BukkitPacketHandler {
 
                 return false;
 
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
+            } catch (Exception throwable) {
+                Logger.warning("ModernPacketHandler error: " + throwable.getMessage());
             }
 
             return !cancelsBeforeHand;
@@ -255,7 +255,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), packet);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("ModernPacketHandler unmodifiable tab error: " + exception.getMessage());
         }
 
         return false;
@@ -270,8 +270,8 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             String result = (String) field.get(suggestionObj);
             field.setAccessible(false);
             return result;
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
+        } catch (Exception throwable) {
+            Logger.warning("ModernPacketHandler getSuggestion error: " + throwable.getMessage());
         }
 
         return "";

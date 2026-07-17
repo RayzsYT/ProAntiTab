@@ -32,7 +32,7 @@ public class SubArgument {
     }
 
 
-    private final HashMap<UUID, Arguments> cachedPlayerArgument = new HashMap<>();
+    private final HashMap<UUID, Arguments> cachedPlayerArgument = new HashMap<>(); /* managed - cleaned in updateDefaultArguments() */
     private List<String> cachedPlayerNames, cachedOnlinePlayers;
 
     private final CommandNodeHandler commandNodeHandler;
@@ -90,6 +90,7 @@ public class SubArgument {
                     Arguments.get().buildArgumentStacks(command);
                 });
 
+        cachedPlayerArgument.keySet().removeIf(uuid -> Storage.getLoader().getPlayerObjByUUID(uuid) == null);
         cachedPlayerArgument.clear();
     }
 

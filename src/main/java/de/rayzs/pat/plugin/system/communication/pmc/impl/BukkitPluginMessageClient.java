@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.system.communication.pmc.impl;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.plugin.system.communication.pmc.PluginMessageClient;
 import de.rayzs.pat.api.storage.Storage;
@@ -75,7 +76,7 @@ public class BukkitPluginMessageClient implements PluginMessageClient, PluginMes
             try {
                 carrier.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, preparedPacket);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.warning("BukkitPluginMessageClient send error: " + exception.getMessage());
             }
         }, carrier);
     }
@@ -97,7 +98,7 @@ public class BukkitPluginMessageClient implements PluginMessageClient, PluginMes
             PATScheduler.createScheduler(() -> Communicator.get().handleP2BPacket((CommunicationPackets.PATPacket) packetObj));
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("BukkitPluginMessageClient receive error: " + exception.getMessage());
         }
     }
 
