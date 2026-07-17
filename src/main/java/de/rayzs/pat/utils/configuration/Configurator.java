@@ -2,6 +2,7 @@ package de.rayzs.pat.utils.configuration;
 
 import de.rayzs.pat.utils.configuration.impl.*;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.plugin.logger.Logger;
 import java.util.HashMap;
 import java.net.*;
 import java.io.*;
@@ -47,7 +48,7 @@ public class Configurator {
                 return connection.getInputStream();
             }
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            Logger.warning("Failed to get resource: " + throwable.getMessage());
             return null;
         }
     }
@@ -81,7 +82,7 @@ public class Configurator {
                 inputStream.close();
             }
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            Logger.warning("Failed to create resource file: " + throwable.getMessage());
         }
     }
 }

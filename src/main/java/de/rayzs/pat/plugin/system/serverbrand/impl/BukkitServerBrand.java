@@ -7,6 +7,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
 import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
+import de.rayzs.pat.plugin.logger.Logger;
 import io.netty.channel.Channel;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -56,7 +57,7 @@ public class BukkitServerBrand implements ServerBrand {
                 SERVER.getMessenger().registerOutgoingPluginChannel(BukkitLoader.getPlugin(), CHANNEL_NAME);
                 INITIALIZED = true;
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.warning("Failed to initialize server brand: " + exception.getMessage());
             }
         }
 
@@ -117,7 +118,7 @@ public class BukkitServerBrand implements ServerBrand {
             Reflection.closeAccess(channelsField);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Failed to prepare player channels: " + exception.getMessage());
         }
 
     }
@@ -167,7 +168,7 @@ public class BukkitServerBrand implements ServerBrand {
             channel.pipeline().writeAndFlush(customPacketPayloadPacket);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Failed to send custom brand: " + exception.getMessage());
         }
     }
 

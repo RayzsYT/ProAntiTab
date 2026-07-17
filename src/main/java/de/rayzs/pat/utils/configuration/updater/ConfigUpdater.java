@@ -97,7 +97,7 @@ public class ConfigUpdater {
             Files.write(outdatedConfig.toPath(), input);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Failed to read/write comparable config: " + exception.getMessage());
         }
 
         Logger.warning(" ");

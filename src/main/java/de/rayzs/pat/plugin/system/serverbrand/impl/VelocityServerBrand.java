@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.lang.reflect.Method;
 import io.netty.buffer.ByteBuf;
 import de.rayzs.pat.utils.*;
+import de.rayzs.pat.plugin.logger.Logger;
 import java.util.Optional;
 
 public class VelocityServerBrand implements ServerBrand {
@@ -98,7 +99,7 @@ public class VelocityServerBrand implements ServerBrand {
                     .get(0).invoke(minecraftConnectionObj, pluginMessagePacket);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Failed to send brand: " + exception.getMessage());
         }
     }
 
@@ -124,7 +125,7 @@ public class VelocityServerBrand implements ServerBrand {
 
             return new PacketUtils.BrandManipulate(customBrand, false);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Failed to create brand packet: " + exception.getMessage());
         }
 
         return null;

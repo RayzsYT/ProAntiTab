@@ -22,7 +22,7 @@ public class PostDebugCommand extends ProCommand {
             sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.SUCCESS.replace("%link%", Objects.requireNonNull(Logger.post())));
         } catch (Exception exception) {
             sender.sendMessage(Storage.ConfigSections.Messages.POST_DEBUG.FAILED);
-            exception.printStackTrace();
+            Logger.warning("Failed to post debug information: " + exception.getMessage());
         }
 
         return true;

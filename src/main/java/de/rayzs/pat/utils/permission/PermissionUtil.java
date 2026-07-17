@@ -8,6 +8,7 @@ import de.rayzs.pat.utils.hooks.GroupManagerHook;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.utils.hooks.LuckPermsHook;
+import de.rayzs.pat.plugin.logger.Logger;
 
 public class PermissionUtil {
 
@@ -117,7 +118,7 @@ public class PermissionUtil {
                 try {
                     throw new Exception("Unknown sender!");
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    Logger.warning("Failed to check permission: " + exception.getMessage());
                 }
 
                 return true;

@@ -7,6 +7,7 @@ import de.rayzs.pat.utils.scheduler.PATScheduler;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import de.rayzs.pat.utils.CommunicationPackets;
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.plugin.logger.Logger;
 import org.bukkit.entity.Player;
 import org.bukkit.*;
 
@@ -75,7 +76,7 @@ public class BukkitPluginMessageClient implements PluginMessageClient, PluginMes
             try {
                 carrier.sendPluginMessage(BukkitLoader.getPlugin(), CHANNEL_NAME, preparedPacket);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.warning("Failed to send plugin message: " + exception.getMessage());
             }
         }, carrier);
     }
@@ -97,7 +98,7 @@ public class BukkitPluginMessageClient implements PluginMessageClient, PluginMes
             PATScheduler.createScheduler(() -> Communicator.get().handleP2BPacket((CommunicationPackets.PATPacket) packetObj));
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Error reading plugin message: " + exception.getMessage());
         }
     }
 

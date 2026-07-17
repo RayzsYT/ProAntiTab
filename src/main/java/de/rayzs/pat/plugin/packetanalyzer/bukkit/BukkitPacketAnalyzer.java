@@ -89,7 +89,7 @@ public class BukkitPacketAnalyzer {
 
         } catch (Exception exception) {
             if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
-                exception.printStackTrace();
+                Logger.warning("Failed to inject player: " + exception.getMessage());
             }
 
             return false;
@@ -166,7 +166,7 @@ public class BukkitPacketAnalyzer {
 
 
                 super.channelRead(channel, packetObj);
-            } catch (Throwable exception) { exception.printStackTrace(); }
+            } catch (Throwable exception) { Logger.warning("Error during channel read: " + exception.getMessage()); }
         }
 
         @Override
@@ -211,7 +211,7 @@ public class BukkitPacketAnalyzer {
                 super.write(channel, packetObj, promise);
 
             } catch (Throwable exception) {
-                exception.printStackTrace();
+                Logger.warning("Error during packet write: " + exception.getMessage());
             }
         }
     }

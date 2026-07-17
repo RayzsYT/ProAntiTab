@@ -35,7 +35,7 @@ public class ProxyConfigurationBuilder implements ConfigurationBuilder {
             loadDefault = !file.exists();
             if(!file.exists()) file.createNewFile();
             configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
-        } catch (Exception exception) { exception.printStackTrace(); }
+        } catch (Exception exception) { Logger.warning("Failed to initialize configuration: " + exception.getMessage()); }
     }
 
     @Override

@@ -128,7 +128,6 @@ public class VelocityAntiTabListener {
             });
         } catch (Exception exception) {
             Logger.warning("An error occurred while processing commands in PAT: " + exception.getMessage());
-            exception.printStackTrace();
         }
     }
 }

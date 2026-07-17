@@ -59,7 +59,7 @@ public class VelocityPacketAnalyzer {
             }
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Failed to initialize suggestion provider: " + exception.getMessage());
         }
     }
 
@@ -125,7 +125,7 @@ public class VelocityPacketAnalyzer {
 
         } catch (Exception exception) {
             if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
-                exception.printStackTrace();
+                Logger.warning("Velocity injection failed: " + exception.getMessage());
             }
 
             return false;
@@ -249,7 +249,7 @@ public class VelocityPacketAnalyzer {
                         return;
 
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    Logger.warning("Error handling signed chat command: " + exception.getMessage());
                 }
             }
 

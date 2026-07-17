@@ -5,6 +5,7 @@ import de.rayzs.pat.plugin.system.communication.pmc.PluginMessageClient;
 import de.rayzs.pat.api.storage.Storage;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import de.rayzs.pat.utils.CommunicationPackets;
+import de.rayzs.pat.plugin.logger.Logger;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Listener;
@@ -68,7 +69,7 @@ public class BungeePluginMessageClient implements PluginMessageClient, Listener 
             try {
                 serverInfo.sendData(CHANNEL_NAME, preparedPacket);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.warning("Failed to send data to server: " + exception.getMessage());
             }
 
         }
@@ -98,7 +99,7 @@ public class BungeePluginMessageClient implements PluginMessageClient, Listener 
             Communicator.get().handleB2PPacket(serverName, (CommunicationPackets.PATPacket) packetObj);
 
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            Logger.warning("Error handling plugin message: " + throwable.getMessage());
         }
 
     }

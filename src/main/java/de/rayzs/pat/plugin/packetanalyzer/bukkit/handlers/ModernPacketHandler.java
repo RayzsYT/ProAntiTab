@@ -152,7 +152,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 return false;
 
             } catch (Throwable throwable) {
-                throwable.printStackTrace();
+                Logger.warning("Error handling 1.21 packet: " + throwable.getMessage());
             }
 
             return !cancelsBeforeHand;
@@ -255,7 +255,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             BukkitPacketAnalyzer.sendPacket(player.getUniqueId(), packet);
 
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.warning("Error in unmodifiable tab completion: " + exception.getMessage());
         }
 
         return false;
@@ -271,7 +271,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             field.setAccessible(false);
             return result;
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            Logger.warning("Error getting suggestion from entry: " + throwable.getMessage());
         }
 
         return "";

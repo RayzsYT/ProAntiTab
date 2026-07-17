@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class Reflection {
 
@@ -34,7 +35,7 @@ public class Reflection {
 
                 oldChannelMethod = software.isPaperBased() && weird;
             } catch (Exception exception) {
-                exception.printStackTrace();
+                Logger.getLogger(Reflection.class.getName()).severe("Error during initialization: " + exception.getMessage());
             }
 
             return;
@@ -89,7 +90,7 @@ public class Reflection {
         try {
             clazz = Class.forName(clazzPath);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Logger.getLogger(Reflection.class.getName()).severe("Failed to find class: " + exception.getMessage());
         }
         return clazz;
     }
