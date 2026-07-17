@@ -56,7 +56,11 @@ public class JsonConfiguration extends ConfigurationProvider {
     }
 
     public Configuration load(InputStream is, Configuration defaults) {
-        return load(new InputStreamReader(is, Charsets.UTF_8), defaults);
+        try (InputStreamReader reader = new InputStreamReader(is, Charsets.UTF_8)) {
+            return load(reader, defaults);
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     public Configuration load(String string) {
