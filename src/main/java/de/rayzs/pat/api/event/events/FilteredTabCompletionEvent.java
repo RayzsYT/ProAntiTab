@@ -1,6 +1,8 @@
 package de.rayzs.pat.api.event.events;
 
 import de.rayzs.pat.api.event.PATEvent;
+import de.rayzs.pat.utils.sender.CommandSender;
+
 import java.util.*;
 
 public abstract class FilteredTabCompletionEvent extends PATEvent<FilteredTabCompletionEvent> {
@@ -10,12 +12,14 @@ public abstract class FilteredTabCompletionEvent extends PATEvent<FilteredTabCom
 
     public FilteredTabCompletionEvent() {
         super(null);
+
         this.cursor = null;
         this.completion = null;
     }
 
-    public FilteredTabCompletionEvent(Object senderObj, String cursor, List<String> completion) {
-        super(senderObj);
+    public FilteredTabCompletionEvent(CommandSender player, String cursor, List<String> completion) {
+        super(player);
+
         this.cursor = cursor;
         this.completion = completion;
     }

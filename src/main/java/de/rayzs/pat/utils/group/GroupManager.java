@@ -70,11 +70,11 @@ public class GroupManager {
         return playerGroups;
     }
 
-    public static AccessResult canAccessCommand(List<Group> groups, String unmodifiedCommand, Storage.Blacklist.BlockType type) {
+    public static AccessResult canAccessCommand(List<Group> groups, String unmodifiedCommand, BlockType type) {
         return canAccessCommand(groups, unmodifiedCommand, type, null);
     }
 
-    public static AccessResult canAccessCommand(List<Group> groups, String unmodifiedCommand, Storage.Blacklist.BlockType type, String server) {
+    public static AccessResult canAccessCommand(List<Group> groups, String unmodifiedCommand, BlockType type, String server) {
         if (groups == null || groups.isEmpty()) {
             return AccessResult.NO_GROUPS;
         }
@@ -132,7 +132,7 @@ public class GroupManager {
         }
 
         if (!permitted && type != BlockType.BOTH)
-            return canAccessCommand(groups, unmodifiedCommand, Storage.Blacklist.BlockType.BOTH, server);
+            return canAccessCommand(groups, unmodifiedCommand, BlockType.BOTH, server);
 
         return permitted ? AccessResult.ALLOWED : AccessResult.NOT_LISTED;
     }

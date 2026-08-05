@@ -4,23 +4,23 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import de.rayzs.pat.api.brand.CustomServerBrand;
-import de.rayzs.pat.api.communication.impl.VelocityClient;
-import de.rayzs.pat.api.event.PATEventHandler;
-import de.rayzs.pat.api.netty.proxy.VelocityPacketAnalyzer;
-import de.rayzs.pat.plugin.converter.StorageConverter;
-import de.rayzs.pat.plugin.subarguments.SubArguments;
-import de.rayzs.pat.plugin.process.CommandProcess;
+import de.rayzs.pat.plugin.system.communication.cph.impl.VelocityCommunicationHandler;
+import de.rayzs.pat.plugin.system.serverbrand.CustomServerBrand;
+import de.rayzs.pat.plugin.system.communication.pmc.impl.VelocityPluginMessageClient;
+import de.rayzs.pat.plugin.packetanalyzer.proxy.VelocityPacketAnalyzer;
+import de.rayzs.pat.plugin.system.converter.StorageConverter;
+import de.rayzs.pat.plugin.system.serverbrand.impl.VelocityServerBrand;
+import de.rayzs.pat.plugin.command.CommandProcess;
+import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.CommandsCache;
 import de.rayzs.pat.plugin.metrics.impl.VelocityMetrics;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.plugin.commands.VelocityCommand;
+import de.rayzs.pat.plugin.command.impl.VelocityCommand;
 import de.rayzs.pat.utils.message.MessageTranslator;
-import de.rayzs.pat.api.communication.Communicator;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.plugin.system.communication.Communicator;
+import de.rayzs.pat.utils.hooks.LuckPermsHook;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.rayzs.pat.plugin.listeners.velocity.*;
 import de.rayzs.pat.utils.group.GroupManager;
@@ -34,13 +34,15 @@ import java.util.concurrent.TimeUnit;
 
 
 import com.google.inject.Inject;
+import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.response.action.ActionHandler;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 import java.util.*;
 
 @Plugin(name = "ProAntiTab",
 id = "proantitab",
-version = "2.3.2",
+version = "2.4.1",
 authors = "Rayzs_YT",
 description = "Hides more than just your plugins.",
 url = "https://www.rayzs.de/products/proantitab/page",
@@ -90,7 +92,6 @@ public class VelocityLoader implements PluginLoader {
 
         Storage.loadAll(true);
         MessageTranslator.initialize();
-        CustomServerBrand.initialize();
         GroupManager.initialize();
 
         metricsFactory.make(this, 21638);
@@ -103,10 +104,8 @@ public class VelocityLoader implements PluginLoader {
 
         startUpdaterTask();
 
-        Storage.PLUGIN_OBJECT = this;
-
         if (server.getPluginManager().getPlugin("luckperms").isPresent())
-            LuckPermsAdapter.initialize();
+            LuckPermsHook.initialize();
 
         if (server.getPluginManager().getPlugin("papiproxybridge").isPresent()) {
             Storage.USE_PAPIPROXYBRIDGE = true;
@@ -117,11 +116,14 @@ public class VelocityLoader implements PluginLoader {
         ConfigUpdater.broadcastMissingParts();
 
         ActionHandler.initialize();
-        SubArguments.initialize();
+        SubArgument.initialize();
+
+        ResponseHandler.update();
 
         StorageConverter.initialize();
+        CustomServerBrand.initialize(new VelocityServerBrand());
 
-        Communicator.initialize(new VelocityClient());
+        Communicator.initialize(new VelocityPluginMessageClient(), new VelocityCommunicationHandler());
 
         VelocityPacketAnalyzer.injectAll();
     }
@@ -131,22 +133,24 @@ public class VelocityLoader implements PluginLoader {
     }
 
     @Override
-    public void delayedPermissionsReload() {
-        server.getScheduler().buildTask(VelocityLoader.instance, () -> {
-            PermissionUtil.reloadPermissions();
-            Storage.getLoader().updateCommandCache();
-        }).delay(1, TimeUnit.SECONDS).schedule();
+    public void addPermission(String permission) {}
+
+    @Override
+    public void removePermission(String permission) {}
+
+    @Override
+    public Object getPluginObj() {
+        return instance;
     }
 
-    public static void delayedPlayerReload(UUID uuid) {
-        server.getScheduler().buildTask(VelocityLoader.instance, () -> {
-            String serverName = Storage.getLoader().getPlayerServerName(uuid);
-            List<String> commands = new ArrayList<>(SubArguments.getServerCommands(serverName));
+    @Override
+    public void updateCommands() {
+        Communicator.Proxy2Backend.sendUpdateCommand();
+    }
 
-            commands.addAll(SubArguments.getGroupCommands(uuid, serverName));
-
-            PATEventHandler.callUpdatePlayerCommandsEvents(uuid, commands, true);
-        }).delay(1, TimeUnit.SECONDS).schedule();
+    @Override
+    public void updateCommands(CommandSender sender) {
+        Communicator.Proxy2Backend.sendUpdateCommand(sender.getUniqueId(), sender.getServerName());
     }
 
     @Override
@@ -178,13 +182,18 @@ public class VelocityLoader implements PluginLoader {
     }
 
     @Override
-    public void updateCommandCache() {
+    public void resetCommandsCache() {
         new ArrayList<>(commandsCacheMap.values()).forEach(CommandsCache::reset);
     }
 
     @Override
-    public HashMap<String, CommandsCache> getCommandsCacheMap() {
+    public HashMap<String, CommandsCache> getPerServerCommandsCacheMap() {
         return commandsCacheMap;
+    }
+
+    @Override
+    public CommandsCache getBukkitCommandsCacheMap() {
+        return null;
     }
 
     @Override
@@ -291,7 +300,7 @@ public class VelocityLoader implements PluginLoader {
     }
 
     @Override
-    public List<String> getPluginNames(String format) {
+    public List<String> getFormattedPluginNames(String format) {
         List<String> pluginNames = new ArrayList<>();
         for (PluginContainer plugin : server.getPluginManager().getPlugins()) {
             PluginDescription description = plugin.getDescription();

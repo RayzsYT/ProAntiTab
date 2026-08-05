@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin;
 
 import de.rayzs.pat.utils.CommandsCache;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,14 +9,32 @@ import java.util.UUID;
 
 public interface PluginLoader {
 
+    void addPermission(String permission);
+    void removePermission(String permission);
+
+    Object getPluginObj();
+
     void handleReload();
     boolean doesCommandExist(String command);
 
-    HashMap<String, CommandsCache> getCommandsCacheMap();
+    /**
+     * Updates commands for all players.
+     * Requires PAT sync on proxy for it to work!
+     * Non-proxy servers do not require anything additionally.
+     */
+    void updateCommands();
 
-    void delayedPermissionsReload();
+    /**
+     * Updates commands for a certain player.
+     * Requires PAT sync on proxy for it to work!
+     * Non-proxy servers do not require anything additionally.
+     */
+    void updateCommands(CommandSender sender);
 
-    void updateCommandCache();
+    HashMap<String, CommandsCache> getPerServerCommandsCacheMap();
+    CommandsCache getBukkitCommandsCacheMap();
+
+    void resetCommandsCache();
 
     List<String> getServerNames();
 
@@ -48,6 +67,7 @@ public interface PluginLoader {
      * <pre>
      * %n = Plugin name
      * %v = Plugin version
+     * </pre>
      */
-    List<String> getPluginNames(String format);
+    List<String> getFormattedPluginNames(String format);
 }

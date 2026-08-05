@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.StringUtils;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import de.rayzs.pat.api.storage.Storage;
@@ -8,6 +9,7 @@ import de.rayzs.pat.plugin.*;
 import net.md_5.bungee.event.*;
 import net.md_5.bungee.api.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BungeePingListener implements Listener {
@@ -19,13 +21,15 @@ public class BungeePingListener implements Listener {
         ProxyServer proxyServer = BungeeLoader.getPlugin().getProxy();
         int online = proxyServer.getOnlineCount(),
                 onlineExtend = online + Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.EXTEND_COUNT,
-                max = -1;
+                tmpMax = -1;
 
         try {
-            max = proxyServer.getConfigurationAdapter().getListeners().iterator().next().getMaxPlayers();
+            tmpMax = proxyServer.getConfigurationAdapter().getListeners().iterator().next().getMaxPlayers();
         } catch (Throwable throwable) {
             Logger.warning("Failed to read max-players count for %max% placeholder! Using -1 as default value instead.");
         }
+
+        final int max = tmpMax;
 
         ServerPing serverPing = event.getResponse();
 
@@ -44,8 +48,22 @@ public class BungeePingListener implements Listener {
             List<String> lines = Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines();
             ServerPing.PlayerInfo[] playerInfos = new ServerPing.PlayerInfo[lines.size()];
 
-            for (int i = 0; i < lines.size(); i++) {
-                playerInfos[i] = new ServerPing.PlayerInfo(replaceString(lines.get(i), online, onlineExtend, max), "");
+            if (!Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.USE_CENTER_VARIABLE) {
+
+                for (int i = 0; i < lines.size(); i++) {
+                    String line = replaceString(lines.get(i), online, onlineExtend, max);
+                    playerInfos[i] = new ServerPing.PlayerInfo(line, "");
+                }
+
+            } else {
+                List<String> cpyLines = new ArrayList<>(Storage.ConfigSections.Settings.CUSTOM_PROTOCOL_PING.PLAYERLIST.getLines());
+
+                cpyLines.replaceAll(string -> replaceString(string, online, onlineExtend, max));
+                StringUtils.centralize(cpyLines);
+
+                for (int i = 0; i < cpyLines.size(); i++) {
+                    playerInfos[i] = new ServerPing.PlayerInfo(cpyLines.get(i), "");
+                }
             }
 
             serverPing.getPlayers().setSample(playerInfos);

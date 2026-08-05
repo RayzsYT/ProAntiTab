@@ -8,6 +8,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.tree.*;
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -169,7 +170,7 @@ public class ProxyCommandNodeHelper<T> {
             LiteralCommandNode newNode;
 
             final boolean cancel = next != null && (next.equals("_-"));
-            final boolean stop = next != null && next.startsWith("%") && next.endsWith("%");
+            final boolean stop = next != null && next.length() > 1 && next.startsWith("%") && next.endsWith("%");
             final boolean skip = part.equals("-_");
 
             if (skip) {

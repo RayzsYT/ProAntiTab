@@ -10,7 +10,7 @@
 # Well... that's basically the whole reason for this one here. xd
 updater:
   enabled: true
-  period: 10000
+  period: 900
 
   announce-missing-parts: true
 
@@ -93,6 +93,14 @@ allow-group-overruling: false
 #   lp (...) permission set proantitab.group.<group> world=<world>
 update-groups-per-world: false
 
+# Automatically forwards any changes made in LuckPerms to the proxy,
+# forcing the proxy to automatically update the permissions without
+# the need to execute anything on the proxy console.
+# This is helpful in case you give any permissions on a backend server
+# which PAT on the proxy needs to detect in order to update the commands
+# of the player accordingly.
+auto-forward-luckperms-changes: false
+
 # Here you can customize the server version that is displayed on a ping. (The text at the player-count)
 # (!) Warning: It's required to use Paper or Purpur to use this feature!
 # (!) Supported server versions: 1.12.2 - latest
@@ -128,6 +136,7 @@ custom-protocol-ping:
     enabled: true
 
     # Available placeholders:
+    # %center%            - centralize text
     # %players%           - list of players
     # %online%            - current online player count
     # %max%               - max player count

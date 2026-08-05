@@ -2,14 +2,13 @@ package de.rayzs.pat.plugin.listeners.bungee;
 
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.event.events.FilteredTabCompletionEvent;
-import de.rayzs.pat.api.netty.proxy.BungeePacketAnalyzer;
+import de.rayzs.pat.plugin.packetanalyzer.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.TabCompleteEvent;
@@ -28,7 +27,7 @@ public class BungeeAntiTabListener implements Listener {
         if(!(event.getReceiver() instanceof ProxiedPlayer)) return;
 
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
-        CommandSender sender = CommandSenderHandler.from(player);
+        CommandSender sender = CommandSender.from(player);
 
         ServerInfo serverInfo = player.getServer().getInfo();
         String serverName = serverInfo.getName();
@@ -80,7 +79,7 @@ public class BungeeAntiTabListener implements Listener {
                 return;
             }
 
-            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(player.getUniqueId(), rawCursor, new ArrayList<>(event.getSuggestions()));
+            FilteredTabCompletionEvent filteredTabCompletionEvent = PATEventHandler.callFilteredTabCompletionEvents(sender, rawCursor, new ArrayList<>(event.getSuggestions()));
 
             if (filteredTabCompletionEvent.isCancelled()) {
                 event.getSuggestions().clear();

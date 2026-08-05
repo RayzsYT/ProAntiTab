@@ -1,7 +1,8 @@
 package de.rayzs.pat.api.storage.placeholders.commands.group;
 
 import de.rayzs.pat.api.storage.storages.PlaceholderStorage;
-import de.rayzs.pat.utils.group.*;
+import de.rayzs.pat.utils.group.Group;
+import de.rayzs.pat.utils.group.GroupManager;
 import org.bukkit.entity.Player;
 
 public class ListGroupSizeCommandsPlaceholder extends PlaceholderStorage {

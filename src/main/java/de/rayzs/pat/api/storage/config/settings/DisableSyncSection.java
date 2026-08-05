@@ -6,7 +6,7 @@ import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
 
 public class DisableSyncSection extends ConfigStorage {
 
-    public boolean DISABLED;
+    public boolean ENABLED;
 
     public DisableSyncSection() {
         super("disable-sync");
@@ -16,7 +16,11 @@ public class DisableSyncSection extends ConfigStorage {
     public void load() {
         super.load();
 
-        if(!Reflection.isProxyServer()) return;
-        DISABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
+
+        if (!Reflection.isProxyServer()) {
+            return;
+        }
+
+        ENABLED = new ConfigSectionHelper<Boolean>(this, null, false).getOrSet();
     }
 }

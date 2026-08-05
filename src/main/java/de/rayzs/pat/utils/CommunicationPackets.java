@@ -1,6 +1,6 @@
 package de.rayzs.pat.utils;
 
-import de.rayzs.pat.api.communication.Communicator;
+import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 
@@ -189,6 +189,10 @@ public class CommunicationPackets {
         public record DataSyncReceivedPacket() implements B2PPacket { }
 
         public record KeepAlivePacket() implements B2PPacket { }
+
+        public record AnnouncePlayerPermissionChanges(UUID playerId) implements B2PPacket { }
+
+        public record AnnounceGroupPermissionChanges(Set<UUID> playerIds) implements B2PPacket { }
 
     }
 }

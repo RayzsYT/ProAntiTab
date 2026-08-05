@@ -9,17 +9,13 @@ import java.util.*;
 public class BlacklistStorage extends StorageTemplate implements Serializable {
 
     private List<String> commands = new ArrayList<>();
-    private List<String> hiddenCommands = new ArrayList<>();
+    private Set<String> hiddenCommands = new HashSet<>();
 
     public BlacklistStorage(String navigatePath) {
         super(Storage.Files.STORAGE, navigatePath);
     }
 
     public boolean isListed(String command) {
-        return isListed(command, false);
-    }
-
-    public boolean isListed(String command, boolean ignoreColons) {
         final boolean caseSensitive = Storage.ConfigSections.Settings.BASE_COMMAND_CASE_SENSITIVE.ENABLED;
         final boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
 
@@ -27,35 +23,39 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
             return false;
         }
 
-        boolean isNegated = Storage.Blacklist.BlockTypeFetcher.isNegated(command);
+        final boolean isNegated = Storage.Blacklist.BlockTypeFetcher.isNegated(command);
+        final boolean takeFirstArgument = !isNegated == turn;
 
-        if (!isNegated == turn) {
+        if (takeFirstArgument) {
             command = StringUtils.getFirstArg(command);
         }
 
+        if (!caseSensitive) {
+            command = command.toLowerCase();
+        }
+
+        return hiddenCommands.contains(command);
+
+        /*
         for (String listedCommand : hiddenCommands) {
             if (listedCommand == null)
                 continue;
 
-            if (ignoreColons) {
-                command = StringUtils.getFirstArg(command);
-
-                if (command.contains(":"))
-                    command = command.substring(command.indexOf(':'));
-            }
-
-            if (!isNegated == turn) {
-                listedCommand = StringUtils.getFirstArg(listedCommand);
-            }
-
-            if (caseSensitive && listedCommand.equals(command)) {
+            if (StringUtils.equals(command, listedCommand, caseSensitive)) {
                 return true;
-            } else if (!caseSensitive && listedCommand.equalsIgnoreCase(command)) {
+            }
+
+            if (!takeFirstArgument) {
+                continue;
+            }
+
+            if (StringUtils.equals(command, StringUtils.getFirstArg(listedCommand), caseSensitive)) {
                 return true;
             }
         }
 
         return false;
+         */
     }
 
     public void setList(List<String> commands) {
@@ -86,10 +86,6 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
         return commands;
     }
 
-    public List<String> getHiddenCommands() {
-        return hiddenCommands;
-    }
-
     @Override
     public void save() {
         getConfig().setAndSave(getNavigatePath(), commands);
@@ -98,6 +94,9 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     @Override
     public void load() {
         getConfig().reload();
+
+        final boolean caseSensitive = Storage.ConfigSections.Settings.BASE_COMMAND_CASE_SENSITIVE.ENABLED;
+
 
         commands = (ArrayList<String>) getConfig().getOrSet(getNavigatePath(), commands);
 
@@ -128,7 +127,8 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
             for (String pluginCommand : pluginCommands) {
                 tmpCommands.remove(pluginCommand);
 
-                tmpCommands.add(Storage.Blacklist.BlockType.NEGATE + pluginCommand);
+                pluginCommand = Storage.Blacklist.BlockType.NEGATE + pluginCommand;
+                tmpCommands.add(caseSensitive ? pluginCommand : pluginCommand.toLowerCase());
             }
         }
 
@@ -141,11 +141,36 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
                 final String negated = Storage.Blacklist.BlockType.NEGATE + pluginCommand;
 
                 if (!commands.contains(negated) && !tmpCommands.contains(negated)) {
-                    tmpCommands.add(pluginCommand);
+                    tmpCommands.add(caseSensitive ? pluginCommand : pluginCommand.toLowerCase());
                 }
             }
         }
 
-        hiddenCommands = tmpCommands;
+
+        if (!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
+            hiddenCommands = new HashSet<>(tmpCommands);
+            return;
+        }
+
+        final List<String> finalisedCommands = new ArrayList<>();
+        for (String command : tmpCommands) {
+
+            if (Storage.Blacklist.BlockTypeFetcher.isNegated(command)) {
+                finalisedCommands.add(caseSensitive ? command : StringUtils.lowercaseFirstArgument(command));
+                continue;
+            }
+
+            if (command.contains(" ")) {
+                final String firstArgument = StringUtils.getFirstArg(command);
+
+                if (!finalisedCommands.contains(firstArgument)) {
+                    finalisedCommands.add(caseSensitive ? firstArgument : firstArgument.toLowerCase());
+                }
+            }
+
+            finalisedCommands.add(caseSensitive ? command : StringUtils.lowercaseFirstArgument(command));
+        }
+
+        hiddenCommands = new HashSet<>(finalisedCommands);
     }
 }

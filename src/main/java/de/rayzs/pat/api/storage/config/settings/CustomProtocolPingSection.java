@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class CustomProtocolPingSection extends ConfigStorage {
 
-    public boolean ENABLED, ALWAYS_SHOW, HIDE_PLAYERS, USE_EXTEND_AS_MAX_COUNT, USE_CUSTOM_PLAYERLIST;
+    public boolean ENABLED, ALWAYS_SHOW, HIDE_PLAYERS, USE_EXTEND_AS_MAX_COUNT, USE_CUSTOM_PLAYERLIST, USE_CENTER_VARIABLE;
     public String PROTOCOL;
 
     public MultipleMessagesHelper PLAYERLIST;
@@ -42,6 +42,7 @@ public class CustomProtocolPingSection extends ConfigStorage {
                 "&8> &7Using &fProAntiTab"
         ));
 
+        USE_CENTER_VARIABLE = PLAYERLIST.getLines().stream().anyMatch(l -> l.startsWith("%center%"));
 
 
         if (HIDE_PLAYERS && USE_CUSTOM_PLAYERLIST) {

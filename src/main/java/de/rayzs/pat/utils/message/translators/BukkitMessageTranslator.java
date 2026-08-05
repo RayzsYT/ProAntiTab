@@ -1,5 +1,6 @@
 package de.rayzs.pat.utils.message.translators;
 
+import de.rayzs.pat.utils.Reflection;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.audience.Audience;
 import de.rayzs.pat.plugin.BukkitLoader;
@@ -26,24 +27,63 @@ public class BukkitMessageTranslator implements Translator {
 
     @Override
     public void send(Object target, String text) {
-        Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
+        if (Reflection.getSoftware().isPaperBased()) {
+            if (target instanceof Player player) {
+                player.sendMessage(toComponent(text));
+            } else if (target instanceof CommandSender sender) {
+                sender.sendMessage(toComponent(text));
+            }
+
+            return;
+        }
+
+
+        Audience audience = target instanceof Player
+                ? audiences.player((Player) target)
+                : audiences.sender((CommandSender) target);
 
         audience.sendMessage(toComponent(text));
     }
 
     @Override
     public void sendActionbar(Object target, String text) {
-        Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
+
+        if (Reflection.getSoftware().isPaperBased()) {
+            if (target instanceof Player player) {
+                player.sendActionBar(toComponent(text));
+            } else if (target instanceof CommandSender sender) {
+                sender.sendActionBar(toComponent(text));
+            }
+
+            return;
+        }
+
+
+        Audience audience = target instanceof Player
+                ? audiences.player((Player) target)
+                : audiences.sender((CommandSender) target);
 
         audience.sendActionBar(toComponent(text));
     }
 
     @Override
     public void sendTitle(Object target, String titleStr, String subtitleStr, int fadeIn, int stay, int fadeOut) {
-        Audience audience = target instanceof Player ? audiences.player((Player) target) : audiences.sender((CommandSender) target);
-
         Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut));
         Title title = Title.title(toComponent(titleStr), toComponent(subtitleStr), times);
+
+        if (Reflection.getSoftware().isPaperBased()) {
+            if (target instanceof Player player) {
+                player.showTitle(title);
+            } else if (target instanceof CommandSender sender) {
+                sender.showTitle(title);
+            }
+
+            return;
+        }
+
+        Audience audience = target instanceof Player
+                ? audiences.player((Player) target)
+                : audiences.sender((CommandSender) target);
 
         audience.showTitle(title);
     }
@@ -52,7 +92,6 @@ public class BukkitMessageTranslator implements Translator {
     public void playSound(Object target, String soundKey, float volume, float pitch) throws Exception {
         if (target instanceof Player player) {
             Sound sound = Sound.valueOf(soundKey);
-
             player.playSound(player.getLocation(), sound, volume, pitch);
         }
     }

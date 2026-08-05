@@ -3,13 +3,11 @@ package de.rayzs.pat.utils.permission;
 import java.util.*;
 
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.adapter.GroupManagerAdapter;
+import de.rayzs.pat.utils.hooks.GroupManagerHook;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
-import de.rayzs.pat.utils.adapter.LuckPermsAdapter;
+import de.rayzs.pat.utils.hooks.LuckPermsHook;
 
 public class PermissionUtil {
 
@@ -63,9 +61,9 @@ public class PermissionUtil {
 
     public static void setPlayerPermissions(CommandSender sender) {
         if (Storage.getPermissionPlugin() == PermissionPlugin.LUCKPERMS) {
-            LuckPermsAdapter.setPermissions(sender.getUniqueId());
+            LuckPermsHook.setPermissions(sender.getUniqueId());
         } else if (Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER) {
-            GroupManagerAdapter.setPermissions(sender.getUniqueId());
+            GroupManagerHook.setPermissions(sender.getUniqueId());
         } else {
             GroupManager.getGroups().forEach(group -> group.hasPermission(sender));
         }
@@ -73,9 +71,9 @@ public class PermissionUtil {
 
     public static void setPlayerPermissions(UUID uuid) {
         if (Storage.getPermissionPlugin() == PermissionPlugin.LUCKPERMS) {
-            LuckPermsAdapter.setPermissions(uuid);
+            LuckPermsHook.setPermissions(uuid);
         } else if (Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER) {
-            GroupManagerAdapter.setPermissions(uuid);
+            GroupManagerHook.setPermissions(uuid);
         } else {
             GroupManager.getGroups().forEach(group -> group.hasPermission(uuid));
         }
@@ -110,7 +108,7 @@ public class PermissionUtil {
         else if (targetObj instanceof CommandSender)
             sender = (CommandSender) targetObj;
         else
-            sender = CommandSenderHandler.from(targetObj);
+            sender = CommandSender.from(targetObj);
 
         // No permission plugin found!
         if (Storage.getPermissionPlugin() == PermissionPlugin.NONE) {

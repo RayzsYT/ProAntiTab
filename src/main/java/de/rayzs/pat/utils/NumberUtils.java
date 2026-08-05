@@ -5,10 +5,10 @@ public class NumberUtils {
     private static final char[] EXCEPTIONS = {'.', ',', 'k', 'm', 'b'};
 
     public static boolean isBetween(int n, int l, int r) {
-        int min = Math.min(l, r);
-        int max = Math.max(l, r);
+        final int min = Math.min(l, r),
+                  max = Math.max(l, r);
 
-        return n >= min && n <= max;
+        return min <= n && n <= max;
     }
 
     public static boolean isDigit(String str) {

@@ -3,6 +3,7 @@ package de.rayzs.pat.api.storage.config.settings;
 import de.rayzs.pat.api.storage.storages.ConfigStorage;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.configuration.helper.ConfigSectionHelper;
+import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
 
 public class BlockNamespaceCommandsSection extends ConfigStorage {
@@ -33,6 +34,6 @@ public class BlockNamespaceCommandsSection extends ConfigStorage {
     }
 
     public boolean doesBypass(CommandSender sender) {
-        return !ENABLED || sender.hasPermission("namespace");
+        return !ENABLED || PermissionUtil.hasPermission(sender, "namespace");
     }
 }

@@ -2,6 +2,7 @@ package de.rayzs.pat.api.event.events;
 
 import de.rayzs.pat.utils.CommunicationPackets;
 import de.rayzs.pat.api.event.PATEvent;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 public abstract class ReceiveSyncEvent extends PATEvent<ReceiveSyncEvent> {
 
@@ -12,8 +13,9 @@ public abstract class ReceiveSyncEvent extends PATEvent<ReceiveSyncEvent> {
         this.dataSyncPacket = null;
     }
 
-    public ReceiveSyncEvent(Object senderObj, CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket) {
-        super(senderObj);
+    public ReceiveSyncEvent(CommandSender player, CommunicationPackets.Proxy2Backend.DataSyncPacket dataSyncPacket) {
+        super(player);
+
         this.dataSyncPacket = dataSyncPacket;
     }
 

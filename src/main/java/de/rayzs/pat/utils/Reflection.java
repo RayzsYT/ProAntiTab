@@ -20,11 +20,11 @@ public class Reflection {
         if (doesClassExist("org.bukkit.Server")) {
             try {
 
-                software = doesClassExist("io.papermc.paper.threadedregions.RegionizedServer")
+                software = doesClassExist("io.izzel.arclight.i18n.ArclightConfig")
+                        ? Software.ARCLIGHT : doesClassExist("io.papermc.paper.threadedregions.RegionizedServer")
                         ? Software.FOLIA : doesClassExist("com.destroystokyo.paper.Metrics")
                         ? Software.PAPER : doesClassExist("org.spigotmc.SpigotConfig")
                         ? Software.SPIGOT : Software.BUKKIT;
-
 
                 loadVersionName(serverObj);
                 loadAges();
@@ -68,6 +68,10 @@ public class Reflection {
 
     public static boolean isCraftbukkit() {
         return software == Software.BUKKIT;
+    }
+
+    public static boolean isArclight() {
+        return software == Software.ARCLIGHT;
     }
 
     public static boolean isProxyServer() {
@@ -373,9 +377,9 @@ public class Reflection {
         release = 0;
     }
 
-    public static int getMajor() { return major; }
-    public static int getMinor() { return minor; }
-    public static int getRelease() { return release; }
+    private static int getMajor() { return major; }
+    private static int getMinor() { return minor; }
+    private static int getRelease() { return release; }
 
     public static boolean isAtLeast(int major, int minor) {
         return Reflection.getMajor() > major || (Reflection.getMajor() == major && Reflection.getMinor() >= minor);
@@ -422,6 +426,7 @@ public class Reflection {
         SPIGOT(false, false),
         PAPER(true, false),
         FOLIA(true, false),
+        ARCLIGHT(false, false),
 
         BUNGEECORD(false, true),
         WATERFALL(true, true),

@@ -1,6 +1,7 @@
 package de.rayzs.pat.api.event.events;
 
 import de.rayzs.pat.api.event.PATEvent;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 public abstract class UpdatePluginEvent extends PATEvent<UpdatePluginEvent> {
 
@@ -8,7 +9,7 @@ public abstract class UpdatePluginEvent extends PATEvent<UpdatePluginEvent> {
         super(null);;
     }
 
-    public UpdatePluginEvent(Object senderObj) {
-        super(senderObj);
+    public UpdatePluginEvent(CommandSender player) {
+        super(player);
     }
 }

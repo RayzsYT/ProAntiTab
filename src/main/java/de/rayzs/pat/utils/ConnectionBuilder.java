@@ -55,17 +55,18 @@ public class ConnectionBuilder {
                 }
             }
 
-            Scanner scanner = new Scanner(connection.getInputStream());
-            StringBuilder builder = new StringBuilder("\\");
-            String next;
+            try (Scanner scanner = new Scanner(connection.getInputStream())) {
+                final StringBuilder builder = new StringBuilder("\\");
+                String next;
 
-            while (scanner.hasNextLine()) {
-                next = scanner.nextLine();
-                responseList.add(next);
-                builder.append(" ").append(next);
+                while (scanner.hasNextLine()) {
+                    next = scanner.nextLine();
+                    responseList.add(next);
+                    builder.append(" ").append(next);
+                }
+
+                response = builder.toString().replace("\\ ", "");
             }
-
-            response = builder.toString().replace("\\ ", "");
 
         } catch (Exception exception) {
             Logger.warning("Could not reach plugin page! More information below. (" + exception + ")");

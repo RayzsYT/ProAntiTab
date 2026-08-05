@@ -5,6 +5,7 @@ import java.util.*;
 import de.rayzs.pat.api.event.PATEventHandler;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
@@ -88,20 +89,25 @@ public class CommandsCache {
 
     public List<String> getPlayerCommands(Collection<String> unfilteredCommands, CommandSender sender, List<Group> groups, String serverName) {
         List<String> playerCommands = new LinkedList<>(unfilteredCommands);
-        List<String> localFilteredCommands = filteredCommands == null ? null : new LinkedList<>();
+        List<String> localFilteredCommands = filteredCommands == null ? null : Reflection.isProxyServer()
+                ? new ArrayList<>() : new ArrayList<>(filteredCommands);
 
         if (localFilteredCommands == null)
             return playerCommands;
 
+        if (Reflection.isProxyServer()) {
+            // Slower and step-by-step due to some conflicts in the past with proxy servers.
 
-        final int max = filteredCommands.size();
-        for (int i = 0; i < max; i++) {
-            try {
-                String command = filteredCommands.get(i);
-                localFilteredCommands.add(command);
-            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-                Logger.warning("Array is out of bounds " + i + "/" + max + "! " + indexOutOfBoundsException.getMessage());
-                break;
+            final int max = filteredCommands.size();
+
+            for (int i = 0; i < max; i++) {
+                try {
+                    String command = filteredCommands.get(i);
+                    localFilteredCommands.add(command);
+                } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+                    Logger.warning("Array is out of bounds " + i + "/" + max + "! " + indexOutOfBoundsException.getMessage());
+                    break;
+                }
             }
         }
 
@@ -123,7 +129,20 @@ public class CommandsCache {
 
         }
 
-        PATEventHandler.callUpdatePlayerCommandsEvents(sender, playerCommands, serverName != null);
+        final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
+
+        SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(
+                sender,
+                serverCommands,
+                serverCommands,
+                Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName)
+        );
+
+        PATEventHandler.callUpdatePlayerCommandsEvents(
+                sender,
+                playerCommands,
+                serverName != null
+        );
 
         return playerCommands.stream().map(command -> {
             command = StringUtils.getFirstArg(command);
@@ -153,7 +172,7 @@ public class CommandsCache {
         filteredCommands = null;
     }
 
-    public boolean isOutdated(List<String> commands) {
-        return filteredCommands == null || !ArrayUtils.compareStringArrays(commands, allCommands);
+    public boolean isOutdated(final List<String> commands) {
+        return filteredCommands == null || !ArrayUtils.isSame(commands, allCommands);
     }
 }

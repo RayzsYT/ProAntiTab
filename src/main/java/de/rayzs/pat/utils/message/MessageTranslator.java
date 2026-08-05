@@ -1,12 +1,12 @@
 package de.rayzs.pat.utils.message;
 
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.configuration.helper.MultipleMessagesHelper;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.message.translators.*;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.*;
 import de.rayzs.pat.utils.sender.CommandSender;
-import de.rayzs.pat.utils.sender.CommandSenderHandler;
 
 import java.util.*;
 
@@ -41,7 +41,21 @@ public class MessageTranslator {
         for (Map.Entry<Character, String> entry : colors.entrySet())
             endingColors.put(entry.getKey(), "</" + entry.getValue().substring(1));
 
-        support = !Reflection.isCraftbukkit() && (Reflection.isAtLeast(1, 18) || Reflection.isProxyServer());
+        support = !Reflection.isArclight()
+                && !Reflection.isCraftbukkit()
+                && (Reflection.isAtLeast(1, 18) || Reflection.isProxyServer());
+
+        if (Reflection.isAtLeast(26, 2) && !Reflection.getSoftware().isPaperBased()) {
+            support = false;
+
+            Logger.warning("Due to an incompatibility issue, MiniMessage support is not given for non-Paper based server softwares as of now!");
+        }
+
+        if (Reflection.getSoftware() == Reflection.Software.BUNGEECORD && !Reflection.doesClassExist("net.kyori.adventure.util.Buildable$Builder")) {
+            support = false;
+
+            Logger.warning("Since MiniMessage isn't supported for Bungeecord anymore and this version of Bungeecord is too advanced, MiniMessage support is disabled!");
+        }
 
         if (support) {
             translator = Reflection.isVelocityServer() ? new VelocityMessageTranslator()
@@ -101,7 +115,7 @@ public class MessageTranslator {
 
             CommandSender sender = target instanceof CommandSender
                     ? (CommandSender) target
-                    : CommandSenderHandler.from(target);
+                    : CommandSender.from(target);
 
             if (!PlaceholderReplacer.process(sender, text, sender::sendMessage))
                 sender.sendMessage(text);
@@ -109,9 +123,14 @@ public class MessageTranslator {
             return;
         }
 
-        if (PlaceholderReplacer.process(target, text, result -> translator.send(target, result))) return;
+        final Object tmpTarget = target instanceof CommandSender sender
+                ? sender.getSenderObject() : target;
 
-        translator.send(target, text);
+        if (PlaceholderReplacer.process(target, text, result -> translator.send(tmpTarget, result))) {
+            return;
+        }
+
+        translator.send(tmpTarget, text);
     }
 
     public static String replaceMessage(String text) {
@@ -122,7 +141,7 @@ public class MessageTranslator {
         CommandSender sender = targetObj == null ? null
                 : targetObj instanceof CommandSender
                 ? (CommandSender) targetObj
-                : CommandSenderHandler.from(targetObj);
+                : CommandSender.from(targetObj);
 
         String executorName = (sender == null || sender.isConsole())
                 ? ""
