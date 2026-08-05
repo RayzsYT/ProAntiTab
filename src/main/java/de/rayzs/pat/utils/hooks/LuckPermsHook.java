@@ -94,10 +94,13 @@ public class LuckPermsHook {
         }
 
         final ImmutableContextSet.Builder builder = ImmutableContextSet.builder();
-        final String contextValue = Storage.getLoader().getPlayerServerName(playerId);
 
-        if (contextValue != null) {
-            builder.add("server", contextValue).add("world", contextValue);
+        if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED || Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_WORLD.ENABLED) {
+            final String contextValue = Storage.getLoader().getPlayerServerName(playerId);
+
+            if (contextValue != null) {
+                builder.add("server", contextValue).add("world", contextValue);
+            }
         }
 
         return user.getCachedData().getPermissionData(QueryOptions.contextual(builder.build())).getPermissionMap();
