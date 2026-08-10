@@ -35,27 +35,6 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
         }
 
         return hiddenCommands.contains(command);
-
-        /*
-        for (String listedCommand : hiddenCommands) {
-            if (listedCommand == null)
-                continue;
-
-            if (StringUtils.equals(command, listedCommand, caseSensitive)) {
-                return true;
-            }
-
-            if (!takeFirstArgument) {
-                continue;
-            }
-
-            if (StringUtils.equals(command, StringUtils.getFirstArg(listedCommand), caseSensitive)) {
-                return true;
-            }
-        }
-
-        return false;
-         */
     }
 
     public void setList(List<String> commands) {
