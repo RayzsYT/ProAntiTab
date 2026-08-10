@@ -8,6 +8,17 @@ import java.util.*;
 
 public class StringUtils {
 
+    public static boolean startsWithIgnoreCase(String startingWithSource, String str) {
+        final int strCutLength = startingWithSource.length();
+        if (strCutLength >= str.length()) {
+            return false;
+        }
+
+        System.out.println("\"" + str.substring(0, strCutLength) + "\"startsWith(\"" + startingWithSource + "\")");
+
+        return startingWithSource.equalsIgnoreCase(str.substring(0, strCutLength));
+    }
+
     public static void centralize(List<String> lines) {
         final Map<Integer, Integer> sizes = new HashMap<>();
         final String centerVariable = "%center%";
