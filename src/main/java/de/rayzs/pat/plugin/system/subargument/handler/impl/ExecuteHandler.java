@@ -133,7 +133,7 @@ public class ExecuteHandler extends SubArgumentHandler {
                     c = StringUtils.replaceLast(c, " ", "");
             }
 
-            listed = c.equalsIgnoreCase(cpyCommand) || cpyCommand.startsWith(c + " ");
+            listed = c.equalsIgnoreCase(cpyCommand) || StringUtils.startsWithIgnoreCase(c + " ", cpyCommand);
 
             if (listed && ends && cpyCommand.length() > c.length()) {
                 listed = false;
