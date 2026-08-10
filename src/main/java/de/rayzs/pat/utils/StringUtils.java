@@ -14,8 +14,6 @@ public class StringUtils {
             return false;
         }
 
-        System.out.println("\"" + str.substring(0, strCutLength) + "\"startsWith(\"" + startingWithSource + "\")");
-
         return startingWithSource.equalsIgnoreCase(str.substring(0, strCutLength));
     }
 
