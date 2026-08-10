@@ -1,7 +1,6 @@
 package de.rayzs.pat.plugin.system.subargument.handler.impl;
 
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.subargument.handler.SubArgumentHandler;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.NumberUtils;
@@ -143,7 +142,7 @@ public class TabCompleteHandler extends SubArgumentHandler {
             });
         }
 
-        if (possibilities.isEmpty()) {
+        if (turn && possibilities.isEmpty()) {
             return suggestions;
         }
 

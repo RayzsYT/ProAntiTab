@@ -40,17 +40,12 @@ public class UpdateArgumentsHandler extends SubArgumentHandler {
 
             } else {
 
-                for (String command : Arguments.get().CHAT_ARGUMENTS.getGeneralArgument().getInputs()) {
+                for (String command : commands) {
                     if (groupCommands.contains(command)) continue;
 
-                    arguments.CHAT_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
+                    arguments.buildArgumentStacks(command);
                 }
 
-                for (String command : Arguments.get().TAB_ARGUMENTS.getGeneralArgument().getInputs()) {
-                    if (groupCommands.contains(command)) continue;
-
-                    arguments.TAB_ARGUMENTS.buildArguments(Storage.Blacklist.BlockTypeFetcher.modify(command));
-                }
             }
 
         }
