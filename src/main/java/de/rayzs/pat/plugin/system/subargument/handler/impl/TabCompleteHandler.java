@@ -4,6 +4,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.system.subargument.handler.SubArgumentHandler;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.NumberUtils;
+import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.plugin.system.subargument.argument.Arguments;
 
@@ -133,13 +134,18 @@ public class TabCompleteHandler extends SubArgumentHandler {
                 possibilities.removeIf(possibility -> getInstance().getCachedOnlinePlayerNames().contains(possibility));
 
 
-            possibilities.removeIf(s -> {
-                if (negated.contains(s)) {
-                    return false;
-                }
+            if (!arguments.getResultTab(StringUtils.getFirstArg(cursor)).isEmpty() && result.isEmpty()) {
+                possibilities.clear();
+                possibilities.add("///////////");
+            } else {
+                possibilities.removeIf(s -> {
+                    if (negated.contains(s)) {
+                        return false;
+                    }
 
-                return result.contains(s);
-            });
+                    return result.contains(s);
+                });
+            }
         }
 
         if (turn && possibilities.isEmpty()) {
