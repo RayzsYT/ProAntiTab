@@ -304,13 +304,12 @@ public class Storage {
         return false;
     }
 
-    public static boolean isServer(String originServer, String targetServer) {
-        originServer = originServer.toLowerCase();
-        targetServer = targetServer.toLowerCase();
-
+    public static boolean isServer(final String originServer, final String targetServer) {
         if (originServer.endsWith("*")) {
-            originServer = originServer.substring(0, originServer.length() - 2);
-            return targetServer.startsWith(originServer);
+            return StringUtils.startsWithIgnoreCase(
+                    originServer.substring(0, originServer.length() - 2),
+                    targetServer
+            );
         }
 
         return originServer.equalsIgnoreCase(targetServer);
