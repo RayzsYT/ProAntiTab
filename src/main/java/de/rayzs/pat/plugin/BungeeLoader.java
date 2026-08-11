@@ -85,8 +85,10 @@ public class BungeeLoader extends Plugin implements PluginLoader {
 
         startUpdaterTask();
 
-        if (manager.getPlugin("LuckPerms") != null)
+        if (manager.getPlugin("LuckPerms") != null) {
+            manager.registerListener(this, new BungeeLuckPermsWarning());
             LuckPermsHook.initialize();
+        }
 
         if(manager.getPlugin("PAPIProxyBridge") != null) {
             Storage.USE_PAPIPROXYBRIDGE = true;

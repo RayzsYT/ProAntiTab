@@ -124,6 +124,8 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         startUpdaterTask();
 
         if (getServer().getPluginManager().getPlugin("LuckPerms") != null) {
+            manager.registerEvents(new BukkitLuckPermsWarning(), this);
+
             LuckPermsHook.initialize();
             Bukkit.getOnlinePlayers().forEach(player -> PermissionUtil.setPlayerPermissions(player.getUniqueId()));
         } else {
