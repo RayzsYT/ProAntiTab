@@ -37,10 +37,6 @@ public class LuckPermsWarning {
             return false;
         }
 
-        if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_WORLD.ENABLED || Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
-            return false;
-        }
-
         if (!LUCKPERMS_PREFIXES.contains(StringUtils.getFirstArg(command))) {
             return false;
         }

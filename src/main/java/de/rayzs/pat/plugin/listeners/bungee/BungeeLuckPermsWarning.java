@@ -1,5 +1,6 @@
 package de.rayzs.pat.plugin.listeners.bungee;
 
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
 import de.rayzs.pat.plugin.BungeeLoader;
 import de.rayzs.pat.utils.LuckPermsWarning;
@@ -17,6 +18,12 @@ public class BungeeLuckPermsWarning implements Listener {
     @EventHandler
     public void onPlayerCommandExecution(final ChatEvent event) {
         if (LuckPermsWarning.alreadyAnnounced()) return;
+
+        if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_WORLD.ENABLED || Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
+            return;
+        }
+
+
         if (! (event.getSender() instanceof ProxiedPlayer player)) return;
 
         final CommandSender sender = CommandSender.from(player);

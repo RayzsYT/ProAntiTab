@@ -5,6 +5,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.utils.LuckPermsWarning;
 import de.rayzs.pat.utils.sender.CommandSender;
@@ -22,6 +23,11 @@ public class VelocityLuckPermsWarning {
     @Subscribe
     public void onCommandExecute(final CommandExecuteEvent event) {
         if (LuckPermsWarning.alreadyAnnounced()) return;
+
+        if (Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_WORLD.ENABLED || Storage.ConfigSections.Settings.UPDATE_GROUPS_PER_SERVER.ENABLED) {
+            return;
+        }
+
 
         final CommandSource commandSource = event.getCommandSource();
         if(! (commandSource instanceof Player player)) return;
