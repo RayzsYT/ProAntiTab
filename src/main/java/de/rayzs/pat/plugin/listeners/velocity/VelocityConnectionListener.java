@@ -52,7 +52,7 @@ public class VelocityConnectionListener {
 
         PermissionUtil.setPlayerPermissions(sender);
 
-        if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate")) {
+        if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate", false)) {
             server.getScheduler().buildTask(loader, () -> {
                 if (player.isActive())
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getUsername());

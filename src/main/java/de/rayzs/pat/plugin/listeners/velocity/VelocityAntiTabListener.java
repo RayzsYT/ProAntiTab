@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin.listeners.velocity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +24,10 @@ import de.rayzs.pat.utils.sender.CommandSender;
 
 public class VelocityAntiTabListener {
 
-    private static ProxyServer server;
+    private final ProxyServer server;
 
     public VelocityAntiTabListener(ProxyServer server) {
-        VelocityAntiTabListener.server = server;
+        this.server = server;
     }
 
     @Subscribe (order = PostOrder.LAST)
@@ -45,21 +46,21 @@ public class VelocityAntiTabListener {
 
         final CommandSender sender = CommandSender.from(player);
 
-        if (PermissionUtil.hasBypassPermission(sender) || event.getSuggestions().isEmpty() || player.getCurrentServer().isEmpty()) {
+        if (PermissionUtil.hasBypassPermission(sender, false) || event.getSuggestions().isEmpty() || player.getCurrentServer().isEmpty()) {
             return;
         }
 
-        final List<Group> groups = GroupManager.getPlayerGroups(sender);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender, false);
 
         event.getSuggestions().removeIf(command -> {
             if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(command) || Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(command)) {
                 return false;
             }
 
-            return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, serverName);
+            return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, serverName, false);
         });
 
-        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(sender, event.getSuggestions());
+        FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(sender, new HashSet<>(event.getSuggestions()));
         if(filteredSuggestionEvent.isCancelled()) event.getSuggestions().clear();
     }
 
@@ -74,7 +75,7 @@ public class VelocityAntiTabListener {
 
             final CommandSender sender = CommandSender.from(player);
 
-            if (PermissionUtil.hasBypassPermission(sender)) {
+            if (PermissionUtil.hasBypassPermission(sender, false)) {
                 return;
             }
 
@@ -91,7 +92,7 @@ public class VelocityAntiTabListener {
             }
 
             final CommandsCache commandsCache = cache.get(serverName);
-            final List<Group> groups = GroupManager.getPlayerGroups(sender);
+            final List<Group> groups = GroupManager.getPlayerGroups(sender, false);
             final List<String> commandsAsString = new ArrayList<>();
 
             event.getRootNode().getChildren().stream()
@@ -101,7 +102,7 @@ public class VelocityAntiTabListener {
             commandsCache.handleCommands(commandsAsString, serverName);
 
             final boolean newer = player.getProtocolVersion().getProtocol() > 340, argsChildrenExist = event.getRootNode().getChild("args") != null;
-            final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName);
+            final HashSet<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName, false);
 
             if (event.getRootNode().getChildren().size() == 1
                     && newer && argsChildrenExist

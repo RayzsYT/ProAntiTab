@@ -1,14 +1,13 @@
 package de.rayzs.pat.plugin.system.subargument.handler.impl;
 
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.subargument.handler.SubArgumentHandler;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.sender.CommandSender;
 import de.rayzs.pat.plugin.system.subargument.argument.Arguments;
 
-import java.util.List;
+import java.util.HashSet;
 
 public class UpdateArgumentsHandler extends SubArgumentHandler {
 
@@ -16,7 +15,7 @@ public class UpdateArgumentsHandler extends SubArgumentHandler {
         super(instance);
     }
 
-    public void updatePlayerArguments(CommandSender sender, List<String> commands, List<String> serverCommands, List<String> groupCommands) {
+    public void updatePlayerArguments(CommandSender sender, HashSet<String> commands, HashSet<String> serverCommands, HashSet<String> groupCommands) {
         final Arguments arguments = getInstance().getPlayerArgument(sender);
 
         arguments.clearArguments();

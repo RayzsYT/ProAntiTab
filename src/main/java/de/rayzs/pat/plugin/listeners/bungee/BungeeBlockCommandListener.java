@@ -36,7 +36,7 @@ public class BungeeBlockCommandListener implements Listener {
 
         String command = event.getMessage();
 
-        if (PermissionUtil.hasBypassPermission(sender, command) || Storage.Blacklist.isDisabledServer(serverName))
+        if (PermissionUtil.hasBypassPermission(sender, command, false) || Storage.Blacklist.isDisabledServer(serverName))
             return;
 
         command = command.startsWith("/") ? command.substring(1) : command;
@@ -104,13 +104,13 @@ public class BungeeBlockCommandListener implements Listener {
             return;
         }
 
-        final List<Group> groups = GroupManager.getPlayerGroups(sender);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender, false);
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
 
-        boolean allowed = Storage.Blacklist.canPlayerAccessChat(sender, groups, command, serverName);
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(sender, groups, command, serverName, false);
         boolean blockedNamespace = false;
 
-        if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
+        if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender, false)) {
             blockedNamespace = cancelBlockedCommand
                     ? Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)
                     : Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesAlwaysBlock(command);

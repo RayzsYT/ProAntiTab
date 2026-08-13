@@ -3,7 +3,6 @@ package de.rayzs.pat.plugin.listeners.velocity;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.command.CommandSource;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
@@ -57,7 +56,7 @@ public class VelocityBlockCommandListener {
 
         final String command = tmpCommand;
 
-        if (PermissionUtil.hasBypassPermission(sender, command) || Storage.Blacklist.isDisabledServer(serverName))
+        if (PermissionUtil.hasBypassPermission(sender, command, false) || Storage.Blacklist.isDisabledServer(serverName))
             return event;
 
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
@@ -119,13 +118,13 @@ public class VelocityBlockCommandListener {
         }
 
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
-        final List<Group> groups = GroupManager.getPlayerGroups(sender);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender, false);
 
-        boolean allowed = Storage.Blacklist.canPlayerAccessChat(sender, groups, command, serverName);
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(sender, groups, command, serverName, false);
         boolean blockedNamespace = false;
 
 
-        if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
+        if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender, false)) {
             blockedNamespace = cancelBlockedCommand
                     ? Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)
                     : Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesAlwaysBlock(command);

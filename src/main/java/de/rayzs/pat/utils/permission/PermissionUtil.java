@@ -65,7 +65,8 @@ public class PermissionUtil {
         } else if (Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER) {
             GroupManagerHook.setPermissions(sender.getUniqueId());
         } else {
-            GroupManager.getGroups().forEach(group -> group.hasPermission(sender));
+            final boolean isOperator = sender.isOperator();
+            GroupManager.getGroups().forEach(group -> group.hasPermission(sender, isOperator));
         }
     }
 
@@ -75,7 +76,11 @@ public class PermissionUtil {
         } else if (Storage.getPermissionPlugin() == PermissionPlugin.GROUPMANAGER) {
             GroupManagerHook.setPermissions(uuid);
         } else {
-            GroupManager.getGroups().forEach(group -> group.hasPermission(uuid));
+            final CommandSender sender = CommandSender.from(uuid);
+            if (sender == null) return;
+
+            final boolean isOperator = sender.isOperator();
+            GroupManager.getGroups().forEach(group -> group.hasPermission(uuid, isOperator));
         }
     }
 
@@ -97,9 +102,11 @@ public class PermissionUtil {
         permissionMap.setState(permission, permitted);
     }
 
-    public static boolean hasPermission(Object targetObj, String permission) {
-        PermissionMap permissionMap;
+    public static boolean hasPermission(final Object targetObj, final String permission, final boolean isOperator) {
+        if (isOperator) return true;
 
+
+        PermissionMap permissionMap;
         CommandSender sender = null;
         UUID uuid = null;
 
@@ -127,8 +134,7 @@ public class PermissionUtil {
                 return true;
             }
 
-            return sender.isOperator()
-                    || sender.hasPermission("*")
+            return sender.hasPermission("*")
                     || sender.hasPermission("proantitab.*")
                     || sender.hasPermission("proantitab." + permission);
         }
@@ -161,31 +167,31 @@ public class PermissionUtil {
                     permissionMap.setState("proantitab." + permission, sender.hasPermission("proantitab." + permission));
 
             }
-
-            if (sender.isOperator()) {
-                return true;
-            }
         }
 
         return permissionMap.isPermitted("*") || permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
     }
 
-    public static boolean hasBypassPermission(Object targetObj) {
+    public static boolean hasBypassPermission(Object targetObj, final boolean isOperator) {
 
         if (!Reflection.isProxyServer() && Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             return false;
         }
 
-        return hasPermission(targetObj, "bypass");
+        return hasPermission(targetObj, "bypass", isOperator);
     }
 
-    public static boolean hasBypassPermission(Object targetObj, String command) {
+    public static boolean hasBypassPermission(
+            final Object targetObj,
+            final String command,
+            final boolean isOperator
+    ) {
 
         if (!Reflection.isProxyServer() && Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             return false;
         }
 
-        if (hasBypassPermission(targetObj)) {
+        if (hasBypassPermission(targetObj, isOperator)) {
             return true;
         }
 
@@ -193,11 +199,15 @@ public class PermissionUtil {
             return false;
         }
 
-        return hasPermission(targetObj, "bypass." + command);
+        return hasPermission(targetObj, "bypass." + command, isOperator);
     }
 
-    public static boolean hasPermissionWithResponse(Object targetObj, String command) {
-        boolean permitted = hasPermission(targetObj, command);
+    public static boolean hasPermissionWithResponse(
+            final Object targetObj,
+            final String command,
+            final boolean isOperator
+    ) {
+        boolean permitted = hasPermission(targetObj, command, isOperator);
 
         if (!permitted && targetObj instanceof CommandSender) {
             String message = Storage.ConfigSections.Messages.NO_PERMISSION.MESSAGE;

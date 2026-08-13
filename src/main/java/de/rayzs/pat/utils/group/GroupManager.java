@@ -45,8 +45,8 @@ public class GroupManager {
         });
     }
 
-    public static List<Group> getPlayerGroups(UUID uuid) {
-        List<Group> playerGroups = new ArrayList<>(GroupManager.getGroups().stream().filter(group -> group.hasPermission(uuid)).toList());
+    public static List<Group> getPlayerGroups(final UUID uuid, final boolean isOperator) {
+        List<Group> playerGroups = new ArrayList<>(GroupManager.getGroups().stream().filter(group -> group.hasPermission(uuid, isOperator)).toList());
 
         int priority = playerGroups.stream()
                 .mapToInt(Group::getPriority)
@@ -58,8 +58,8 @@ public class GroupManager {
         return playerGroups;
     }
 
-    public static List<Group> getPlayerGroups(CommandSender sender) {
-        List<Group> playerGroups = new ArrayList<>(GroupManager.getGroups().stream().filter(group -> group.hasPermission(sender)).toList());
+    public static List<Group> getPlayerGroups(final CommandSender sender, final boolean isOperator) {
+        List<Group> playerGroups = new ArrayList<>(GroupManager.getGroups().stream().filter(group -> group.hasPermission(sender, isOperator)).toList());
 
         int priority = playerGroups.stream()
                                 .mapToInt(Group::getPriority)

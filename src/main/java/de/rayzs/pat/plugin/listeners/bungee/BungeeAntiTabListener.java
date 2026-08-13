@@ -50,13 +50,13 @@ public class BungeeAntiTabListener implements Listener {
         if (Storage.Blacklist.isDisabledServer(serverName))
             return;
 
-        if (PermissionUtil.hasBypassPermission(sender))
+        if (PermissionUtil.hasBypassPermission(sender, false))
             return;
 
 
 
-        final List<Group> groups = GroupManager.getPlayerGroups(sender);
-        final boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender, false);
+        final boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender, false);
         final boolean spaces = cursor.contains(" ");
 
         boolean cancelsBeforeHand = false;
@@ -66,7 +66,7 @@ public class BungeeAntiTabListener implements Listener {
         }
 
         if (!cancelsBeforeHand && !cursor.isEmpty()) {
-            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.getFirstArg(cursor), serverName);
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.getFirstArg(cursor), serverName, false);
         }
 
         if (!cancelsBeforeHand) {
@@ -100,7 +100,7 @@ public class BungeeAntiTabListener implements Listener {
                 return false;
             }
 
-            return !Storage.Blacklist.canPlayerAccessTab(sender, groups, cpy, serverName);
+            return !Storage.Blacklist.canPlayerAccessTab(sender, groups, cpy, serverName, false);
         });
     }
 

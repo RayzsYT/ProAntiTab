@@ -23,7 +23,12 @@ import de.rayzs.pat.utils.Reflection;
 public class LegacyPacketHandler implements BukkitPacketHandler {
 
     @Override
-    public boolean handleIncomingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
+    public boolean handleIncomingPacket(
+            final Player player,
+            final CommandSender sender,
+            final Object packetObj,
+            final boolean isOperator
+    ) throws Exception {
         Field stringField = Reflection.getFirstFieldByType(packetObj.getClass(), "String", Reflection.SearchOption.ENDS);
         if(stringField == null) {
             Logger.warning("Failed PacketAnalyze process! (#1)");
@@ -36,14 +41,19 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
     }
 
     @Override
-    public boolean handleOutgoingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
+    public boolean handleOutgoingPacket(
+            final Player player,
+            final CommandSender sender,
+            final Object packetObj,
+            final boolean isOperator
+    ) throws Exception {
         final String rawInput = BukkitPacketAnalyzer.getPlayerInput(player);
 
         if(rawInput == null) {
             return false;
         }
 
-        final List<Group> groups = GroupManager.getPlayerGroups(sender);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender, isOperator);
 
         String input = rawInput;
         boolean cancelsBeforeHand = false;
@@ -54,7 +64,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
 
         input = input.substring(1);
 
-        final boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender);
+        final boolean doesBypassNamespace = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender, isOperator);
         final boolean spaces = input.contains(" ");
 
         if (Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(input) && !doesBypassNamespace) {
@@ -62,7 +72,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
         }
 
         if (!cancelsBeforeHand && !input.isEmpty()) {
-            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.getFirstArg(input));
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.getFirstArg(input), isOperator);
         }
 
         if (!cancelsBeforeHand) {
@@ -117,7 +127,7 @@ public class LegacyPacketHandler implements BukkitPacketHandler {
                         return false;
                     }
 
-                    return !Storage.Blacklist.canPlayerAccessTab(sender, groups, cpy);
+                    return !Storage.Blacklist.canPlayerAccessTab(sender, groups, cpy, isOperator);
                 });
             }
 

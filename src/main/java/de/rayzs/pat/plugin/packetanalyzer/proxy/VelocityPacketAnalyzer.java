@@ -177,7 +177,7 @@ public class VelocityPacketAnalyzer {
 
         final String serverName = sender.getServerName();
 
-        final boolean ignore = PermissionUtil.hasBypassPermission(sender) || Storage.Blacklist.isDisabledServer(serverName);
+        final boolean ignore = PermissionUtil.hasBypassPermission(sender, false) || Storage.Blacklist.isDisabledServer(serverName);
         final ProxyCommandNodeHelper<CommandSource> helper = new ProxyCommandNodeHelper<>(commands.getRootNode());
 
         final List<String> commandsAsString = new ArrayList<>();
@@ -187,7 +187,7 @@ public class VelocityPacketAnalyzer {
             return;
         }
 
-        final List<Group> groups = GroupManager.getPlayerGroups(sender);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender, false);
 
         final Map<String, CommandsCache> cache = Storage.getLoader().getPerServerCommandsCacheMap();
         if (!cache.containsKey(serverName)) {
@@ -197,7 +197,7 @@ public class VelocityPacketAnalyzer {
         final CommandsCache commandsCache = cache.get(serverName);
         commandsCache.handleCommands(commandsAsString, serverName);
 
-        final List<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName);
+        final HashSet<String> playerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName, false);
         helper.removeIf(str -> {
             if (str.equals("args")) {
                 return false;
@@ -298,8 +298,8 @@ public class VelocityPacketAnalyzer {
                     return;
                 }
 
-                if (!PermissionUtil.hasBypassPermission(sender) && player.getCurrentServer().isPresent()) {
-                    final List<Group> groups = GroupManager.getPlayerGroups(sender);
+                if (!PermissionUtil.hasBypassPermission(sender, false) && player.getCurrentServer().isPresent()) {
+                    final List<Group> groups = GroupManager.getPlayerGroups(sender, false);
 
                     boolean cancelsBeforeHand = false;
                     String playerInput = getPlayerInput(player), rawPlayerInput = playerInput, server = player.getCurrentServer().get().getServerInfo().getName();
@@ -312,7 +312,7 @@ public class VelocityPacketAnalyzer {
                     }
 
                     if (!playerInput.equals("/")) {
-                        cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.replaceFirst(playerInput, "/", ""), server);
+                        cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, StringUtils.replaceFirst(playerInput, "/", ""), server, false);
 
                         if (!cancelsBeforeHand) {
                             cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", "")) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(StringUtils.replaceFirst(playerInput, "/", ""));
@@ -336,7 +336,7 @@ public class VelocityPacketAnalyzer {
                                     return false;
                                 }
 
-                                return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, player.getCurrentServer().get().getServerInfo().getName());
+                                return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, player.getCurrentServer().get().getServerInfo().getName(), false);
                             });
 
                         } else {

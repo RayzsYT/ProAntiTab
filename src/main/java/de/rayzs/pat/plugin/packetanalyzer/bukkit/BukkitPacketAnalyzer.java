@@ -138,9 +138,14 @@ public class BukkitPacketAnalyzer {
         private final Player player;
         private final CommandSender sender;
 
+        private long lastCheckedForOperatorPermission = System.currentTimeMillis();
+        private boolean operatorStatus;
+
         private PacketDecoder(Player player) {
             this.player = player;
             this.sender = CommandSender.from(player);
+
+            this.operatorStatus = player.isOp();
         }
 
         @Override
@@ -158,15 +163,15 @@ public class BukkitPacketAnalyzer {
                     return;
                 }
 
-                if (!PermissionUtil.hasBypassPermission(sender)) {
-
-                    if (!PACKET_HANDLER.handleIncomingPacket(player, sender, packetObj))
-                        return;
+                if (!hasBypassPermission() && !PACKET_HANDLER.handleIncomingPacket(player, sender, packetObj, false)) {
+                    return;
                 }
 
 
                 super.channelRead(channel, packetObj);
-            } catch (Throwable exception) { exception.printStackTrace(); }
+            } catch (Throwable exception) {
+                exception.printStackTrace();
+            }
         }
 
         @Override
@@ -182,20 +187,20 @@ public class BukkitPacketAnalyzer {
                 final boolean isCommandsPacket = packetName.equals("ClientboundCommandsPacket");
                 final boolean isTabCompletePacket = packetName.equals("PacketPlayOutTabComplete") || packetName.equals("ClientboundCommandSuggestionsPacket");
 
-                if (!isCommandsPacket && !isTabCompletePacket || PermissionUtil.hasBypassPermission(sender)) {
+                if (!isCommandsPacket && !isTabCompletePacket || hasBypassPermission()) {
                     super.write(channel, packetObj, promise);
                     return;
                 }
 
                 if (isCommandsPacket) {
-                    COMMANDS_NODE_HANDLER.handleOutgoingPacket(player, sender, packetObj);
+                    COMMANDS_NODE_HANDLER.handleOutgoingPacket(player, sender, packetObj, false);
 
                     super.write(channel, packetObj, promise);
                     return;
                 }
 
-                UUID uuid = player.getUniqueId();
-                Object sentPacketObj = SENT_PACKET.get(uuid);
+                final UUID uuid = sender.getUniqueId();
+                final Object sentPacketObj = SENT_PACKET.get(uuid);
 
                 if (sentPacketObj != null) {
                     if (sentPacketObj == packetObj) {
@@ -205,14 +210,29 @@ public class BukkitPacketAnalyzer {
                     }
                 }
 
-                if (!PACKET_HANDLER.handleOutgoingPacket(player, sender, packetObj))
+                if (!PACKET_HANDLER.handleOutgoingPacket(player, sender, packetObj, false)) {
                     return;
+                }
 
                 super.write(channel, packetObj, promise);
 
             } catch (Throwable exception) {
                 exception.printStackTrace();
             }
+        }
+
+        private boolean hasBypassPermission() {
+            if (PermissionUtil.hasBypassPermission(sender, false)) {
+                return true;
+            }
+
+            if (System.currentTimeMillis() - this.lastCheckedForOperatorPermission >= 2000) {
+                this.lastCheckedForOperatorPermission = System.currentTimeMillis();
+                this.operatorStatus = player.isOp();
+                return this.operatorStatus;
+            }
+
+            return this.operatorStatus;
         }
     }
 }

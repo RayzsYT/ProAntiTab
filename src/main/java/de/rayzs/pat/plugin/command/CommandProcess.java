@@ -66,9 +66,10 @@ public class CommandProcess {
     }
 
     public static void handleCommand(Object senderObj, String[] args, String label) {
-        CommandSender sender = CommandSender.from(senderObj);
+        final CommandSender sender = CommandSender.from(senderObj);
+        final boolean isOperator = sender.isOperator();
 
-        if (!PermissionUtil.hasPermissionWithResponse(sender, "use"))
+        if (!PermissionUtil.hasPermissionWithResponse(sender, "use", isOperator))
             return;
 
         if (args.length == 0) {
@@ -109,7 +110,7 @@ public class CommandProcess {
             }
 
             ProCommand command = optCommand.get();
-            if (!PermissionUtil.hasPermissionWithResponse(sender, command.getName()))
+            if (!PermissionUtil.hasPermissionWithResponse(sender, command.getName(), isOperator))
                 return;
 
             if (!command.execute(sender, commandArgs)) {
@@ -137,7 +138,7 @@ public class CommandProcess {
         }
 
         ProCommand command = optCommand.get();
-        if (!PermissionUtil.hasPermissionWithResponse(sender, command.getName()))
+        if (!PermissionUtil.hasPermissionWithResponse(sender, command.getName(), isOperator))
             return;
 
         if (!command.execute(sender, commandArgs)) {
@@ -147,10 +148,11 @@ public class CommandProcess {
     }
 
     public static List<String> handleTabComplete(Object senderObj, String[] args) {
-        CommandSender sender = CommandSender.from(senderObj);
-        List<String> result = new ArrayList<>();
+        final CommandSender sender = CommandSender.from(senderObj);
+        final boolean isOperator = sender.isOperator();
+        final List<String> result = new ArrayList<>();
 
-        if (!PermissionUtil.hasPermission(sender, "use"))
+        if (!PermissionUtil.hasPermission(sender, "use", isOperator))
             return result;
 
         if (args.length <= 1) {
@@ -164,7 +166,7 @@ public class CommandProcess {
                         if (!Reflection.isProxyServer() && cmd.isProxyOnly())
                             return false;
 
-                        return PermissionUtil.hasPermission(sender, cmd.getName());
+                        return PermissionUtil.hasPermission(sender, cmd.getName(), isOperator);
                     })
                     .forEach(cmd -> {
                         result.add(cmd.getName());
@@ -185,7 +187,7 @@ public class CommandProcess {
                             .filter(cmd -> {
 
                                 if (Reflection.isProxyServer() && cmd.isServerCommand())
-                                    return PermissionUtil.hasPermission(sender, cmd.getName());
+                                    return PermissionUtil.hasPermission(sender, cmd.getName(), isOperator);
 
                                 return false;
                             })
@@ -206,7 +208,7 @@ public class CommandProcess {
                 optCommand = COMMANDS.stream().filter(cmd -> {
 
                     if (Reflection.isProxyServer() && cmd.isServerCommand()) {
-                        return cmd.isCommand(servCommandName) && PermissionUtil.hasPermission(sender, cmd.getName());
+                        return cmd.isCommand(servCommandName) && PermissionUtil.hasPermission(sender, cmd.getName(), isOperator);
                     }
 
                     return false;
@@ -231,7 +233,7 @@ public class CommandProcess {
             if (optCommand.isPresent()) {
                 ProCommand command = optCommand.get();
 
-                if (PermissionUtil.hasPermission(sender, command.getName())) {
+                if (PermissionUtil.hasPermission(sender, command.getName(), isOperator)) {
                     List<String> cmdCompletions = command.tabComplete(sender, commandArgs);
                     result.addAll(cmdCompletions != null ? cmdCompletions : List.of());
                 }

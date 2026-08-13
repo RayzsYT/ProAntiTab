@@ -213,13 +213,13 @@ public class Storage {
 
                 associatedServers.forEach(serverName -> {
                     final List<UUID> playerIds = Storage.getLoader().getPlayerIdsByServer(serverName);
-                    final List<String> commands = Blacklist.Collector.collectAllServerCommands(serverName);
+                    final HashSet<String> commands = Blacklist.Collector.collectAllServerCommands(serverName);
 
                     playerIds.forEach(playerId -> {
                         final CommandSender sender = CommandSender.from(playerId);
 
-                        final List<String> playerCommands = new ArrayList<>(commands);
-                        final List<String> groupCommands = Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
+                        final HashSet<String> playerCommands = new HashSet<>(commands);
+                        final HashSet<String> groupCommands = Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
 
                         playerCommands.addAll(groupCommands);
 
@@ -236,9 +236,9 @@ public class Storage {
                 playerIds.forEach(playerId -> {
                     final CommandSender sender = CommandSender.from(playerId);
 
-                    final List<String> serverCommands = Blacklist.Collector.collectAllServerCommands(sender.getServerName());
-                    final List<String> playerCommands = new ArrayList<>(serverCommands);
-                    final List<String> groupCommands = Blacklist.Collector.collectAllPlayerGroupCommands(sender, sender.getServerName());
+                    final HashSet<String> serverCommands = Blacklist.Collector.collectAllServerCommands(sender.getServerName());
+                    final HashSet<String> playerCommands = new HashSet<>(serverCommands);
+                    final HashSet<String> groupCommands = Blacklist.Collector.collectAllPlayerGroupCommands(sender, sender.getServerName());
 
                     playerCommands.addAll(groupCommands);
 
@@ -449,8 +449,8 @@ public class Storage {
              * @param serverName Target server name.
              * @return List of collected commands.
              */
-            public static List<String> collectAllServerCommands(String serverName) {
-                List<String> commands = new ArrayList<>(Blacklist.getBlacklist().getCommands());
+            public static HashSet<String> collectAllServerCommands(String serverName) {
+                HashSet<String> commands = new HashSet<>(Blacklist.getBlacklist().getCommands());
                 if (!Reflection.isProxyServer())
                     return commands;
 
@@ -472,9 +472,9 @@ public class Storage {
              * @param serverName Target server name.
              * @return List of collected commands.
              */
-            public static List<String> collectAllPlayerGroupCommands(CommandSender sender, String serverName) {
-                final List<String> commands = new ArrayList<>();
-                final List<Group> groups = GroupManager.getPlayerGroups(sender);
+            public static HashSet<String> collectAllPlayerGroupCommands(CommandSender sender, String serverName) {
+                final HashSet<String> commands = new HashSet<>();
+                final List<Group> groups = GroupManager.getPlayerGroups(sender, sender.isOperator());
 
                 if (serverName == null) {
                     groups.forEach(group -> commands.addAll(group.getCommands()));
@@ -607,28 +607,63 @@ public class Storage {
             return IGNORED_SERVERS.isListed(server);
         }
 
-        public static boolean canPlayerAccess(CommandSender sender, List<Group> groups, String command, BlockType type) {
-            return canPlayerAccess(sender, groups, command, type, null);
+        public static boolean canPlayerAccess(
+                final CommandSender sender,
+                final List<Group> groups,
+                final String command,
+                final BlockType type,
+                final boolean isOperator
+        ) {
+            return canPlayerAccess(sender, groups, command, type, null, isOperator);
         }
 
-        public static boolean canPlayerAccessChat(CommandSender sender, List<Group> groups, String command) {
-            return canPlayerAccess(sender, groups, command, BlockType.CHAT, null);
+        public static boolean canPlayerAccessChat(
+                final CommandSender sender,
+                final List<Group> groups,
+                final String command,
+                final boolean isOperator
+        ) {
+            return canPlayerAccess(sender, groups, command, BlockType.CHAT, null, isOperator);
         }
 
 
-        public static boolean canPlayerAccessChat(CommandSender sender, List<Group> groups, String command, String server) {
-            return canPlayerAccess(sender, groups, command, BlockType.CHAT, server);
+        public static boolean canPlayerAccessChat(
+                final CommandSender sender,
+                final List<Group> groups,
+                final String command,
+                final String server,
+                final boolean isOperator
+        ) {
+            return canPlayerAccess(sender, groups, command, BlockType.CHAT, server, isOperator);
         }
 
-        public static boolean canPlayerAccessTab(CommandSender sender, List<Group> groups, String command) {
-            return canPlayerAccess(sender, groups, command, BlockType.TAB, null);
+        public static boolean canPlayerAccessTab(
+                final CommandSender sender,
+                final List<Group> groups,
+                final String command,
+                final boolean isOperator
+        ) {
+            return canPlayerAccess(sender, groups, command, BlockType.TAB, null, isOperator);
         }
 
-        public static boolean canPlayerAccessTab(CommandSender sender, List<Group> groups, String command, String server) {
-            return canPlayerAccess(sender, groups, command, BlockType.TAB, server);
+        public static boolean canPlayerAccessTab(
+                final CommandSender sender,
+                final List<Group> groups,
+                final String command,
+                final String server,
+                final boolean isOperator
+        ) {
+            return canPlayerAccess(sender, groups, command, BlockType.TAB, server, isOperator);
         }
 
-        public static boolean canPlayerAccess(CommandSender sender, List<Group> groups, String command, BlockType type, String server) {
+        public static boolean canPlayerAccess(
+                final CommandSender sender,
+                final List<Group> groups,
+                final String command,
+                final BlockType type,
+                final String server,
+                final boolean isOperator
+        ) {
             final boolean allowGroupOverruling = ConfigSections.Settings.ALLOW_GROUP_OVERRULING.ENABLED;
             final boolean blocked = isBlocked(command, type, server);
 
@@ -643,7 +678,7 @@ public class Storage {
                 }
 
                 if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
-                    if (PermissionUtil.hasBypassPermission(sender, command)) {
+                    if (PermissionUtil.hasBypassPermission(sender, command, isOperator)) {
                         return true;
                     }
                 }
@@ -657,7 +692,7 @@ public class Storage {
             }
 
             if (Storage.getPermissionPlugin() != PermissionPlugin.NONE) {
-                if (PermissionUtil.hasBypassPermission(sender, command)) {
+                if (PermissionUtil.hasBypassPermission(sender, command, isOperator)) {
                     return true;
                 }
             }

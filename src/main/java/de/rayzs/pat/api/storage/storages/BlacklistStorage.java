@@ -9,7 +9,7 @@ import java.util.*;
 public class BlacklistStorage extends StorageTemplate implements Serializable {
 
     private List<String> commands = new ArrayList<>();
-    private Set<String> hiddenCommands = new HashSet<>();
+    private HashSet<String> hiddenCommands = new HashSet<>();
 
     public BlacklistStorage(String navigatePath) {
         super(Storage.Files.STORAGE, navigatePath);
@@ -80,7 +80,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
         commands = (ArrayList<String>) getConfig().getOrSet(getNavigatePath(), commands);
 
         final List<String> tmpCommands = commands != null ? new ArrayList<>(commands) : new ArrayList<>();
-        final Set<String> pluginListCommands = new HashSet<>(), negatedPluginListCommands = new HashSet<>();
+        final HashSet<String> pluginListCommands = new HashSet<>(), negatedPluginListCommands = new HashSet<>();
 
         final String pluginCommandPrefix = "plugin=";
         final String negatedPluginCommandPrefix = Storage.Blacklist.BlockType.NEGATE + pluginCommandPrefix;

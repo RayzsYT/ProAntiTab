@@ -30,10 +30,10 @@ public class BlockNamespaceCommandsSection extends ConfigStorage {
             return false;
         }
 
-        return StringUtils.getFirstArg(command).contains(":");
+        return StringUtils.getFirstArg(command).indexOf(':') != -1;
     }
 
-    public boolean doesBypass(CommandSender sender) {
-        return !ENABLED || PermissionUtil.hasPermission(sender, "namespace");
+    public boolean doesBypass(final CommandSender sender, final boolean isOperator) {
+        return !ENABLED || PermissionUtil.hasPermission(sender, "namespace", isOperator);
     }
 }

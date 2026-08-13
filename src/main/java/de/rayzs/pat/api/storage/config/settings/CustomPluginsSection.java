@@ -38,6 +38,7 @@ public class CustomPluginsSection extends ConfigStorage {
             if (currentCommand.equalsIgnoreCase(command))
                 return true;
         }
+
         return false;
     }
 }

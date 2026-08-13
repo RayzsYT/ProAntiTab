@@ -192,10 +192,10 @@ public class LuckPermsHook {
 
         if (Reflection.isProxyServer()) {
             final String serverName = sender.getServerName();
-            final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
-            final List<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
+            final HashSet<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
+            final HashSet<String> groupCommands = Storage.Blacklist.Collector.collectAllPlayerGroupCommands(sender, serverName);
 
-            final List<String> playerCommands = new ArrayList<>(serverCommands);
+            final HashSet<String> playerCommands = new HashSet<>(serverCommands);
             playerCommands.addAll(groupCommands);
 
             SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(sender, playerCommands, serverCommands, groupCommands);

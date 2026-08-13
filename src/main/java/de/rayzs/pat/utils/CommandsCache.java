@@ -83,14 +83,25 @@ public class CommandsCache {
         filteredCommands = tmpFilteredCommands;
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, CommandSender sender, List<Group> groups) {
-        return getPlayerCommands(unfilteredCommands, sender, groups, null);
+    public HashSet<String> getPlayerCommands(
+            final Collection<String> unfilteredCommands,
+            final CommandSender sender,
+            final List<Group> groups,
+            final boolean isOperator
+    ) {
+        return getPlayerCommands(unfilteredCommands, sender, groups, null, isOperator);
     }
 
-    public List<String> getPlayerCommands(Collection<String> unfilteredCommands, CommandSender sender, List<Group> groups, String serverName) {
-        List<String> playerCommands = new LinkedList<>(unfilteredCommands);
-        List<String> localFilteredCommands = filteredCommands == null ? null : Reflection.isProxyServer()
-                ? new ArrayList<>() : new ArrayList<>(filteredCommands);
+    public HashSet<String> getPlayerCommands(
+            final Collection<String> unfilteredCommands,
+            final CommandSender sender,
+            final List<Group> groups,
+            final String serverName,
+            final boolean isOperator
+    ) {
+        final HashSet<String> playerCommands = new HashSet<>(unfilteredCommands);
+        final HashSet<String> localFilteredCommands = filteredCommands == null ? null : Reflection.isProxyServer()
+                ? new HashSet<>() : new HashSet<>(filteredCommands);
 
         if (localFilteredCommands == null)
             return playerCommands;
@@ -112,8 +123,8 @@ public class CommandsCache {
         }
 
 
-        if (!PermissionUtil.hasBypassPermission(sender)) {
-            boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender);
+        if (!PermissionUtil.hasBypassPermission(sender, isOperator)) {
+            boolean hasNamespaceBypass = Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender, isOperator);
 
             playerCommands.removeIf(command -> {
                 if (!hasNamespaceBypass && Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)) {
@@ -124,12 +135,12 @@ public class CommandsCache {
                     return false;
                 }
 
-                return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, serverName);
+                return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, serverName, isOperator);
             });
 
         }
 
-        final List<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
+        final HashSet<String> serverCommands = Storage.Blacklist.Collector.collectAllServerCommands(serverName);
 
         SubArgument.get().getUpdateArgumentsHandler().updatePlayerArguments(
                 sender,
@@ -144,7 +155,7 @@ public class CommandsCache {
                 serverName != null
         );
 
-        return playerCommands.stream().map(command -> {
+        return new HashSet<>(playerCommands.stream().map(command -> {
             command = StringUtils.getFirstArg(command);
 
             Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(command);
@@ -152,7 +163,7 @@ public class CommandsCache {
                 return command;
 
             return Storage.Blacklist.BlockTypeFetcher.modify(command, type);
-        }).toList();
+        }).toList());
 
     }
 

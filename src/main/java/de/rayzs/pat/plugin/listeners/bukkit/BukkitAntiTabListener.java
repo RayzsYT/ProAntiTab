@@ -27,6 +27,7 @@ public class BukkitAntiTabListener implements Listener {
         final Player player = event.getPlayer();
         final CommandSender sender = CommandSender.from(player);
         final UUID uuid = player.getUniqueId();
+        final boolean isOperator = player.isOp();
 
 
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
@@ -50,12 +51,12 @@ public class BukkitAntiTabListener implements Listener {
                 : BukkitLoader.getAllCommands()
         );
 
-        if (!player.isOp() && knownOperators.contains(uuid)) {
+        if (!isOperator && knownOperators.contains(uuid)) {
             knownOperators.remove(uuid);
             PermissionUtil.reloadPermissions(sender);
         }
 
-        if (PermissionUtil.hasBypassPermission(sender)) {
+        if (PermissionUtil.hasBypassPermission(sender, isOperator)) {
             return;
         }
 
@@ -66,17 +67,16 @@ public class BukkitAntiTabListener implements Listener {
             return;
         }
 
-        final List<Group> groups = GroupManager.getPlayerGroups(sender);
-        final List<String> playerCommands = Storage.getLoader().getBukkitCommandsCacheMap().getPlayerCommands(new ArrayList<>(event.getCommands()), sender, groups);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender, isOperator);
+        final HashSet<String> playerCommands = Storage.getLoader().getBukkitCommandsCacheMap().getPlayerCommands(new ArrayList<>(event.getCommands()), sender, groups, isOperator);
         final FilteredSuggestionEvent filteredSuggestionEvent = PATEventHandler.callFilteredSuggestionEvents(sender, playerCommands);
 
-        event.getCommands().clear();
-
         if (filteredSuggestionEvent.isCancelled()) {
+            event.getCommands().clear();
             return;
         }
 
-        event.getCommands().addAll(filteredSuggestionEvent.getSuggestions());
+        event.getCommands().removeIf(command -> !filteredSuggestionEvent.getSuggestions().contains(command));
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.ALWAYS_TAB_COMPLETABLE) {
             event.getCommands().addAll(Storage.ConfigSections.Settings.CUSTOM_PLUGIN.COMMANDS.getLines());

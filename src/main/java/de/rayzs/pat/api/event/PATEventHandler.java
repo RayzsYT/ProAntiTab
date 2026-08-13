@@ -22,7 +22,7 @@ public class PATEventHandler {
         return event;
     }
 
-    public static FilteredSuggestionEvent callFilteredSuggestionEvents(CommandSender player, List<String> suggestions) {
+    public static FilteredSuggestionEvent callFilteredSuggestionEvents(CommandSender player, HashSet<String> suggestions) {
         FilteredSuggestionEvent event = EmptyEvent.createEmptyFilteredSuggestionEvent(player, suggestions);
 
         for (PATEvent patEvent : EVENTS) {
@@ -70,7 +70,7 @@ public class PATEventHandler {
         return event;
     }
 
-    public static UpdatePlayerCommandsEvent callUpdatePlayerCommandsEvents(CommandSender player, List<String> commands, boolean serverBased) {
+    public static UpdatePlayerCommandsEvent callUpdatePlayerCommandsEvents(CommandSender player, HashSet<String> commands, boolean serverBased) {
         UpdatePlayerCommandsEvent event = EmptyEvent.createEmptyUpdatePlayerCommandsEvent(player, commands, serverBased);
 
         for (PATEvent patEvent : EVENTS) {
@@ -143,7 +143,7 @@ public class PATEventHandler {
             };
         }
 
-        public static UpdatePlayerCommandsEvent createEmptyUpdatePlayerCommandsEvent(CommandSender player, List<String> commands, boolean serverBased) {
+        public static UpdatePlayerCommandsEvent createEmptyUpdatePlayerCommandsEvent(CommandSender player, HashSet<String> commands, boolean serverBased) {
             return new UpdatePlayerCommandsEvent(player, commands, serverBased) {
                 @Override
                 public void handle(UpdatePlayerCommandsEvent event) {
@@ -170,7 +170,7 @@ public class PATEventHandler {
             };
         }
 
-        public static FilteredSuggestionEvent createEmptyFilteredSuggestionEvent(CommandSender player, List<String> suggestions) {
+        public static FilteredSuggestionEvent createEmptyFilteredSuggestionEvent(CommandSender player, HashSet<String> suggestions) {
             return new FilteredSuggestionEvent(player, suggestions) {
                 @Override
                 public void handle(FilteredSuggestionEvent event) {

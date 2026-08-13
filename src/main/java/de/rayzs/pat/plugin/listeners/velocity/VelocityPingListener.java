@@ -13,11 +13,11 @@ import java.util.UUID;
 
 public class VelocityPingListener {
 
-    private static ProxyServer server;
     private static final UUID RANDOM_UUID = UUID.randomUUID();
+    private ProxyServer server;
 
     public VelocityPingListener(ProxyServer server) {
-        VelocityPingListener.server = server;
+        this.server = server;
     }
 
     @Subscribe

@@ -31,10 +31,15 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     private static boolean modifiable = true;
 
     @Override
-    public boolean handleIncomingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
+    public boolean handleIncomingPacket(
+            final Player player,
+            final CommandSender sender,
+            final Object packetObj,
+            final boolean isOperator
+    ) throws Exception {
         Field stringField = Reflection.getFirstFieldByType(packetObj.getClass(), "String", Reflection.SearchOption.ENDS);
 
-        if(stringField == null) {
+        if (stringField == null) {
             Logger.warning("Failed PacketAnalyze process! (#1)");
             return false;
         }
@@ -62,7 +67,12 @@ public class ModernPacketHandler implements BukkitPacketHandler {
     }
 
     @Override
-    public boolean handleOutgoingPacket(Player player, CommandSender sender, Object packetObj) throws Exception {
+    public boolean handleOutgoingPacket(
+            final Player player,
+            final CommandSender sender,
+            final Object packetObj,
+            final boolean isOperator
+    ) throws Exception {
         Object suggestionObj;
         String rawInput = BukkitPacketAnalyzer.getPlayerInput(player), input = rawInput;
 
@@ -70,10 +80,10 @@ public class ModernPacketHandler implements BukkitPacketHandler {
             return false;
         }
 
-        final List<Group> groups = GroupManager.getPlayerGroups(sender);
+        final boolean is121Packet = packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket");
+        final List<Group> groups = GroupManager.getPlayerGroups(sender, isOperator);
 
-        boolean is121Packet = packetObj.getClass().getSimpleName().equals("ClientboundCommandSuggestionsPacket"),
-                cancelsBeforeHand = false;
+        boolean cancelsBeforeHand = false;
 
         int spaces = 0;
         if(input.startsWith("/") || is121Packet) {
@@ -85,7 +95,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 if (spaces > 0) input = split[0];
             }
 
-            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, input);
+            cancelsBeforeHand = !Storage.Blacklist.canPlayerAccessTab(sender, groups, input, isOperator);
 
             if (!cancelsBeforeHand)
                 cancelsBeforeHand = Storage.ConfigSections.Settings.CUSTOM_VERSION.isTabCompletable(input) || Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isTabCompletable(input);
@@ -114,7 +124,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
                 if (spaces == 0) {
                     suggestions.removeIf(suggestion -> {
                         String command = getSuggestionFromEntry(suggestion);
-                        return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command);
+                        return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, isOperator);
                     });
 
                     return true;
@@ -190,7 +200,7 @@ public class ModernPacketHandler implements BukkitPacketHandler {
 
             suggestions.getList().removeIf(suggestion -> {
                 String command = suggestion.getText();
-                return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command);
+                return !Storage.Blacklist.canPlayerAccessTab(sender, groups, command, isOperator);
             });
 
             return true;

@@ -156,12 +156,12 @@ public class Group implements Serializable {
         this.priority = priority;
     }
 
-    public boolean hasPermission(CommandSender sender) {
-        return PermissionUtil.hasPermission(sender, "group." + this.groupName);
+    public boolean hasPermission(final CommandSender sender, final boolean isOperator) {
+        return PermissionUtil.hasPermission(sender, "group." + this.groupName, isOperator);
     }
 
-    public boolean hasPermission(UUID uuid) {
-        return PermissionUtil.hasPermission(uuid, "group." + this.groupName);
+    public boolean hasPermission(final UUID uuid, final boolean isOperator) {
+        return PermissionUtil.hasPermission(uuid, "group." + this.groupName, isOperator);
     }
 
     public boolean contains(String command) {

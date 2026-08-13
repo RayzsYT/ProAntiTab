@@ -30,13 +30,14 @@ public class BukkitBlockCommandListener implements Listener {
         final Player player = event.getPlayer();
         final CommandSender sender = CommandSender.from(player);
         final World world = player.getWorld();
+        final boolean isOperator = player.isOp();
 
         String rawCommand = StringUtils.getFirstArg(event.getMessage()),
                 command =  rawCommand.substring(1);
 
         if (!Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.ENABLED || event.isCancelled()) return;
 
-        if (PermissionUtil.hasBypassPermission(sender))
+        if (PermissionUtil.hasBypassPermission(sender, isOperator))
             return;
 
         /* Removed since not necessary and only takes up unnecessary performance.
@@ -56,6 +57,7 @@ public class BukkitBlockCommandListener implements Listener {
     public void onPlayerCommandProcess(PlayerCommandPreprocessEvent event) {
         final Player player = event.getPlayer();
         final CommandSender sender = CommandSender.from(player);
+        final boolean isOperator = player.isOp();
 
         final String commandFirstArg = StringUtils.getFirstArg(event.getMessage());
 
@@ -88,7 +90,7 @@ public class BukkitBlockCommandListener implements Listener {
             return;
         }
 
-        if (PermissionUtil.hasBypassPermission(sender, command)) {
+        if (PermissionUtil.hasBypassPermission(sender, command, isOperator)) {
             return;
         }
 
@@ -145,12 +147,12 @@ public class BukkitBlockCommandListener implements Listener {
         }
 
         final boolean cancelBlockedCommand = Storage.ConfigSections.Settings.CANCEL_COMMAND.ENABLED;
-        final List<Group> groups = GroupManager.getPlayerGroups(sender);
+        final List<Group> groups = GroupManager.getPlayerGroups(sender, isOperator);
 
-        boolean allowed = Storage.Blacklist.canPlayerAccessChat(sender, groups, command);
+        boolean allowed = Storage.Blacklist.canPlayerAccessChat(sender, groups, command, isOperator);
         boolean blockedNamespace = false;
 
-        if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender)) {
+        if (!Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesBypass(sender, isOperator)) {
             blockedNamespace = cancelBlockedCommand
                     ? Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.isCommand(command)
                     : Storage.ConfigSections.Settings.BLOCK_NAMESPACE_COMMANDS.doesAlwaysBlock(command);

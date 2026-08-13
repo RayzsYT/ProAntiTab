@@ -144,17 +144,17 @@ public class BungeePacketAnalyzer {
     private static void modifyCommands(ProxiedPlayer player, CommandSender sender, Commands commands) {
         String serverName = sender.getServerName();
 
-        final boolean ignore = PermissionUtil.hasBypassPermission(sender) || Storage.Blacklist.isDisabledServer(serverName);
+        final boolean ignore = PermissionUtil.hasBypassPermission(sender, false) || Storage.Blacklist.isDisabledServer(serverName);
 
         ProxyCommandNodeHelper helper = new ProxyCommandNodeHelper<CommandNode>(commands.getRoot());
 
         List<String> commandsAsString = new ArrayList<>(PROXY_COMMANDS);
         commandsAsString.addAll(helper.getChildrenNames());
 
-        List<String> playerCommands = new ArrayList<>();
+        HashSet<String> playerCommands = new HashSet<>();
 
         if (!ignore) {
-            final List<Group> groups = GroupManager.getPlayerGroups(sender);
+            final List<Group> groups = GroupManager.getPlayerGroups(sender, false);
 
             final Map<String, CommandsCache> cache = Storage.getLoader().getPerServerCommandsCacheMap();
             if (!cache.containsKey(serverName)) {
@@ -164,7 +164,7 @@ public class BungeePacketAnalyzer {
             final CommandsCache commandsCache = cache.get(serverName);
             commandsCache.handleCommands(commandsAsString, serverName);
 
-            final List<String> tmpPlayerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName);
+            final HashSet<String> tmpPlayerCommands = commandsCache.getPlayerCommands(commandsAsString, sender, groups, serverName, false);
 
             if (commands.getRoot().getChildren().size() != 0) {
                 helper.removeIf(str -> !tmpPlayerCommands.contains(str));

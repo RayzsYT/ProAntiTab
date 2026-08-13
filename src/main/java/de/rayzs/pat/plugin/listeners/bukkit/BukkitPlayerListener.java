@@ -25,6 +25,7 @@ public class BukkitPlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         final CommandSender sender = CommandSender.from(player);
+        final boolean isOperator = player.isOp();
 
         PATEventHandler.callServerPlayersChangeEvents(sender, ServerPlayersChangeEvent.Type.JOINED);
         SubArgument.get().updateCachedPlayerNames();
@@ -74,7 +75,7 @@ public class BukkitPlayerListener implements Listener {
             }, 10);
         }
 
-        if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate")) {
+        if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate", isOperator)) {
             PATScheduler.createScheduler(() -> {
                 if (player.isOnline()) {
                     MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
