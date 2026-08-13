@@ -104,8 +104,10 @@ public class VelocityLoader implements PluginLoader {
 
         startUpdaterTask();
 
-        if (server.getPluginManager().getPlugin("luckperms").isPresent())
+        if (server.getPluginManager().getPlugin("luckperms").isPresent()) {
+            server.getEventManager().register(this, new VelocityLuckPermsWarning(server));
             LuckPermsHook.initialize();
+        }
 
         if (server.getPluginManager().getPlugin("papiproxybridge").isPresent()) {
             Storage.USE_PAPIPROXYBRIDGE = true;
