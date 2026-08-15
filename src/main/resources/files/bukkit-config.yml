@@ -117,6 +117,7 @@ auto-forward-luckperms-changes: false
 #     minecraft client that relies on plugin channels for identification!
 plugin-channels-hider:
   enabled: false
+
   whitelisted-channels:
     - "minecraft:brand"
     - "bungeecord:main"

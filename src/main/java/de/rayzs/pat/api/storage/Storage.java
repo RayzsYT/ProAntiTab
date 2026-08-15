@@ -335,6 +335,7 @@ public class Storage {
 
             public static final AllowGroupOverrulingSection ALLOW_GROUP_OVERRULING = new AllowGroupOverrulingSection();
             public static final AutoLowercaseCommandsSection AUTO_LOWERCASE_COMMANDS = new AutoLowercaseCommandsSection();
+            public static final TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
             public static final BlockNamespaceCommandsSection BLOCK_NAMESPACE_COMMANDS = new BlockNamespaceCommandsSection();
             public static final HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
             public static final HidePluginChannelsSection HIDE_PLUGIN_CHANNELS = new HidePluginChannelsSection();
@@ -349,7 +350,6 @@ public class Storage {
             public static final ForwardLuckPermsChangesSection FORWARD_LUCK_PERMS_CHANGES_SECTION = new ForwardLuckPermsChangesSection();
             public static final CustomProtocolPingSection CUSTOM_PROTOCOL_PING = new CustomProtocolPingSection();
             public static final CustomUnknownCommandSection CUSTOM_UNKNOWN_COMMAND = new CustomUnknownCommandSection();
-            public static final TurnBlacklistToWhitelistSection TURN_BLACKLIST_TO_WHITELIST = new TurnBlacklistToWhitelistSection();
             public static final BaseCommandCaseSensitiveSection BASE_COMMAND_CASE_SENSITIVE = new BaseCommandCaseSensitiveSection();
             public static final UpdateGroupsPerWorldSection UPDATE_GROUPS_PER_WORLD = new UpdateGroupsPerWorldSection();
             public static final UpdateGroupsPerServerSection UPDATE_GROUPS_PER_SERVER = new UpdateGroupsPerServerSection();
