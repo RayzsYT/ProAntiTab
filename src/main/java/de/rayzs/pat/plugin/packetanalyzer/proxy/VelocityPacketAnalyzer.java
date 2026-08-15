@@ -1,17 +1,16 @@
 package de.rayzs.pat.plugin.packetanalyzer.proxy;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
-import com.velocitypowered.proxy.protocol.packet.AvailableCommandsPacket;
-import com.velocitypowered.proxy.protocol.packet.PluginMessagePacket;
-import com.velocitypowered.proxy.protocol.packet.TabCompleteRequestPacket;
-import com.velocitypowered.proxy.protocol.packet.TabCompleteResponsePacket;
+import com.velocitypowered.proxy.protocol.packet.*;
 import com.velocitypowered.proxy.protocol.packet.chat.session.UnsignedPlayerCommandPacket;
 
 import de.rayzs.pat.plugin.system.serverbrand.CustomServerBrand;
@@ -32,6 +31,8 @@ import de.rayzs.pat.utils.message.MessageTranslator;
 import de.rayzs.pat.utils.node.ProxyCommandNodeHelper;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -217,6 +218,42 @@ public class VelocityPacketAnalyzer {
         SubArgument.get().getCommandNodeHandler().handleCommandNode(helper, SubArgument.get().getPlayerArgument(sender));
     }
 
+    private static void handlePluginMessageChannelsPacket(final PluginMessagePacket packet) {
+        final String channelId = packet.getChannel();
+
+        if (REGISTER_CHANNELS.contains(channelId)) {
+            final ByteBuf buf = packet.content();
+            final byte[] data = new byte[buf.readableBytes()];
+            buf.getBytes(buf.readerIndex(), data);
+
+            final String dataStr = new String(data, StandardCharsets.UTF_8);
+            final String[] channels = dataStr.split("\u0000");
+
+            final List<String> filteredChannels = new ArrayList<>(Arrays.asList(channels));
+            final AtomicBoolean changedAnything = new AtomicBoolean(false);
+
+            filteredChannels.removeIf(channel -> {
+                if (!Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.WHITELISTED_CHANNELS.getLines().contains(channel)) {
+                    changedAnything.set(true);
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (changedAnything.get()) {
+                final ByteBuf newBuf = Unpooled.wrappedBuffer(String.join("\u0000", filteredChannels).getBytes());
+                packet.replace(newBuf);
+            }
+        }
+    }
+
+
+    private static final HashSet<String> REGISTER_CHANNELS = new HashSet<>(
+            Arrays.asList("register", "unregister", "minecraft:register", "minecraft:unregister")
+    );
+
+
     private static class PacketDecoder extends ChannelDuplexHandler {
 
         private final Player player;
@@ -253,6 +290,10 @@ public class VelocityPacketAnalyzer {
                 }
             }
 
+            if (packet instanceof PluginMessagePacket pluginMessagePacket && Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.ENABLED) {
+                handlePluginMessageChannelsPacket(pluginMessagePacket);
+            }
+
             if (packet instanceof UnsignedPlayerCommandPacket unsignedPlayerCommandPacket) {
                 if (!VelocityBlockCommandListener.handleCommand(player, unsignedPlayerCommandPacket.getCommand()).getResult().isAllowed())
                     return;
@@ -282,11 +323,13 @@ public class VelocityPacketAnalyzer {
             MinecraftPacket packet = (MinecraftPacket) msg;
 
             if (packet instanceof PluginMessagePacket pluginMessagePacket) {
-                if(CustomServerBrand.get().isEnabled() && CustomServerBrand.get().isBrandTag(pluginMessagePacket.getChannel()) && !player.getCurrentServer().isPresent()) {
+                if (CustomServerBrand.get().isEnabled() && CustomServerBrand.get().isBrandTag(pluginMessagePacket.getChannel()) && !player.getCurrentServer().isPresent()) {
                     final PacketUtils.BrandManipulate brandManipulatePacket = CustomServerBrand.get().createBrandPacket(player);
 
                     super.write(ctx, new PluginMessagePacket(pluginMessagePacket.getChannel(), brandManipulatePacket.getByteBuf()), promise);
                     return;
+                } else if (Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.ENABLED) {
+                    handlePluginMessageChannelsPacket(pluginMessagePacket);
                 }
 
             } else if (packet instanceof TabCompleteResponsePacket response) {
