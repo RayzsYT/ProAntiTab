@@ -275,7 +275,8 @@ public class BukkitPacketAnalyzer {
             return this.operatorStatus;
         }
 
-        private static HashSet<String> REGISTER_CHANNELS = new HashSet<>(
+
+        private final HashSet<String> REGISTER_CHANNELS = new HashSet<>(
                 Arrays.asList("register", "unregister", "minecraft:register", "minecraft:unregister")
         );
 
