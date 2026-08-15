@@ -45,9 +45,9 @@ import java.util.stream.Collectors;
 
 public class BukkitLoader extends JavaPlugin implements PluginLoader {
 
-    private static List<String> commands = new ArrayList<>(),
-            allowedCommands = new ArrayList<>(),
-            disallowedCommands = new ArrayList<>();
+    private static List<String> allCommands = new ArrayList<>(),
+                                allowedCommands = new ArrayList<>(),
+                                disallowedCommands = new ArrayList<>();
 
     private static Plugin plugin;
     private static java.util.logging.Logger logger;
@@ -55,6 +55,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     private final CommandsCache commandsCache = new CommandsCache();
     private final List<String> offlinePlayerNames = new ArrayList<>();
 
+    private HashSet<String> registeredCommands = new HashSet<>();
     private Map<String, Command> commandsMap = null;
 
     private BukkitAntiTabListener bukkitAntiTabListener = null;
@@ -235,9 +236,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         if (commandsMap == null)
             return false;
 
-        loadAllCommands();
-
-        return getAllCommands().contains(command);
+        return registeredCommands.contains(command);
     }
 
     @Override
@@ -355,12 +354,10 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     public static List<String> getAllCommands() {
-        return new ArrayList<>(commands);
+        return allCommands;
     }
 
-    public static List<String> getAllowedCommands() {
-        return new ArrayList<>(allowedCommands);
-    }
+    public static List<String> getAllowedCommands() { return allowedCommands; }
 
     public static List<String> getDisallowedCommands() {
         return disallowedCommands;
@@ -442,50 +439,47 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     }
 
     private void loadAllCommands() {
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) return;
 
         if (lastCommandsLoad != -1 && System.currentTimeMillis() - lastCommandsLoad < 1000)
             return;
 
-        List<String> result = new ArrayList<>();
+        final HashSet<String> tmpCommands = new HashSet<>(Bukkit.getHelpMap().getHelpTopics().stream()
+                .map(topic -> {
+                    String name = topic.getName();
 
-        if (commandsMap == null) {
-            result.addAll(
-                    Bukkit.getHelpMap().getHelpTopics().stream()
-                    .map(topic -> {
-                        String name = topic.getName();
+                    if (name.startsWith("/"))
+                        name = name.substring(1);
 
-                        if (name.startsWith("/"))
-                            name = name.substring(1);
-
-                        return name;
-                    }).toList()
-            );
-
-            return;
-        }
+                    return name;
+                }).toList());
 
         commandsMap.entrySet().forEach(entry -> {
-            String key = entry.getKey();
-            Command command = entry.getValue();
+            final String key = entry.getKey();
+            final Command command = entry.getValue();
 
-            result.add(key);
+            tmpCommands.add(key);
 
             if (!command.getAliases().isEmpty()) {
-                result.addAll(command.getAliases());
+                tmpCommands.addAll(command.getAliases());
             }
         });
 
-        boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
-        List<String> allowedCommands = new ArrayList<>(result).stream().filter(command -> {
-            boolean contains = Storage.Blacklist.getBlacklist().getCommands().contains(command);
+        final boolean turn = Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED;
+        final List<String> tmpAllowedCommands = tmpCommands.stream().filter(command -> {
+            final boolean contains = Storage.Blacklist.getBlacklist().getCommands().contains(command);
             return turn == contains;
         }).toList();
 
+        final List<String> tmpDisallowedCommands = tmpCommands.stream().filter(command ->
+                !allowedCommands.contains(command)
+        ).toList();
+
         lastCommandsLoad = System.currentTimeMillis();
 
-        BukkitLoader.commands = result;
-        BukkitLoader.allowedCommands = allowedCommands;
-        BukkitLoader.disallowedCommands = commands.stream().filter(command -> !allowedCommands.contains(command)).toList();
+        registeredCommands = tmpCommands;
+        allowedCommands = tmpAllowedCommands;
+        disallowedCommands = tmpDisallowedCommands;
     }
 
     public static Plugin getPlugin() {
