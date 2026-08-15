@@ -101,6 +101,27 @@ update-groups-per-world: false
 # of the player accordingly.
 auto-forward-luckperms-changes: false
 
+
+# This option here works as a whitelist and hides certain plugins channels
+# from the user, if they are not supposed to be able to register for any
+# of the non-mentioned plugin channels below. This prevents modern plugin
+# spoofing attempts that are now trying to find plugins via their plugin
+# channel.
+#
+# (!) Warning:
+#     Currently only works on standalone Spigot servers >=1.20
+#     and proxies like Bungeecord/Velocity. It's also not
+#     recommended to enable this feature, unless you know
+#     what plugin channels are and which may be needed
+#     for your server, in case your server supports a specific
+#     minecraft client that relies on plugin channels for identification!
+plugin-channels-hider:
+  enabled: false
+  whitelisted-channels:
+    - "minecraft:brand"
+    - "bungeecord:main"
+    - "velocity:main"
+
 # Here you can customize the server version that is displayed on a ping. (The text at the player-count)
 # (!) Warning: It's required to use Paper or Purpur to use this feature!
 # (!) Supported server versions: 1.12.2 - latest

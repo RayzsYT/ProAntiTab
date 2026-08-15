@@ -1,10 +1,15 @@
 package de.rayzs.pat.plugin.packetanalyzer.bukkit;
 
+import com.mojang.datafixers.kinds.Const;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.packetanalyzer.bukkit.handlers.LegacyPacketHandler;
 import de.rayzs.pat.plugin.packetanalyzer.bukkit.handlers.ModernCommandsNodeHandler;
 import de.rayzs.pat.plugin.packetanalyzer.bukkit.handlers.ModernPacketHandler;
 import de.rayzs.pat.utils.permission.PermissionUtil;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.ExpireCache;
@@ -16,6 +21,7 @@ import org.bukkit.entity.Player;
 import io.netty.channel.*;
 import org.bukkit.Bukkit;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BukkitPacketAnalyzer {
 
@@ -49,7 +55,7 @@ public class BukkitPacketAnalyzer {
     }
 
     public static boolean inject(Player player) {
-        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.ENABLED)
             return true;
 
         try {
@@ -110,7 +116,7 @@ public class BukkitPacketAnalyzer {
     }
 
     public static void uninject(Channel channel) {
-        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED)
+        if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.ENABLED)
             return;
 
         if (channel != null) {
@@ -151,12 +157,29 @@ public class BukkitPacketAnalyzer {
         @Override
         public void channelRead(ChannelHandlerContext channel, Object packetObj) {
             try {
-                if (packetObj.getClass() == null || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+                if (packetObj.getClass() == null) {
                     super.channelRead(channel, packetObj);
                     return;
                 }
 
+
                 String packetName = packetObj.getClass().getSimpleName();
+
+                if (Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.ENABLED && packetName.equalsIgnoreCase("ServerboundCustomPayloadPacket")) {
+                    final Object newPacketObj = handlePluginChannelPacket(packetObj);
+
+                    if (newPacketObj != null)
+                        super.channelRead(channel, newPacketObj);
+
+                    return;
+                }
+
+
+                if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+                    super.channelRead(channel, packetObj);
+                    return;
+                }
+
 
                 if (!packetName.equals("PacketPlayInTabComplete") && !packetName.equals("ServerboundCommandSuggestionPacket")) {
                     super.channelRead(channel, packetObj);
@@ -177,13 +200,30 @@ public class BukkitPacketAnalyzer {
         @Override
         public void write(ChannelHandlerContext channel, Object packetObj, ChannelPromise promise) {
             try {
-
-                if(packetObj.getClass() == null || Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+                if(packetObj.getClass() == null) {
                     super.write(channel, packetObj, promise);
                     return;
                 }
 
+
                 final String packetName = packetObj.getClass().getSimpleName();
+
+                if (Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.ENABLED && packetName.equalsIgnoreCase("ClientboundCustomPayloadPacket")) {
+                    final Object newPacketObj = handlePluginChannelPacket(packetObj);
+
+                    if (newPacketObj != null)
+                        super.write(channel, newPacketObj, promise);
+
+                    return;
+                }
+
+
+                if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
+                    super.write(channel, packetObj, promise);
+                    return;
+                }
+
+
                 final boolean isCommandsPacket = packetName.equals("ClientboundCommandsPacket");
                 final boolean isTabCompletePacket = packetName.equals("PacketPlayOutTabComplete") || packetName.equals("ClientboundCommandSuggestionsPacket");
 
@@ -233,6 +273,72 @@ public class BukkitPacketAnalyzer {
             }
 
             return this.operatorStatus;
+        }
+
+        private static HashSet<String> REGISTER_CHANNELS = new HashSet<>(
+                Arrays.asList("register", "unregister", "minecraft:register", "minecraft:unregister")
+        );
+
+        private Object handlePluginChannelPacket(Object packet) throws NoSuchFieldException, IllegalAccessException {
+            final Field payloadField = packet.getClass().getDeclaredField("payload");
+            payloadField.setAccessible(true);
+
+            final Object payloadObj = payloadField.get(packet);
+            final Field channelField = payloadObj.getClass().getDeclaredField("id");
+            channelField.setAccessible(true);
+
+            final Object channelIdObj = channelField.get(payloadObj);
+            final String channelId = channelIdObj.toString();
+            channelField.setAccessible(false);
+
+
+            if (!REGISTER_CHANNELS.contains(channelId)) {
+                return packet;
+            }
+
+
+            final Field dataField = payloadObj.getClass().getDeclaredField("data");
+            dataField.setAccessible(true);
+
+            final byte[] data = (byte[]) dataField.get(payloadObj);
+            dataField.setAccessible(true);
+
+            final String dataStr = new String(data, StandardCharsets.UTF_8);
+            final String[] channels = dataStr.split("\u0000");
+
+            final List<String> filteredChannels = new ArrayList<>(Arrays.asList(channels));
+            final AtomicBoolean changedAnything = new AtomicBoolean(false);
+
+            filteredChannels.removeIf(channel -> {
+                if (!Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.WHITELISTED_CHANNELS.getLines().contains(channel)) {
+                    changedAnything.set(true);
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (!changedAnything.get()) {
+                return packet;
+            }
+
+            try {
+                final Class<?> customPayloadClass = packet.getClass().getConstructors()[0].getParameterTypes()[0];
+                final Class<?> discardPayloadClass = payloadObj.getClass();
+
+                final Constructor<?> discardPayloadConstr = discardPayloadClass.getConstructor(channelIdObj.getClass(), byte[].class);
+                final Object newDiscardPayloadObj = discardPayloadConstr.newInstance(
+                        channelIdObj,
+                        String.join("\u0000", filteredChannels).getBytes()
+                );
+
+                final Constructor<?> newPacketConstr = packet.getClass().getConstructor(customPayloadClass);
+                return newPacketConstr.newInstance(newDiscardPayloadObj);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+
+            return packet;
         }
     }
 }
