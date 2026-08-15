@@ -6,21 +6,21 @@ import java.util.*;
 
 public class MultipleMessagesHelper implements Serializable {
 
-    private final ArrayList<String> lines;
+    private final List<String> lines;
 
     public MultipleMessagesHelper(ConfigStorage config, String path, List<String> input) {
-        ConfigSectionHelper<ArrayList<String>> sectionHelper = new ConfigSectionHelper<>(config, path, input);
+        final ConfigSectionHelper<ArrayList<String>> sectionHelper = new ConfigSectionHelper<>(config, path, input);
+        final Object resultObj = sectionHelper.getOrSet();
 
-        if(!sectionHelper.exist()) {
-            lines = new ArrayList<>(input);
-            sectionHelper.set(lines);
+        if (resultObj instanceof List list) {
+            lines = (List<String>) list;
             return;
         }
 
-        lines = sectionHelper.get();
+        lines = input;
     }
 
-    public ArrayList<String> getLines() {
+    public List<String> getLines() {
         return lines;
     }
 }
