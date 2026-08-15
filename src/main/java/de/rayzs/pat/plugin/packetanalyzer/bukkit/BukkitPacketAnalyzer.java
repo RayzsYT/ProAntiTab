@@ -276,10 +276,6 @@ public class BukkitPacketAnalyzer {
         }
 
 
-        private final HashSet<String> REGISTER_CHANNELS = new HashSet<>(
-                Arrays.asList("register", "unregister", "minecraft:register", "minecraft:unregister")
-        );
-
         private Object handlePluginChannelPacket(Object packet) throws NoSuchFieldException, IllegalAccessException {
             final Field payloadField = packet.getClass().getDeclaredField("payload");
             payloadField.setAccessible(true);
@@ -293,7 +289,7 @@ public class BukkitPacketAnalyzer {
             channelField.setAccessible(false);
 
 
-            if (!REGISTER_CHANNELS.contains(channelId)) {
+            if (!Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.isRegisterChannel(channelId)) {
                 return packet;
             }
 

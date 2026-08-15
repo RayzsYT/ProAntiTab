@@ -221,7 +221,7 @@ public class VelocityPacketAnalyzer {
     private static void handlePluginMessageChannelsPacket(final PluginMessagePacket packet) {
         final String channelId = packet.getChannel();
 
-        if (REGISTER_CHANNELS.contains(channelId)) {
+        if (Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.isRegisterChannel(channelId)) {
             final ByteBuf buf = packet.content();
             final byte[] data = new byte[buf.readableBytes()];
             buf.getBytes(buf.readerIndex(), data);
@@ -247,11 +247,6 @@ public class VelocityPacketAnalyzer {
             }
         }
     }
-
-
-    private static final HashSet<String> REGISTER_CHANNELS = new HashSet<>(
-            Arrays.asList("register", "unregister", "minecraft:register", "minecraft:unregister")
-    );
 
 
     private static class PacketDecoder extends ChannelDuplexHandler {
