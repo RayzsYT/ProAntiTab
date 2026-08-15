@@ -24,15 +24,16 @@ public class BukkitAntiTabListener implements Listener {
 
     @EventHandler (priority = EventPriority.LOWEST)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
-        final Player player = event.getPlayer();
-        final CommandSender sender = CommandSender.from(player);
-        final UUID uuid = player.getUniqueId();
-        final boolean isOperator = player.isOp();
-
 
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED) {
             return;
         }
+
+
+        final Player player = event.getPlayer();
+        final CommandSender sender = CommandSender.from(player);
+        final UUID uuid = player.getUniqueId();
+        final boolean isOperator = player.isOp();
 
         if (player.isOp()) {
             if (!knownOperators.contains(uuid)) {
