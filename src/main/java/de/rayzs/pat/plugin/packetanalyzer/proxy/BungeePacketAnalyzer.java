@@ -1,9 +1,11 @@
 package de.rayzs.pat.plugin.packetanalyzer.proxy;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.mojang.brigadier.tree.CommandNode;
 
@@ -21,6 +23,8 @@ import de.rayzs.pat.utils.node.ProxyCommandNodeHelper;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
@@ -240,6 +244,7 @@ public class BungeePacketAnalyzer {
         }
     }
 
+
     private static class PacketDecoder extends MessageToMessageDecoder<PacketWrapper> {
 
         private final ProxiedPlayer player;
@@ -262,6 +267,31 @@ public class BungeePacketAnalyzer {
 
                 if (CustomServerBrand.get().isEnabled() && CustomServerBrand.get().isBrandTag(pluginMessage.getTag())) {
                     return;
+                } else if (Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.ENABLED) {
+                    final String channelId = pluginMessage.getTag();
+
+                    if (Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.isRegisterChannel(channelId)) {
+                        final String dataStr = new String(pluginMessage.getData(), StandardCharsets.UTF_8);
+                        final String[] channels = dataStr.split("\u0000");
+
+                        final List<String> filteredChannels = new ArrayList<>(Arrays.asList(channels));
+                        final AtomicBoolean changedAnything = new AtomicBoolean(false);
+
+                        filteredChannels.removeIf(channel -> {
+                            if (!Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.WHITELISTED_CHANNELS.getLines().contains(channel)) {
+                                changedAnything.set(true);
+                                return true;
+                            }
+
+                            return false;
+                        });
+
+                        if (changedAnything.get()) {
+                            pluginMessage.setData(String.join("\u0000", filteredChannels).getBytes());
+                            player.unsafe().sendPacket(pluginMessage);
+                            return;
+                        }
+                    }
                 }
 
             } else if (wrapper.packet instanceof Commands response) {
