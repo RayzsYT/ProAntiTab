@@ -40,13 +40,7 @@ public class BukkitBlockCommandListener implements Listener {
         if (PermissionUtil.hasBypassPermission(sender, isOperator))
             return;
 
-        /* Removed since not necessary and only takes up unnecessary performance.
-
         if (Storage.getLoader().doesCommandExist(command))
-            return;
-         */
-
-        if (Bukkit.getHelpMap().getHelpTopic(rawCommand) != null)
             return;
 
         event.setCancelled(true);
