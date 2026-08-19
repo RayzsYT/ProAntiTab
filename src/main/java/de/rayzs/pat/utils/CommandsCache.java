@@ -116,7 +116,7 @@ public class CommandsCache {
                     String command = filteredCommands.get(i);
                     localFilteredCommands.add(command);
                 } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-                    Logger.warning("Array is out of bounds " + i + "/" + max + "! " + indexOutOfBoundsException.getMessage());
+                    //Logger.warning("Array is out of bounds " + i + "/" + max + "! " + indexOutOfBoundsException.getMessage());
                     break;
                 }
             }
