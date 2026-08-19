@@ -339,6 +339,7 @@ public class Storage {
             public static final BlockNamespaceCommandsSection BLOCK_NAMESPACE_COMMANDS = new BlockNamespaceCommandsSection();
             public static final HandleThroughProxySection HANDLE_THROUGH_PROXY = new HandleThroughProxySection();
             public static final HidePluginChannelsSection HIDE_PLUGIN_CHANNELS = new HidePluginChannelsSection();
+            public static final TabCompletionForNotExistingCommandsSection TAB_COMPLETION_FOR_NOT_EXISTING_COMMANDS = new TabCompletionForNotExistingCommandsSection();
             public static final InjectionFailedSection INJECTION_FAILED = new InjectionFailedSection();
             public static final PatchExploitSection PATCH_EXPLOITS = new PatchExploitSection();
             public static final CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();

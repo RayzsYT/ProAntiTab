@@ -207,6 +207,14 @@ public class VelocityPacketAnalyzer {
             return !playerCommands.contains(str);
         });
 
+        if (Storage.ConfigSections.Settings.TAB_COMPLETION_FOR_NOT_EXISTING_COMMANDS.ENABLED) {
+            for (Group group : groups) {
+                for (String groupCommands : group.getAllCommands(serverName)) {
+                    helper.add(groupCommands, true);
+                }
+            }
+        }
+
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.ALWAYS_TAB_COMPLETABLE) {
             Storage.ConfigSections.Settings.CUSTOM_VERSION.COMMANDS.getLines().forEach(input -> helper.add(input, false));
         }

@@ -64,6 +64,11 @@ allow-group-overruling: false
 #   lpv (...) permission set proantitab.group.<group> server=<server>
 update-groups-per-server: false
 
+# If you whitelist a command using PAT that does not exist, it would still
+# make the command tab-completable, even though it doesn't exist.
+# (!) WARNING: Only works with PAT groups!
+tab-completion-for-not-existing-commands: false
+
 # Enabling this forwards the notification message to the backend
 # server so it will be displayed there as well. (Only in console)
 forward-console-notification-alerts: false

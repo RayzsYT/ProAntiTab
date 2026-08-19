@@ -23,8 +23,6 @@ import de.rayzs.pat.utils.node.ProxyCommandNodeHelper;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
@@ -150,16 +148,17 @@ public class BungeePacketAnalyzer {
 
         final boolean ignore = PermissionUtil.hasBypassPermission(sender, false) || Storage.Blacklist.isDisabledServer(serverName);
 
-        ProxyCommandNodeHelper helper = new ProxyCommandNodeHelper<CommandNode>(commands.getRoot());
-
-        List<String> commandsAsString = new ArrayList<>(PROXY_COMMANDS);
+        final ProxyCommandNodeHelper helper = new ProxyCommandNodeHelper<CommandNode>(commands.getRoot());
+        final List<String> commandsAsString = new ArrayList<>(PROXY_COMMANDS);
         commandsAsString.addAll(helper.getChildrenNames());
+
+        final List<Group> groups = ignore
+                ? Collections.emptyList()
+                : GroupManager.getPlayerGroups(sender, false);
 
         HashSet<String> playerCommands = new HashSet<>();
 
         if (!ignore) {
-            final List<Group> groups = GroupManager.getPlayerGroups(sender, false);
-
             final Map<String, CommandsCache> cache = Storage.getLoader().getPerServerCommandsCacheMap();
             if (!cache.containsKey(serverName)) {
                 cache.put(serverName, new CommandsCache());
@@ -217,6 +216,14 @@ public class BungeePacketAnalyzer {
         for (String command : PROXY_COMMANDS) {
             if (ignore || playerCommands.contains(command)) {
                 helper.add(command, true);
+            }
+        }
+
+        if (Storage.ConfigSections.Settings.TAB_COMPLETION_FOR_NOT_EXISTING_COMMANDS.ENABLED) {
+            for (Group group : groups) {
+                for (String groupCommands : group.getAllCommands(serverName)) {
+                    helper.add(groupCommands, true);
+                }
             }
         }
 
