@@ -101,6 +101,9 @@ update-groups-per-world: false
 # of the player accordingly.
 auto-forward-luckperms-changes: false
 
+# When enabled, PAT will ignore the * permission entirely.
+ignore-star-permission: false
+
 
 # This option here works as a whitelist and hides certain plugins channels
 # from the user, if they are not supposed to be able to register for any

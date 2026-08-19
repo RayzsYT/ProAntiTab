@@ -69,6 +69,9 @@ update-groups-per-server: false
 # (!) WARNING: Only works with PAT groups!
 tab-completion-for-not-existing-commands: false
 
+# When enabled, PAT will ignore the * permission entirely.
+ignore-star-permission: false
+
 # Enabling this forwards the notification message to the backend
 # server so it will be displayed there as well. (Only in console)
 forward-console-notification-alerts: false

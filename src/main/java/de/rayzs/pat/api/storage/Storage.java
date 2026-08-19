@@ -341,6 +341,7 @@ public class Storage {
             public static final HidePluginChannelsSection HIDE_PLUGIN_CHANNELS = new HidePluginChannelsSection();
             public static final TabCompletionForNotExistingCommandsSection TAB_COMPLETION_FOR_NOT_EXISTING_COMMANDS = new TabCompletionForNotExistingCommandsSection();
             public static final InjectionFailedSection INJECTION_FAILED = new InjectionFailedSection();
+            public static final IgnoreStarPermissionSection IGNORE_STAR_PERMISSION = new IgnoreStarPermissionSection();
             public static final PatchExploitSection PATCH_EXPLOITS = new PatchExploitSection();
             public static final CustomBrandSection CUSTOM_BRAND = new CustomBrandSection();
             public static final CancelCommandSection CANCEL_COMMAND = new CancelCommandSection();

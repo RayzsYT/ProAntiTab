@@ -169,7 +169,9 @@ public class PermissionUtil {
             }
         }
 
-        return permissionMap.isPermitted("*") || permissionMap.isPermitted("proantitab.*") || permissionMap.isPermitted("proantitab." + permission);
+        return (permissionMap.isPermitted("*") && !Storage.ConfigSections.Settings.IGNORE_STAR_PERMISSION.ENABLED)
+                || permissionMap.isPermitted("proantitab.*")
+                || permissionMap.isPermitted("proantitab." + permission);
     }
 
     public static boolean hasBypassPermission(Object targetObj, final boolean isOperator) {
