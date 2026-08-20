@@ -92,12 +92,29 @@ public class PermissionUtil {
     }
 
     public static void setPermission(UUID uuid, String permission, boolean permitted) {
-        PermissionMap permissionMap;
+        PermissionMap permissionMap = MAP.get(uuid);
 
-        if(!MAP.containsKey(uuid)) {
+        if(permissionMap == null) {
             permissionMap = new PermissionMap(uuid);
             MAP.put(uuid, permissionMap);
-        } else permissionMap = MAP.get(uuid);
+        }
+
+
+        final boolean isNegatedPermission = permission.charAt(0) == '-';
+
+        // Ignore because set permission is negated.
+        if (!isNegatedPermission && permissionMap.isPermitted("-" + permission)) {
+            return;
+        }
+
+        if (isNegatedPermission) {
+            final String nonNegatedPermission = permission.substring(1);
+
+            if (permissionMap.isPermitted(nonNegatedPermission)) {
+                permissionMap.setState(nonNegatedPermission, false);
+                return;
+            }
+        }
 
         permissionMap.setState(permission, permitted);
     }
@@ -169,7 +186,7 @@ public class PermissionUtil {
             }
         }
 
-        return (permissionMap.isPermitted("*") && !Storage.ConfigSections.Settings.IGNORE_STAR_PERMISSION.ENABLED)
+        return permissionMap.isPermitted("*")
                 || permissionMap.isPermitted("proantitab.*")
                 || permissionMap.isPermitted("proantitab." + permission);
     }

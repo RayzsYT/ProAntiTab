@@ -3,9 +3,11 @@ package de.rayzs.pat.plugin.listeners.velocity;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.command.CommandSource;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
+import de.rayzs.pat.plugin.system.subargument.argument.Arguments;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.message.MessageTranslator;
@@ -139,7 +141,6 @@ public class VelocityBlockCommandListener {
 
 
         if (!allowed) {
-
             ExecuteCommandEvent executeCommandEvent = PATEventHandler.callExecuteCommandEvents(
                     sender,
                     event.getCommand(),
@@ -190,6 +191,21 @@ public class VelocityBlockCommandListener {
         );
 
         if (executeCommandEvent.isBlocked()) {
+
+
+            if (event.getCommand().toLowerCase().contains("discord")) {
+                Logger.info("Blocked for " + player.getUsername() + " (" + command + " -> " + event.getCommand() + ")");
+                Logger.info("Groups: " + (groups.isEmpty() ? "None" : String.join(", ", groups.stream().map(Group::getGroupName).toList())));
+                Logger.info("Server: " + serverName + " (" + sender.getServerName() + ")");
+                Arguments argument = SubArgument.get().getPlayerArgument(sender);
+
+                if (argument != null) {
+                    Logger.info("Chat Arguments: " + String.join(", ", argument.CHAT_ARGUMENTS.getAllInputs()));
+                    Logger.info("Tab Arguments: " + String.join(", ", argument.TAB_ARGUMENTS.getAllInputs()));
+                } else Logger.info("Arguments: /");
+            }
+
+
             event.setResult(CommandExecuteEvent.CommandResult.denied());
 
             MessageTranslator.send(

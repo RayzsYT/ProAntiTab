@@ -209,8 +209,9 @@ public class LuckPermsHook {
     private static boolean isRelevantPermission(Node node) {
         final String key = node.getKey();
 
-        return key.startsWith("group.")
+        return key.equals("*")
+                || key.startsWith("group.")
                 || key.startsWith("proantitab.")
-                || key.equals("*");
+                || key.startsWith("-proantitab.");
     }
 }

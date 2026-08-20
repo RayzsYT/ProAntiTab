@@ -1,6 +1,7 @@
 package de.rayzs.pat.plugin.system.subargument.handler.impl;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.subargument.handler.SubArgumentHandler;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.StringUtils;
@@ -67,7 +68,14 @@ public class ExecuteHandler extends SubArgumentHandler {
             listed = !turn;
         }
 
-        return turn != listed;
+        final boolean blocked = turn != listed;
+
+        if (blocked && command.contains("discord")) {
+            Logger.info("Yes, sub-argument was blocked! (" + sender.getName() + ", " + command + ")");
+            Logger.info("-> " + turn + ", " + listed + ", " + negated);
+        }
+
+        return blocked;
     }
 
     private boolean isListed(String command, List<String> commands) {
