@@ -209,8 +209,12 @@ public class VelocityPacketAnalyzer {
 
         if (Storage.ConfigSections.Settings.TAB_COMPLETION_FOR_NOT_EXISTING_COMMANDS.ENABLED) {
             for (Group group : groups) {
-                for (String groupCommands : group.getAllCommands(serverName)) {
-                    helper.add(groupCommands, true);
+                for (String groupServerName : group.getBlacklistServerNames(serverName)) {
+                    if (Storage.isServer(groupServerName, serverName)) {
+                        for (String groupCommands : group.getAllCommands(groupServerName)) {
+                            helper.add(groupCommands, true);
+                        }
+                    }
                 }
             }
         }
