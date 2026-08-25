@@ -98,6 +98,8 @@ public class CommandNodeHandler extends SubArgumentHandler {
                 break;
             }
 
+            if (input == null) continue;
+
             final Storage.Blacklist.BlockType type = Storage.Blacklist.BlockTypeFetcher.getType(input);
             if (type == Storage.Blacklist.BlockType.CHAT) {
                 continue;
