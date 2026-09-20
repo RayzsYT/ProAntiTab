@@ -1,6 +1,5 @@
 package de.rayzs.pat.plugin.packetanalyzer.bukkit;
 
-import com.mojang.datafixers.kinds.Const;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.packetanalyzer.bukkit.handlers.LegacyPacketHandler;
 import de.rayzs.pat.plugin.packetanalyzer.bukkit.handlers.ModernCommandsNodeHandler;
@@ -286,7 +285,14 @@ public class BukkitPacketAnalyzer {
             payloadField.setAccessible(true);
 
             final Object payloadObj = payloadField.get(packet);
-            final Field channelField = payloadObj.getClass().getDeclaredField("id");
+            Field channelField;
+
+            try {
+                channelField = payloadObj.getClass().getDeclaredField("id");
+            } catch (NoSuchFieldException noSuchFieldException) {
+                return packet;
+            }
+
             channelField.setAccessible(true);
 
             final Object channelIdObj = channelField.get(payloadObj);

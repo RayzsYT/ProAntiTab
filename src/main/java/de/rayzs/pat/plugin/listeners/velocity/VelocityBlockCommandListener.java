@@ -192,7 +192,7 @@ public class VelocityBlockCommandListener {
 
         if (executeCommandEvent.isBlocked()) {
 
-
+/*
             if (event.getCommand().toLowerCase().contains("discord")) {
                 Logger.info("Blocked for " + player.getUsername() + " (" + command + " -> " + event.getCommand() + ")");
                 Logger.info("Groups: " + (groups.isEmpty() ? "None" : String.join(", ", groups.stream().map(Group::getGroupName).toList())));
@@ -204,6 +204,7 @@ public class VelocityBlockCommandListener {
                     Logger.info("Tab Arguments: " + String.join(", ", argument.TAB_ARGUMENTS.getAllInputs()));
                 } else Logger.info("Arguments: /");
             }
+            */
 
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());

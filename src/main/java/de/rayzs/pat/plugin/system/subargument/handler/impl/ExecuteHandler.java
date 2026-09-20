@@ -68,14 +68,17 @@ public class ExecuteHandler extends SubArgumentHandler {
             listed = !turn;
         }
 
-        final boolean blocked = turn != listed;
-
+/*
+       final boolean blocked = turn != listed;
         if (blocked && command.contains("discord")) {
             Logger.info("Yes, sub-argument was blocked! (" + sender.getName() + ", " + command + ")");
             Logger.info("-> " + turn + ", " + listed + ", " + negated);
         }
 
         return blocked;
+*/
+
+        return turn != listed;
     }
 
     private boolean isListed(String command, List<String> commands) {
