@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommitsDisabled",
+    ":separateMultipleMajorReleases",
+    ":dependencyDashboardApproval",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "dependencyDashboard": true,
+  "timezone": "America/New_York",
+  "schedule": ["after 3pm on Wednesday"],
+  "prFooter": "Release Notes:\n\n- N/A"
+}
