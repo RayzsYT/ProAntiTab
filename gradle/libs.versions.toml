@@ -1,0 +1,98 @@
+metadata.format.version = "1.1"
+
+# =====================================================================
+# Version catalog for ProAntiTab.
+#
+# Naming conventions
+#   * Library aliases: kebab-case, based on the artifact name, e.g.
+#       `paper-api`  -> libs.paper.api
+#       `bungee-cord` -> libs.bungee.cord
+#       `placeholder-api` -> libs.placeholder.api
+#   * Plugin aliases: kebab-case, e.g. `run-paper` -> libs.plugins.run.paper.
+#   * Version aliases: camelCase, e.g. `adventurePlatform` ->
+#     libs.versions.adventurePlatform.
+# =====================================================================
+
+[versions]
+
+# --- Server platforms / APIs (compileOnly) ---
+paper = "1.21.11-R0.1-SNAPSHOT"
+folia = "1.20.1-R0.1-SNAPSHOT"
+bungeeCord = "1.21-R0.5-SNAPSHOT"
+bungeeCordProtocol = "1.16-R0.4"
+waterfall = "1.20-R0.3-SNAPSHOT"
+velocity = "3.5.0-SNAPSHOT"
+netty = "4.2.0.Final"
+
+# --- Adventure / MiniMessage (implementation, bundled) ---
+adventure = "5.2.0"
+adventurePlatform = "4.4.1"
+examination = "1.3.0"
+
+# --- Optional hooks (compileOnly) ---
+placeholderApi = "2.12.2"
+luckPerms = "5.5"
+viaVersion = "5.7.0-SNAPSHOT"
+papiProxyBridge = "1.4"
+groupManager = "3.2"
+
+# --- Mojang / transitive runtime libraries (compileOnly) ---
+authlib = "4.0.43"
+brigadier = "1.1.8"
+datafixerupper = "6.0.8"
+mojangLogging = "1.1.1"
+log4j = "2.18.0"
+mavenResolver = "3.8.5"
+mavenResolverConnector = "1.7.3"
+sisuGuice = "2.1.7"
+configurate = "4.1.2"
+jetbrainsAnnotations = "26.0.2"
+
+# --- Build plugins ---
+shadow = "9.3.2"
+runPaper = "3.0.2"
+
+[libraries]
+
+# --- Server platforms (compileOnly) ---
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
+folia-api = { module = "dev.folia:folia-api", version.ref = "folia" }
+bungee-cord = { module = "net.md-5:bungeecord-api", version.ref = "bungeeCord" }
+bungee-cord-protocol = { module = "net.md-5:bungeecord-protocol", version.ref = "bungeeCordProtocol" }
+waterfall-api = { module = "io.github.waterfallmc:waterfall-api", version.ref = "waterfall" }
+velocity-api = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
+velocity-proxy = { module = "com.velocitypowered:velocity-proxy", version.ref = "velocity" }
+netty = { module = "io.netty:netty-all", version.ref = "netty" }
+
+# --- Adventure / MiniMessage (implementation, bundled) ---
+adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+mini-message = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
+adventure-platform-api = { module = "net.kyori:adventure-platform-api", version.ref = "adventurePlatform" }
+adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventurePlatform" }
+adventure-platform-bungeecord = { module = "net.kyori:adventure-platform-bungeecord", version.ref = "adventurePlatform" }
+examination-api = { module = "net.kyori:examination-api", version.ref = "examination" }
+
+# --- Optional hooks (compileOnly) ---
+placeholder-api = { module = "me.clip:placeholderapi", version.ref = "placeholderApi" }
+luck-perms = { module = "net.luckperms:api", version.ref = "luckPerms" }
+via-version-api = { module = "com.viaversion:viaversion-api", version.ref = "viaVersion" }
+papi-proxy-bridge = { module = "net.william278:papiproxybridge", version.ref = "papiProxyBridge" }
+group-manager = { module = "com.github.ElgarL:groupmanager", version.ref = "groupManager" }
+
+# --- Mojang / transitive runtime libraries (compileOnly) ---
+auth-lib = { module = "com.mojang:authlib", version.ref = "authlib" }
+brigadier = { module = "com.mojang:brigadier", version.ref = "brigadier" }
+data-fixer-upper = { module = "com.mojang:datafixerupper", version.ref = "datafixerupper" }
+mojang-logging = { module = "com.mojang:logging", version.ref = "mojangLogging" }
+log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
+maven-resolver-provider = { module = "org.apache.maven:maven-resolver-provider", version.ref = "mavenResolver" }
+maven-resolver-connector-basic = { module = "org.apache.maven.resolver:maven-resolver-connector-basic", version.ref = "mavenResolverConnector" }
+maven-resolver-transport-http = { module = "org.apache.maven.resolver:maven-resolver-transport-http", version.ref = "mavenResolverConnector" }
+sisu-guice = { module = "org.sonatype.sisu:sisu-guice", version.ref = "sisuGuice" }
+configurate-hocon = { module = "org.spongepowered:configurate-hocon", version.ref = "configurate" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrainsAnnotations" }
+
+[plugins]
+
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "runPaper" }
