@@ -1,9 +1,9 @@
-name: ProAntiTab
-description: Hides more than just your plugins.
-website: https://www.rayzs.de/products/proantitab/page
+name: ${name}
+description: ${description}
+website: ${website}
 
-author: Rayzs_YT
-version: 2.5.1
-main: de.rayzs.pat.plugin.BungeeLoader
+author: ${author}
+version: "${version}"
+main: ${bungeeMain}
 
 softDepends: [LuckPerms, PAPIProxyBridge]
