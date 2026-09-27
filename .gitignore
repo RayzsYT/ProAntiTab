@@ -1,0 +1,75 @@
+# --- IDEs & Editors ---
+.idea/
+.zed/
+.vscode/
+*.iml
+*.ipr
+*.iws
+out/
+.idea_modules/
+atlassian-ide-plugin.xml
+
+# --- Build & Gradle ---
+.gradle/
+build/
+bin/
+gradle-app.setting
+.gradletasknamecache
+run/
+
+# --- Artifacts ---
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# --- Compiled classes & logs ---
+*.class
+*.log
+hs_err_pid*
+*.stackdump
+
+# --- Operating System Junk ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux / General
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
