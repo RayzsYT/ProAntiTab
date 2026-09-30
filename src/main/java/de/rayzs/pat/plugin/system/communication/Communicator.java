@@ -186,7 +186,7 @@ public class Communicator {
 
     // BACKEND -> PROXY
     public void handleB2PPacket(String serverName, CommunicationPackets.PATPacket incomingPacket) {
-        if (!incomingPacket.tokenMatches(Storage.TOKEN)) {
+        if (!incomingPacket.tokenMatches(Storage.HASHED_TOKEN)) {
             return;
         }
 
@@ -253,7 +253,7 @@ public class Communicator {
 
     // PROXY -> BACKEND
     public void handleP2BPacket(CommunicationPackets.PATPacket incomingPacket) {
-        if (!incomingPacket.tokenMatches(Storage.TOKEN)) {
+        if (!incomingPacket.tokenMatches(Storage.HASHED_TOKEN)) {
             return;
         }
 

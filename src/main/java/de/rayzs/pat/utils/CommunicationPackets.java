@@ -31,7 +31,7 @@ public class CommunicationPackets {
             outputStream.flush();
 
             final byte[] encryptedBytes = xor(arrayOutputStream.toByteArray(), isInitialPacket
-                    ? Storage.TOKEN
+                    ? Storage.HASHED_TOKEN
                     : id.toString()
             );
 
