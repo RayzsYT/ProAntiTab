@@ -76,11 +76,17 @@ public class VelocityPluginMessageClient implements PluginMessageClient {
 
     @Subscribe
     public void onQueryReceive(PluginMessageEvent event) {
-        if (event.getIdentifier() != IDENTIFIER) {
+        if (!IDENTIFIER.equals(event.getIdentifier())) {
             return;
         }
 
-        final ServerConnection server = (ServerConnection) event.getSource();
+        // This is a private proxy/backend channel. Mark it handled before inspecting
+        // the source so player-originated messages are never forwarded downstream.
+        event.setResult(PluginMessageEvent.ForwardResult.handled());
+
+        if (!(event.getSource() instanceof ServerConnection server)) {
+            return;
+        }
         final String serverName = server.getServerInfo().getName();
         final UUID clientId = Communicator.get().getClientId(serverName);
 
