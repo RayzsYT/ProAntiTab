@@ -80,7 +80,12 @@ public class BungeePluginMessageClient implements PluginMessageClient, Listener 
             return;
         }
 
-        final Server server = (Server) event.getSender();
+        // Private channel: never forward matching traffic between a player and backend.
+        event.setCancelled(true);
+
+        if (!(event.getSender() instanceof Server server)) {
+            return;
+        }
         final String serverName = server.getInfo().getName();
         final UUID clientId = Communicator.get().getClientId(serverName);
 
