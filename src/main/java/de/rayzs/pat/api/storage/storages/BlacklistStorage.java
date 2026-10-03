@@ -11,6 +11,16 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     private List<String> commands = new ArrayList<>();
     private HashSet<String> hiddenCommands = new HashSet<>();
 
+    // Precomputed O(1) membership caches derived from hiddenCommands. Rebuilt via
+    // rebuildLookups() (atomic swap of fresh sets) so a concurrent reader never sees an
+    // empty/partial set. transient: caches, not serialized, always rebuilt on load().
+    // volatile: publish the new set to all threads on the hot path.
+    private transient volatile Set<String> rawLookup = new HashSet<>(), firstArgLookup = new HashSet<>();
+    private transient volatile boolean lookupCaseSensitive = false;
+    // Dirty flag: defer the O(n) rebuild off add()/remove()/clear() so bulk imports stay
+    // O(1) per mutation instead of O(n); the rebuild runs lazily on the next isListed().
+    private transient volatile boolean lookupDirty = true;
+
     public BlacklistStorage(String navigatePath) {
         super(Storage.Files.STORAGE, navigatePath);
     }
@@ -23,18 +33,48 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
             return false;
         }
 
+        // Rebuild lazily if the case-sensitivity toggle changed at runtime or the cache is dirty.
+        if (lookupDirty || caseSensitive != lookupCaseSensitive) {
+            rebuildLookups();
+            lookupDirty = false;
+        }
+
         final boolean isNegated = Storage.Blacklist.BlockTypeFetcher.isNegated(command);
         final boolean takeFirstArgument = !isNegated == turn;
 
+        String query = command;
         if (takeFirstArgument) {
-            command = StringUtils.getFirstArg(command);
+            query = StringUtils.getFirstArg(query);
         }
-
         if (!caseSensitive) {
-            command = command.toLowerCase();
+            query = query.toLowerCase(Locale.ROOT);
         }
 
-        return hiddenCommands.contains(command);
+        // takeFirstArgument path -> firstArgLookup (entries first-arg-normalized), else rawLookup.
+        return (takeFirstArgument ? firstArgLookup : rawLookup).contains(query);
+    }
+
+    /** Precomputes O(1) membership sets (raw + first-arg-normalized) from hiddenCommands. */
+    private void rebuildLookups() {
+        synchronized (this) { // guard hiddenCommands iteration vs concurrent add/remove/clear
+            final boolean cs = Storage.ConfigSections.Settings.BASE_COMMAND_CASE_SENSITIVE.ENABLED;
+            // Build into local sets first, then assign atomically: never publish a half-built set.
+            Set<String> newRawLookup = new HashSet<>();
+            Set<String> newFirstArgLookup = new HashSet<>();
+            for (String hc : hiddenCommands) {
+                if (hc == null)
+                    continue;
+
+                newRawLookup.add(cs ? hc : hc.toLowerCase(Locale.ROOT));
+                String firstArg = StringUtils.getFirstArg(hc);
+                if (firstArg == null)
+                    continue;
+                newFirstArgLookup.add(cs ? firstArg : firstArg.toLowerCase(Locale.ROOT));
+            }
+            this.rawLookup = newRawLookup;
+            this.firstArgLookup = newFirstArgLookup;
+            this.lookupCaseSensitive = cs;
+        }
     }
 
     public void setList(List<String> commands) {
@@ -42,22 +82,38 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
     }
 
     public BlacklistStorage add(String command) {
-        if (!commands.contains(command)) {
-            commands.add(command);
-            hiddenCommands.add(command);
+        synchronized (this) {
+            if (!commands.contains(command)) {
+                commands.add(command);
+                hiddenCommands.add(command);
+                markDirty();
+            }
         }
 
         return this;
     }
 
     public BlacklistStorage remove(String command) {
-        commands.remove(command);
-        hiddenCommands.remove(command);
+        synchronized (this) {
+            commands.remove(command);
+            hiddenCommands.remove(command);
+            markDirty();
+        }
+
         return this;
     }
 
+    private void markDirty() {
+        this.lookupDirty = true;
+    }
+
     public BlacklistStorage clear() {
-        commands.clear();
+        synchronized (this) {
+            commands.clear();
+            hiddenCommands.clear(); // lookup source must be cleared too, or cache stays stale
+            markDirty();
+        }
+
         return this;
     }
 
@@ -128,6 +184,7 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
 
         if (!Storage.ConfigSections.Settings.TURN_BLACKLIST_TO_WHITELIST.ENABLED) {
             hiddenCommands = new HashSet<>(tmpCommands);
+            rebuildLookups();
             return;
         }
 
@@ -151,5 +208,6 @@ public class BlacklistStorage extends StorageTemplate implements Serializable {
         }
 
         hiddenCommands = new HashSet<>(finalisedCommands);
+        rebuildLookups();
     }
 }
