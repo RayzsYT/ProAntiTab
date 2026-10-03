@@ -53,15 +53,15 @@ public class BukkitPacketAnalyzer {
         channel.pipeline().writeAndFlush(object);
     }
 
-    public static boolean inject(Player player) {
+    public static InjectionState inject(Player player) {
         if (Storage.ConfigSections.Settings.HANDLE_THROUGH_PROXY.ENABLED && !Storage.ConfigSections.Settings.HIDE_PLUGIN_CHANNELS.ENABLED)
-            return true;
+            return InjectionState.SKIPPED;
 
         try {
             Channel channel = Reflection.getPlayerChannel(player);
 
-            if (channel == null) {
-                return false;
+            if (channel == null || !channel.pipeline().names().contains(PIPELINE_NAME)) {
+                return InjectionState.SKIPPED;
             }
 
             if (channel.pipeline().names().contains(BukkitPacketAnalyzer.HANDLER_NAME))
@@ -77,36 +77,36 @@ public class BukkitPacketAnalyzer {
             // changed the compilation and therefore the variables again.
 
             Reflection.toggleInjectionMethod();
-            final boolean success = inject(player);
+            final InjectionState state = inject(player);
 
-            if (!success) {
+            if (state == InjectionState.FAILED) {
                 Logger.warning("Both injection methods failed! Please report this back to me on my Discord! (https://www.rayzs.de/discord)");
             }
 
-            return success;
+            return state;
 
         } catch (NoSuchFieldException noSuchFieldException) {
 
             if (!Storage.ConfigSections.Settings.INJECTION_FAILED.ENABLED) {
-                return true;
+                return InjectionState.SUCCESS;
             }
 
             Logger.warning("Failed to inject into " + player.getName() + " and kicked the player as result, to avoid any security risks.");
             Logger.warning("You can read more about it here: https://www.rayzs.de/products/proantitab/pkafi");
             Logger.warning("Error details: " + noSuchFieldException.getMessage());
 
-            return false;
+            return InjectionState.FAILED;
 
         } catch (Exception exception) {
             if (!Storage.ConfigSections.Settings.INJECTION_FAILED.SUPPRESS_EXCEPTIONS) {
                 exception.printStackTrace();
             }
 
-            return false;
+            return InjectionState.FAILED;
 
         }
 
-        return true;
+        return InjectionState.SUCCESS;
     }
 
     public static void uninject(UUID uuid) {
@@ -131,6 +131,10 @@ public class BukkitPacketAnalyzer {
                     pipeline.remove(BukkitPacketAnalyzer.HANDLER_NAME);
             });
         }
+    }
+
+    public enum InjectionState {
+        SUCCESS, FAILED, SKIPPED
     }
 
     public static String getPlayerInput(Player player) {

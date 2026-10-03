@@ -52,10 +52,14 @@ public class BukkitPlayerListener implements Listener {
             }, 20);
         }
 
-        if (!BukkitPacketAnalyzer.inject(player)) {
+
+        final BukkitPacketAnalyzer.InjectionState injectionState = BukkitPacketAnalyzer.inject(player);
+
+
+        if (injectionState == BukkitPacketAnalyzer.InjectionState.FAILED) {
             PATScheduler.createScheduler(() -> {
                 if (player.isOnline()) {
-                    if (!BukkitPacketAnalyzer.inject(player)) {
+                    if (BukkitPacketAnalyzer.inject(player) == BukkitPacketAnalyzer.InjectionState.FAILED) {
 
                         if (Storage.ConfigSections.Settings.INJECTION_FAILED.ENABLED) {
 
@@ -73,6 +77,8 @@ public class BukkitPlayerListener implements Listener {
                     }
                 }
             }, 10);
+        } else if (injectionState == BukkitPacketAnalyzer.InjectionState.SKIPPED) {
+            Logger.warning("Skipped injection for " + player.getName() + ". Player seems to have a corrupted pipeline. (A fake player?)");
         }
 
         if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate", isOperator)) {
