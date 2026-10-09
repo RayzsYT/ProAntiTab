@@ -51,31 +51,6 @@ public class StringUtils {
         }
     }
 
-    public static String hashString(final String string, final String algorithm) {
-        try {
-            final MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
-            final byte[] hash = messageDigest.digest(string.getBytes(StandardCharsets.UTF_8));
-            final StringBuilder hexString = new StringBuilder(2 * hash.length);
-
-            for (final byte b : hash) {
-                final String hex = Integer.toHexString(0xff & b);
-
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-
-                hexString.append(hex);
-            }
-
-            return hexString.toString();
-
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-
-        return null;
-    }
-
     public static String replaceFirst(String input, String trigger, String replacement) {
 
         if (!input.contains(trigger)) {
