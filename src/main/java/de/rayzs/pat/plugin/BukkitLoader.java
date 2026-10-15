@@ -159,6 +159,11 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         });
 
 
+
+        // Register permissions for LuckPerms to recognise.
+
+        addPermission("bypass");
+
         for (final ProCommand command : CommandProcess.getCommands()) {
             addPermission(command.getName());
         }
