@@ -1,5 +1,6 @@
 package de.rayzs.pat.api.storage;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -61,7 +62,7 @@ public class Storage {
 
     public static final List<UUID> NOTIFY_PLAYERS = new ArrayList<>();
 
-    public static String TOKEN = "", HASHED_TOKEN = "", CENSORED_TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
+    public static String TOKEN = "", CENSORED_TOKEN = "", SERVER_NAME = null, CURRENT_VERSION = "", NEWER_VERSION = "";
     public static boolean OUTDATED = false, SEND_CONSOLE_NOTIFICATION = true;
     public static boolean USE_PLACEHOLDERAPI = false, USE_PAPIPROXYBRIDGE = false, USE_VIAVERSION = false;
 
@@ -89,6 +90,12 @@ public class Storage {
 
         Logger.warning("No known permissions plugin found, so some features may be disabled.");
         Logger.warning("Read more about it here: https://rayzs.de/products/proantitab/nkppf");
+    }
+
+    private static String generateToken() {
+        byte[] bytes = new byte[32];
+        new SecureRandom().nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     public static PermissionPlugin getPermissionPlugin() {
@@ -140,11 +147,9 @@ public class Storage {
 
         if (useDefaultToken) {
             TOKEN = Reflection.isProxyServer()
-                    ? (String) Files.TOKEN.getOrSet("token", UUID.randomUUID().toString())
+                    ? (String) Files.TOKEN.getOrSet("token", generateToken())
                     : ConfigSections.Settings.HANDLE_THROUGH_PROXY.TOKEN;
         }
-
-        HASHED_TOKEN = Objects.requireNonNullElse(StringUtils.hashString(TOKEN, "SHA-256"), TOKEN);
     }
 
     public static void loadConfig() {

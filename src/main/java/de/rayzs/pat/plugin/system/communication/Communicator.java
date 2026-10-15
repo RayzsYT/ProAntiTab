@@ -186,10 +186,6 @@ public class Communicator {
 
     // BACKEND -> PROXY
     public void handleB2PPacket(String serverName, CommunicationPackets.PATPacket incomingPacket) {
-        if (!incomingPacket.tokenMatches(Storage.HASHED_TOKEN)) {
-            return;
-        }
-
         if (incomingPacket instanceof CommunicationPackets.Backend2Proxy.KeepAlivePacket packet) {
             final Client client = clients.get(serverName);
             if (client == null) return;
@@ -253,10 +249,6 @@ public class Communicator {
 
     // PROXY -> BACKEND
     public void handleP2BPacket(CommunicationPackets.PATPacket incomingPacket) {
-        if (!incomingPacket.tokenMatches(Storage.HASHED_TOKEN)) {
-            return;
-        }
-
         if (incomingPacket instanceof CommunicationPackets.Proxy2Backend.KeepAliveResponsePacket packet) {
 
             lastReceivedKeepAliveResponse = System.currentTimeMillis();

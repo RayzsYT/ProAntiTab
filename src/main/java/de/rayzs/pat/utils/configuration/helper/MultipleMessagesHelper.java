@@ -8,6 +8,11 @@ public class MultipleMessagesHelper implements Serializable {
 
     private final List<String> lines;
 
+    /** Construct a message set from authenticated wire data. */
+    public MultipleMessagesHelper(List<String> lines) {
+        this.lines = new ArrayList<>(lines);
+    }
+
     public MultipleMessagesHelper(ConfigStorage config, String path, List<String> input) {
         final ConfigSectionHelper<ArrayList<String>> sectionHelper = new ConfigSectionHelper<>(config, path, input);
         final Object resultObj = sectionHelper.getOrSet();
