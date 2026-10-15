@@ -14,7 +14,7 @@ import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.hooks.GroupManagerHook;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.hooks.ViaVersionHook;
 import de.rayzs.pat.plugin.system.communication.Communicator;
@@ -69,6 +69,8 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         Configurator.createResourcedFile("files\\bukkit-storage.yml", "storage.yml", false);
         Configurator.createResourcedFile("files\\bukkit-placeholders.yml", "placeholders.yml", false);
         Configurator.createResourcedFile("files\\bukkit-custom-responses.yml", "custom-responses.yml", false);
+
+
     }
 
     @Override
@@ -95,7 +97,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
         if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null)
             new PlaceholderHook().register();
 
-        MessageTranslator.initialize();
+        MessageHelper.initialize();
 
         Communicator.initialize(new BukkitPluginMessageClient(), new BukkitCommunicationHandler());
         BackendUpdater.initialize();
@@ -190,7 +192,7 @@ public class BukkitLoader extends JavaPlugin implements PluginLoader {
     public void onDisable() {
         BackendUpdater.get().stop();
         BukkitPacketAnalyzer.uninjectAll();
-        MessageTranslator.closeAudiences();
+        MessageHelper.closeAudiences();
     }
 
     public void registerCommand(String... commands) {

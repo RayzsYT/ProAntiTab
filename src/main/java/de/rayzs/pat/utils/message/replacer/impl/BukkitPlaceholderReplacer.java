@@ -6,17 +6,12 @@ import org.bukkit.entity.Player;
 
 public class BukkitPlaceholderReplacer {
 
-    public String process(Object playerObj, String text) {
-        Player player = null;
+    public String process(CommandSender sender, String text) {
 
-        if(playerObj != null)
-            if(playerObj instanceof CommandSender) {
-                CommandSender sender = (CommandSender) playerObj;
-                player = sender.isPlayer() ? (Player) sender.getSenderObject() : null;
-            } else if(playerObj instanceof Player)
-                player = (Player) playerObj;
+        if (sender.isPlayer() && sender.getSenderObject() instanceof Player player) {
+            return PlaceholderAPI.setPlaceholders(player, text);
+        }
 
-
-        return PlaceholderAPI.setPlaceholders(player, text);
+        return PlaceholderAPI.setPlaceholders(null, text);
     }
 }

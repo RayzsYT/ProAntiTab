@@ -419,7 +419,7 @@ public class Storage {
             public static String findAndReplace(Player player, String request) {
                 String result = null, param = "";
 
-                if(USE_PLACEHOLDERAPI) {
+                if (USE_PLACEHOLDERAPI) {
                     for (PlaceholderStorage storage : PLACEHOLDERS) {
                         if (!storage.getRequest().startsWith(request)) continue;
 
@@ -435,7 +435,7 @@ public class Storage {
 
                     // Second time because of nested placeholders
                     if (result != null && result.contains("%")) {
-                        result = PlaceholderReplacer.replace(player, result);
+                        result = PlaceholderReplacer.applyPlaceholders(CommandSender.from(player), result);
                     }
                 }
 

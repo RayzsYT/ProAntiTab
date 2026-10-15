@@ -2,9 +2,10 @@ package de.rayzs.pat.utils.response.action.impl;
 
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.response.action.Action;
+import de.rayzs.pat.utils.sender.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -40,19 +41,19 @@ public class BungeeAction implements Action {
 
     @Override
     public void sendTitle(String action, UUID uuid, String command, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+        final CommandSender sender = CommandSender.from(uuid);
 
-        if (player == null) {
+        if (sender == null) {
             return;
         }
 
         title = ResponseHandler.replaceArgsVariables(title, command);
         subTitle = ResponseHandler.replaceArgsVariables(subTitle, command);
 
-        title = StringUtils.replace(title, "%player%", player.getName());
-        subTitle = StringUtils.replace(subTitle, "%player%", player.getName());
+        title = StringUtils.replace(title, "%player%", sender.getName());
+        subTitle = StringUtils.replace(subTitle, "%player%", sender.getName());
 
-        MessageTranslator.sendTitle(player, title, subTitle, fadeIn, stay, fadeOut);
+        MessageHelper.sendTitle(sender, title, subTitle, fadeIn, stay, fadeOut);
     }
 
     @Override
@@ -61,14 +62,14 @@ public class BungeeAction implements Action {
 
     @Override
     public void playSound(String action, UUID uuid, String soundName, float volume, float pitch) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+        final CommandSender sender = CommandSender.from(uuid);
 
-        if (player == null) {
+        if (sender == null) {
             return;
         }
 
         try {
-            MessageTranslator.playSound(player, soundName, volume, pitch);
+            MessageHelper.playSound(sender, soundName, volume, pitch);
         } catch (Exception exception) {
             Logger.warning("! Failed to read action: " + action);
             Logger.warning("  > The sound \"" + soundName + "\" could not be found!");
@@ -79,14 +80,14 @@ public class BungeeAction implements Action {
 
     @Override
     public void sendActionbar(String action, UUID uuid, String command, String message) {
-        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
+        final CommandSender sender = CommandSender.from(uuid);
 
-        if (player == null) {
+        if (sender == null) {
             return;
         }
 
-        message = StringUtils.replace(message, "%player%", player.getName());
+        message = StringUtils.replace(message, "%player%", sender.getName());
         message = ResponseHandler.replaceArgsVariables(message, command);
-        MessageTranslator.sendActionbar(player, message);
+        MessageHelper.sendActionbar(sender, message);
     }
 }

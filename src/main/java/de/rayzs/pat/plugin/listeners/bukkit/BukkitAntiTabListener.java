@@ -61,7 +61,7 @@ public class BukkitAntiTabListener implements Listener {
             return;
         }
 
-        if (Reflection.isCraftbukkit() && !Bukkit.getOnlinePlayers().contains(player)) {
+        if (Reflection.isBukkit() && !Bukkit.getOnlinePlayers().contains(player)) {
             event.getCommands().clear();
 
             PATScheduler.createScheduler(player::updateCommands, 10);

@@ -66,8 +66,12 @@ public class Reflection {
         return software == Software.FOLIA;
     }
 
-    public static boolean isCraftbukkit() {
+    public static boolean isBukkit() {
         return software == Software.BUKKIT;
+    }
+
+    public static boolean isSpigot() {
+        return software == Software.SPIGOT;
     }
 
     public static boolean isArclight() {
@@ -77,6 +81,11 @@ public class Reflection {
     public static boolean isProxyServer() {
         return software.isProxySoftware();
     }
+
+    public static boolean isBungeeServer() {
+        return software == Software.BUNGEECORD;
+    }
+
     public static boolean isVelocityServer() {
         return software == Software.VELOCITY;
     }

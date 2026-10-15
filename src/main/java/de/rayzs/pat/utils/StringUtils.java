@@ -1,9 +1,7 @@
 package de.rayzs.pat.utils;
 
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.*;
 
 public class StringUtils {
@@ -26,7 +24,7 @@ public class StringUtils {
             String line = lines.get(i);
 
             if (line.startsWith(centerVariable)) {
-                line = MessageTranslator.colorless(line.substring(centerVariable.length()));
+                line = MessageHelper.strip(line.substring(centerVariable.length()));
 
                 int size = line.length();
                 sizes.put(i, size);
@@ -126,28 +124,33 @@ public class StringUtils {
         return input;
     }
 
+    public static String replace(List<String> input, String... replacements) {
+        return replace(String.join("\n", input), replacements);
+    }
+
     public static String replace(String input, String... replacements) {
-        final HashMap<String, String> REPLACEMENTS = new HashMap<>();
+        if (replacements.length == 0) {
+            return input;
+        }
 
-        if (replacements.length > 0) {
-            String firstReplacementInput = null, secondReplacementInput = null;
 
-            for (String replacement : replacements) {
-                if (firstReplacementInput == null) firstReplacementInput = replacement;
-                else secondReplacementInput = replacement;
+        final HashMap<String, String> cache = new HashMap<>();
+        String firstReplacementInput = null, secondReplacementInput = null;
 
-                if (firstReplacementInput != null && secondReplacementInput != null) {
-                    REPLACEMENTS.put(firstReplacementInput, secondReplacementInput);
-                    firstReplacementInput = null;
-                    secondReplacementInput = null;
-                }
+        for (String replacement : replacements) {
+            if (firstReplacementInput == null) firstReplacementInput = replacement;
+            else secondReplacementInput = replacement;
+
+            if (firstReplacementInput != null && secondReplacementInput != null) {
+                cache.put(firstReplacementInput, secondReplacementInput);
+                firstReplacementInput = null;
+                secondReplacementInput = null;
             }
         }
 
         String text = input;
-        if (replacements.length > 0)
-            for (Map.Entry<String, String> entry : REPLACEMENTS.entrySet())
-                text = text.replace(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, String> entry : cache.entrySet())
+            text = text.replace(entry.getKey(), entry.getValue());
 
         return text;
     }

@@ -3,14 +3,12 @@ package de.rayzs.pat.plugin.listeners.velocity;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
 import com.velocitypowered.api.command.CommandSource;
-import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
-import de.rayzs.pat.plugin.system.subargument.argument.Arguments;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.api.storage.Storage;
@@ -38,7 +36,7 @@ public class VelocityBlockCommandListener {
         }
 
         final CommandSource commandSource = event.getCommandSource();
-        final Object consoleSender = Storage.getLoader().getConsoleSender();
+        final CommandSender consoleSender = CommandSender.from(Storage.getLoader().getConsoleSender());
 
         if(! (commandSource instanceof Player))
             return event;
@@ -64,8 +62,8 @@ public class VelocityBlockCommandListener {
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
 
-        final List<String> notificationMessage = MessageTranslator.replaceMessageList(
-                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
+        final String notificationMessage = StringUtils.replace(
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT.getLines(),
                 "%player%", player.getUsername(),
                 "%command%", displayCommand,
                 "%server%", serverName
@@ -75,19 +73,20 @@ public class VelocityBlockCommandListener {
 
             Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
-            MessageTranslator.send(
-                    player,
+            MessageHelper.sendMessage(
+                    sender,
                     Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
-                MessageTranslator.send(consoleSender, notificationMessage);
+                MessageHelper.sendMessage(consoleSender, notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
-                if (p != null) {
-                    MessageTranslator.send(p, notificationMessage);
+                final CommandSender otherSender = CommandSender.from(uuid);
+
+                if (otherSender != null) {
+                    MessageHelper.sendMessage(otherSender, notificationMessage);
                 }
             });
 
@@ -99,19 +98,20 @@ public class VelocityBlockCommandListener {
 
             Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
-            MessageTranslator.send(
-                    player,
+            MessageHelper.sendMessage(
+                    sender,
                     Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
 
             if (Storage.SEND_CONSOLE_NOTIFICATION)
-                MessageTranslator.send(consoleSender, notificationMessage);
+                MessageHelper.sendMessage(consoleSender, notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
-                if (p != null) {
-                    MessageTranslator.send(p, notificationMessage);
+                final CommandSender otherSender = CommandSender.from(uuid);
+
+                if (otherSender != null) {
+                    MessageHelper.sendMessage(otherSender, notificationMessage);
                 }
             });
 
@@ -151,7 +151,7 @@ public class VelocityBlockCommandListener {
             if (executeCommandEvent.isBlocked()) {
                 event.setResult(CommandExecuteEvent.CommandResult.denied());
 
-                MessageTranslator.send(
+                MessageHelper.sendMessage(
                         sender,
                         ResponseHandler.getResponse(
                                 sender.getUniqueId(),
@@ -168,12 +168,13 @@ public class VelocityBlockCommandListener {
                 Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
                 if (Storage.SEND_CONSOLE_NOTIFICATION)
-                    MessageTranslator.send(consoleSender, notificationMessage);
+                    MessageHelper.sendMessage(consoleSender, notificationMessage);
 
                 Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                    Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
-                    if (p != null) {
-                        MessageTranslator.send(p, notificationMessage);
+                    final CommandSender otherSender = CommandSender.from(uuid);
+
+                    if (otherSender != null) {
+                        MessageHelper.sendMessage(otherSender, notificationMessage);
                     }
                 });
             }
@@ -209,7 +210,7 @@ public class VelocityBlockCommandListener {
 
             event.setResult(CommandExecuteEvent.CommandResult.denied());
 
-            MessageTranslator.send(
+            MessageHelper.sendMessage(
                     sender,
                     ResponseHandler.getResponse(
                             sender.getUniqueId(),

@@ -1,8 +1,7 @@
 package de.rayzs.pat.utils.response.action;
 
 import de.rayzs.pat.utils.response.action.impl.BungeeAction;
-import de.rayzs.pat.utils.response.action.impl.ModernBukkitAction;
-import de.rayzs.pat.utils.response.action.impl.OldBukkitAction;
+import de.rayzs.pat.utils.response.action.impl.BukkitAction;
 import de.rayzs.pat.utils.response.action.impl.VelocityAction;
 import de.rayzs.pat.utils.Reflection;
 import java.util.UUID;
@@ -11,8 +10,7 @@ public class ActionHandler {
 
     private static final Action ACTION = Reflection.isProxyServer() ? Reflection.isVelocityServer()
             ? new VelocityAction() : new BungeeAction()
-            : Reflection.isAtMost(1, 16)
-            ? new OldBukkitAction() : new ModernBukkitAction();
+            : new BukkitAction();
 
     public static void initialize() {}
 

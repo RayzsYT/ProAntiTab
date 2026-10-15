@@ -6,7 +6,8 @@ import de.rayzs.pat.plugin.system.communication.cph.CommunicationPacketHandler;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.CommunicationPackets;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.StringUtils;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
 import de.rayzs.pat.utils.sender.CommandSender;
 import org.bukkit.Bukkit;
@@ -59,12 +60,13 @@ public class BukkitCommunicationHandler implements CommunicationPacketHandler {
             return;
         }
 
-        final List<String> notificationMessage = MessageTranslator.replaceMessageList(
-                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
+        final String notificationMessage = StringUtils.replace(
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT.getLines(),
                 "%player%", player.getName(),
                 "%command%", packet.command(),
                 "%server%", Storage.SERVER_NAME,
-                "%world%", player.getWorld().getName());
+                "%world%", player.getWorld().getName()
+        );
 
         Logger.info(notificationMessage);
     }

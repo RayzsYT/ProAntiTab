@@ -2,7 +2,8 @@ package de.rayzs.pat.plugin.system.serverbrand.impl;
 
 import de.rayzs.pat.plugin.system.serverbrand.ServerBrand;
 import de.rayzs.pat.utils.StringUtils;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import net.md_5.bungee.api.connection.*;
@@ -29,7 +30,7 @@ public class BungeeServerBrand implements ServerBrand {
         }
 
         if (Storage.ConfigSections.Settings.CUSTOM_BRAND.REPEAT_DELAY == -1) {
-            BRAND = MessageTranslator.replaceMessage(
+            BRAND = PlaceholderReplacer.applyPlaceholders(null,
                     Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(0)
             ) + "§r";
 
@@ -46,7 +47,7 @@ public class BungeeServerBrand implements ServerBrand {
             public void run() {
                 animationPos = (++animationPos) % length;
 
-                BRAND = MessageTranslator.replaceMessage(
+                BRAND = PlaceholderReplacer.applyPlaceholders(null,
                         Storage.ConfigSections.Settings.CUSTOM_BRAND.BRANDS.getLines().get(animationPos)
                 ) + "§r";
 

@@ -1,0 +1,19 @@
+{
+  "id": "proantitab",
+  "name": "ProAntiTab",
+  "version": "2.5.1",
+  "description": "Hides more than just your plugins.",
+  "url": "https://www.rayzs.de/products/proantitab/page",
+  "authors": ["Rayzs_YT"],
+  "main":"de.rayzs.pat.plugin.VelocityLoader",
+  "dependencies": [
+    {
+      "id":"luckperms",
+      "optional":true
+    },
+    {
+      "id":"papiproxybridge",
+      "optional":true
+    }
+  ]
+}

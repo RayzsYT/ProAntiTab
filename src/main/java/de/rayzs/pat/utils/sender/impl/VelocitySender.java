@@ -4,7 +4,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.VelocityLoader;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
 
 import java.util.Optional;
@@ -105,7 +105,22 @@ public class VelocitySender extends CommandSenderAbstract {
 
     @Override
     public void sendMessage(String message) {
-        MessageTranslator.send(sender, message);
+        MessageHelper.sendMessage(this, message);
+    }
+
+    @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        MessageHelper.sendTitle(this, title, subtitle, fadeIn, stay, fadeOut);
+    }
+
+    @Override
+    public void sendActionbar(String message) {
+        MessageHelper.sendActionbar(this, message);
+    }
+
+    @Override
+    public void execute(String command) {
+        VelocityLoader.getServer().getCommandManager().executeAsync(sender, command);
     }
 
     @Override

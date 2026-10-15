@@ -8,7 +8,8 @@ import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.plugin.packetanalyzer.proxy.VelocityPacketAnalyzer;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.*;
@@ -55,7 +56,7 @@ public class VelocityConnectionListener {
         if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate", false)) {
             server.getScheduler().buildTask(loader, () -> {
                 if (player.isActive())
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getUsername());
+                    MessageHelper.sendMessage(sender, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getUsername());
             }).delay(1, TimeUnit.SECONDS).schedule();
         }
     }
@@ -63,6 +64,7 @@ public class VelocityConnectionListener {
     @Subscribe
     public void onServerSwitch(ServerConnectedEvent event) {
         final Player player = event.getPlayer();
+        final CommandSender sender = CommandSender.from(player);
 
         if (!VelocityPacketAnalyzer.isInjected(player)) {
 
@@ -71,14 +73,14 @@ public class VelocityConnectionListener {
                     if (!VelocityPacketAnalyzer.inject(player)) {
                         if (Storage.ConfigSections.Settings.INJECTION_FAILED.ENABLED) {
 
-                            Logger.info(MessageTranslator.replaceMessage(
-                                    player,
+                            Logger.info(PlaceholderReplacer.applyPlaceholders(
+                                    sender,
                                     Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE
                             ));
 
                             player.disconnect(Component.text(
-                                    MessageTranslator.replaceMessage(
-                                            player,
+                                    PlaceholderReplacer.applyPlaceholders(
+                                            sender,
                                             Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE
                                     )
                             ));
@@ -93,7 +95,6 @@ public class VelocityConnectionListener {
             final ServerInfo serverInfo = event.getServer().getServerInfo();
             if (serverInfo != null) Storage.tempCachePlayerToServer(player.getUniqueId(), serverInfo.getName());
 
-            CommandSender sender = CommandSender.from(player);
             Objects.requireNonNull(sender);
             PermissionUtil.reloadPermissions(sender);
         }

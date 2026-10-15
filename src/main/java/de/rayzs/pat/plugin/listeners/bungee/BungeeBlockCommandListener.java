@@ -6,7 +6,7 @@ import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.response.ResponseHandler;
 import de.rayzs.pat.utils.sender.CommandSender;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -50,8 +50,8 @@ public class BungeeBlockCommandListener implements Listener {
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
 
-        final List<String> notificationMessage = MessageTranslator.replaceMessageList(
-                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
+        final String notificationMessage = StringUtils.replace(
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT.getLines(),
                 "%player%", player.getName(),
                 "%command%", displayCommand,
                 "%server%", serverName);
@@ -60,8 +60,8 @@ public class BungeeBlockCommandListener implements Listener {
 
             Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
-            MessageTranslator.send(
-                    player,
+            MessageHelper.sendMessage(
+                    sender,
                     Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
@@ -70,9 +70,10 @@ public class BungeeBlockCommandListener implements Listener {
                 Logger.info(notificationMessage);
 
             Storage.NOTIFY_PLAYERS.stream().forEach(uuid -> {
-                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
-                if (p != null) {
-                    MessageTranslator.send(p, notificationMessage);
+                final CommandSender otherSender = CommandSender.from(uuid);
+
+                if (otherSender != null) {
+                    MessageHelper.sendMessage(otherSender, notificationMessage);
                 }
             });
 
@@ -84,8 +85,8 @@ public class BungeeBlockCommandListener implements Listener {
 
             Communicator.Proxy2Backend.sendNotification(player.getUniqueId(), serverName, displayCommand);
 
-            MessageTranslator.send(
-                    player,
+            MessageHelper.sendMessage(
+                    sender,
                     Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
@@ -94,9 +95,10 @@ public class BungeeBlockCommandListener implements Listener {
                 Logger.info(notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
-                if (p != null) {
-                    MessageTranslator.send(p, notificationMessage);
+                final CommandSender otherSender = CommandSender.from(uuid);
+
+                if (otherSender != null) {
+                    MessageHelper.sendMessage(otherSender, notificationMessage);
                 }
             });
 
@@ -133,7 +135,7 @@ public class BungeeBlockCommandListener implements Listener {
             if (executeCommandEvent.isBlocked()) {
                 event.setCancelled(true);
 
-                MessageTranslator.send(
+                MessageHelper.sendMessage(
                         sender,
                         ResponseHandler.getResponse(
                                 sender.getUniqueId(),
@@ -153,10 +155,10 @@ public class BungeeBlockCommandListener implements Listener {
                     Logger.info(notificationMessage);
 
                 Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                    Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
+                    final CommandSender otherSender = CommandSender.from(uuid);
 
-                    if (p != null) {
-                        MessageTranslator.send(p, notificationMessage);
+                    if (otherSender != null) {
+                        MessageHelper.sendMessage(otherSender, notificationMessage);
                     }
                 });
 
@@ -176,7 +178,7 @@ public class BungeeBlockCommandListener implements Listener {
         if (executeCommandEvent.isBlocked()) {
             event.setCancelled(true);
 
-            MessageTranslator.send(
+            MessageHelper.sendMessage(
                     sender,
                     ResponseHandler.getResponse(
                             sender.getUniqueId(),

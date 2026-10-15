@@ -7,7 +7,8 @@ import de.rayzs.pat.plugin.packetanalyzer.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.plugin.system.communication.BackendUpdater;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.permission.PermissionPlugin;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.api.storage.Storage;
@@ -63,12 +64,12 @@ public class BukkitPlayerListener implements Listener {
 
                         if (Storage.ConfigSections.Settings.INJECTION_FAILED.ENABLED) {
 
-                            Logger.info(MessageTranslator.replaceMessage(
+                            Logger.info(PlaceholderReplacer.applyPlaceholders(
                                     sender,
                                     Storage.ConfigSections.Settings.INJECTION_FAILED.CONSOLE_MESSAGE
                             ));
 
-                            player.kickPlayer(MessageTranslator.replaceMessage(
+                            player.kickPlayer(PlaceholderReplacer.applyPlaceholders(
                                     sender,
                                     Storage.ConfigSections.Settings.INJECTION_FAILED.KICK_MESSAGE
                             ));
@@ -84,7 +85,7 @@ public class BukkitPlayerListener implements Listener {
         if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate", isOperator)) {
             PATScheduler.createScheduler(() -> {
                 if (player.isOnline()) {
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
+                    MessageHelper.sendMessage(sender, Storage.ConfigSections.Settings.UPDATE.OUTDATED.getLines());
                 }
             }, 20);
         }

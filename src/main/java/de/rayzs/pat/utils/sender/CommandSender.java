@@ -51,5 +51,9 @@ public interface CommandSender {
     String getName();
     String getServerName();
 
+    void execute(String command);
+    void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut);
+    void sendActionbar(String message);
+
     void sendMessage(String message);
 }

@@ -1,13 +1,20 @@
 package de.rayzs.pat.utils.sender.impl;
 
 import de.rayzs.pat.api.storage.Storage;
+import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 import java.util.UUID;
 
 public class BukkitSender extends CommandSenderAbstract {
@@ -100,23 +107,95 @@ public class BukkitSender extends CommandSenderAbstract {
 
     @Override
     public void sendMessage(String message) {
-        if (MessageTranslator.isSupported()) {
-            MessageTranslator.send(sender, message);
+        if (MessageHelper.isSupported()) {
+            MessageHelper.sendMessage(this, message);
             return;
         }
 
         // To prevent color-code overlapping on Bukkit consoles.
-        if (Reflection.isCraftbukkit() && isConsole()) {
+        if (Reflection.isBukkit() && isConsole()) {
             String[] lines = message.split("\n");
 
             for (String line : lines) {
-                sender.sendMessage(MessageTranslator.replaceMessage(sender, line));
+                sender.sendMessage(PlaceholderReplacer.applyPlaceholders(this, line));
             }
 
             return;
         }
 
-        sender.sendMessage(MessageTranslator.replaceMessage(sender, message));
+        sender.sendMessage(PlaceholderReplacer.applyPlaceholders(this, message));
+    }
+
+    @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        if (isPlayer()) return;
+
+        if (MessageHelper.isSupported()) {
+            MessageHelper.sendTitle(this, title, subtitle, 10, 10, 10);
+            return;
+        }
+
+        if (Reflection.isAfter(1, 11, 0)) {
+            ((Player) sender).sendTitle(
+                    PlaceholderReplacer.applyPlaceholders(this, title),
+                    PlaceholderReplacer.applyPlaceholders(this, subtitle),
+                    fadeIn, stay, fadeOut
+            );
+        } else {
+            ((Player) sender).sendTitle(
+                    PlaceholderReplacer.applyPlaceholders(this, title),
+                    PlaceholderReplacer.applyPlaceholders(this, subtitle)
+            );
+        }
+    }
+
+    @Override
+    public void execute(String command) {
+        Bukkit.dispatchCommand(sender, command);
+    }
+
+    @Override
+    public void sendActionbar(String message) {
+        if (MessageHelper.isSupported()) {
+            MessageHelper.sendActionbar(this, message);
+            return;
+        }
+
+
+        if (Reflection.isAtMost(1, 16)) {
+            try {
+                final Object entityPlayer = sender.getClass().getMethod("getHandle").invoke(sender);
+                final Constructor<?> constructor = (Objects.<Class<?>> requireNonNull(Class.forName("net.minecraft.server." + Reflection.getVersionPackageName() + ".PacketPlayOutChat")))
+                        .getConstructor(
+                                Class.forName("net.minecraft.server." + Reflection.getVersionPackageName() + ".IChatBaseComponent"),
+                                byte.class
+                        );
+
+                final Object iChatBaseComponent = (Objects.requireNonNull(Class.forName("net.minecraft.server." + Reflection.getVersionPackageName() + ".IChatBaseComponent")))
+                        .getDeclaredClasses()[0]
+                        .getMethod("a", String.class)
+                        .invoke(null, "{\"text\":\"" + message + "\"}");
+
+                final Object actionbarPacket = constructor.newInstance(iChatBaseComponent, (byte) 2);
+                final Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
+
+                playerConnection.getClass().getMethod(
+                        "sendPacket",
+                        Class.forName("net.minecraft.server." + Reflection.getVersionPackageName() + ".Packet")
+                ).invoke(playerConnection, actionbarPacket);
+
+                return;
+
+
+            } catch (ClassNotFoundException
+                     | NoSuchMethodException
+                     | IllegalAccessException
+                     | InvocationTargetException
+                     | NoSuchFieldException
+                     | InstantiationException ignored) { }
+        }
+
+        Logger.warning("Actionbars are not supported in this server version!");
     }
 
     @Override

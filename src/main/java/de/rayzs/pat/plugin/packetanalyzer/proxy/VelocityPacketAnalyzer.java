@@ -27,7 +27,7 @@ import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.group.Group;
 import de.rayzs.pat.utils.group.GroupManager;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.node.ProxyCommandNodeHelper;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 import de.rayzs.pat.utils.sender.CommandSender;
@@ -310,7 +310,7 @@ public class VelocityPacketAnalyzer {
                 if (request.getCommand() != null) {
 
                     if (Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(request.getCommand())) {
-                        MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getUsername()));
+                        MessageHelper.sendMessage(CommandSender.from(VelocityLoader.getServer().getConsoleCommandSource()), Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getUsername()));
                         player.disconnect(LegacyComponentSerializer.legacyAmpersand().deserialize(Storage.ConfigSections.Settings.PATCH_EXPLOITS.KICK_MESSAGE.get()));
                     } else {
                         insertPlayerInput(player, request.getCommand());

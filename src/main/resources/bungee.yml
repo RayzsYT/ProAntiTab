@@ -7,3 +7,9 @@ version: 2.5.1
 main: de.rayzs.pat.plugin.BungeeLoader
 
 softDepends: [LuckPerms, PAPIProxyBridge]
+
+libraries:
+  - net.kyori:adventure-platform-bungeecord:4.4.1
+  - net.kyori:adventure-text-minimessage:5.2.0
+  - net.kyori:adventure-api:5.2.0
+  - net.kyori:adventure-text-serializer-legacy:5.2.0

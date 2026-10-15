@@ -7,6 +7,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.utils.ExpireCache;
 import de.rayzs.pat.utils.StringUtils;
 import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
+import de.rayzs.pat.utils.sender.CommandSender;
 import org.bukkit.event.*;
 import org.bukkit.Bukkit;
 import org.bukkit.profile.PlayerTextures;
@@ -105,7 +106,9 @@ public class PaperServerListPing implements Listener {
                 .replace("%online%", String.valueOf(online))
                 .replace("%max%", String.valueOf(max));
 
-        return replaced.contains("%") ? PlaceholderReplacer.replace(null, replaced) : replaced;
+        return replaced.contains("%")
+                ? PlaceholderReplacer.applyPlaceholders(CommandSender.from(Bukkit.getConsoleSender()), replaced)
+                : replaced;
     }
 
     private static class ProtocolHoverLine implements PlayerProfile {
@@ -218,7 +221,7 @@ public class PaperServerListPing implements Listener {
         }
 
         @Override
-        public org.bukkit.profile.@NotNull PlayerProfile clone() {
+        public PlayerProfile clone() {
             return null;
         }
 

@@ -12,39 +12,38 @@ import java.time.Duration;
 public class VelocityMessageTranslator implements Translator {
 
     @Override
-    public String translate(String text) {
-        return MiniMessage.miniMessage().serialize(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+    public String strip(String text) {
+        return miniMessage.stripTags(text);
     }
 
     @Override
-    public void send(Object target, String text) {
-        if (target instanceof CommandSource source) {
+    public void send(de.rayzs.pat.utils.sender.CommandSender sender, String text) {
+        if (sender.getSenderObject() instanceof CommandSource source) {
             source.sendMessage(toComponent(text));
         }
     }
 
     @Override
-    public void sendActionbar(Object target, String text) {
-        if (target instanceof CommandSource source) {
+    public void sendActionbar(de.rayzs.pat.utils.sender.CommandSender sender, String text) {
+        if (sender.getSenderObject() instanceof CommandSource source) {
             source.sendActionBar(toComponent(text));
         }
     }
 
     @Override
-    public void sendTitle(Object target, String titleStr, String subtitleStr, int fadeIn, int stay, int fadeOut) {
-        Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut));
-        Title title = Title.title(toComponent(titleStr), toComponent(subtitleStr), times);
+    public void sendTitle(de.rayzs.pat.utils.sender.CommandSender sender, String titleStr, String subtitleStr, int fadeIn, int stay, int fadeOut) {
+        final Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut));
+        final Title title = Title.title(toComponent(titleStr), toComponent(subtitleStr), times);
 
-        if (target instanceof CommandSource source) {
+        if (sender.getSenderObject() instanceof CommandSource source) {
             source.showTitle(title);
         }
     }
 
     @Override
-    public void playSound(Object target, String soundKey, float volume, float pitch) throws Exception {
-        if (target instanceof CommandSource source) {
-            Sound sound = Sound.sound(Key.key(soundKey), Sound.Source.MASTER, 1f, 1f);
-
+    public void playSound(de.rayzs.pat.utils.sender.CommandSender sender, String soundKey, float volume, float pitch) throws Exception {
+        if (sender.getSenderObject() instanceof CommandSource source) {
+            final Sound sound = Sound.sound(Key.key(soundKey), Sound.Source.MASTER, 1f, 1f);
             source.playSound(sound, Sound.Emitter.self());
         }
     }

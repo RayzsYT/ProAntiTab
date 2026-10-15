@@ -23,7 +23,7 @@ import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.Reflection;
 import de.rayzs.pat.utils.StringUtils;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
 
 public class ModernPacketHandler implements BukkitPacketHandler {
@@ -48,8 +48,8 @@ public class ModernPacketHandler implements BukkitPacketHandler {
         if (!text.isBlank() && text.charAt(0) != '/') text = '/' + text;
 
         if (Storage.ConfigSections.Settings.PATCH_EXPLOITS.isMalicious(text)) {
-            MessageTranslator.send(
-                    Bukkit.getConsoleSender(),
+            MessageHelper.sendMessage(
+                    CommandSender.from(Bukkit.getConsoleSender()),
                     Storage.ConfigSections.Settings.PATCH_EXPLOITS.ALERT_MESSAGE.get().replace("%player%", player.getName())
             );
 

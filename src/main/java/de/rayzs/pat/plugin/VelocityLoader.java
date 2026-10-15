@@ -18,7 +18,7 @@ import com.velocitypowered.api.scheduler.ScheduledTask;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
 import de.rayzs.pat.plugin.command.impl.VelocityCommand;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.utils.hooks.LuckPermsHook;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -40,16 +40,6 @@ import de.rayzs.pat.utils.sender.CommandSender;
 
 import java.util.*;
 
-@Plugin(name = "ProAntiTab",
-id = "proantitab",
-version = "2.5.1",
-authors = "Rayzs_YT",
-description = "Hides more than just your plugins.",
-url = "https://www.rayzs.de/products/proantitab/page",
-dependencies = {
-        @Dependency(id = "luckperms", optional = true),
-        @Dependency(id = "papiproxybridge", optional = true)
-})
 public class VelocityLoader implements PluginLoader {
 
     private static VelocityLoader instance;
@@ -91,7 +81,7 @@ public class VelocityLoader implements PluginLoader {
         VersionComparer.get().setCurrentVersion(Storage.CURRENT_VERSION);
 
         Storage.loadAll(true);
-        MessageTranslator.initialize();
+        MessageHelper.initialize();
         GroupManager.initialize();
 
         metricsFactory.make(this, 21638);

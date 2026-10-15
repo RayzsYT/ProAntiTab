@@ -1,13 +1,16 @@
 package de.rayzs.pat.plugin.logger.impl;
 
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.plugin.VelocityLoader;
 import de.rayzs.pat.plugin.logger.*;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
+import de.rayzs.pat.utils.sender.CommandSender;
 import org.slf4j.Logger;
 import java.util.*;
 
 public class VelocityLogger implements LoggerTemplate {
 
+    private final CommandSender console = CommandSender.from(VelocityLoader.getServer().getConsoleCommandSource());
     private final Logger logger = VelocityLoader.getPluginLogger();
 
     @Override
@@ -37,10 +40,10 @@ public class VelocityLogger implements LoggerTemplate {
 
     @Override
     public void send(LoggerPriority priority, String message) {
-        message = MessageTranslator.replaceMessage(message);
+        message = PlaceholderReplacer.applyPlaceholders(null, message);
 
         if (message.contains("§")) {
-            MessageTranslator.send(VelocityLoader.getServer().getConsoleCommandSource(), message);
+            MessageHelper.sendMessage(console, message);
             return;
         }
 

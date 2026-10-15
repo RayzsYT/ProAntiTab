@@ -15,7 +15,7 @@
 #   %pat_general_prefix%                    = Get the PAT prefix set in the config.yml.
 #   %pat_general_user%                      = Get the name of the user who receives this message.
 #   %pat_general_version_current%           = Get current version name of PAT.
-#   %pat_general_version_newest%            = Get newest version name of PAT.
+#   %pat_general_version_newest%            = Get the newest version name of PAT.
 
 # Placeholders of some of the messages in the config.yml:
 #   %pat_message_unknowncommand%            = Get the "unknown command"-message from the config.yml of PAT. [cancel-blocked-command]

@@ -1,10 +1,10 @@
 package de.rayzs.pat.utils.message.translators;
 
-import de.rayzs.pat.utils.Reflection;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.audience.Audience;
 import de.rayzs.pat.plugin.BukkitLoader;
 import net.kyori.adventure.title.Title;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import de.rayzs.pat.utils.message.*;
@@ -21,76 +21,67 @@ public class BukkitMessageTranslator implements Translator {
     }
 
     @Override
-    public String translate(String text) {
-        return miniMessage.serialize(miniMessage.deserialize(MessageTranslator.translateLegacy(text)));
+    public String strip(String text) {
+        return ChatColor.stripColor(miniMessage.stripTags(text));
     }
 
     @Override
-    public void send(Object target, String text) {
-        if (Reflection.getSoftware().isPaperBased()) {
-            if (target instanceof Player player) {
-                player.sendMessage(toComponent(text));
-            } else if (target instanceof CommandSender sender) {
-                sender.sendMessage(toComponent(text));
-            }
+    public void send(de.rayzs.pat.utils.sender.CommandSender sender, String text) {
+        final Audience audience = sender.getSenderObject() instanceof Player player
+                ? audiences.player(player)
+                : sender.getSenderObject() instanceof CommandSender commandSender
+                ? audiences.sender(commandSender)
+                : null;
 
+
+        if (audience == null) {
             return;
         }
-
-
-        Audience audience = target instanceof Player
-                ? audiences.player((Player) target)
-                : audiences.sender((CommandSender) target);
 
         audience.sendMessage(toComponent(text));
     }
 
     @Override
-    public void sendActionbar(Object target, String text) {
+    public void sendActionbar(de.rayzs.pat.utils.sender.CommandSender sender, String text) {
+        final Audience audience = sender.getSenderObject() instanceof Player player
+                ? audiences.player(player)
+                : sender.getSenderObject() instanceof CommandSender commandSender
+                ? audiences.sender(commandSender)
+                : null;
 
-        if (Reflection.getSoftware().isPaperBased()) {
-            if (target instanceof Player player) {
-                player.sendActionBar(toComponent(text));
-            } else if (target instanceof CommandSender sender) {
-                sender.sendActionBar(toComponent(text));
-            }
 
+        if (audience == null) {
             return;
         }
 
-
-        Audience audience = target instanceof Player
-                ? audiences.player((Player) target)
-                : audiences.sender((CommandSender) target);
 
         audience.sendActionBar(toComponent(text));
     }
 
     @Override
-    public void sendTitle(Object target, String titleStr, String subtitleStr, int fadeIn, int stay, int fadeOut) {
-        Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut));
-        Title title = Title.title(toComponent(titleStr), toComponent(subtitleStr), times);
+    public void sendTitle(de.rayzs.pat.utils.sender.CommandSender sender, String titleStr, String subtitleStr, int fadeIn, int stay, int fadeOut) {
 
-        if (Reflection.getSoftware().isPaperBased()) {
-            if (target instanceof Player player) {
-                player.showTitle(title);
-            } else if (target instanceof CommandSender sender) {
-                sender.showTitle(title);
-            }
+        final Audience audience = sender.getSenderObject() instanceof Player player
+                ? audiences.player(player)
+                : sender.getSenderObject() instanceof CommandSender commandSender
+                ? audiences.sender(commandSender)
+                : null;
 
+
+        if (audience == null) {
             return;
         }
 
-        Audience audience = target instanceof Player
-                ? audiences.player((Player) target)
-                : audiences.sender((CommandSender) target);
+
+        final Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut));
+        final Title title = Title.title(toComponent(titleStr), toComponent(subtitleStr), times);
 
         audience.showTitle(title);
     }
 
     @Override
-    public void playSound(Object target, String soundKey, float volume, float pitch) throws Exception {
-        if (target instanceof Player player) {
+    public void playSound(de.rayzs.pat.utils.sender.CommandSender sender, String soundKey, float volume, float pitch) throws Exception {
+        if (sender.getSenderObject() instanceof Player player) {
             Sound sound = Sound.valueOf(soundKey);
             player.playSound(player.getLocation(), sound, volume, pitch);
         }

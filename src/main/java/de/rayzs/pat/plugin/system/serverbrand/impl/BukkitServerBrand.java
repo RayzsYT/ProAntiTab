@@ -2,12 +2,15 @@ package de.rayzs.pat.plugin.system.serverbrand.impl;
 
 import de.rayzs.pat.plugin.packetanalyzer.bukkit.BukkitPacketAnalyzer;
 import de.rayzs.pat.plugin.system.serverbrand.ServerBrand;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.BukkitLoader;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.scheduler.PATScheduler;
 import de.rayzs.pat.utils.scheduler.PATSchedulerTask;
+import de.rayzs.pat.utils.sender.CommandSender;
 import io.netty.channel.Channel;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import de.rayzs.pat.utils.*;
@@ -137,7 +140,7 @@ public class BukkitServerBrand implements ServerBrand {
 
         if (!Reflection.isWeird()) {
             final PacketUtils.BrandManipulate serverBrand = new PacketUtils.BrandManipulate(
-                    MessageTranslator.replaceMessage(player, customBrand)
+                    PlaceholderReplacer.applyPlaceholders(CommandSender.from(player), customBrand)
             );
 
             player.sendPluginMessage(
@@ -158,7 +161,7 @@ public class BukkitServerBrand implements ServerBrand {
 
             final Object brandPayloadObj = brandPayloadClass
                     .getDeclaredConstructor(String.class)
-                    .newInstance(MessageTranslator.replaceMessage(player, customBrand));
+                    .newInstance(PlaceholderReplacer.applyPlaceholders(CommandSender.from(player), customBrand));
 
             final Object customPacketPayloadPacket = clientBoundCustomPacketPayloadPacketClass
                     .getDeclaredConstructor(customPacketPayloadPacketClass)

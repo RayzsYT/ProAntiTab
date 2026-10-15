@@ -6,7 +6,7 @@ import de.rayzs.pat.api.event.events.ServerPlayersChangeEvent;
 import de.rayzs.pat.plugin.packetanalyzer.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.permission.PermissionUtil;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.sender.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -39,7 +39,7 @@ public class BungeePlayerConnectionListener implements Listener {
         if (Storage.OUTDATED && PermissionUtil.hasPermission(sender, "joinupdate", false)) {
             ProxyServer.getInstance().getScheduler().schedule(BungeeLoader.getPlugin(), () -> {
                 if (player.isConnected()) {
-                    MessageTranslator.send(player, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getName());
+                    MessageHelper.sendMessage(sender, Storage.ConfigSections.Settings.UPDATE.OUTDATED, "%player%", player.getName());
                 }
             }, 1, TimeUnit.SECONDS);
         }

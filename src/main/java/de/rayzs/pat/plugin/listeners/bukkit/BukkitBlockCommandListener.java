@@ -20,7 +20,7 @@ import de.rayzs.pat.api.event.events.ExecuteCommandEvent;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.permission.PermissionUtil;
 
 public class BukkitBlockCommandListener implements Listener {
@@ -44,7 +44,7 @@ public class BukkitBlockCommandListener implements Listener {
             return;
 
         event.setCancelled(true);
-        MessageTranslator.send(player, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE, "%command%", command, "%world%", world.getName());
+        MessageHelper.sendMessage(sender, Storage.ConfigSections.Settings.CUSTOM_UNKNOWN_COMMAND.MESSAGE, "%command%", command, "%world%", world.getName());
     }
 
     @EventHandler (priority = EventPriority.LOWEST)
@@ -89,17 +89,16 @@ public class BukkitBlockCommandListener implements Listener {
         }
 
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
-
-        List<String> notificationMessage = MessageTranslator.replaceMessageList(
-                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
+        final String notificationMessage = StringUtils.replace(
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT.getLines(),
                 "%player%", player.getName(),
                 "%command%", displayCommand,
                 "%world%", worldName);
 
         if (Storage.ConfigSections.Settings.CUSTOM_PLUGIN.isCommand(command)) {
 
-            MessageTranslator.send(
-                    player,
+            MessageHelper.sendMessage(
+                    sender,
                     Storage.ConfigSections.Settings.CUSTOM_PLUGIN.MESSAGE,
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
@@ -108,9 +107,9 @@ public class BukkitBlockCommandListener implements Listener {
                 Logger.info(notificationMessage);
 
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
-                Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
-                if (p != null) {
-                    MessageTranslator.send(p, notificationMessage);
+                final CommandSender otherSender = CommandSender.from(uuid);
+                if (otherSender != null) {
+                    MessageHelper.sendMessage(otherSender, notificationMessage);
                 }
             });
 
@@ -120,8 +119,8 @@ public class BukkitBlockCommandListener implements Listener {
 
         if (Storage.ConfigSections.Settings.CUSTOM_VERSION.isCommand(command)) {
 
-            MessageTranslator.send(
-                    player,
+            MessageHelper.sendMessage(
+                    sender,
                     Storage.ConfigSections.Settings.CUSTOM_VERSION.MESSAGE,
                     "%command%", StringUtils.getFirstArg(displayCommand)
             );
@@ -132,7 +131,7 @@ public class BukkitBlockCommandListener implements Listener {
             Storage.NOTIFY_PLAYERS.forEach(uuid -> {
                 Object p = Storage.getLoader().getPlayerObjByUUID(uuid);
                 if (p != null) {
-                    MessageTranslator.send(p, notificationMessage);
+                    MessageHelper.sendMessage(sender, notificationMessage);
                 }
             });
 
@@ -169,7 +168,8 @@ public class BukkitBlockCommandListener implements Listener {
             if (executeCommandEvent.isBlocked()) {
                 event.setCancelled(true);
 
-                MessageTranslator.send(
+
+                MessageHelper.sendMessage(
                         sender,
                         ResponseHandler.getResponse(
                                 sender.getUniqueId(),
@@ -187,8 +187,8 @@ public class BukkitBlockCommandListener implements Listener {
                     Logger.info(notificationMessage);
 
                 Storage.NOTIFY_PLAYERS.stream().filter(uuid -> Bukkit.getServer().getPlayer(uuid) != null).forEach(uuid -> {
-                    Player target = Bukkit.getServer().getPlayer(uuid);
-                    MessageTranslator.send(target, notificationMessage);
+                    final CommandSender otherSender = CommandSender.from(uuid);
+                    MessageHelper.sendMessage(otherSender, notificationMessage);
                 });
 
             }
@@ -207,7 +207,7 @@ public class BukkitBlockCommandListener implements Listener {
         if (executeCommandEvent.isBlocked()) {
             event.setCancelled(true);
 
-            MessageTranslator.send(
+            MessageHelper.sendMessage(
                     sender,
                     ResponseHandler.getResponse(
                             sender.getUniqueId(),

@@ -11,7 +11,7 @@ import de.rayzs.pat.plugin.packetanalyzer.proxy.BungeePacketAnalyzer;
 import de.rayzs.pat.plugin.system.subargument.SubArgument;
 import de.rayzs.pat.utils.configuration.Configurator;
 import de.rayzs.pat.utils.configuration.updater.ConfigUpdater;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
 import de.rayzs.pat.utils.hooks.LuckPermsHook;
 import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.utils.response.ResponseHandler;
@@ -64,7 +64,7 @@ public class BungeeLoader extends Plugin implements PluginLoader {
 
         Storage.loadAll(true);
 
-        MessageTranslator.initialize();
+        MessageHelper.initialize();
         GroupManager.initialize();
 
         bStats.initialize(this);
@@ -121,7 +121,7 @@ public class BungeeLoader extends Plugin implements PluginLoader {
     @Override
     public void onDisable() {
         BungeePacketAnalyzer.uninjectAll();
-        MessageTranslator.closeAudiences();
+        MessageHelper.closeAudiences();
     }
 
     @Override

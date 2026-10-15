@@ -1,10 +1,14 @@
 package de.rayzs.pat.utils.sender.impl;
 
 import de.rayzs.pat.api.storage.Storage;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.plugin.logger.Logger;
+import de.rayzs.pat.utils.message.MessageHelper;
+import de.rayzs.pat.utils.message.replacer.PlaceholderReplacer;
 import de.rayzs.pat.utils.sender.CommandSenderAbstract;
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.UUID;
@@ -102,12 +106,56 @@ public class BungeeSender extends CommandSenderAbstract {
 
     @Override
     public void sendMessage(String message) {
-        if (MessageTranslator.isSupported()) {
-            MessageTranslator.send(sender, message);
+        if (MessageHelper.isSupported()) {
+            MessageHelper.sendMessage(this, message);
             return;
         }
 
-        sender.sendMessage(MessageTranslator.replaceMessage(sender, message));
+        sender.sendMessage(PlaceholderReplacer.applyPlaceholders(this, message));
+    }
+
+    @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        if (MessageHelper.isSupported()) {
+            MessageHelper.sendTitle(this, title, subtitle, fadeIn, stay, fadeOut);
+            return;
+        }
+
+        if (! (sender instanceof ProxiedPlayer player)) {
+            return;
+        }
+
+        ProxyServer.getInstance().createTitle()
+                .title(TextComponent.fromLegacyText(PlaceholderReplacer.applyPlaceholders(this, title)))
+                .subTitle(TextComponent.fromLegacyText(PlaceholderReplacer.applyPlaceholders(this, subtitle)))
+                .fadeIn(fadeIn)
+                .stay(stay)
+                .fadeOut(fadeOut)
+                .send(player);
+    }
+
+    @Override
+    public void sendActionbar(String message) {
+        if (MessageHelper.isSupported()) {
+            MessageHelper.sendActionbar(this, message);
+            return;
+        }
+
+        if (! (sender instanceof ProxiedPlayer player)) {
+            return;
+        }
+
+        player.sendMessage(
+                ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(
+                        PlaceholderReplacer.applyPlaceholders(this, message)
+                )
+        );
+    }
+
+    @Override
+    public void execute(String command) {
+        ProxyServer.getInstance().getPluginManager().dispatchCommand(sender, command);
     }
 
     @Override

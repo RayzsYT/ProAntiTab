@@ -15,33 +15,10 @@ public class ProxyPlaceholderReplacer {
         placeholderAPI.setRequestTimeout(1500);
     }
 
-    public boolean process(Object playerObj, String text, Consumer<String> consumer) {
-        UUID uuid = null;
+    public boolean process(CommandSender sender, String text, Consumer<String> consumer) {
+        if (sender == null || !sender.isPlayer()) return false;
 
-        if(playerObj != null)
-
-            if (playerObj instanceof CommandSender) {
-
-                uuid = ((CommandSender) playerObj).getUniqueId();
-
-            } else if (Reflection.isVelocityServer()) {
-
-                if (playerObj instanceof com.velocitypowered.api.proxy.Player)
-                    uuid = ((com.velocitypowered.api.proxy.Player) playerObj).getUniqueId();
-
-            } else if (Reflection.isProxyServer()) {
-
-                if (playerObj instanceof net.md_5.bungee.api.connection.ProxiedPlayer)
-                    uuid = ((net.md_5.bungee.api.connection.ProxiedPlayer) playerObj).getUniqueId();
-
-            } else {
-                if (playerObj instanceof org.bukkit.entity.Player)
-                    uuid = ((org.bukkit.entity.Player) playerObj).getUniqueId();
-            }
-
-        if(uuid == null) return false;
-        placeholderAPI.formatPlaceholders(text, uuid).thenAccept(consumer);
-
+        placeholderAPI.formatPlaceholders(text, sender.getUniqueId()).thenAccept(consumer);
         return true;
     }
 }

@@ -4,7 +4,8 @@ import de.rayzs.pat.plugin.system.communication.Communicator;
 import de.rayzs.pat.api.storage.Storage;
 import de.rayzs.pat.plugin.logger.Logger;
 import de.rayzs.pat.utils.StringUtils;
-import de.rayzs.pat.utils.message.MessageTranslator;
+import de.rayzs.pat.utils.message.MessageHelper;
+import de.rayzs.pat.utils.sender.CommandSender;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,8 +26,8 @@ public interface Action {
         final String displayCommand = StringUtils.replaceTriggers(command, "", "\\", "<", ">", "&");
 
 
-        final List<String> notificationMessage = MessageTranslator.replaceMessageList(
-                Storage.ConfigSections.Messages.NOTIFICATION.ALERT,
+        final String notificationMessage = StringUtils.replace(
+                Storage.ConfigSections.Messages.NOTIFICATION.ALERT.getLines(),
                 "%player%", playerName,
                 "%command%", displayCommand,
                 "%server%", serverName);
@@ -36,10 +37,11 @@ public interface Action {
         if (Storage.SEND_CONSOLE_NOTIFICATION)
             Logger.info(notificationMessage);
 
-        Storage.NOTIFY_PLAYERS.stream().forEach(tmpUUID -> {
-            Object p = Storage.getLoader().getPlayerObjByUUID(tmpUUID);
-            if (p != null) {
-                MessageTranslator.send(p, notificationMessage);
+        Storage.NOTIFY_PLAYERS.stream().forEach(otherUuid -> {
+            final CommandSender otherSender = CommandSender.from(otherUuid);
+
+            if (otherSender != null) {
+                MessageHelper.sendMessage(otherSender, notificationMessage);
             }
         });
     }
